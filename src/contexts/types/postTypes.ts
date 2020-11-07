@@ -332,6 +332,7 @@ export interface PostsContextType {
     password: string,
     votingWeight: number,
     voteAmount: number,
+    setToastMessage: (message: string) => void,
   ) => Promise<any>;
   // submit post
   submitPost: (

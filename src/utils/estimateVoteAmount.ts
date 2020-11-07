@@ -1,14 +1,14 @@
 import {ExtendedAccount} from 'dblurt';
 import {
   getAccount,
-  SteemGlobalProps,
+  BlockchainGlobalProps,
   parseToken,
   vestsToRshares,
 } from '~/providers/blurt/dblurtApi';
 
 export const estimateVoteAmount = (
   account: ExtendedAccount,
-  globalProps: SteemGlobalProps,
+  globalProps: BlockchainGlobalProps,
   voteWeight = 1,
 ) => {
   const {fundRecentClaims, fundRewardBalance, base, quote} = globalProps;

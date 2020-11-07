@@ -63,7 +63,7 @@ const LandingStack = () => {
         }}
       />
       <Stack.Screen
-        name="Intro"
+        name="Welcome"
         component={WelcomeScreen}
         options={{
           headerTransparent: true,

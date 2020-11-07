@@ -26,6 +26,7 @@ import {
 
 import {NUM_FETCH_POSTS, TRUNCATE_BODY_LENGTH} from '~/constants/blockchain';
 
+// TODO: check if the voting in release mode is working on steem blockchain
 // blurt
 const MAINNET_OFFICIAL = [
   'https://api.blurt.blog',
@@ -39,37 +40,11 @@ const client = new Client(MAINNET_OFFICIAL, {
   chainId: 'cd8d90f29ae273abec3eaa7731e25934c63eb654d55080caff2ebb7f5df6381f',
 });
 
-// hive
-// const MAINNET_OFFICIAL = [
-//   'https://rpc.esteem.app',
-//   'https://anyx.io',
-//   'https://api.pharesim.me',
-//   'https://api.hive.blog',
-//   'https://api.hivekings.com',
-// ];
-// const client = new Client(MAINNET_OFFICIAL, {
-//   timeout: 5000,
-// });
-
-//const MAINNET_OFFICIAL = 'https://api.blurtworld.com';
-
-//const client = new dsteem.Client(MAINNET_OFFICIAL, {timeout: 5000});
-//const client = new dsteem.Client("https://api.steemit.com", {timeout: 5000});
 console.log('Blurt Client', client);
 
 // patch
 const diff_match_patch = require('diff-match-patch');
 const dmp = new diff_match_patch();
-
-// markdown parser
-// import {Remarkable} from 'remarkable';
-// import {linkify} from 'remarkable/linkify';
-// //const md = new Remarkable({ html: true, breaks: true, linify: true });
-// const md = new Remarkable('full', {
-//   html: true,
-//   breaks: true,
-// });
-// md.use(linkify);
 
 import {
   parsePosts,
@@ -78,7 +53,6 @@ import {
   parseComment,
 } from '~/utils/postParser';
 import {estimateVoteAmount} from '~/utils/estimateVoteAmount';
-import {sign} from 'crypto';
 
 global.Buffer = global.Buffer || require('buffer').Buffer;
 
@@ -232,9 +206,7 @@ export const createAccount = async (
 export const verifyPassoword = async (username: string, password: string) => {
   // @test master password for playdreams
   // posting key in wif: etainclub
-  password = Config.ETAINCLUB_POSTING_WIF;
-
-  console.log('[verifyPassword] password', password);
+  //  password = Config.ETAINCLUB_POSTING_WIF;
 
   // get accounts by username
   let account = null;
@@ -363,7 +335,7 @@ export const vestsToRshares = (
   return (power * vestingShares) / 1e4;
 };
 
-export interface SteemGlobalProps {
+export interface BlockchainGlobalProps {
   steemPerMVests: number;
   base: number;
   quote: number;
@@ -373,8 +345,11 @@ export interface SteemGlobalProps {
   dynamicProps: {};
 }
 
+//// global props
+let globalProps: BlockchainGlobalProps = null;
+
 // fetch global propperties
-export const fetchGlobalProps = async (): Promise<SteemGlobalProps> => {
+export const fetchGlobalProps = async (): Promise<BlockchainGlobalProps> => {
   let globalDynamic;
   let feedHistory;
   let rewardFund;
@@ -401,7 +376,9 @@ export const fetchGlobalProps = async (): Promise<SteemGlobalProps> => {
   //  const quote = parseToken(feedHistory.current_median_history.quote);
   const fundRecentClaims = rewardFund.recent_claims;
   const fundRewardBalance = parseToken(rewardFund.reward_balance);
-  return {
+
+  // update the globalProps
+  globalProps = {
     steemPerMVests,
     base: 1,
     quote: 1,
@@ -410,6 +387,8 @@ export const fetchGlobalProps = async (): Promise<SteemGlobalProps> => {
     sbdPrintRate,
     dynamicProps: globalDynamic,
   };
+
+  return globalProps;
 };
 
 ////// user related
@@ -434,7 +413,7 @@ export const getAccount = async (
 
 export const getVoteAmount = async (
   username: string,
-  globalProps: SteemGlobalProps,
+  globalProps: BlockchainGlobalProps,
 ): Promise<string> => {
   try {
     console.log('[fetchUserData] fetching...');
@@ -446,7 +425,8 @@ export const getVoteAmount = async (
     if (!account[0]) return;
 
     // get global properties
-    //    const globalProps = await fetchGlobalProps();
+    if (!globalProps) globalProps = await fetchGlobalProps();
+
     // estimate vote amount
     const voteAmount = estimateVoteAmount(account[0], globalProps);
     return voteAmount;
@@ -495,7 +475,7 @@ export const fetchUserProfile = async (username: string) => {
           JSON.parse(get(account, 'posting_json_metadata'));
         console.log('[fetchUserProfile]', account.about);
       } catch (error) {
-        console.log('failed to fetch profile', error);
+        console.log('failed to fetch profile metadata', error);
         account.about = {};
       }
     }
@@ -509,9 +489,11 @@ export const fetchUserProfile = async (username: string) => {
     // build profile data
     const profileData: ProfileData = {
       profile: {
-        metadata: account.about.profile,
+        metadata: account.about.profile
+          ? account.about.profile
+          : {name: '', cover_image: '', profile_image: ''},
         name: username,
-        voteAmount: '0',
+        voteAmount: estimateVoteAmount(account, globalProps),
         votePower: String(voting_power),
         balance: balance.split(' ')[0],
         power: String(power),
@@ -530,101 +512,6 @@ export const fetchUserProfile = async (username: string) => {
     return null;
   }
 };
-
-/*
-export const fetchUserProfile = async (username: string) => {
-  try {
-    console.log('[fetchUserData] fetching...');
-    // fetch account
-    const accounts = await client.database.getAccounts([username]);
-    const account = accounts[0];
-    console.log('[fetchUserData] fetched. account0', account);
-    // check sanity
-    if (!account[0]) {
-      return null;
-    }
-
-    // compute reputation
-    const reputation = calculateReputation(
-      parseInt(account[0].reputation as string),
-    );
-    // get followers count
-    const followCount = await getFollows(username);
-    console.log('[fetchUserData] follow count', followCount);
-    // get global properties
-    const globalProps = await fetchGlobalProps();
-    // estimate vote amount
-    const voteAmount = estimateVoteAmount(account, globalProps);
-    // steem power
-    const steem_power = await vestToSteem(
-      account.vesting_shares as string,
-      globalProps.dynamicProps.total_vesting_shares,
-      globalProps.dynamicProps.total_vesting_fund_steem,
-    );
-    // received steem power
-    const received_steem_power = await vestToSteem(
-      get(account, 'received_vesting_shares' as string),
-      get(globalProps.dynamicProps, 'total_vesting_shares'),
-      get(
-        globalProps.dynamicProps,
-        'total_vesting_fund_steem',
-        globalProps.dynamicProps.total_vesting_fund_steem,
-      ),
-    );
-    // delegated steem power
-    const delegated_steem_power = await vestToSteem(
-      get(account, 'delegated_vesting_shares' as string),
-      get(globalProps.dynamicProps, 'total_vesting_shares'),
-      get(
-        globalProps.dynamicProps,
-        'total_vesting_fund_steem',
-        globalProps.dynamicProps.total_vesting_fund_steem,
-      ),
-    );
-
-    // parse meta data
-    if (
-      has(account, 'posting_json_metadata') ||
-      has(account, 'json_metadata')
-    ) {
-      try {
-        account.about =
-          JSON.parse(get(account, 'json_metadata')) ||
-          JSON.parse(get(account, 'posting_json_metadata'));
-        console.log('[dSteem|fetchUserData]', account.about);
-      } catch (error) {
-        console.log('failed to fetch profile', error);
-        account.about = {};
-      }
-    }
-    account.avatar = getAvatar(get(account, 'about'));
-    account.nickname = getName(get(account, 'about'));
-
-    // build user data
-    const _account: ProfileData = {
-      profile: {
-        post_count: account[0].post_count,
-        metadata: {
-          profile: account.about,
-        },
-        name: username,
-        reputation: reputation,
-        stats: {
-          sp: parseFloat(steem_power),
-          following: followCount.following_count,
-          followers: followCount.followers_count,
-        },
-      },
-      voteAmount,
-    };
-
-    return _account;
-  } catch (error) {
-    console.log('failed to fetch user data');
-    return Promise.reject(error);
-  }
-};
-*/
 
 // get state using url
 export const getState = async (url: string): Promise<any> => {
@@ -870,7 +757,7 @@ export const broadcastPost = async (
   password: string,
 ) => {
   // @test: etainclub
-  password = Config.ETAINCLUB_POSTING_WIF;
+  //  password = Config.ETAINCLUB_POSTING_WIF;
 
   // verify the key
   const verified = await verifyPassoword(postingData.author, password);
@@ -970,7 +857,7 @@ export const broadcastPostUpdate = async (
 export const signImage = async (photo, username, password) => {
   // verify the user and password
   // @test
-  password = Config.ETAINCLUB_POSTING_WIF;
+  //  password = Config.ETAINCLUB_POSTING_WIF;
   const verified = await verifyPassoword(username, password);
   if (!verified) {
     console.log('[signImage] failed to verify password');
@@ -1081,30 +968,18 @@ export const submitVote = async (
   };
 
   // @test: etainclub
-  password = Config.ETAINCLUB_POSTING_WIF;
+  //  password = Config.ETAINCLUB_POSTING_WIF;
 
-  console.log('[submitVote] voe', vote);
-  console.log('[submitVote] password', password);
+  console.log('[submitVote] vote', vote);
 
   // verify the key
   const verified = await verifyPassoword(voter, password);
   if (!verified) {
-    //    return {success: false, message: 'the password is invalid'};
+    return {success: false, message: 'the password is invalid'};
   }
 
   // get privake key from password
   const privateKey = PrivateKey.from(password);
-
-  console.log('[submitVote] privateKey', privateKey);
-
-  // @test get back the private wif key
-  console.log('[submitVote] privateKey wif', privateKey.toString());
-
-  //  const blurtPrivateKey = BlurtPrivateKey.fromWif(password);
-
-  //  console.log('[submitVote] blurtPrivateKey wif', blurtPrivateKey.toString());
-
-  //  debugger;
 
   if (privateKey) {
     return new Promise((resolve, reject) => {
@@ -1372,6 +1247,101 @@ export const fetchPostsSummary = async (
   } catch (error) {
     console.log('failed to get posts summaries', error);
     return null;
+  }
+};
+*/
+
+/*
+export const fetchUserProfile = async (username: string) => {
+  try {
+    console.log('[fetchUserData] fetching...');
+    // fetch account
+    const accounts = await client.database.getAccounts([username]);
+    const account = accounts[0];
+    console.log('[fetchUserData] fetched. account0', account);
+    // check sanity
+    if (!account[0]) {
+      return null;
+    }
+
+    // compute reputation
+    const reputation = calculateReputation(
+      parseInt(account[0].reputation as string),
+    );
+    // get followers count
+    const followCount = await getFollows(username);
+    console.log('[fetchUserData] follow count', followCount);
+    // get global properties
+    const globalProps = await fetchGlobalProps();
+    // estimate vote amount
+    const voteAmount = estimateVoteAmount(account, globalProps);
+    // steem power
+    const steem_power = await vestToSteem(
+      account.vesting_shares as string,
+      globalProps.dynamicProps.total_vesting_shares,
+      globalProps.dynamicProps.total_vesting_fund_steem,
+    );
+    // received steem power
+    const received_steem_power = await vestToSteem(
+      get(account, 'received_vesting_shares' as string),
+      get(globalProps.dynamicProps, 'total_vesting_shares'),
+      get(
+        globalProps.dynamicProps,
+        'total_vesting_fund_steem',
+        globalProps.dynamicProps.total_vesting_fund_steem,
+      ),
+    );
+    // delegated steem power
+    const delegated_steem_power = await vestToSteem(
+      get(account, 'delegated_vesting_shares' as string),
+      get(globalProps.dynamicProps, 'total_vesting_shares'),
+      get(
+        globalProps.dynamicProps,
+        'total_vesting_fund_steem',
+        globalProps.dynamicProps.total_vesting_fund_steem,
+      ),
+    );
+
+    // parse meta data
+    if (
+      has(account, 'posting_json_metadata') ||
+      has(account, 'json_metadata')
+    ) {
+      try {
+        account.about =
+          JSON.parse(get(account, 'json_metadata')) ||
+          JSON.parse(get(account, 'posting_json_metadata'));
+        console.log('[dSteem|fetchUserData]', account.about);
+      } catch (error) {
+        console.log('failed to fetch profile', error);
+        account.about = {};
+      }
+    }
+    account.avatar = getAvatar(get(account, 'about'));
+    account.nickname = getName(get(account, 'about'));
+
+    // build user data
+    const _account: ProfileData = {
+      profile: {
+        post_count: account[0].post_count,
+        metadata: {
+          profile: account.about,
+        },
+        name: username,
+        reputation: reputation,
+        stats: {
+          sp: parseFloat(steem_power),
+          following: followCount.following_count,
+          followers: followCount.followers_count,
+        },
+      },
+      voteAmount,
+    };
+
+    return _account;
+  } catch (error) {
+    console.log('failed to fetch user data');
+    return Promise.reject(error);
   }
 };
 */

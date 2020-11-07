@@ -1,10 +1,17 @@
 import React, {useState, useContext, useEffect, useCallback} from 'react';
 import {View} from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
+import {get, has} from 'lodash';
 import {ProfileScreen} from '../screen/Profile';
 import {AuthContext, UserContext, UIContext, PostsContext} from '~/contexts';
 import {PostsTypes, PostData, ProfileData} from '~/contexts/types';
 import {getVoteAmount} from '~/providers/blurt/dblurtApi';
+import {
+  Images,
+  argonTheme,
+  BLURT_IMAGE_SERVER,
+  STEEM_IMAGE_SERVER,
+} from '~/constants';
 
 const Profile = ({navigation}): JSX.Element => {
   // contexts
@@ -13,9 +20,11 @@ const Profile = ({navigation}): JSX.Element => {
   const {uiState, setAuthorParam} = useContext(UIContext);
   const {postsState, fetchPosts, clearPosts} = useContext(PostsContext);
   // states
-  const [authorData, setAuthorData] = useState<ProfileData>(null);
+  const [profileData, setProfileData] = useState<ProfileData>(null);
+  const [profileFetched, setProfileFetched] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [authorPosts, setAuthorPosts] = useState<PostData[]>(null);
+  const [blogs, setBlogs] = useState(null);
   const [postsFetching, setPostsFetching] = useState(true);
 
   console.log('[ProfileContainer] navigation', navigation);
@@ -23,53 +32,44 @@ const Profile = ({navigation}): JSX.Element => {
   //// fetch user state
   useEffect(() => {
     if (authState.loggedIn) {
+      setProfileFetched(false);
       _getUserProfileData(authState.currentCredentials.username);
     }
   }, []);
+  //// TODO: fetch user's bookmark and favorites
 
-  // set posts to re-render when fetching finished
-  useEffect(() => {
-    if (postsState.fetched) {
-      console.log('[Profile|useEffect] fetched event, postsState', postsState);
-      // set author posts to the state, which will re-render screen
-      setAuthorPosts(postsState[postsState.postsType].posts);
+  // TODO: generalize this for Steem chain
+  const IMAGE_SERVER = BLURT_IMAGE_SERVER;
+
+  const _getUserProfileData = async (author: string) => {
+    // fetch user profile data
+    const _profileData = await getUserProfileData(author);
+    console.log('[_getUserProfileData] profile data', _profileData);
+    // set profile data
+    setProfileData(_profileData);
+    // build summaries of blogs
+    if (_profileData) {
+      // extract summary data from blogs
+      const summaries = _profileData.blogRefs.map((blogRef) => {
+        // get content
+        const blog = get(_profileData.blogs, blogRef, {});
+        // get avatar
+        const avatar = `${IMAGE_SERVER}/u/${author}/avatar`;
+        return {
+          author,
+          avatar,
+          title: blog.title,
+          createdAt: blog.created,
+          postRef: {
+            author: author,
+            permlink: blogRef.split('/')[1],
+          },
+        };
+      });
+      console.log('[_getAuthorProfile] blog summarys', summaries);
+      setBlogs(summaries);
+      setProfileFetched(true);
     }
-  }, [postsState.fetched]);
-
-  // update loaded flag after fetching author data
-  useEffect(() => {
-    console.log(
-      '[ProfileContainter|authorData changed] authorData',
-      authorData,
-    );
-    // now set loaded flag
-    if (authorData) {
-      setLoaded(true);
-      // fetch author posts
-      _fetchPosts(false);
-    }
-  }, [authorData]);
-
-  const _getUserProfileData = async (username: string) => {
-    const profileData = await getUserProfileData(username);
-    setAuthorData(profileData);
-  };
-
-  const _fetchPosts = async (appending: boolean) => {
-    console.log('fetching posts, postsState', postsState);
-    console.log('fetching posts, selectedAuthor', uiState.selectedAuthor);
-
-    // set fetching flag
-    setPostsFetching(true);
-    fetchPosts(
-      PostsTypes.AUTHOR,
-      postsState.tagIndex,
-      postsState.filterIndex,
-      authState.currentCredentials.username,
-      appending,
-      authState.currentCredentials.username,
-    );
-    console.log('postsState', postsState);
   };
 
   const _clearPosts = async () => {
@@ -78,11 +78,10 @@ const Profile = ({navigation}): JSX.Element => {
   };
 
   return (
-    loaded && (
+    profileData && (
       <ProfileScreen
-        authorData={authorData}
-        authorPosts={authorPosts}
-        fetchPosts={_fetchPosts}
+        profileData={profileData}
+        blogs={blogs}
         clearPosts={_clearPosts}
       />
     )

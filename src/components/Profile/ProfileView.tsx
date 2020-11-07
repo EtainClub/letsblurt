@@ -199,7 +199,7 @@ const ProfileView: React.FC<Props> = ({
                 marginBottom: 4,
                 fontFamily: 'open-sans-bold',
               }}>
-              {profile.power}
+              {getNumberStat(parseInt(profile.power))}
             </Text>
             <Text
               style={{fontFamily: 'open-sans-regular'}}
@@ -216,7 +216,7 @@ const ProfileView: React.FC<Props> = ({
                 marginBottom: 4,
                 fontFamily: 'open-sans-bold',
               }}>
-              ${profile.voteAmount}
+              {profile.voteAmount} BLT
             </Text>
             <Text
               style={{fontFamily: 'open-sans-regular'}}

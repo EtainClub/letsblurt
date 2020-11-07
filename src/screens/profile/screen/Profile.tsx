@@ -19,7 +19,7 @@ import {Images, argonTheme, BLURT_IMAGE_SERVER} from '~/constants';
 import {HeaderHeight} from '~/constants/utils';
 import {getNumberStat} from '~/utils/stats';
 import {Feed} from '~/screens';
-import {PostsFeed, PostsList, ProfileContainer} from '~/components';
+import {PostsListView, ProfileContainer} from '~/components';
 import {PostsTypes, PostData, ProfileData} from '~/contexts/types';
 
 const {width, height} = Dimensions.get('screen');
@@ -28,16 +28,13 @@ const thumbMeasure = (width - 48 - 32) / 3;
 const initialLayout = {width: Dimensions.get('window').width};
 
 interface Props {
-  authorData: ProfileData;
-  authorPosts: PostData[];
-  fetchPosts: (appending: boolean) => void;
+  profileData: ProfileData;
+  blogs: any[];
   clearPosts: () => void;
 }
 const ProfileScreen = (props: Props): JSX.Element => {
   console.log('[ProfileSceeen] props', props);
   const intl = useIntl();
-  const {profile, voteAmount, power} = props.authorData;
-  console.log('[ProfileSceeen] profile', profile);
 
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
@@ -46,9 +43,10 @@ const ProfileScreen = (props: Props): JSX.Element => {
     {key: 'favorites', title: 'Favorites'},
   ]);
 
-  const BlogList = () => <PostsList posts={props.authorPosts} isUser />;
+  const BlogList = () =>
+    props.blogs && <PostsListView posts={props.blogs} isUser />;
 
-  const BookmarkList = () => <PostsList posts={props.authorPosts} isUser />;
+  const BookmarkList = () => <PostsListView posts={props.blogs} isUser />;
 
   const FavoriteList = () => (
     <View style={{flex: 1}}>
@@ -69,7 +67,7 @@ const ProfileScreen = (props: Props): JSX.Element => {
         source={Images.ProfileBackground}
         style={styles.profileContainer}
         imageStyle={styles.profileBackground}>
-        <ProfileContainer profileData={props.authorData} isUser={true} />
+        <ProfileContainer profileData={props.profileData} isUser={true} />
         <TabView
           navigationState={{index, routes}}
           renderScene={renderScene}

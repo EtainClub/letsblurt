@@ -64,6 +64,7 @@ const ActionBarContainer = (props: Props): JSX.Element => {
       authState.currentCredentials.password,
       votingWeight,
       parseFloat(userState.voteAmount),
+      setToastMessage,
     );
     console.log('[ActionBarContainer|_processVoting] results', results);
     setToastMessage(`Voted! block num ${results.block_num}`);

@@ -11,7 +11,7 @@ export const ResolveAuth = (props) => {
   console.log('[ResolveAuth] props', props);
   //// contexts
   const {authState, setAuthResolved, setCredentials} = useContext(AuthContext)!;
-  const {fetchSteemGlobalProps} = useContext(UserContext);
+  const {fetchBlockchainGlobalProps} = useContext(UserContext);
   const {postsState, fetchCommunities} = useContext(PostsContext);
   // state
   const [fetched, setFetched] = useState(false);
@@ -32,7 +32,7 @@ export const ResolveAuth = (props) => {
         postsState.communityList,
       );
       // get steem global props and get user's vote amount
-      fetchSteemGlobalProps(username);
+      fetchBlockchainGlobalProps(username);
       setAuthResolved(true);
       // TODO is this not necessary, why?
       navigate({name: 'Drawer'});
@@ -53,7 +53,7 @@ export const ResolveAuth = (props) => {
       setFetched(true);
     } else {
       // @todo no communiy list at first, handle this
-      navigate({name: 'Intro'});
+      navigate({name: 'Welcome'});
     }
   };
 

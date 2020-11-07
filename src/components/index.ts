@@ -6,7 +6,7 @@ import Drawer from './Drawer';
 import {Header} from './Header';
 import {DropdownModal} from './DropdownModal';
 import {PostsFeed} from './PostsFeed';
-import {PostsList} from './PostsList';
+import {PostsListView} from './PostsList';
 import {PostBody} from './PostBody';
 import {ProfileContainer} from './Profile';
 import {WalletStatsView} from './Wallet';
@@ -21,7 +21,7 @@ export {
   Tabs,
   DropdownModal,
   PostsFeed,
-  PostsList,
+  PostsListView,
   PostBody,
   ProfileContainer,
   WalletStatsView,

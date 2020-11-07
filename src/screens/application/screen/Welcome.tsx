@@ -8,8 +8,6 @@
  * @format
  */
 import Config from 'react-native-config';
-console.log('[Welecom] Config', Config);
-
 import React, {useContext} from 'react';
 import {
   ScrollView,
@@ -40,9 +38,21 @@ const WelcomeScreen = () => {
   const {uiState, setToastMessage} = useContext(UIContext);
 
   const WELCOME_MESSAGES = [
-    {text: intl.formatMessage({id: 'Welcome.msg1'}), color: '#03A9F4'},
-    {text: intl.formatMessage({id: 'Welcome.msg2'}), color: '#009788'},
-    {text: intl.formatMessage({id: 'Welcome.msg3'}), color: '#03A9F4'},
+    {
+      text: intl.formatMessage({id: 'Welcome.msg1'}),
+      color: 'white',
+      bcolor: '#F65058FF',
+    },
+    {
+      text: intl.formatMessage({id: 'Welcome.msg2'}),
+      color: 'black',
+      bcolor: '#FBDE44FF',
+    },
+    {
+      text: intl.formatMessage({id: 'Welcome.msg3'}),
+      color: 'white',
+      bcolor: '#28334AFF',
+    },
   ];
 
   const _onGetStarted = async () => {
@@ -66,8 +76,8 @@ const WelcomeScreen = () => {
       return (
         <Block
           key={message.text}
-          style={[styles.slide, {backgroundColor: message.color}]}>
-          <Text size={26} color="white" style={{margin: 10}}>
+          style={[styles.slide, {backgroundColor: message.bcolor}]}>
+          <Text size={26} color={message.color} style={{margin: 10}}>
             {message.text}
           </Text>
           {_renderLastSlide(index)}

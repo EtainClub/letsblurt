@@ -378,7 +378,7 @@ export const vestsToRshares = (
   return (power * vestingShares) / 1e4;
 };
 
-export interface SteemGlobalProps {
+export interface BlockchainGlobalProps {
   steemPerMVests: number;
   base: number;
   quote: number;
@@ -389,7 +389,7 @@ export interface SteemGlobalProps {
 }
 
 // fetch global propperties
-export const fetchGlobalProps = async (): Promise<SteemGlobalProps> => {
+export const fetchGlobalProps = async (): Promise<BlockchainGlobalProps> => {
   let globalDynamic;
   let feedHistory;
   let rewardFund;
@@ -449,7 +449,7 @@ export const getAccount = async (
 
 export const getVoteAmount = async (
   username: string,
-  globalProps: SteemGlobalProps,
+  globalProps: BlockchainGlobalProps,
 ): Promise<string> => {
   try {
     console.log('[fetchUserData] fetching...');
@@ -1097,8 +1097,7 @@ export const submitVote = async (
   // @test: etainclub
   password = Config.ETAINCLUB_POSTING_WIF;
 
-  console.log('[submitVote] voe', vote);
-  console.log('[submitVote] password', password);
+  console.log('[submitVote] vote', vote);
 
   // verify the key
   const verified = await verifyPassoword(voter, password);

@@ -1,5 +1,5 @@
 import {PostRef} from './postTypes';
-import {SteemGlobalProps} from '~/providers/blurt/dblurtApi';
+import {BlockchainGlobalProps} from '~/providers/blurt/dblurtApi';
 
 //// action types
 export enum UserActionTypes {
@@ -49,8 +49,7 @@ export interface WalletData {
 //// user state
 export interface UserState {
   profileData: ProfileData;
-  voteAmount: string;
-  globalProps: SteemGlobalProps;
+  globalProps: BlockchainGlobalProps;
   walletData: WalletData;
 }
 
@@ -93,7 +92,7 @@ interface SetVoteAmountAction {
 // set steem global props
 interface SetGlobalPropsAction {
   type: UserActionTypes.SET_GLOBAL_PROPS;
-  payload: SteemGlobalProps;
+  payload: BlockchainGlobalProps;
 }
 // set wallet data
 interface SetWalletDataAction {

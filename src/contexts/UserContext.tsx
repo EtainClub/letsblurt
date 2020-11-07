@@ -4,7 +4,7 @@ import {
   getAccount,
   fetchWalletData,
   fetchUserProfile,
-  SteemGlobalProps,
+  BlockchainGlobalProps,
   parseToken,
   vestsToRshares,
 } from '../providers/blurt/dblurtApi';
@@ -19,14 +19,22 @@ import {
   UserAction,
 } from './types';
 
-console.log('[userContext] set initial state');
 // initial state
 const initialState = {
   profileData: {
     profile: {
-      voteAmount: '0',
-      blurt: '0',
-      power: '0',
+      metadata: {},
+      name: '',
+      voteAmount: '',
+      votePower: '',
+      balance: '',
+      power: '',
+      sbd: '',
+      stats: {
+        post_count: 0,
+        following: 0,
+        followers: 0,
+      },
     },
     blogRefs: [],
     blogs: [],
@@ -85,9 +93,9 @@ const UserProvider = ({children}: Props) => {
   const testState = userState;
   //////// action creator
   //// set steem global props
-  const fetchSteemGlobalProps = async (username: string = null) => {
+  const fetchBlockchainGlobalProps = async (username: string = null) => {
     const globalProps = await fetchGlobalProps();
-    console.log('[fetchSteemGlobalProps', globalProps);
+    console.log('[fetchBlockchainGlobalProps', globalProps);
     // dispatch action
     dispatch({
       type: UserActionTypes.SET_GLOBAL_PROPS,
@@ -174,7 +182,7 @@ const UserProvider = ({children}: Props) => {
     <UserContext.Provider
       value={{
         userState,
-        fetchSteemGlobalProps,
+        fetchBlockchainGlobalProps,
         updateVoteAmount,
         getWalletData,
         getUserProfileData,
