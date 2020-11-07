@@ -1,0 +1,75 @@
+import * as Keychain from 'react-native-keychain';
+
+//// action types
+export enum AuthActionTypes {
+  RESOLVE_AUTH,
+  LOGIN,
+  LOGOUT,
+  SET_CREDENTIALS,
+  ADD,
+}
+
+// keychain credentials, username/password pair
+export type Credentials = {
+  username: string;
+  password: string;
+};
+
+// auth state
+export interface AuthState {
+  authResolved: boolean;
+  loggedIn: boolean;
+  currentCredentials: Credentials;
+  credentialsList: Credentials[];
+}
+
+// auth context type
+export interface AuthContextType {
+  // auth state
+  authState: AuthState;
+  //// action creators
+  ////
+  setAuthResolved: (resolved: boolean) => void;
+  // set credentials
+  setCredentials: (username: string) => void;
+  // login with token. @toto what to do?
+  //  tryLoginWithToken: (username: string) => void;
+  // process login
+  processLogin: (credentials: Credentials, addingAccount: boolean) => void;
+  // process logout
+  processLogout: () => void;
+  // change account
+  changeAccount: (account: string) => void;
+}
+
+interface ResolveAuthAction {
+  type: AuthActionTypes.RESOLVE_AUTH;
+  payload: boolean;
+}
+
+interface LoginAction {
+  type: AuthActionTypes.LOGIN;
+  payload: Credentials;
+}
+
+interface LogoutAction {
+  type: AuthActionTypes.LOGOUT;
+  payload: string;
+}
+
+interface SetCredentialsAction {
+  type: AuthActionTypes.SET_CREDENTIALS;
+  payload: Credentials;
+}
+
+interface AddAction {
+  type: AuthActionTypes.ADD;
+  payload: Credentials;
+}
+
+export type AuthAction =
+  | ResolveAuthAction
+  | LoginAction
+  | LogoutAction
+  | SetCredentialsAction
+  | AddAction;

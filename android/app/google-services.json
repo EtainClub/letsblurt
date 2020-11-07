@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "808143161985",
+    "firebase_url": "https://letsblurt-dbd72.firebaseio.com",
+    "project_id": "letsblurt-dbd72",
+    "storage_bucket": "letsblurt-dbd72.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:808143161985:android:8c90fee1f84190972c9b80",
+        "android_client_info": {
+          "package_name": "club.etain.letsblurt"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "808143161985-befno4amublmfk0u8rlli8b440qnsda4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgUpLuie_Q7lDgnxkJOqRDcWOM6vpN2MQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "808143161985-befno4amublmfk0u8rlli8b440qnsda4.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

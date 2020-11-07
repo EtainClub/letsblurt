@@ -1,0 +1,403 @@
+//// action types
+export enum PostsActionTypes {
+  UPVOTE,
+  UPVOTE_COMMENT,
+  SET_POSTS,
+  SET_FETCHED,
+  CLEAR_POSTS,
+  APPEND_POSTS,
+  SET_TAG_INDEX,
+  SET_TAG_LIST,
+  SET_FILTER_INDEX,
+  SET_POST_DETAILS,
+  BOOKMARK_POST,
+  RESTEEM_POST,
+  FAVORITE_POST,
+  COMMENT_POST,
+  SET_POST_REF,
+  SET_COMMUNITIES,
+  SELECT_TAG,
+  SELECT_FILTER,
+}
+
+// post meta data
+export interface MetaData {
+  image: string[];
+  tags: string[];
+  [key: string]: any;
+}
+
+// post reference
+export interface PostRef {
+  author: string;
+  permlink: string;
+}
+
+// posts types
+export enum PostsTypes {
+  FEED = 'feed',
+  AUTHOR = 'author',
+  HASH_TAG = 'hash',
+}
+
+// post state to be shown in actionbar, avatar
+export interface PostState {
+  createdAt: string;
+  // stats
+  vote_count: number;
+  resteem_count: number;
+  comment_count: number;
+  bookmark_count?: number;
+  payout: string;
+  voters: any[];
+  nsfw?: boolean;
+  isPromoted: boolean;
+
+  // post reference
+  parent_ref?: PostRef;
+  post_ref: PostRef;
+
+  // user's actions related
+  voted: boolean;
+  bookmarked?: boolean;
+  resteemed?: boolean;
+  favorite?: boolean;
+  commented?: boolean;
+  votePercent?: number;
+
+  // author
+  avatar: string;
+  nickname?: string;
+  reputation: number;
+
+  // comments
+  isComment: boolean;
+}
+
+// complete post data including PostState
+export interface PostData {
+  // post
+  id: number;
+  title: string;
+  body: string;
+  markdownBody: string;
+  summary: string;
+  image: string;
+
+  // meta
+  json_metadata: string;
+  metadata: MetaData;
+
+  // state
+  state: PostState;
+}
+
+// comment data, including comments tree
+export interface CommentData extends PostData {
+  comments: CommentData[];
+  depth: number;
+}
+
+// initial post data
+export const INIT_POST_DATA = {
+  // id
+  id: -1,
+  // post
+  title: '',
+  body: '',
+  markdownBody: '',
+  summary: '',
+  image: '',
+  tags: [],
+
+  // meta
+  json_metadata: '',
+  metadata: {
+    image: [],
+    tags: [],
+  },
+
+  // stats
+  state: {
+    createdAt: '',
+
+    vote_count: 0,
+    resteem_count: 0,
+    comment_count: 0,
+    bookmark_count: 0,
+    payout: '',
+    voters: [],
+    nsfw: false,
+    isPromoted: false,
+
+    // post reference
+    parent_ref: null,
+    post_ref: null,
+
+    // user's actions related
+    voted: false,
+    bookmarked: false,
+    resteemed: false,
+    favorite: false,
+    commented: false,
+    votePercent: 0,
+
+    // author
+    avatar: '',
+    nickname: '',
+    reputation: 25,
+
+    // comments
+    isComment: false,
+  },
+};
+
+// meta posts
+export interface MetaPosts {
+  posts: PostData[];
+  startPostRef: PostRef;
+  index: number;
+}
+
+// posts state
+export interface PostsState {
+  // target type: feed, author's blog, tag posts
+  feed: MetaPosts;
+  author: MetaPosts;
+  hash: MetaPosts;
+
+  //// current post
+  postsType: PostsTypes;
+  // post details ref
+  postRef: PostRef;
+  // post details
+  postDetails: PostData;
+  // fetched flag
+  fetched: boolean;
+
+  //// tag, filter selection
+  tagList: any[];
+  // tag index
+  tagIndex: number;
+  // community list
+  communityList: any[];
+  // filter: trending, created
+  filterList: string[];
+  // filter index
+  filterIndex: number;
+}
+
+// initial posts
+export const INIT_POSTS_DATA: MetaPosts = {
+  posts: [],
+  startPostRef: {
+    author: null,
+    permlink: null,
+  },
+  index: 0,
+};
+
+export interface PostingContent {
+  author: string;
+  title: string;
+  body: string;
+  parent_author: string;
+  parent_permlink: string;
+  json_metadata: string;
+  permlink: string;
+}
+
+// default filter list
+export const INIT_FILTER_LIST = ['trending', 'created'];
+// initial tag item for friends posts of feed posts
+export const INIT_FRIENDS_TAG = ['Friends', '', ''];
+// initial tag item for my posts of feed posts
+export const INIT_MY_TAG = ['My', '', ''];
+// initial tag item for author posts
+export const INIT_AUTHOR_TAG = ['Author', '', ''];
+
+//// actions
+// fetching posts
+interface SetPostsAction {
+  type: PostsActionTypes.SET_POSTS;
+  payload: {
+    postsType: PostsTypes;
+    metaposts: MetaPosts;
+  };
+}
+// set fetched flag
+interface SetFetchedAction {
+  type: PostsActionTypes.SET_FETCHED;
+  payload: boolean;
+}
+// clear posts of the given type
+interface ClearPostsAction {
+  type: PostsActionTypes.CLEAR_POSTS;
+  payload: PostsTypes;
+}
+// append posts
+interface AppendPostsAction {
+  type: PostsActionTypes.APPEND_POSTS;
+  payload: {
+    postsType: PostsTypes;
+    metaposts: MetaPosts;
+  };
+}
+// set tag list
+interface SetTagListAction {
+  type: PostsActionTypes.SET_TAG_LIST;
+  payload: any[];
+}
+// set tag index
+interface SetTagIndexAction {
+  type: PostsActionTypes.SET_TAG_INDEX;
+  payload: number;
+}
+// set filter index
+interface SetFilterIndexAction {
+  type: PostsActionTypes.SET_FILTER_INDEX;
+  payload: number;
+}
+// set post details
+interface SetPostDetailsAction {
+  type: PostsActionTypes.SET_POST_DETAILS;
+  payload: PostData;
+}
+// voting
+interface UpVoteAction {
+  type: PostsActionTypes.UPVOTE;
+  payload: {
+    postIndex: number;
+    voteAmount: number;
+    username: string;
+  };
+}
+// voting comment
+interface UpVoteCommentAction {
+  type: PostsActionTypes.UPVOTE_COMMENT;
+  payload: {
+    postIndex: number;
+    voteAmount: number;
+    username: string;
+    postRef: PostRef;
+  };
+}
+// commenting
+interface CommentAction {
+  type: PostsActionTypes.COMMENT_POST;
+  payload: {
+    postIndex: number;
+    username: string;
+  };
+}
+// bookmarking
+interface BookmarkAction {
+  type: PostsActionTypes.BOOKMARK_POST;
+}
+// set post details erf
+interface SetPostRefAction {
+  type: PostsActionTypes.SET_POST_REF;
+  payload: PostRef;
+}
+// set communities
+interface SetCommunitiesAction {
+  type: PostsActionTypes.SET_COMMUNITIES;
+  payload: any[];
+}
+
+// posts context type
+export interface PostsContextType {
+  // posts state
+  postsState: PostsState;
+  //// action creators
+  // fetch posts
+  fetchPosts: (
+    postsType: PostsTypes,
+    tagIndex: number,
+    filterIndex: number,
+    username?: string,
+    appending?: boolean,
+    inputTag?: string,
+  ) => void;
+  // clear posts
+  clearPosts: (postsType: PostsTypes) => void;
+  // get post details
+  getPostDetails: (postRef: PostRef, username: string) => Promise<PostData>;
+  // upvote
+  upvote: (
+    postIndex: number,
+    isComment: boolean,
+    postRef: PostRef,
+    username: string,
+    password: string,
+    votingWeight: number,
+    voteAmount: number,
+  ) => Promise<any>;
+  // submit post
+  submitPost: (
+    postingContent: PostingContent,
+    password: string,
+    isComment: boolean,
+    postIndex?: number,
+  ) => Promise<{
+    success: boolean;
+    message: any;
+  }>;
+  // update post
+  updatePost: (
+    originalBody: string,
+    originalPermlink: string,
+    originalParentPermlink: string,
+    postingContent: PostingContent,
+    password: string,
+    isComment: boolean,
+    postIndex?: number,
+  ) => Promise<{
+    success: boolean;
+    message: any;
+  }>;
+  // bookmark
+  bookmark: () => void;
+  // set post ref
+  setPostRef: (postRef: PostRef) => void;
+  // set communities
+  fetchCommunities: (username: string) => void;
+  // set tag index
+  setTagIndex: (
+    index: number,
+    postsType: PostsTypes,
+    username?: string,
+  ) => void;
+  // set filter index
+  setFilterIndex: (index: number, username?: string) => void;
+}
+
+export type PostsAction =
+  | SetPostsAction
+  | SetFetchedAction
+  | SetPostRefAction
+  | ClearPostsAction
+  | AppendPostsAction
+  | SetPostDetailsAction
+  | UpVoteAction
+  | UpVoteCommentAction
+  | CommentAction
+  | BookmarkAction
+  | SetCommunitiesAction
+  | SetTagIndexAction
+  | SetTagListAction
+  | SetFilterIndexAction;
+
+/*
+  export interface PostsQuery {
+  sort: string;
+  tag: string;
+  observer?: string;
+  limit: number;
+  start_permlink: string;
+  start_author: string;
+  truncate_body?: number;
+  filterNsfw?: boolean;
+}
+
+*/

@@ -1,0 +1,61 @@
+import React, {useEffect, useContext, useState} from 'react';
+
+import AsyncStorage from '@react-native-community/async-storage';
+import {AuthContext, UserContext, PostsContext} from '~/contexts';
+import {navigate} from '~/navigation/service';
+
+export const LOGIN_TOKEN = 'loginToken';
+
+export const ResolveAuth = (props) => {
+  //// props
+  console.log('[ResolveAuth] props', props);
+  //// contexts
+  const {authState, setAuthResolved, setCredentials} = useContext(AuthContext)!;
+  const {fetchSteemGlobalProps} = useContext(UserContext);
+  const {postsState, fetchCommunities} = useContext(PostsContext);
+  // state
+  const [fetched, setFetched] = useState(false);
+  const [username, setUsername] = useState(null);
+
+  console.log('ResolveAuthScreen, auth state', authState);
+
+  useEffect(() => {
+    _resolveEntry();
+  }, []);
+
+  useEffect(() => {
+    console.log('[ResolveAuthScreen], fetched effect, fetched', fetched);
+
+    if (fetched) {
+      console.log(
+        '[ResolveAuth|useEffect] fetched Community list',
+        postsState.communityList,
+      );
+      // get steem global props and get user's vote amount
+      fetchSteemGlobalProps(username);
+      setAuthResolved(true);
+      // TODO is this not necessary, why?
+      navigate({name: 'Drawer'});
+    }
+  }, [fetched]);
+
+  const _resolveEntry = async () => {
+    // get user login token from storage
+    let username = await AsyncStorage.getItem(LOGIN_TOKEN);
+    setUsername(username);
+    // set category to feed if username exists
+    if (username) {
+      // set credentials
+      await setCredentials(username);
+      // fetch community list
+      //      await fetchCommunities(username);
+      // set fetched flag
+      setFetched(true);
+    } else {
+      // @todo no communiy list at first, handle this
+      navigate({name: 'Intro'});
+    }
+  };
+
+  return null;
+};
