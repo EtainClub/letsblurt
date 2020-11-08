@@ -26,6 +26,7 @@ import {PostsFeedView} from './PostsFeedView';
 //// props
 interface Props {
   posts: PostData[];
+  fetching: boolean;
   fetchPosts: (appending?: boolean) => void;
   clearPosts: () => void;
 }
@@ -80,7 +81,7 @@ const PostsFeed = (props: Props): JSX.Element => {
   return (
     <PostsFeedView
       posts={posts}
-      loading={loading}
+      loading={loading || props.fetching}
       handleSubmitSearch={_handleSubmitSearch}
       refreshPosts={_refreshPosts}
       fetchMorePosts={_fetchMorePosts}

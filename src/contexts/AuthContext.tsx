@@ -59,6 +59,11 @@ const authReducer = (state: AuthState, action: AuthAction) => {
         loggedIn: true,
         authResolved: true,
       };
+    case AuthActionTypes.CHANGE_CREDENTIALS:
+      return {
+        ...state,
+        currentCredentials: action.payload,
+      };
     default:
       return state;
   }
@@ -147,22 +152,24 @@ const AuthProvider = ({children}: Props) => {
       payload: currentCredentials.username,
     });
   };
-  // change account
+
+  //// change account
   const changeAccount = async (account: string) => {
     console.log('[AuthContext] changeAccount account', account);
     // get credentials
-    const credentials = await _getCredentials(account);
+    const {credentials} = await _getCredentials(account);
+    console.log('[AuthContext|changeAccount] key credentials', credentials);
     if (!credentials) {
       console.log('[AuthContext|changeAccount] error! no account');
       return;
     }
-    console.log('[AuthContext|changeAccount] key credentials', credentials);
     // dispatch action
     dispatch({
-      type: AuthActionTypes.SET_CREDENTIALS,
+      type: AuthActionTypes.CHANGE_CREDENTIALS,
       payload: credentials,
     });
   };
+
   return (
     <AuthContext.Provider
       value={{
@@ -194,7 +201,6 @@ const _getCredentials = async (username: string) => {
       const credentials = keysList.find(
         (key) => Object.keys(key)[0] === username,
       );
-
       if (credentials) {
         console.log('[_getCredentials] user exists, credentials', credentials);
 
@@ -206,12 +212,21 @@ const _getCredentials = async (username: string) => {
           keysList: keysList,
         };
       }
-      return null;
+      return {
+        credentials: null,
+        keysList: null,
+      };
     }
-    return null;
+    return {
+      credentials: null,
+      keysList: null,
+    };
   } catch (error) {
     console.log('failed to retrieve credentials', error);
-    return null;
+    return {
+      credentials: null,
+      keysList: null,
+    };
   }
 };
 

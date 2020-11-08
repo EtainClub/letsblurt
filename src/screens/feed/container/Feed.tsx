@@ -38,7 +38,10 @@ const Feed = (props: Props): JSX.Element => {
   useEffect(() => {
     _fetchPosts(false);
   }, []);
-
+  //// account change event
+  useEffect(() => {
+    _fetchPosts(false);
+  }, [authState.currentCredentials]);
   //// focus event with tag param
   useFocusEffect(
     useCallback(() => {
@@ -78,7 +81,11 @@ const Feed = (props: Props): JSX.Element => {
       postsType,
     );
     setFetching(true);
-    fetchPosts(
+    // clear posts if not appending
+    if (!appending) {
+      await clearPosts(postsType);
+    }
+    await fetchPosts(
       postsType,
       postsState.tagIndex,
       postsState.filterIndex,
@@ -87,6 +94,7 @@ const Feed = (props: Props): JSX.Element => {
       uiState.selectedTag,
     );
     console.log('postsState', postsState);
+    setFetching(false);
   };
 
   const _clearPosts = async () => {
@@ -96,6 +104,7 @@ const Feed = (props: Props): JSX.Element => {
   return (
     <PostsFeed
       posts={posts}
+      fetching={fetching}
       fetchPosts={_fetchPosts}
       clearPosts={_clearPosts}
     />

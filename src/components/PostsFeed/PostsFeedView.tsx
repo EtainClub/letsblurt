@@ -161,7 +161,7 @@ const PostsFeedView = (props: Props): JSX.Element => {
           buttonColor="red"
           iconTextColor="#FFFFFF"
           onClickAction={_handlePressSearch}
-          visible={searchFAB}
+          visible
           iconTextComponent={
             <Icon family="antdesign" size={16} name="search1" />
           }

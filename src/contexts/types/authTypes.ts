@@ -3,7 +3,7 @@ import * as Keychain from 'react-native-keychain';
 //// action types
 export enum AuthActionTypes {
   RESOLVE_AUTH,
-  LOGIN,
+  CHANGE_CREDENTIALS,
   LOGOUT,
   SET_CREDENTIALS,
   ADD,
@@ -47,12 +47,9 @@ interface ResolveAuthAction {
   payload: boolean;
 }
 
-interface LoginAction {
-  type: AuthActionTypes.LOGIN;
-  payload: {
-    currentCredientials: Credentials;
-    credentialsList: any[];
-  };
+interface ChangeCredentialsAction {
+  type: AuthActionTypes.CHANGE_CREDENTIALS;
+  payload: Credentials;
 }
 
 interface LogoutAction {
@@ -75,7 +72,7 @@ interface AddAction {
 
 export type AuthAction =
   | ResolveAuthAction
-  | LoginAction
+  | ChangeCredentialsAction
   | LogoutAction
   | SetCredentialsAction
   | AddAction;

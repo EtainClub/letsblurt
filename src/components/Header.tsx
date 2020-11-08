@@ -45,7 +45,7 @@ const Header = (props: Props): JSX.Element => {
   //// lanugage
   const intl = useIntl();
   // contexts
-  const {authState} = useContext(AuthContext);
+  const {authState, changeAccount} = useContext(AuthContext);
   const {userState} = useContext(UserContext);
   const {uiState, setTagParam, setSearchParam} = useContext(UIContext);
   const {postsState, setTagIndex, setFilterIndex, clearPosts} = useContext(
@@ -54,6 +54,7 @@ const Header = (props: Props): JSX.Element => {
   // states
   const [username, setUsername] = useState(null);
   const [searchText, setSearchText] = useState('');
+  const [accounts, setAccounts] = useState(null);
   const [searching, setSearching] = useState(false);
   const [community, setCommunity] = useState(0);
   const [category, setTag] = useState(0);
@@ -63,6 +64,13 @@ const Header = (props: Props): JSX.Element => {
     if (authState.loggedIn) {
       console.log('[Header] authState', authState);
       setUsername(authState.currentCredentials.username);
+      // set accounts
+      const iterator = authState.credentialsList.values();
+      let _accounts = [];
+      for (const key of iterator) {
+        _accounts.push(Object.keys(key)[0]);
+      }
+      setAccounts(_accounts);
     }
   }, [authState.currentCredentials]);
   /*
@@ -82,43 +90,49 @@ const Header = (props: Props): JSX.Element => {
     setSearchParam(searchText);
   };
 
-  const _renderAccountRow = (option, index, isSelect) => (
-    <Block row style={{margin: 5}}>
-      <Image
-        source={{
-          uri: `${BLURT_IMAGE_SERVER}/u/${username}/avatar`,
-        }}
-        style={[
-          styles.avatar,
-          {
-            width: 30,
-            height: 30,
-            borderRadius: 30 / 2,
-          },
-        ]}
-      />
-      <Block row middle>
-        <Text
-          size={14}
-          style={{marginHorizontal: 5, color: argonTheme.COLORS.WHITE}}>
-          {option}
-        </Text>
-        {isSelect ? (
-          <Block right>
-            <Icon
-              size={16}
-              color={argonTheme.COLORS.ERROR}
-              name="check"
-              family="antdegisn"
-            />
-          </Block>
-        ) : null}
+  const _renderAccountRow = (option, index, isSelect) => {
+    console.log('_renderAccountRow', option, index, isSelect);
+    return (
+      <Block row style={{margin: 5}}>
+        <Image
+          source={{
+            uri: `${BLURT_IMAGE_SERVER}/u/${option}/avatar`,
+          }}
+          style={[
+            styles.avatar,
+            {
+              width: 30,
+              height: 30,
+              borderRadius: 30 / 2,
+            },
+          ]}
+        />
+        <Block row middle>
+          <Text
+            size={14}
+            style={{marginHorizontal: 5, color: argonTheme.COLORS.WHITE}}>
+            {option}
+          </Text>
+          {isSelect ? (
+            <Block right>
+              <Icon
+                size={16}
+                color={argonTheme.COLORS.ERROR}
+                name="check"
+                family="antdegisn"
+              />
+            </Block>
+          ) : null}
+        </Block>
       </Block>
-    </Block>
-  );
+    );
+  };
 
-  // temp data
-  const accounts = authState.credentialsList.map((item) => Object.keys(item));
+  const _handleChangeAccount = async (index: number, value: string) => {
+    console.log('accounts', accounts);
+    console.log('value', value);
+    changeAccount(value);
+  };
 
   const Avatar = () => {
     return (
@@ -131,7 +145,8 @@ const Header = (props: Props): JSX.Element => {
           rowTextStyle={styles.rowTextStyle}
           style={styles.dropdown}
           dropdownStyle={styles.dropdownStyle}
-          textStyle={styles.dropdownText}>
+          textStyle={styles.dropdownText}
+          onSelect={_handleChangeAccount}>
           <Image
             source={{
               uri: `${BLURT_IMAGE_SERVER}/u/${username}/avatar`,
