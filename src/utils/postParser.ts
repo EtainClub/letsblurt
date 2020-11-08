@@ -185,7 +185,7 @@ const parseActiveVotes = (
       value.percent /= 100;
       value.is_down_vote = Math.sign(value.percent) < 0;
       value.avatar = getResizedAvatar(value.voter);
-      postData.state.voters[index] = `${value.voter} ($${value.value})`;
+      postData.state.voters[index] = `${value.voter} (${value.value})`;
     });
     // limit the number of items
     if (postData.state.voters.length > 20) {

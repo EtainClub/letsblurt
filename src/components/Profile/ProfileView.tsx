@@ -96,14 +96,16 @@ const ProfileView: React.FC<Props> = ({
                   }}
                   style={[styles.avatar, {left: 10}]}
                 />
-                <Icon
-                  style={{left: 10, top: 80}}
-                  size={30}
-                  color={argonTheme.COLORS.ERROR}
-                  name="pencil"
-                  family="font-awesome"
-                  onPress={() => console.log('edit profile')}
-                />
+                {isUser && (
+                  <Icon
+                    style={{left: 10, top: 80}}
+                    size={30}
+                    color={argonTheme.COLORS.ERROR}
+                    name="pencil"
+                    family="font-awesome"
+                    onPress={() => console.log('edit profile')}
+                  />
+                )}
               </Block>
               <Text>{profile.metadata.name}</Text>
               <Text color="orange">@{profile.name}</Text>

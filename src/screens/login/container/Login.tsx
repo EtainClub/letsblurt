@@ -92,9 +92,9 @@ const Login = (props: Props): JSX.Element => {
       return false;
     }
     // @test (etainclub)
-    //    password = Config.ETAINCLUB_POSTING_WIF;
+    password = Config.ETAINCLUB_POSTING_WIF;
     // @test (letsblur)
-    //    password = Config.CREATOR_POSTING_WIF;
+    password = Config.CREATOR_POSTING_WIF;
     // verify the private key
     const valid = await verifyPassoword(username, password);
     if (!valid) {

@@ -15,6 +15,7 @@ import {useFocusEffect} from '@react-navigation/native';
 import {navigate} from '~/navigation/service';
 //// language
 import {useIntl} from 'react-intl';
+import {getCharacterLength} from '~/utils/strings';
 import {substr_utf8_bytes} from '~/utils/strings';
 const runes = require('runes');
 

@@ -1,3 +1,9 @@
+export function getCharacterLength(str) {
+  // The string iterator that is used here iterates over characters,
+  //  not mere code units
+  return [...str].length;
+}
+
 function encode_utf8(s) {
   return unescape(encodeURIComponent(s));
 }

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import Config from 'react-native-config';
 
-const IMAGE_API = 'https://steemitimages.com';
+const IMAGE_API = 'https://images.blurt.blog';
 
 //// upload image
 export const uploadImage = (media, username: string, sign) => {

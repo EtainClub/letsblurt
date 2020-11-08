@@ -168,6 +168,8 @@ const AuthProvider = ({children}: Props) => {
       type: AuthActionTypes.CHANGE_CREDENTIALS,
       payload: credentials,
     });
+    // change account in the storage
+    AsyncStorage.setItem(LOGIN_TOKEN, account);
   };
 
   return (
@@ -274,8 +276,8 @@ const _storeCredentials = async ({username, password}: Credentials) => {
 
 const _removeCredentials = async (username: string) => {
   try {
-    //const result = await Keychain.resetGenericPassword({service: username});
-    const result = await Keychain.resetInternetCredentials(KEYCHAIN_SERVER);
+    const result = await Keychain.resetGenericPassword({service: username});
+    //    const result = await Keychain.resetInternetCredentials(KEYCHAIN_SERVER);
     console.log('remove credentials result', result);
   } catch (error) {
     console.error('failed to remove credentials', error);
