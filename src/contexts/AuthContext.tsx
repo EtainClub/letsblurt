@@ -6,7 +6,6 @@ import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 // keychain
 import * as Keychain from 'react-native-keychain';
-//import createDataContext from './createDataContext';
 import React, {useReducer, createContext} from 'react';
 //
 import {
@@ -17,11 +16,9 @@ import {
   Credentials,
 } from './types/authTypes';
 import AsyncStorage from '@react-native-community/async-storage';
-// navigation
-import {navigate} from '../navigation/service';
-import {acc} from 'react-native-reanimated';
-//
 import {LOGIN_TOKEN} from '../screens';
+
+const KEYCHAIN_SERVER = 'users';
 
 const initialState: AuthState = {
   authResolved: false,
@@ -35,44 +32,32 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // auth reducer
 const authReducer = (state: AuthState, action: AuthAction) => {
-  let newList: Credentials[] = [];
   switch (action.type) {
     case AuthActionTypes.RESOLVE_AUTH:
       return {...state, authResolved: action.payload};
-    case AuthActionTypes.LOGIN:
-      console.log('login action payload', action.payload);
-      // append the current credentials to the list
-      newList = state.credentialsList;
-      newList.push(action.payload);
-      console.log('append new credentials', action.payload);
-      // set the current credentials and set loggined
-      return {
-        currentCredentials: action.payload,
-        credentialsList: newList,
-        loggedIn: true,
-        authResolved: true,
-      };
     case AuthActionTypes.LOGOUT:
       console.log('logout action payload', action.payload);
       console.log('before credentials list', state.currentCredentials);
-      newList = state.credentialsList.filter(
-        (credentials: Credentials) => credentials.username !== action.payload,
-      );
-      console.log('after credentials list', newList);
-      // clear the current credentials and set logout
-      return {
-        currentCredentials: {username: '', password: ''},
-        credentialsList: newList,
-        loggedIn: false,
-        authResolved: false,
-      };
+      return state;
+    // newList = state.credentialsList.filter(
+    //   (credentials: Credentials) => credentials.username !== action.payload,
+    // );
+    //      console.log('after credentials list', newList);
+    // clear the current credentials and set logout
+    // return {
+    //   currentCredentials: {username: '', password: ''},
+    //   credentialsList: newList,
+    //   loggedIn: false,
+    //   authResolved: false,
+    // };
     case AuthActionTypes.SET_CREDENTIALS:
       console.log('change action payload', action.payload);
       // change credentials
       return {
-        ...state,
-        currentCredentials: action.payload,
+        currentCredentials: action.payload.currentCredientials,
+        credentialsList: action.payload.credentialsList,
         loggedIn: true,
+        authResolved: true,
       };
     default:
       return state;
@@ -105,36 +90,21 @@ const AuthProvider = ({children}: Props) => {
       console.log('no username is given', username);
       return;
     }
-    // get credentials
-    const credentails = await _getCredentials(username);
+    // get credentials and keys list
+    const {credentials, keysList} = await _getCredentials(username);
     // @todo update user logged in state
-    dispatch({
-      type: AuthActionTypes.SET_CREDENTIALS,
-      payload: credentails,
-    });
+    if (credentials) {
+      dispatch({
+        type: AuthActionTypes.SET_CREDENTIALS,
+        payload: {
+          currentCredientials: credentials,
+          credentialsList: keysList,
+        },
+      });
+    }
   };
 
-  // skip login if the token exists
-  // const tryLoginWithToken = async (username: string) => {
-  //   if (username) {
-  //     console.log('loginToken exists');
-  //     // get credentials
-  //     const credentails = await _getCredentials(username);
-  //     // @todo update user logged in state
-  //     dispatch({
-  //       type: AuthActionTypes.CHANGE,
-  //       payload: credentails,
-  //     });
-  //     // navigate to landing screen
-  //     navigate({name: 'Drawer'});
-  //   } else {
-  //     console.log('loginToken is null');
-  //     // show intro
-  //     navigate({name: 'Intro'});
-  //   }
-  // };
-
-  // process login
+  //// process login
   const processLogin = async (
     credentials: Credentials,
     addingAccount?: boolean,
@@ -143,15 +113,18 @@ const AuthProvider = ({children}: Props) => {
     // add credentails in case of not loggedin or addingAccount
     if (authState.loggedIn && !addingAccount) return;
     // save the credentials in the keychain
-    _storeCredentials(credentials);
+    const keysList = await _storeCredentials(credentials);
     // dispatch action: set credentials
     dispatch({
-      type: AuthActionTypes.LOGIN,
-      payload: credentials,
+      type: AuthActionTypes.SET_CREDENTIALS,
+      payload: {
+        currentCredientials: credentials,
+        credentialsList: keysList,
+      },
     });
-    // @todo update firebase user db
   };
-  // process logout
+
+  //// process logout
   const processLogout = async () => {
     console.log('[AuthContext] processLogout');
     const {currentCredentials} = authState;
@@ -209,16 +182,31 @@ const AuthProvider = ({children}: Props) => {
 // get the credentials
 const _getCredentials = async (username: string) => {
   try {
-    const keyCredentials = await Keychain.getGenericPassword({
-      service: username,
-    });
-    console.log('retrieved credentials', keyCredentials);
-    if (keyCredentials) {
-      const credentials = {
-        username: keyCredentials.username,
-        password: keyCredentials.password,
-      };
-      return credentials;
+    // retrieve keys list
+    const keychain = await Keychain.getInternetCredentials(KEYCHAIN_SERVER);
+    // get credentials if exists
+    if (keychain) {
+      // parse keys
+      const keysList = JSON.parse(keychain.password);
+      console.log('[_getCredentials] retrieved keys list', keysList);
+
+      // get password
+      const credentials = keysList.find(
+        (key) => Object.keys(key)[0] === username,
+      );
+
+      if (credentials) {
+        console.log('[_getCredentials] user exists, credentials', credentials);
+
+        return {
+          credentials: {
+            username,
+            password: Object.values(credentials)[0] as string,
+          },
+          keysList: keysList,
+        };
+      }
+      return null;
     }
     return null;
   } catch (error) {
@@ -227,21 +215,52 @@ const _getCredentials = async (username: string) => {
   }
 };
 
+//// helpers: store credentials as a string
 const _storeCredentials = async ({username, password}: Credentials) => {
   try {
-    const result = await Keychain.setGenericPassword(username, password, {
-      service: username,
-    });
-    console.log('[storeCredentials] result', result);
-    // dispatch action. update credentials list
+    // first retrieve all the stored credentials
+    const prevKeychain = await Keychain.getInternetCredentials(KEYCHAIN_SERVER);
+    console.log('[storeCredentials] initCrededentials', prevKeychain);
+    // set new credentials
+    let credentials = {};
+    credentials[username] = password;
+    // empty keys list
+    let keysList = [];
+    // if previous keys exist, append them
+    if (prevKeychain) {
+      // parse credentials which are stored in password
+      const prevKeys = JSON.parse(prevKeychain.password);
+      // append the new one
+      keysList = keysList.concat(prevKeys);
+      // check uniqueness
+      const sameKey = prevKeys.find((key) => Object.keys(key)[0] === username);
+      if (!sameKey) {
+        // append the new key
+        keysList.push(credentials);
+      }
+    } else {
+      // append the new one first
+      keysList.push(credentials);
+    }
+
+    // set new keys list
+    Keychain.setInternetCredentials(
+      KEYCHAIN_SERVER,
+      KEYCHAIN_SERVER,
+      JSON.stringify(keysList),
+    );
+    // return
+    return keysList;
   } catch (error) {
     console.log('failed to store credentials of', username, error);
+    return null;
   }
 };
 
 const _removeCredentials = async (username: string) => {
   try {
-    const result = await Keychain.resetGenericPassword({service: username});
+    //const result = await Keychain.resetGenericPassword({service: username});
+    const result = await Keychain.resetInternetCredentials(KEYCHAIN_SERVER);
     console.log('remove credentials result', result);
   } catch (error) {
     console.error('failed to remove credentials', error);

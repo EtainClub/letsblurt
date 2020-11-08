@@ -1,9 +1,13 @@
 import React, {useState, useEffect, useContext} from 'react';
+//// config
+import Config from 'react-native-config';
+//// language
+import {useIntl} from 'react-intl';
 // firebase
 import messaging from '@react-native-firebase/messaging';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
-// steem api
+// blockchain api
 import {getAccount, verifyPassoword} from '~/providers/blurt/dblurtApi';
 import {navigate} from '~/navigation/service';
 import {LoginScreen} from '../screen/Login';
@@ -21,6 +25,8 @@ const Login = (props: Props): JSX.Element => {
   console.log('[LoginContainer] props', props);
   const {route} = props;
   const addingAccount = route.params?.addingAccount;
+  //// language
+  const intl = useIntl();
   //// contexts
   const {authState, processLogin, processLogout} = useContext(AuthContext);
   const {uiState, setToastMessage} = useContext(UIContext);
@@ -82,30 +88,38 @@ const Login = (props: Props): JSX.Element => {
     const account = await getAccount(username);
     if (!account) {
       console.log('failed. login. username does not exist', username);
+      setToastMessage(intl.formatMessage({id: 'Login.msg_username'}));
       return false;
     }
+    // @test (etainclub)
+    password = Config.ETAINCLUB_POSTING_WIF;
+    // @test (letsblur)
+    password = Config.CREATOR_POSTING_WIF;
     // verify the private key
     const valid = await verifyPassoword(username, password);
-    if (valid) {
-      console.log('password is valid');
-      // process login action
-      console.log('[LoginContainer] before processLogin, props', props);
-      processLogin({username, password}, addingAccount);
-      // process firestore login
-      _updateUserDB(username);
-
-      // fetch communities of user
-      //      fetchCommunities(username);
-
-      console.log('account info', account);
-      // @test get the credentials
-      console.log('after process login authState', authState);
-      setToastMessage(`logged in as ${username}`);
-      // update user vote amount
-      updateVoteAmount(username);
-      // navigate to feed
-      navigate({name: 'Feed'});
+    if (!valid) {
+      setToastMessage(intl.formatMessage({id: 'Login.msg_password'}));
+      return false;
     }
+
+    //// process login
+    console.log('password is valid');
+    // process login action
+    processLogin({username, password}, addingAccount);
+    // process firestore login
+    _updateUserDB(username);
+
+    // fetch communities of user
+    //      fetchCommunities(username);
+
+    console.log('account info', account);
+    // @test get the credentials
+    console.log('after process login authState', authState);
+    setToastMessage(`logged in as ${username}`);
+    // update user vote amount
+    updateVoteAmount(username);
+    // navigate to feed
+    navigate({name: 'Feed'});
   };
   return <LoginScreen processLogin={_processLogin} />;
 };

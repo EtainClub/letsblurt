@@ -1,11 +1,11 @@
 import React from 'react';
 
-import {View, Text, TouchableHighlight} from 'react-native';
-import {navigate} from '../../../navigation/service';
-import {Icon} from 'galio-framework';
+import {View, TouchableHighlight} from 'react-native';
+import {navigate} from '~/navigation/service';
+import {Button, Icon, Block, NavBar, Input, Text, theme} from 'galio-framework';
 
 interface Props {
-  username: string;
+  handleLogout: () => void;
 }
 
 const SettingScreen = (props: Props): JSX.Element => {
@@ -15,7 +15,7 @@ const SettingScreen = (props: Props): JSX.Element => {
       <TouchableHighlight onPress={() => navigate({name: 'Posting'})}>
         <Text>Setting Screen </Text>
       </TouchableHighlight>
-      <Icon size={46} family="font-awesome" name="user" color="red" />
+      <Button onPress={props.handleLogout}>Logout</Button>
     </View>
   );
 };

@@ -61,6 +61,7 @@ const Header = (props: Props): JSX.Element => {
   /// auth state change effect
   useEffect(() => {
     if (authState.loggedIn) {
+      console.log('[Header] authState', authState);
       setUsername(authState.currentCredentials.username);
     }
   }, [authState.currentCredentials]);
@@ -81,8 +82,6 @@ const Header = (props: Props): JSX.Element => {
     setSearchParam(searchText);
   };
 
-  // temp data
-  const accounts = ['etainclub', 'blurt'];
   const _renderAccountRow = (option, index, isSelect) => (
     <Block row style={{margin: 5}}>
       <Image
@@ -117,6 +116,9 @@ const Header = (props: Props): JSX.Element => {
       </Block>
     </Block>
   );
+
+  // temp data
+  const accounts = authState.credentialsList.map((item) => Object.keys(item));
 
   const Avatar = () => {
     return (

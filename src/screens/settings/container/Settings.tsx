@@ -1,4 +1,5 @@
-import React from 'react';
+import React, {useContext} from 'react';
+import {AuthContext} from '~/contexts';
 import {SettingScreen} from '../screen/Settings';
 
 interface Props {
@@ -7,7 +8,14 @@ interface Props {
 
 const Settings = (props: Props): JSX.Element => {
   const {username} = props;
-  return <SettingScreen username={username} />;
+  //// contexts
+  const {authState, processLogout} = useContext(AuthContext);
+  const _handleLogout = async () => {
+    console.log('[Settings] handle logout');
+    await processLogout();
+  };
+
+  return <SettingScreen handleLogout={_handleLogout} />;
 };
 
 export {Settings};

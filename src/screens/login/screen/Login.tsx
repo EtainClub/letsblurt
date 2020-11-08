@@ -9,9 +9,9 @@ import {
 import {Block, Button, Input, Text, theme} from 'galio-framework';
 
 import LinearGradient from 'react-native-linear-gradient';
-import {materialTheme} from '../../../constants/';
-import {HeaderHeight, iPhoneX} from '../../../constants/utils';
-import {navigate} from '../../../navigation/service';
+import {materialTheme} from '~/constants/';
+import {HeaderHeight, iPhoneX} from '~/constants/utils';
+import {navigate} from '~/navigation/service';
 
 import {useIntl} from 'react-intl';
 
@@ -72,10 +72,10 @@ const LoginScreen = (props: Props): JSX.Element => {
             paddingHorizontal: 50,
           }}>
           <Text center color="white" size={24}>
-            {intl.formatMessage({id: 'Signin.header'})}
+            {intl.formatMessage({id: 'Login.header'})}
           </Text>
           <Text center color="white" size={14}>
-            {intl.formatMessage({id: 'Signin.header-desc'})}
+            {intl.formatMessage({id: 'Login.header_desc'})}
           </Text>
         </Block>
         <Block flex={1} center space="between">
@@ -122,7 +122,7 @@ const LoginScreen = (props: Props): JSX.Element => {
               style={styles.button}
               loading={loading}
               onPress={_processLogin}>
-              {intl.formatMessage({id: 'Signin.button'})}
+              {intl.formatMessage({id: 'Login.button'})}
             </Button>
             <Button
               color="transparent"
@@ -134,7 +134,7 @@ const LoginScreen = (props: Props): JSX.Element => {
                 color={theme.COLORS.WHITE}
                 size={theme.SIZES.FONT * 0.9}
                 style={{marginTop: 20}}>
-                {intl.formatMessage({id: 'Signin.signup-guide'})}
+                {intl.formatMessage({id: 'Login.signup_guide'})}
               </Text>
             </Button>
           </Block>

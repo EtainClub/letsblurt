@@ -109,8 +109,8 @@ export interface UserContextType {
   // ui state
   userState: UserState;
   //// action creators
-  // fetch global props
-  fetchSteemGlobalProps: (username?: string) => void;
+  // fetch blockchain global props
+  fetchBlockchainGlobalProps: (username?: string) => void;
   // update vote amount
   updateVoteAmount: (username: string) => void;
   // get wallet data

@@ -64,17 +64,16 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 
 // user reducer
 const userReducer = (state: UserState, action: UserAction) => {
-  const {payload} = action;
   switch (action.type) {
     case UserActionTypes.SET_GLOBAL_PROPS:
       console.log('[UserContext|userReducer] set global props', state, action);
-      return {...state, globalProps: payload};
+      return {...state, globalProps: action.payload};
     case UserActionTypes.SET_VOTE_AMOUNT:
-      return {...state, voteAmount: payload};
+      return {...state, voteAmount: action.payload};
     case UserActionTypes.FOLLOW:
       return state;
     case UserActionTypes.SET_WALLET_DATA:
-      return {...state, walletData: payload};
+      return {...state, walletData: action.payload};
     default:
       return state;
   }

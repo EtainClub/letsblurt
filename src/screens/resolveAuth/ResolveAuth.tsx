@@ -39,13 +39,17 @@ export const ResolveAuth = (props) => {
     }
   }, [fetched]);
 
+  //// resolve auth
   const _resolveEntry = async () => {
     // get user login token from storage
     let username = await AsyncStorage.getItem(LOGIN_TOKEN);
-    setUsername(username);
+    // @test
+    //    username = 'letsblurt';
     // set category to feed if username exists
     if (username) {
-      // set credentials
+      // set username
+      setUsername(username);
+      // retrieve all credentials
       await setCredentials(username);
       // fetch community list
       //      await fetchCommunities(username);

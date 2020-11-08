@@ -11,6 +11,8 @@ import {
 //// initial settings state
 const initialState = {
   blockchainType: BlockchainTypes.BLURT,
+  savingPassword: true,
+  usingOTP: true,
 };
 
 // create settings context
@@ -20,10 +22,13 @@ const SettingsContext = createContext<SettingsContextType | undefined>(
 
 // settings reducer
 const settingsReducer = (state: SettingsState, action: SettingsAction) => {
-  const {type, payload} = action;
-  switch (type) {
+  switch (action.type) {
     case SettingsActionTypes.SET_BLOCKCHAIN_TYPE:
-      return {...state, blockchainType: payload};
+      return {...state, blockchainType: action.payload};
+    case SettingsActionTypes.SAVE_PASSWORD:
+      return {...state, savingPassword: action.payload};
+    case SettingsActionTypes.USE_OTP:
+      return {...state, usingOTP: action.payload};
     default:
       return state;
   }
@@ -51,11 +56,32 @@ const SettingsProvider = ({children}: Props) => {
     });
   };
 
+  //// set saving password
+  const savePassword = (save: boolean) => {
+    console.log('[savePassword] save?', save);
+    // dispatch action
+    dispatch({
+      type: SettingsActionTypes.SAVE_PASSWORD,
+      payload: save,
+    });
+  };
+
+  //// use otp
+  const useOTP = (use: boolean) => {
+    console.log('[useOTP] use?', use);
+    // dispatch action
+    dispatch({
+      type: SettingsActionTypes.USE_OTP,
+      payload: use,
+    });
+  };
   return (
     <SettingsContext.Provider
       value={{
         settingsState,
         setBlockchainType,
+        savePassword,
+        useOTP,
       }}>
       {children}
     </SettingsContext.Provider>

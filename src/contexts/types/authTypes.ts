@@ -20,7 +20,7 @@ export interface AuthState {
   authResolved: boolean;
   loggedIn: boolean;
   currentCredentials: Credentials;
-  credentialsList: Credentials[];
+  credentialsList: any[];
 }
 
 // auth context type
@@ -49,7 +49,10 @@ interface ResolveAuthAction {
 
 interface LoginAction {
   type: AuthActionTypes.LOGIN;
-  payload: Credentials;
+  payload: {
+    currentCredientials: Credentials;
+    credentialsList: any[];
+  };
 }
 
 interface LogoutAction {
@@ -59,7 +62,10 @@ interface LogoutAction {
 
 interface SetCredentialsAction {
   type: AuthActionTypes.SET_CREDENTIALS;
-  payload: Credentials;
+  payload: {
+    currentCredientials: Credentials;
+    credentialsList: any[];
+  };
 }
 
 interface AddAction {

@@ -34,19 +34,19 @@ const SignupScreen = (props: Props): JSX.Element => {
   const _checkUsernameValid = (username: string) => {
     if (username.length < 3) {
       console.log('username must be longer than 3.', username);
-      setMessage(intl.formatMessage({id: 'Signup.msg-too-short'}));
+      setMessage(intl.formatMessage({id: 'Signup.msg_too_short'}));
       return false;
     }
     // long length
     if (username.length > 16) {
       console.log('username must be shorter than 16.', username);
-      setMessage(intl.formatMessage({id: 'Singup.msg-too-long'}));
+      setMessage(intl.formatMessage({id: 'Singup.msg_too_long'}));
       return false;
     }
     // start with number
     if (username.match(/^\d/)) {
       console.log('username must not start with a number.', username);
-      setMessage(intl.formatMessage({id: 'Signup.msg-number'}));
+      setMessage(intl.formatMessage({id: 'Signup.msg_number'}));
       return false;
     }
     return true;
@@ -104,7 +104,7 @@ const SignupScreen = (props: Props): JSX.Element => {
               {intl.formatMessage({id: 'Signup.header'})}
             </Text>
             <Text color="orange" center size={theme.SIZES.FONT * 0.875}>
-              {intl.formatMessage({id: 'Signup.header-desc'})}
+              {intl.formatMessage({id: 'Signup.header_desc'})}
             </Text>
           </Block>
 
@@ -155,7 +155,7 @@ const SignupScreen = (props: Props): JSX.Element => {
                   center
                   color={theme.COLORS.WHITE}
                   size={theme.SIZES.FONT * 0.75}>
-                  {intl.formatMessage({id: 'Signup.signin-guide'})}
+                  {intl.formatMessage({id: 'Signup.signin_guide'})}
                 </Text>
               </Button>
             </Block>
