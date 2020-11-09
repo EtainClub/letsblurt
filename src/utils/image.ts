@@ -3,6 +3,9 @@ import {Platform} from 'react-native';
 //import {proxifyImageSrc} from '@esteemapp/esteem-render-helpers';
 import {proxifyImageSrc} from '~/utils/render-helpers';
 
+import {BLURT_IMAGE_SERVER, STEEM_IMAGE_SERVER} from '~/constants';
+const IMAGE_SERVER = BLURT_IMAGE_SERVER;
+
 const OS = Platform.OS;
 
 // @todo need to setup image service
@@ -28,9 +31,16 @@ export const getResizedAvatar = (
     return '';
   }
 
+  // const url =
+  //   OS === 'android'
+  //     ? 'https://steemitimages.com'
+  //     : 'https://steemitimages.com';
+  // return `${url}/u/${author}/avatar/${sizeString}`;
+
   const url =
     OS === 'android'
       ? 'https://steemitimages.com'
       : 'https://steemitimages.com';
-  return `${url}/u/${author}/avatar/${sizeString}`;
+
+  return `${IMAGE_SERVER}/u/${author}/avatar/${sizeString}`;
 };

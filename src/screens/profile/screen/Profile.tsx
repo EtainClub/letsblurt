@@ -30,6 +30,7 @@ const initialLayout = {width: Dimensions.get('window').width};
 interface Props {
   profileData: ProfileData;
   blogs: any[];
+  bookmarks: any[];
   clearPosts: () => void;
 }
 const ProfileScreen = (props: Props): JSX.Element => {
@@ -46,7 +47,8 @@ const ProfileScreen = (props: Props): JSX.Element => {
   const BlogList = () =>
     props.blogs && <PostsListView posts={props.blogs} isUser />;
 
-  const BookmarkList = () => <PostsListView posts={props.blogs} isUser />;
+  const BookmarkList = () =>
+    props.bookmarks && <PostsListView posts={props.bookmarks} isUser />;
 
   const FavoriteList = () => (
     <View style={{flex: 1}}>

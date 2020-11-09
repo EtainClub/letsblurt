@@ -151,7 +151,7 @@ const Header = (props: Props): JSX.Element => {
             source={{
               uri: `${BLURT_IMAGE_SERVER}/u/${username}/avatar`,
             }}
-            style={[styles.avatar, {left: 20}]}
+            style={[styles.avatar]}
           />
         </ModalDropdown>
       )
@@ -265,7 +265,7 @@ const Header = (props: Props): JSX.Element => {
                 onSelect={_handleOnFilterChange}
               />
             </Block>
-            <Block style={{left: 100, top: 0}}>
+            <Block style={{left: 140, top: 2}}>
               <Avatar />
             </Block>
 
@@ -299,7 +299,7 @@ const Header = (props: Props): JSX.Element => {
               options={communityOptions}
               onSelect={_handleOnTagChangeForPosting}
             />
-            <Block style={{left: 32, top: 0}}>
+            <Block style={{left: 107, top: 2}}>
               <Avatar />
             </Block>
           </Block>
@@ -312,7 +312,7 @@ const Header = (props: Props): JSX.Element => {
       case 'Wallet':
       case 'Settings':
         return (
-          <Block style={{left: 40}}>
+          <Block style={{left: 140, top: 10}}>
             <Avatar />
           </Block>
         );

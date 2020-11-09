@@ -3,7 +3,7 @@ import React, {useState, useEffect, useContext} from 'react';
 import {navigate} from '~/navigation/service';
 import {PostState} from '~/contexts/types';
 import {AuthContext, PostsContext, UserContext, UIContext} from '~/contexts';
-
+import {PostRef} from '~/contexts/types';
 import {ActionBarView} from './ActionBarView';
 import {ActionBarStyle} from '~/constants/actionBarTypes';
 
@@ -20,7 +20,9 @@ const ActionBarContainer = (props: Props): JSX.Element => {
   // props
   const {postState} = props;
   // contexts
-  const {postsState, upvote, setPostRef} = useContext(PostsContext);
+  const {postsState, upvote, bookmarkPost, setPostRef} = useContext(
+    PostsContext,
+  );
   const {authState} = useContext(AuthContext);
   const {userState} = useContext(UserContext);
   const {uiState, setToastMessage, setAuthorParam, setEditMode} = useContext(
@@ -63,7 +65,7 @@ const ActionBarContainer = (props: Props): JSX.Element => {
       authState.currentCredentials.username,
       authState.currentCredentials.password,
       votingWeight,
-      parseFloat(userState.voteAmount),
+      parseFloat(userState.profileData.profile.voteAmount),
       setToastMessage,
     );
     console.log('[ActionBarContainer|_processVoting] results', results);
@@ -90,19 +92,36 @@ const ActionBarContainer = (props: Props): JSX.Element => {
     navigate({name: 'Posting'});
   };
 
+  //// handle press bookmark
+  const _handlePressBookmark = () => {
+    // check sanity: logged in
+    if (!authState.loggedIn) return;
+    // create or append collection in firebase
+    bookmarkPost(
+      postState.post_ref,
+      authState.currentCredentials.username,
+      postState.title,
+      setToastMessage,
+    );
+  };
+
   return (
     <ActionBarView
       actionBarStyle={props.actionBarStyle}
       postState={postState}
       postIndex={props.postIndex}
       loggedIn={authState.loggedIn}
-      voteAmount={parseFloat(userState.voteAmount)}
+      isUser={
+        authState.currentCredentials.username === postState.post_ref.author
+      }
+      voteAmount={parseFloat(userState.profileData.profile.voteAmount)}
       handlePressVoting={_processVoting}
       handlePressEditPost={_handlePressEditPost}
       handlePressReply={props.handlePressReply}
       handlePressComments={props.handlePressComments}
       handlePressEditComment={props.handlePressEditComment}
       handlePressVoter={_handlePressVoter}
+      handlePressBookmark={_handlePressBookmark}
     />
   );
 };

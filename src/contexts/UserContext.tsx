@@ -74,6 +74,9 @@ const userReducer = (state: UserState, action: UserAction) => {
       return state;
     case UserActionTypes.SET_WALLET_DATA:
       return {...state, walletData: action.payload};
+    case UserActionTypes.ADD_BOOKMARK:
+      // TODO: update bookmark state
+      return state;
     default:
       return state;
   }

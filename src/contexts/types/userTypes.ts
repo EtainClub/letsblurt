@@ -33,6 +33,8 @@ export interface ProfileData {
   };
   blogRefs?: string[];
   blogs?: any;
+  // bookmarks
+  bookmarks?: any;
 }
 
 //// wallet data
@@ -117,6 +119,8 @@ export interface UserContextType {
   getWalletData: (username: string) => Promise<WalletData>;
   // get user profile data
   getUserProfileData: (usernmae: string) => Promise<any>;
+  // add bookmark
+  addBookmark: (postRef: PostRef, username: string, title: string) => void;
 }
 
 export type UserAction =

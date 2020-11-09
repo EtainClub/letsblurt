@@ -164,7 +164,7 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
 
   return !refreshing ? (
     <Block style={{marginHorizontal: 5, marginBottom: 150}}>
-      <Text size={24}>{post.title}</Text>
+      <Text size={24}>{post.state.title}</Text>
       <Block row space="between">
         <Avatar
           avatar={post.state.avatar}

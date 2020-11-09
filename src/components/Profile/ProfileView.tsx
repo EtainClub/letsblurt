@@ -38,6 +38,8 @@ interface Props {
   profileData: ProfileData;
   blockchain?: BlockchainTypes;
   isUser?: boolean;
+  favoriting: boolean;
+  handlePressFavorite: () => void;
 }
 //// component with default props
 const ProfileView: React.FC<Props> = ({
@@ -53,6 +55,7 @@ const ProfileView: React.FC<Props> = ({
   //// contexts
   //// stats
   ////
+
   const IMAGE_SERVER =
     blockchain === BlockchainTypes.BLURT
       ? BLURT_IMAGE_SERVER
@@ -121,13 +124,14 @@ const ProfileView: React.FC<Props> = ({
               <Text color="blue">{intl.formatMessage({id: 'following'})}</Text>
               {!isUser ? (
                 <Button
-                  onPress={() => console.log('Follow')}
+                  onPress={props.handlePressFavorite}
+                  loading={props.favoriting}
                   small
                   center
                   style={{
                     padding: 0,
                     width: 100,
-                    backgroundColor: argonTheme.COLORS.BUTTON_COLOR,
+                    backgroundColor: argonTheme.COLORS.ERROR,
                   }}>
                   {intl.formatMessage({id: 'Profile.favorite_button'})}
                 </Button>

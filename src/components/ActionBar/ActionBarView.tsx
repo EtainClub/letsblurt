@@ -25,7 +25,8 @@ import {ActionBarStyle} from '~/constants/actionBarTypes';
 import {PostState} from '~/contexts/types';
 import ModalDropdown from 'react-native-modal-dropdown';
 
-import {AuthContext, PostsContext, UIContext} from '~/contexts';
+import {UIContext} from '~/contexts';
+import {PostRef} from '~/contexts/types';
 import {navigate} from '~/navigation/service';
 
 interface Props {
@@ -33,6 +34,7 @@ interface Props {
   postIndex?: number;
   actionBarStyle: ActionBarStyle;
   loggedIn: boolean;
+  isUser: boolean;
   voteAmount: number;
   handlePressVoting: (votingWeight: number) => Promise<boolean>;
   handlePressComments?: () => void;
@@ -49,13 +51,11 @@ const ActionBarView = (props: Props): JSX.Element => {
   // props
   const {actionBarStyle, postState, handlePressVoting} = props;
   const {vote_count, voters, payout, comment_count, bookmarked} = postState;
-  const {voteAmount} = props;
+  const {voteAmount, isUser} = props;
   // language
   const intl = useIntl();
   // contexts
-  const {postsState} = useContext(PostsContext);
-  const {authState} = useContext(AuthContext);
-  const {uiState, setToastMessage} = useContext(UIContext);
+  const {setToastMessage} = useContext(UIContext);
   // states
   const [voting, setVoting] = useState(false);
   const [voted, setVoted] = useState(postState.voted);
@@ -77,11 +77,6 @@ const ActionBarView = (props: Props): JSX.Element => {
   }, [postState]);
 
   //////// functions
-  //// helper: check author is user
-  const _isAuthor = () => {
-    return authState.currentCredentials.username === postState.post_ref.author;
-  };
-
   //// handle press vote icon of action bar
   const _onPressVoteIcon = () => {
     console.log('[Action] _onPressVoteIcon');
@@ -130,6 +125,7 @@ const ActionBarView = (props: Props): JSX.Element => {
   const _onPressBookmark = () => {
     console.log('[ActionBar] onPressBookMark');
     // @todo add bookmark
+    props.handlePressBookmark();
   };
 
   //// handle press reply button of action bar
@@ -261,7 +257,7 @@ const ActionBarView = (props: Props): JSX.Element => {
                 </Text>
               </Block>
             </TouchableWithoutFeedback>
-            {_isAuthor() ? (
+            {isUser ? (
               <TouchableWithoutFeedback onPress={_onPressEditComment}>
                 <Block row style={{paddingRight: 10}}>
                   <Text size={actionBarStyle.textSize}>
@@ -324,7 +320,7 @@ const ActionBarView = (props: Props): JSX.Element => {
             </Block>
           </TouchableWithoutFeedback>
         ) : null}
-        {actionBarStyle.bookmark && _isAuthor() ? (
+        {actionBarStyle.bookmark && isUser ? (
           <TouchableWithoutFeedback onPress={_onPressEditPost}>
             <Text>{intl.formatMessage({id: 'edit'})}</Text>
           </TouchableWithoutFeedback>

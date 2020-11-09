@@ -31,6 +31,9 @@ import {Post} from '~/components/Post';
 import {ActionBarStyleFeed} from '~/constants/actionBarTypes';
 import {getTimeFromNow} from '~/utils/time';
 
+import {Images, BLURT_IMAGE_SERVER, STEEM_IMAGE_SERVER} from '~/constants';
+const IMAGE_SERVER = BLURT_IMAGE_SERVER;
+
 const BACKGROUND_COLORS = [
   argonTheme.COLORS.BORDER,
   argonTheme.COLORS.SECONDARY,
@@ -48,7 +51,8 @@ interface Props {
 
 const PostsListView = (props: Props): JSX.Element => {
   //// props
-  const posts = props.posts.slice(0, props.posts.length - 1);
+  // const posts = props.posts.slice(0, props.posts.length - 1);
+  const posts = props.posts;
   //// language
   const intl = useIntl();
   //// contexts
@@ -108,6 +112,7 @@ const PostsListView = (props: Props): JSX.Element => {
 
   //// render a post
   const _renderPost = (item: any, index: number) => {
+    const avatar = `${IMAGE_SERVER}/u/${item.author}/avatar`;
     return (
       <TouchableWithoutFeedback onPress={() => _onPressPost(index)}>
         <Block
@@ -125,7 +130,7 @@ const PostsListView = (props: Props): JSX.Element => {
             <Block center width={70}>
               <Image
                 source={{
-                  uri: item.avatar || null,
+                  uri: avatar || null,
                 }}
                 style={styles.avatar}
               />

@@ -83,7 +83,7 @@ const PostView = (props: Props): JSX.Element => {
         <Block flex={6} space="between" style={styles.postDescription}>
           <Block>
             <Text size={16} style={{color: materialTheme.COLORS.ERROR}}>
-              {runes.substr(post.title, 0, 45)}
+              {runes.substr(post.state.title, 0, 45)}
             </Text>
             <HTML
               html={post.summary.replace(/\p{Emoji_Presentation}/gu, ' ')}

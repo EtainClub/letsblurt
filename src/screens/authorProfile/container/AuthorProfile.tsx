@@ -84,7 +84,7 @@ const AuthorProfile = (props: Props): JSX.Element => {
         const avatar = `${IMAGE_SERVER}/u/${author}/avatar`;
         return {
           author,
-          avatar,
+          //          avatar,
           title: blog.title,
           createdAt: blog.created,
           postRef: {

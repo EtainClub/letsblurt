@@ -1,6 +1,8 @@
 //// react
 import React, {useReducer, createContext} from 'react';
-//// steem api
+//// language
+import {useIntl} from 'react-intl';
+//// blockchain api
 import {
   fetchPostsSummary,
   verifyPassoword,
@@ -12,6 +14,8 @@ import {
   fetchPostDetails,
 } from '~/providers/blurt/dblurtApi';
 import {renderPostBody} from '~/utils/render-helpers';
+import firestore from '@react-native-firebase/firestore';
+
 //// types
 import {
   PostRef,
@@ -64,36 +68,35 @@ const PostsContext = createContext<PostsContextType | undefined>(undefined);
 const postsReducer = (state: PostsState, action: PostsAction) => {
   let posts = [];
   let metaposts = {};
-  const {payload} = action;
   switch (action.type) {
     case PostsActionTypes.SET_TAG_LIST:
       return {
         ...state,
-        tagList: payload,
+        tagList: action.payload,
       };
     case PostsActionTypes.SET_COMMUNITIES:
       return {
         ...state,
-        communityList: payload,
+        communityList: action.payload,
       };
     case PostsActionTypes.SET_POSTS:
-      console.log('[postsReducer] set posts aciton. payload', payload);
+      console.log('[postsReducer] set posts aciton. payload', action.payload);
       //// set posts to the posts type array
       return {
         ...state,
-        [payload.postsType]: payload.metaposts,
-        postsType: payload.postsType,
+        [action.payload.postsType]: action.payload.metaposts,
+        postsType: action.payload.postsType,
         fetched: true,
       };
 
     case PostsActionTypes.APPEND_POSTS:
-      console.log('[postsReducer appending aciton payload', payload);
+      console.log('[postsReducer appending aciton payload', action.payload);
       // append
       console.log(
         '[postsReducer appending aciton poststype',
-        payload.postsType,
+        action.payload.postsType,
       );
-      metaposts = state[payload.postsType];
+      metaposts = state[action.payload.postsType];
       console.log('[postsReducer appending aciton posts', metaposts);
       // posts[payload.postsType] = state.posts[payload.postsType].concat(
       //   payload.posts,
@@ -105,14 +108,14 @@ const postsReducer = (state: PostsState, action: PostsAction) => {
       };
 
     case PostsActionTypes.SET_FETCHED:
-      console.log('[postsReducer] set fetched. payload', payload);
-      return {...state, fetched: payload};
+      console.log('[postsReducer] set fetched. payload', action.payload);
+      return {...state, fetched: action.payload};
 
     case PostsActionTypes.SET_POST_REF:
       return {...state, postRef: action.payload};
 
     case PostsActionTypes.CLEAR_POSTS:
-      console.log('[postReducer] clearing action payload', payload);
+      console.log('[postReducer] clearing action payload', action.payload);
 
       return {
         ...state,
@@ -125,17 +128,26 @@ const postsReducer = (state: PostsState, action: PostsAction) => {
       };
 
     case PostsActionTypes.SET_TAG_INDEX:
-      return {...state, tagIndex: payload};
+      return {...state, tagIndex: action.payload};
 
     case PostsActionTypes.SET_FILTER_INDEX:
-      return {...state, filterIndex: payload};
+      return {...state, filterIndex: action.payload};
 
     case PostsActionTypes.SET_POST_DETAILS:
       return {
         ...state,
-        postDetails: payload,
+        postDetails: action.payload,
       };
-
+    case PostsActionTypes.BOOKMARK_POST:
+      // update post details's state
+      const postsDetails = state.postDetails;
+      postsDetails.state.bookmarked = action.payload;
+      return {
+        ...state,
+        postDetails: {
+          ...state.postDetails,
+        },
+      };
     case PostsActionTypes.UPVOTE:
       console.log('[postReducer] upvoting action payload', action.payload);
       return state;
@@ -158,6 +170,8 @@ type Props = {
 };
 
 const PostsProvider = ({children}: Props) => {
+  //// language
+  const intl = useIntl();
   // userReducer hook
   // set auth reducer with initial state of auth state
   const [postsState, dispatch] = useReducer(postsReducer, initialState);
@@ -494,7 +508,7 @@ const PostsProvider = ({children}: Props) => {
       // update post detail
       const post = postsState.postDetails;
       post.body = renderPostBody(postingContent.body, true, true);
-      post.title = postingContent.title;
+      post.state.title = postingContent.title;
       post.metadata = JSON.parse(postingContent.json_metadata);
       dispatch({
         type: action,
@@ -505,10 +519,136 @@ const PostsProvider = ({children}: Props) => {
     return {success, message};
   };
 
-  // bookmarking
-  const bookmark = async () => {};
+  //// bookmark post in firebase
+  const bookmarkPost = async (
+    postRef: PostRef,
+    username: string,
+    title: string,
+    setToastMessage?: (message: string) => void,
+  ) => {
+    console.log('[addBookmark] postRef', postRef);
+    //// get the firebase user doc ref
+    // build doc id
+    const docId = `${postRef.author}${postRef.permlink}`;
+    // create a reference to the doc
+    const docRef = firestore()
+      .doc(`users/${username}`)
+      .collection('bookmarks')
+      .doc(docId);
+    // check saniy if the user already bookmarked this
+    const bookmark = await docRef.get();
+    if (bookmark.exists) {
+      console.log('[addBookmark] User bookmarked already');
+      setToastMessage(intl.formatMessage({id: 'Bookmark.already'}));
+      return;
+    }
+    // add new doc
+    docRef.set({
+      author: postRef.author,
+      title: title,
+      postRef: postRef,
+      createdAt: new Date(),
+    });
+    // dispatch action
+    dispatch({
+      type: PostsActionTypes.BOOKMARK_POST,
+      payload: true,
+    });
+  };
 
-  // set post ref
+  //// fetch database state
+  const fetchDatabaseState = async (postRef: PostRef, username: string) => {
+    console.log('[fetchDatabaseState] postRef', postRef);
+    //// get the firebase user doc ref
+    // build doc id
+    const docId = `${postRef.author}${postRef.permlink}`;
+    // create a reference to the doc
+    const docRef = firestore()
+      .doc(`users/${username}`)
+      .collection('bookmarks')
+      .doc(docId);
+    // check saniy if the user already bookmarked this
+    const bookmark = await docRef.get();
+    if (bookmark.exists) {
+      return {
+        bookmarked: true,
+      };
+    } else {
+      return {
+        bookmarked: false,
+      };
+    }
+  };
+
+  //// fetch bookmarks
+  const fetchBookmarks = async (username: string) => {
+    console.log('[fetchBookmarks] username', username);
+    // get user's bookmarks collection
+    let bookmarks = [];
+    await firestore()
+      .doc(`users/${username}`)
+      .collection('bookmarks')
+      .get()
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
+          bookmarks.push(doc.data());
+        });
+      })
+      .catch((e) => {
+        console.log('failed to get bookmarks', e);
+      });
+    return bookmarks;
+  };
+
+  //// favorite author
+  const favoriteAuthor = async (
+    author: string,
+    username: string,
+    setToastMessage?: (message: string) => void,
+  ) => {
+    console.log('[favoriteAuthor] author', author);
+    //// get the firebase user doc ref
+    // create a reference to the doc
+    const docRef = firestore()
+      .doc(`users/${username}`)
+      .collection('favorites')
+      .doc(author);
+
+    // check saniy if the user already favorited the author
+    const favorite = await docRef.get();
+    if (favorite.exists) {
+      console.log('[favoriteAuthor] User favorited the author already');
+      setToastMessage(intl.formatMessage({id: 'Favorite.already'}));
+      return;
+    }
+    // add new doc
+    docRef.set({
+      author: author,
+      createdAt: new Date(),
+    });
+  };
+
+  //// fetch favorites
+  const fetchFavorites = async (username: string) => {
+    console.log('[fetchFavorites] username', username);
+    // get user's favorite collection
+    let favorites = [];
+    await firestore()
+      .doc(`users/${username}`)
+      .collection('favorites')
+      .get()
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
+          favorites.push(doc.data());
+        });
+      })
+      .catch((e) => {
+        console.log('failed to get bookmarks', e);
+      });
+    return favorites;
+  };
+
+  //// set post ref
   const setPostRef = (postRef: PostRef) => {
     // dispatch action
     dispatch({
@@ -530,7 +670,11 @@ const PostsProvider = ({children}: Props) => {
         upvote,
         submitPost,
         updatePost,
-        bookmark,
+        bookmarkPost,
+        fetchBookmarks,
+        fetchDatabaseState,
+        favoriteAuthor,
+        fetchFavorites,
       }}>
       {children}
     </PostsContext.Provider>

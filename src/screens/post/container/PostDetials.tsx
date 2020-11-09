@@ -28,7 +28,12 @@ const PostDetails = (props: Props): JSX.Element => {
   // contexts
   const {authState} = useContext(AuthContext);
   const {userState, updateVoteAmount} = useContext(UserContext);
-  const {postsState, submitPost, getPostDetails} = useContext(PostsContext);
+  const {
+    postsState,
+    submitPost,
+    getPostDetails,
+    fetchDatabaseState,
+  } = useContext(PostsContext);
   const {uiState, setTagParam} = useContext(UIContext);
   // states
   const [postDetails, setPostDetails] = useState<PostData>(null);
@@ -58,6 +63,12 @@ const PostDetails = (props: Props): JSX.Element => {
       postsState.postRef,
       authState.currentCredentials.username,
     );
+    // fetch database
+    const {bookmarked} = await fetchDatabaseState(
+      postsState.postRef,
+      authState.currentCredentials.username,
+    );
+    details.state.bookmarked = bookmarked;
     // set post details
     setPostDetails(details);
     // fetch comments

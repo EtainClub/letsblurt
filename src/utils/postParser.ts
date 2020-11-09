@@ -33,7 +33,6 @@ export const parsePost = async (
   const postData: PostData = {
     // post
     id: post.id ? post.id : post.post_id,
-    title: post.title,
     body: post.body,
     markdownBody: '',
     summary: '',
@@ -67,6 +66,7 @@ export const parsePost = async (
         author: post.author,
         permlink: post.permlink,
       },
+      title: post.title,
 
       // user's actions related
       voted: false,
@@ -258,7 +258,6 @@ export const parseComment = async (comment: Discussion, username: string) => {
   const commentData: CommentData = {
     // comment
     id: comment.id,
-    title: comment.title,
     body: comment.body,
     markdownBody: '',
     summary: '',
@@ -295,6 +294,7 @@ export const parseComment = async (comment: Discussion, username: string) => {
         author: comment.author,
         permlink: comment.permlink,
       },
+      title: comment.title,
 
       // user's actions related
       voted: false,

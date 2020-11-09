@@ -56,6 +56,7 @@ export interface PostState {
   // post reference
   parent_ref?: PostRef;
   post_ref: PostRef;
+  title: string;
 
   // user's actions related
   voted: boolean;
@@ -78,7 +79,6 @@ export interface PostState {
 export interface PostData {
   // post
   id: number;
-  title: string;
   body: string;
   markdownBody: string;
   summary: string;
@@ -103,7 +103,6 @@ export const INIT_POST_DATA = {
   // id
   id: -1,
   // post
-  title: '',
   body: '',
   markdownBody: '',
   summary: '',
@@ -133,6 +132,7 @@ export const INIT_POST_DATA = {
     // post reference
     parent_ref: null,
     post_ref: null,
+    title: '',
 
     // user's actions related
     voted: false,
@@ -290,9 +290,11 @@ interface CommentAction {
     username: string;
   };
 }
+
 // bookmarking
 interface BookmarkAction {
   type: PostsActionTypes.BOOKMARK_POST;
+  payload: boolean;
 }
 // set post details erf
 interface SetPostRefAction {
@@ -332,7 +334,7 @@ export interface PostsContextType {
     password: string,
     votingWeight: number,
     voteAmount: number,
-    setToastMessage: (message: string) => void,
+    setToastMessage?: (message: string) => void,
   ) => Promise<any>;
   // submit post
   submitPost: (
@@ -358,7 +360,28 @@ export interface PostsContextType {
     message: any;
   }>;
   // bookmark
-  bookmark: () => void;
+  bookmarkPost: (
+    postRef: PostRef,
+    username: string,
+    title: string,
+    setToastMessage?: (message: string) => void,
+  ) => void;
+  // fetch database state
+  fetchDatabaseState: (
+    postRef: PostRef,
+    username: string,
+  ) => Promise<{bookmarked: boolean}>;
+  // fetch all bookmarks
+  fetchBookmarks: (username: string) => Promise<any[]>;
+  // bookmark
+  favoriteAuthor: (
+    author: string,
+    username: string,
+    setToastMessage?: (message: string) => void,
+  ) => void;
+  // fetch all favorite authurs
+  fetchFavorites: (username: string) => Promise<any[]>;
+
   // set post ref
   setPostRef: (postRef: PostRef) => void;
   // set communities
