@@ -182,3 +182,44 @@ const styles = StyleSheet.create({
     borderRadius: 24 / 2,
   },
 });
+
+/*
+const PostsListContainer = (props: Props): JSX.Element => {
+  //// contexts
+  const {authState} = useContext(AuthContext);
+  //// states
+  const [posts, setPosts] = useState(null);
+  const [fetched, setFetched] = useState(false);
+  //// effect
+  useEffect(() => {
+    console.log('[PostsListsContainer] fetch posts');
+    // fetch posts data from references (author/permlink)
+    _getPosts(props.postsRefs);
+  }, []);
+
+  const _getPosts = async (refs: string[]) => {
+    // refs format: author/permlink
+    const promises = refs.map(async (ref) => {
+      const authorPermlink = ref.split('/');
+      console.log(
+        '[PostsListsContainer] authorPermlink',
+        authorPermlink[0],
+        authorPermlink[1],
+      );
+      return fetchPost(authorPermlink[0], authorPermlink[1]);
+    });
+    const parsedPosts = await Promise.all(promises);
+    console.log('[PostsListsContainer] parsed posts', parsedPosts);
+    // set
+    setPosts(parsedPosts);
+  };
+
+  return posts ? (
+    <PostsListView posts={posts} isUser={false} />
+  ) : (
+    <ActivityIndicator color="pink" />
+  );
+};
+
+export {PostsListContainer};
+*/

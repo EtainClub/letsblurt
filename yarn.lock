@@ -1488,6 +1488,14 @@
   resolved "https://registry.yarnpkg.com/@types/prop-types/-/prop-types-15.7.3.tgz#2ab0d5da2e5815f94b0b9d4b95d1e5f243ab2ca7"
   integrity sha512-KfRL3PuHmqQLOG+2tGpRO26Ctg+Cq1E01D2DMriKEATHgWLfeNDmq9e29Q9WIky0dQ3NPkd1mzYH8Lm936Z9qw==
 
+"@types/react-native-draggable-flatlist@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@types/react-native-draggable-flatlist/-/react-native-draggable-flatlist-1.1.1.tgz#81fa66d1f4899348195acfad6e23e33dec935a7b"
+  integrity sha512-E/dkV2QrPvDXvcDLGpBZmR1iDql20ph9zUjHpZ2heNA56+k5iTQP6NN5oVlLC7B3sFScntI57kn3ZiDBHVTDsQ==
+  dependencies:
+    "@types/react" "*"
+    "@types/react-native" "*"
+
 "@types/react-native-push-notification@^5.0.2":
   version "5.0.5"
   resolved "https://registry.yarnpkg.com/@types/react-native-push-notification/-/react-native-push-notification-5.0.5.tgz#a84efdeb15af414a89b1291f4df631266d6a4330"
@@ -6791,6 +6799,11 @@ react-native-country-picker-modal@^2.0.0:
     node-emoji "1.10.0"
     prop-types "15.7.2"
     react-async-hook "3.6.1"
+
+react-native-draggable-flatlist@^2.5.0:
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/react-native-draggable-flatlist/-/react-native-draggable-flatlist-2.5.0.tgz#8d3f190ce6c8b59a3f6232564aebd62676c11bbc"
+  integrity sha512-j09QNGGejYK+L7qhl9ciCtJyAQnES/xjW2SOOa32Ym9WXOqQm8j2/lsMdiEYZMCJmWCdCbutMh4zF4+25nOkZA==
 
 react-native-fab@^1.0.17:
   version "1.0.17"

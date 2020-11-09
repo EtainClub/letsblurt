@@ -270,6 +270,7 @@
     "already": "You already bookmarked this post"
   },
   "Favorite": {
-    "already": "You already favorited the author"
+    "already": "You already favorited the author",
+    "done": "favorited the author"
   }
 }

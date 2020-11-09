@@ -10,6 +10,8 @@ import {PostsListView} from './PostsList';
 import {PostBody} from './PostBody';
 import {ProfileContainer} from './Profile';
 import {WalletStatsView} from './Wallet';
+import {DraggableList} from './DraggableList';
+
 //import Switch from "./Switch";
 //import Voting from "./Voting";
 //import Comment from "./Comment";
@@ -25,4 +27,5 @@ export {
   PostBody,
   ProfileContainer,
   WalletStatsView,
+  DraggableList,
 };

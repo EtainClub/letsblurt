@@ -18,16 +18,20 @@ const Profile = ({navigation}): JSX.Element => {
   const {authState} = useContext(AuthContext)!;
   const {userState, getUserProfileData} = useContext(UserContext);
   const {uiState, setAuthorParam} = useContext(UIContext);
-  const {postsState, fetchPosts, fetchBookmarks, clearPosts} = useContext(
-    PostsContext,
-  );
+  const {
+    postsState,
+    fetchPosts,
+    fetchBookmarks,
+    fetchFavorites,
+    clearPosts,
+  } = useContext(PostsContext);
   // states
   const [profileData, setProfileData] = useState<ProfileData>(null);
   const [profileFetched, setProfileFetched] = useState(false);
   const [loaded, setLoaded] = useState(false);
-  const [authorPosts, setAuthorPosts] = useState<PostData[]>(null);
   const [blogs, setBlogs] = useState(null);
   const [bookmarks, setBookmarks] = useState(null);
+  const [favorites, setFavorites] = useState(null);
   const [postsFetching, setPostsFetching] = useState(true);
 
   console.log('[ProfileContainer] navigation', navigation);
@@ -35,9 +39,11 @@ const Profile = ({navigation}): JSX.Element => {
   //// fetch user state
   useEffect(() => {
     if (authState.loggedIn) {
+      const {username} = authState.currentCredentials;
       setProfileFetched(false);
-      _getUserProfileData(authState.currentCredentials.username);
-      _fetchBookmarks(authState.currentCredentials.username);
+      _getUserProfileData(username);
+      _fetchBookmarks(username);
+      _fetchFavorites(username);
     }
   }, []);
   //// TODO: fetch user's bookmark and favorites
@@ -83,6 +89,13 @@ const Profile = ({navigation}): JSX.Element => {
     setBookmarks(bookmarks);
   };
 
+  //// fetch favorites
+  const _fetchFavorites = async (username: string) => {
+    const favorites = await fetchFavorites(username);
+    // set favorites
+    setFavorites(favorites);
+  };
+
   //// clear posts
   const _clearPosts = async () => {
     console.log('[ProfileContainer] clear posts');
@@ -95,6 +108,7 @@ const Profile = ({navigation}): JSX.Element => {
         profileData={profileData}
         blogs={blogs}
         bookmarks={bookmarks}
+        favorites={favorites}
         clearPosts={_clearPosts}
       />
     )

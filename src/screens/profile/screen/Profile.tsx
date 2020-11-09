@@ -19,7 +19,7 @@ import {Images, argonTheme, BLURT_IMAGE_SERVER} from '~/constants';
 import {HeaderHeight} from '~/constants/utils';
 import {getNumberStat} from '~/utils/stats';
 import {Feed} from '~/screens';
-import {PostsListView, ProfileContainer} from '~/components';
+import {PostsListView, ProfileContainer, DraggableList} from '~/components';
 import {PostsTypes, PostData, ProfileData} from '~/contexts/types';
 
 const {width, height} = Dimensions.get('screen');
@@ -31,6 +31,7 @@ interface Props {
   profileData: ProfileData;
   blogs: any[];
   bookmarks: any[];
+  favorites: any[];
   clearPosts: () => void;
 }
 const ProfileScreen = (props: Props): JSX.Element => {
@@ -50,12 +51,8 @@ const ProfileScreen = (props: Props): JSX.Element => {
   const BookmarkList = () =>
     props.bookmarks && <PostsListView posts={props.bookmarks} isUser />;
 
-  const FavoriteList = () => (
-    <View style={{flex: 1}}>
-      <Text>Favorites</Text>
-      <Text>Authors</Text>
-    </View>
-  );
+  const FavoriteList = () =>
+    props.favorites && <DraggableList data={props.favorites} />;
 
   const renderScene = SceneMap({
     blogs: BlogList,

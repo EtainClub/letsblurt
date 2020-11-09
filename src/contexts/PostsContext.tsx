@@ -626,6 +626,7 @@ const PostsProvider = ({children}: Props) => {
       author: author,
       createdAt: new Date(),
     });
+    setToastMessage(intl.formatMessage({id: 'Favorite.done'}));
   };
 
   //// fetch favorites
