@@ -1,3 +1,3 @@
-import {DraggableListContainer} from './DraggableListContainer';
+import {DraggableListView} from './DraggableListView';
 
-export {DraggableListContainer as DraggableList};
+export {DraggableListView as DraggableList};

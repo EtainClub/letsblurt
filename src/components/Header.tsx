@@ -450,7 +450,7 @@ const styles = StyleSheet.create({
   dropdownStyle: {
     marginTop: 15,
     minWidth: 150,
-    width: 160,
+    width: 200,
     backgroundColor: argonTheme.COLORS.DEFAULT,
   },
   dropdownButtonStyle: {

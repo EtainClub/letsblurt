@@ -12,6 +12,7 @@ import {
   BLURT_IMAGE_SERVER,
   STEEM_IMAGE_SERVER,
 } from '~/constants';
+import {navigate} from '~/navigation/service';
 
 const Profile = ({navigation}): JSX.Element => {
   // contexts
@@ -96,6 +97,14 @@ const Profile = ({navigation}): JSX.Element => {
     setFavorites(favorites);
   };
 
+  ////
+  const _handlePressFavoriteItem = (author: string) => {
+    // set author param
+    setAuthorParam(author);
+    // navigate
+    navigate({name: 'AuthorProfile'});
+  };
+
   //// clear posts
   const _clearPosts = async () => {
     console.log('[ProfileContainer] clear posts');
@@ -109,6 +118,7 @@ const Profile = ({navigation}): JSX.Element => {
         blogs={blogs}
         bookmarks={bookmarks}
         favorites={favorites}
+        handlePressFavoriteItem={_handlePressFavoriteItem}
         clearPosts={_clearPosts}
       />
     )

@@ -38,6 +38,7 @@ const DraggableListView = (props: Props): JSX.Element => {
 
   return (
     <DraggableFlatList
+      style={{marginTop: 10}}
       data={props.data}
       renderItem={props.renderItem}
       keyExtractor={(item, index) => `draggable-item-${item.author}`}

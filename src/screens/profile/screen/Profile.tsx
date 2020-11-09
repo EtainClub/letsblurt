@@ -3,6 +3,7 @@ import React from 'react';
 //// react native
 import {
   View,
+  TouchableWithoutFeedback,
   TouchableHighlight,
   Image,
   ImageBackground,
@@ -21,7 +22,12 @@ import {getNumberStat} from '~/utils/stats';
 import {Feed} from '~/screens';
 import {PostsListView, ProfileContainer, DraggableList} from '~/components';
 import {PostsTypes, PostData, ProfileData} from '~/contexts/types';
-
+import {getTimeFromNow} from '~/utils/time';
+const IMAGE_SERVER = BLURT_IMAGE_SERVER;
+const BACKGROUND_COLORS = [
+  argonTheme.COLORS.BORDER,
+  argonTheme.COLORS.SECONDARY,
+];
 const {width, height} = Dimensions.get('screen');
 const thumbMeasure = (width - 48 - 32) / 3;
 
@@ -32,6 +38,7 @@ interface Props {
   blogs: any[];
   bookmarks: any[];
   favorites: any[];
+  handlePressFavoriteItem: (author: string) => void;
   clearPosts: () => void;
 }
 const ProfileScreen = (props: Props): JSX.Element => {
@@ -52,13 +59,52 @@ const ProfileScreen = (props: Props): JSX.Element => {
     props.bookmarks && <PostsListView posts={props.bookmarks} isUser />;
 
   const FavoriteList = () =>
-    props.favorites && <DraggableList data={props.favorites} />;
+    props.favorites && (
+      <DraggableList data={props.favorites} renderItem={_renderFavoriteItem} />
+    );
 
   const renderScene = SceneMap({
     blogs: BlogList,
     bookmarks: BookmarkList,
     favorites: FavoriteList,
   });
+
+  ////
+  const _renderFavoriteItem = ({item, index, drag, isActive}) => {
+    console.log('[DraggableListContainer] _renderItem, item', item);
+    const avatar = `${IMAGE_SERVER}/u/${item.author}/avatar`;
+    return (
+      <TouchableWithoutFeedback
+        onPress={() => props.handlePressFavoriteItem(item.author)}>
+        <Block
+          flex
+          card
+          row
+          space="between"
+          style={{
+            marginBottom: 5,
+            padding: 5,
+            backgroundColor:
+              BACKGROUND_COLORS[index % BACKGROUND_COLORS.length],
+          }}>
+          <Block row middle>
+            <Block center width={70}>
+              <Image
+                source={{
+                  uri: avatar || null,
+                }}
+                style={styles.itemAvatar}
+              />
+              <Text size={10}>{item.author}</Text>
+            </Block>
+          </Block>
+          <Block middle>
+            <Text>{getTimeFromNow(item.createdAt).split('ago')[0]}</Text>
+          </Block>
+        </Block>
+      </TouchableWithoutFeedback>
+    );
+  };
 
   return (
     <Block flex style={styles.profileScreen}>
@@ -124,6 +170,11 @@ const styles = StyleSheet.create({
     height: 124,
     borderRadius: 62,
     borderWidth: 0,
+  },
+  itemAvatar: {
+    width: 24,
+    height: 24,
+    borderRadius: 24 / 2,
   },
 });
 
