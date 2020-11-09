@@ -279,13 +279,29 @@ const profile = {
 
 const AuthorStack = () => {
   return (
-    <Stack.Navigator mode="card" headerMode="none">
+    <Stack.Navigator mode="card" headerMode="screen">
       <Stack.Screen
         name="AuthorProfile"
         component={AuthorProfile}
         options={{
           header: ({navigation}) => {
             return <Header title="Author" navigation={navigation} />;
+          },
+        }}
+      />
+    </Stack.Navigator>
+  );
+};
+
+const SettingsStack = () => {
+  return (
+    <Stack.Navigator mode="card" headerMode="screen">
+      <Stack.Screen
+        name="Settings"
+        component={Settings}
+        options={{
+          header: ({navigation}) => {
+            return <Header title="Settings" navigation={navigation} />;
           },
         }}
       />
@@ -337,7 +353,7 @@ const DrawerNavigator = (props) => {
           <Drawer.Screen name="SignUp" component={Signup} />
         </>
       )}
-      <Drawer.Screen name="Settings" component={Settings} />
+      <Drawer.Screen name="Settings" component={SettingsStack} />
     </Drawer.Navigator>
   );
 };

@@ -307,7 +307,7 @@ const Header = (props: Props): JSX.Element => {
       case 'Search':
         return <SearchBar />;
       case 'Profile':
-      case 'AuthorProfile':
+      case 'Author':
       case 'Notification':
       case 'Wallet':
       case 'Settings':
