@@ -7,6 +7,7 @@ import {
   BlockchainGlobalProps,
   parseToken,
   vestsToRshares,
+  fetchNotifications,
 } from '../providers/blurt/dblurtApi';
 import {estimateVoteAmount} from '~/utils/estimateVoteAmount';
 import {parseBlurtTransaction} from '~/utils/parseTransaction';
@@ -167,7 +168,7 @@ const UserProvider = ({children}: Props) => {
 
   const getUserProfileData = async (username: string) => {
     // check sanity
-    if (!username) null;
+    if (!username) return null;
     const profileData = await fetchUserProfile(username);
     console.log('[getUserProfile] profile data fetched', profileData);
     // dispatch action
@@ -180,6 +181,12 @@ const UserProvider = ({children}: Props) => {
     return profileData;
   };
 
+  const getNotifications = async (username: string) => {
+    if (!username) return null;
+    const notifications = await fetchNotifications(username);
+    console.log('[getNotifications] notifications', notifications);
+  };
+
   return (
     <UserContext.Provider
       value={{
@@ -188,6 +195,7 @@ const UserProvider = ({children}: Props) => {
         updateVoteAmount,
         getWalletData,
         getUserProfileData,
+        getNotifications,
       }}>
       {children}
     </UserContext.Provider>

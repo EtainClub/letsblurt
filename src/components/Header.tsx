@@ -239,7 +239,7 @@ const Header = (props: Props): JSX.Element => {
         tagList.forEach((item) => communityOptions.push(item[1]));
         return (
           <Block row space="between">
-            <Block row space="around" style={{left: 100}}>
+            <Block row space="between" style={{left: 150}}>
               <DropdownModal
                 key={communityOptions[tagIndex]}
                 defaultText={defaultCommunityText || communityOptions[tagIndex]}
@@ -279,33 +279,33 @@ const Header = (props: Props): JSX.Element => {
             /> */}
           </Block>
         );
-      case 'Posting':
-        tagList.forEach((item, index) => {
-          if (index === 0) return;
-          communityOptions.push(item[1]);
-        });
-        return (
-          <Block row space="around">
-            <Text style={{top: 13}}>Posting to</Text>
-            <DropdownModal
-              key={communityOptions[tagIndex]}
-              defaultText={defaultCommunityText || communityOptions[tagIndex]}
-              dropdownButtonStyle={styles.dropdownButtonStyle}
-              selectedOptionIndex={tagIndex}
-              rowTextStyle={styles.rowTextStyle}
-              style={styles.dropdown}
-              dropdownStyle={styles.dropdownStyle}
-              textStyle={styles.dropdownText}
-              options={communityOptions}
-              onSelect={_handleOnTagChangeForPosting}
-            />
-            <Block style={{left: 107, top: 2}}>
-              <Avatar />
-            </Block>
-          </Block>
-        );
       case 'Search':
         return <SearchBar />;
+      case 'Posting':
+      // tagList.forEach((item, index) => {
+      //   if (index === 0) return;
+      //   communityOptions.push(item[1]);
+      // });
+      // return (
+      //   <Block row space="around">
+      //     <Text style={{top: 13}}>Posting to</Text>
+      //     <DropdownModal
+      //       key={communityOptions[tagIndex]}
+      //       defaultText={defaultCommunityText || communityOptions[tagIndex]}
+      //       dropdownButtonStyle={styles.dropdownButtonStyle}
+      //       selectedOptionIndex={tagIndex}
+      //       rowTextStyle={styles.rowTextStyle}
+      //       style={styles.dropdown}
+      //       dropdownStyle={styles.dropdownStyle}
+      //       textStyle={styles.dropdownText}
+      //       options={communityOptions}
+      //       onSelect={_handleOnTagChangeForPosting}
+      //     />
+      //     <Block style={{left: 107, top: 2}}>
+      //       <Avatar />
+      //     </Block>
+      //   </Block>
+      // );
       case 'Profile':
       case 'Author':
       case 'Notification':

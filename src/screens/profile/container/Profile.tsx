@@ -17,7 +17,9 @@ import {navigate} from '~/navigation/service';
 const Profile = ({navigation}): JSX.Element => {
   // contexts
   const {authState} = useContext(AuthContext)!;
-  const {userState, getUserProfileData} = useContext(UserContext);
+  const {userState, getUserProfileData, getNotifications} = useContext(
+    UserContext,
+  );
   const {uiState, setAuthorParam} = useContext(UIContext);
   const {
     postsState,
@@ -46,7 +48,7 @@ const Profile = ({navigation}): JSX.Element => {
       _fetchBookmarks(username);
       _fetchFavorites(username);
     }
-  }, []);
+  }, [authState.currentCredentials]);
   //// TODO: fetch user's bookmark and favorites
 
   // TODO: generalize this for Steem chain
@@ -80,6 +82,9 @@ const Profile = ({navigation}): JSX.Element => {
       console.log('[_getAuthorProfile] blog summarys', summaries);
       setBlogs(summaries);
       setProfileFetched(true);
+
+      // @test
+      getNotifications(author);
     }
   };
 

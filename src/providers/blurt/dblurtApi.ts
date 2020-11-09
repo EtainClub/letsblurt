@@ -1083,6 +1083,43 @@ export const fetchWalletData = async (username: string) => {
   }
 };
 
+export const fetchNotifications = async (username: string) => {
+  debugger;
+  try {
+    const data = {
+      id: 0,
+      jsonrpc: '2.0',
+      method: 'get_notifications',
+      params: [username],
+    };
+    fetch('wss://notifications.blurt.world', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        console.log('[fetchNotifications] username, account', res.result);
+        debugger;
+      });
+  } catch (error) {
+    console.log('failed to fetch notifications', error);
+  }
+
+  // try {
+  //   const params = `@${username}/notifications`;
+  //   const accountState = await client.call('condenser_api', `get_state`, [
+  //     params,
+  //   ]);
+  //   console.log('[fetchNotifications] accountState', accountState);
+
+  //   // const params = username;
+  //   // const notifications = await client.call('get_notifications', [params]);
+  //   // console.log('[fetchNotifications] notifications', notifications);
+  // } catch (error) {
+  //   console.log('Failed to fetch notifications', error);
+  // }
+};
+
 /*
 
 // fetch user profile
