@@ -2668,7 +2668,7 @@ core-js-pure@^3.0.0:
   resolved "https://registry.yarnpkg.com/core-js-pure/-/core-js-pure-3.6.5.tgz#c79e75f5e38dbc85a662d91eea52b8256d53b813"
   integrity sha512-lacdXOimsiD0QyNf9BC/mxivNJ/ybBGJXQFKzRekp1WTHoVUWsUHEn+2T8GJAzzIhyOuXA+gOxCVN3l+5PLPUA==
 
-core-js@^2.2.2, core-js@^2.4.1:
+core-js@^2.2.2, core-js@^2.4.1, core-js@^2.5.0:
   version "2.6.11"
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.6.11.tgz#38831469f9922bded8ee21c9dc46985e0399308c"
   integrity sha512-5wjnpaT/3dV+XB4borEsnAYQchn00XSgTAWKDkEqv+K8KevjbzmofK6hfJ9TZIlpj2N0xQpazy7PiRQiWHqzWg==
@@ -2834,7 +2834,7 @@ dayjs@^1.8.15:
 
 "dblurt@https://github.com/EtainLove/dhive":
   version "0.14.11"
-  resolved "https://github.com/EtainLove/dhive#d4d479a0272611e01ae681560e8c62e9a9caa22a"
+  resolved "https://github.com/EtainLove/dhive#c45340c09915f6aabbe8fbde2f598252df3b3a74"
   dependencies:
     bs58 "^4.0.1"
     bytebuffer "^5.0.1"
@@ -3057,6 +3057,19 @@ drbg.js@^1.0.1:
     browserify-aes "^1.0.6"
     create-hash "^1.1.2"
     create-hmac "^1.1.4"
+
+dsteem@^0.11.3:
+  version "0.11.3"
+  resolved "https://registry.yarnpkg.com/dsteem/-/dsteem-0.11.3.tgz#91b62cf71ef8ed4f936a1a663bd7e1f4fc021bd2"
+  integrity sha512-b7GkqHrWkTUiorlMaIBSi5DLTjUd8UuxK8HQeO4QMwDtuMiEOKH4tKd7vME5g/ktMNIKexvRoZ1fc6JYjPTHBA==
+  dependencies:
+    bs58 "^4.0.1"
+    bytebuffer "^5.0.1"
+    core-js "^2.5.0"
+    node-fetch "^2.3.0"
+    secp256k1 "^3.5.2"
+    verror "^1.10.0"
+    whatwg-fetch "^3.0.0"
 
 ecc-jsbn@~0.1.1:
   version "0.1.2"
@@ -6086,7 +6099,7 @@ node-emoji@1.10.0:
   dependencies:
     lodash.toarray "^4.4.0"
 
-node-fetch@2.6.1, node-fetch@^2.2.0, node-fetch@^2.6.0:
+node-fetch@2.6.1, node-fetch@^2.2.0, node-fetch@^2.3.0, node-fetch@^2.6.0:
   version "2.6.1"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.1.tgz#045bd323631f76ed2e2b55573394416b639a0052"
   integrity sha512-V4aYg89jEoVRxRb2fJdAg8FHvI7cEyYdVAh94HH0UIK8oJxUfkjlDQN9RbMx+bEjP7+ggMiFRprSti032Oipxw==
@@ -7397,7 +7410,7 @@ scheduler@0.19.1, scheduler@^0.19.1:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
 
-secp256k1@^3.8.0:
+secp256k1@^3.5.2, secp256k1@^3.8.0:
   version "3.8.0"
   resolved "https://registry.yarnpkg.com/secp256k1/-/secp256k1-3.8.0.tgz#28f59f4b01dbee9575f56a47034b7d2e3b3b352d"
   integrity sha512-k5ke5avRZbtl9Tqx/SA7CbY3NF6Ro+Sj9cZxezFzuBlLDmyqPiL8hJJ+EmzD8Ig4LUDByHJ3/iPOVoRixs/hmw==

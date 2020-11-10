@@ -103,7 +103,6 @@ const PostDetails = (props: Props): JSX.Element => {
     // build posting content
     const postingContent: PostingContent = {
       author: username,
-      password: password,
       title: '',
       body: comment,
       parent_author: postsState.postRef.author,
@@ -112,7 +111,11 @@ const PostDetails = (props: Props): JSX.Element => {
       permlink: permlink,
     };
 
-    const {success, message} = await submitPost(postingContent, true, index);
+    const {success, message} = await submitPost(
+      postingContent,
+      password,
+      index,
+    );
     // set submitted flag
     setSubmitted(true);
     return message;

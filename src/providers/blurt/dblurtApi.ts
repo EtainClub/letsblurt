@@ -34,7 +34,7 @@ const MAINNET_OFFICIAL = [
   'https://blurtd.privex.io',
   'https://rpc.blurt.buzz',
 ];
-const client = new Client(MAINNET_OFFICIAL, {
+const client = new Client('MAINNET_OFFICIAL', {
   timeout: 5000,
   addressPrefix: 'BLT',
   chainId: 'cd8d90f29ae273abec3eaa7731e25934c63eb654d55080caff2ebb7f5df6381f',
@@ -983,19 +983,8 @@ export const submitVote = async (
 
   if (privateKey) {
     return new Promise((resolve, reject) => {
-      const op = ['vote', vote];
-      sendOperations([op], privateKey)
-        .then((result) => {
-          console.log('voting result', result);
-          resolve(result);
-        })
-        .catch((error) => {
-          console.log('failed to submit a vote', error);
-          reject(error);
-        });
-
-      // client.broadcast
-      //   .vote(vote, privateKey)
+      // const op = ['vote', vote];
+      // sendOperations([op], privateKey)
       //   .then((result) => {
       //     console.log('voting result', result);
       //     resolve(result);
@@ -1004,6 +993,17 @@ export const submitVote = async (
       //     console.log('failed to submit a vote', error);
       //     reject(error);
       //   });
+
+      client.broadcast
+        .vote(vote, privateKey)
+        .then((result) => {
+          console.log('voting result', result);
+          resolve(result);
+        })
+        .catch((error) => {
+          console.log('failed to submit a vote', error);
+          reject(error);
+        });
     });
   }
 
