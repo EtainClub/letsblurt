@@ -870,6 +870,21 @@
   dependencies:
     "@hapi/hoek" "^8.3.0"
 
+"@hiveio/dhive@^0.14.11":
+  version "0.14.11"
+  resolved "https://registry.yarnpkg.com/@hiveio/dhive/-/dhive-0.14.11.tgz#01d3d67b8276c9dd4c2f89984779259857068645"
+  integrity sha512-inKw3adkr1tsRVxHAD97q0TkX5fi+BD9HmSPQnVdJVAm+f9DpmeMcs4oVPXZ/MNQEeHsXdwIXxSLhw1qtTFrLA==
+  dependencies:
+    bs58 "^4.0.1"
+    bytebuffer "^5.0.1"
+    core-js "^3.6.4"
+    cross-fetch "^3.0.4"
+    jsbi "^3.1.4"
+    node-fetch "^2.6.0"
+    secp256k1 "^3.8.0"
+    verror "^1.10.0"
+    whatwg-fetch "^3.0.0"
+
 "@istanbuljs/load-nyc-config@^1.0.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@istanbuljs/load-nyc-config/-/load-nyc-config-1.1.0.tgz#fd3db1d59ecf7cf121e80650bb86712f9b55eced"
