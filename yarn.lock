@@ -870,21 +870,6 @@
   dependencies:
     "@hapi/hoek" "^8.3.0"
 
-"@hiveio/dhive@^0.14.11":
-  version "0.14.11"
-  resolved "https://registry.yarnpkg.com/@hiveio/dhive/-/dhive-0.14.11.tgz#01d3d67b8276c9dd4c2f89984779259857068645"
-  integrity sha512-inKw3adkr1tsRVxHAD97q0TkX5fi+BD9HmSPQnVdJVAm+f9DpmeMcs4oVPXZ/MNQEeHsXdwIXxSLhw1qtTFrLA==
-  dependencies:
-    bs58 "^4.0.1"
-    bytebuffer "^5.0.1"
-    core-js "^3.6.4"
-    cross-fetch "^3.0.4"
-    jsbi "^3.1.4"
-    node-fetch "^2.6.0"
-    secp256k1 "^3.8.0"
-    verror "^1.10.0"
-    whatwg-fetch "^3.0.0"
-
 "@istanbuljs/load-nyc-config@^1.0.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@istanbuljs/load-nyc-config/-/load-nyc-config-1.1.0.tgz#fd3db1d59ecf7cf121e80650bb86712f9b55eced"
@@ -2780,11 +2765,6 @@ crypto-js@^3.1.47:
   resolved "https://registry.yarnpkg.com/crypto-js/-/crypto-js-3.3.0.tgz#846dd1cce2f68aacfa156c8578f926a609b7976b"
   integrity sha512-DIT51nX0dCfKltpRiXV+/TVZq+Qq2NgF4644+K7Ttnla7zEzqc+kjJyiB96BHNyUTBxyjzRcZYpUdZa+QAqi6Q==
 
-crypto@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/crypto/-/crypto-1.0.1.tgz#2af1b7cad8175d24c8a1b0778255794a21803037"
-  integrity sha512-VxBKmeNcqQdiUQUW2Tzq0t377b54N2bMtXO/qiLa+6eRRmmC4qT3D4OnTGoT/U6O9aklQ/jTwbOtRMTTY8G0Ig==
-
 css-color-keywords@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/css-color-keywords/-/css-color-keywords-1.0.0.tgz#fea2616dc676b2962686b3af8dbdbe180b244e05"
@@ -3111,6 +3091,11 @@ elliptic@^6.5.2:
     inherits "^2.0.1"
     minimalistic-assert "^1.0.0"
     minimalistic-crypto-utils "^1.0.0"
+
+emitter-component@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/emitter-component/-/emitter-component-1.1.1.tgz#065e2dbed6959bf470679edabeaf7981d1003ab6"
+  integrity sha1-Bl4tvtaVm/RwZ57avq95gdEAOrY=
 
 emoji-regex@^7.0.1:
   version "7.0.3"
@@ -7837,6 +7822,13 @@ stream-buffers@~2.2.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/stream-buffers/-/stream-buffers-2.2.0.tgz#91d5f5130d1cef96dcfa7f726945188741d09ee4"
   integrity sha1-kdX1Ew0c75bc+n9yaUUYh0HQnuQ=
+
+stream@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/stream/-/stream-0.0.2.tgz#7f5363f057f6592c5595f00bc80a27f5cec1f0ef"
+  integrity sha1-f1Nj8Ff2WSxVlfALyAon9c7B8O8=
+  dependencies:
+    emitter-component "^1.1.1"
 
 strict-uri-encode@^2.0.0:
   version "2.0.0"

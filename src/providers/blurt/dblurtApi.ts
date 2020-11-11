@@ -908,9 +908,67 @@ export const getActiveVotes = (
       });
   });
 
+function isCanonicalSignature(signature: Buffer): boolean {
+  return (
+    !(signature[0] & 0x80) &&
+    !(signature[0] === 0 && !(signature[1] & 0x80)) &&
+    !(signature[32] & 0x80) &&
+    !(signature[32] === 0 && !(signature[33] & 0x80))
+  );
+}
+
+import * as secp256k1 from 'secp256k1';
+
+import {Signature} from 'dblurt';
+/**
+ * Sign message.
+ * @param message 32-byte message.
+ */
+function sign(key: Buffer, message: Buffer): Signature {
+  console.log('[sendOperations] sign. key', key);
+  console.log('[sendOperations] sign. message', message);
+
+  let rv: {signature: Buffer; recovery: number};
+  let attempts = 0;
+  do {
+    const options = {
+      data: cryptoUtils.sha256(
+        Buffer.concat([message, Buffer.alloc(1, ++attempts)]),
+      ),
+    };
+    console.log('[sendOperations] sign, options', options);
+
+    rv = secp256k1.sign(message, key, options);
+    console.log('[sendOperations] sign, rv', rv);
+  } while (!isCanonicalSignature(rv.signature));
+  const signature = new Signature(rv.signature, rv.recovery);
+  console.log('[sendOperations] sign. signature', signature);
+
+  return signature;
+}
+
+/**
+ * Return a deep copy of a JSON-serializable object.
+ */
+export function copy<T>(object: T): T {
+  return JSON.parse(JSON.stringify(object));
+}
+
+export interface Transaction {
+  ref_block_num: number;
+  ref_block_prefix: number;
+  expiration: string;
+  operations: Operation[];
+  extensions: any[];
+}
+
+export interface SignedTransaction extends Transaction {
+  signatures: string[];
+}
+
 const sendOperations = async (
   operations: Operation[],
-  key: PrivateKey | PrivateKey[],
+  keys: PrivateKey | PrivateKey[],
 ) => {
   console.log('[sendOperations]');
 
@@ -937,13 +995,69 @@ const sendOperations = async (
   };
 
   console.log('[sendOperations] tx', tx);
-  const tx2 = cryptoUtils.signTransaction(tx, key, client.chainId);
-  console.log('[sendOperations] tx2', tx);
+  console.log('[sendOperations] chainId', client.chainId);
+
+  //  const signature = cryptoUtils.signTransaction(tx, key, client.chainId);
+  //  const tx2 = signTransaction(tx, key, client.chainId);
+
+  // serialize
+  const ByteBuffer = require('bytebuffer');
+  const buffer = new ByteBuffer(
+    ByteBuffer.DEFAULT_CAPACITY,
+    ByteBuffer.LITTLE_ENDIAN,
+  );
+
+  // serialize
+  buffer.writeUInt16(tx.ref_block_num);
+  buffer.writeUInt32(tx.ref_block_prefix);
+  //buffer.writeUInt32(tx.expiration);
+  buffer.writeUint32(
+    Math.floor(new Date(tx.expiration + 'Z').getTime() / 1000),
+  );
+  buffer.writeVarint32(tx.operations.length); // number of operations
+  buffer.writeVarint32(0); // operation id
+  buffer.writeVString(operations[0][1].voter);
+  buffer.writeVString(operations[0][1].author);
+  buffer.writeVString(operations[0][1].permlink);
+  buffer.writeInt16(operations[0][1].weight);
+  buffer.writeVarint32(extensions.length); // number of extensions
+
+  console.log('[sendOperations] buffer', buffer);
+
+  // convert byte buffer to actual buffer
+  buffer.flip();
+  const transactionData = Buffer.from(buffer.toBuffer());
+  const CHAIN_ID = Buffer.from(
+    'cd8d90f29ae273abec3eaa7731e25934c63eb654d55080caff2ebb7f5df6381f',
+    'hex',
+  );
+
+  const digest = cryptoUtils.sha256(Buffer.concat([CHAIN_ID, transactionData]));
+
+  console.log('[sendOperations] digest', digest);
+
+  const signedTransaction = copy(tx) as SignedTransaction;
+  if (!signedTransaction.signatures) {
+    signedTransaction.signatures = [];
+  }
+
+  if (!Array.isArray(keys)) {
+    keys = [keys];
+  }
+  for (const key of keys) {
+    const signature = sign(key, digest);
+    console.log('[sendOperations] signature', signature);
+    signedTransaction.signatures.push(signature.toString());
+  }
+
+  console.log('[sendOperations] signedTransaction', signedTransaction);
+
+  //  console.log('[sendOperations] signed transaction', signature);
 
   const result = await client.call(
     'condenser_api',
     'broadcast_transaction_synchronous',
-    [tx2],
+    [signedTransaction],
   );
 
   console.log('[sendOperations] result', result);
@@ -968,7 +1082,7 @@ export const submitVote = async (
   };
 
   // @test: etainclub
-  //  password = Config.ETAINCLUB_POSTING_WIF;
+  //password = Config.ETAINCLUB_POSTING_WIF;
 
   console.log('[submitVote] vote', vote);
 
@@ -980,22 +1094,13 @@ export const submitVote = async (
 
   // get privake key from password
   const privateKey = PrivateKey.from(password);
+  console.log('[sendOperations] password', password);
 
   if (privateKey) {
+    console.log('[sendOperations] privateKey', privateKey);
     return new Promise((resolve, reject) => {
-      // const op = ['vote', vote];
-      // sendOperations([op], privateKey)
-      //   .then((result) => {
-      //     console.log('voting result', result);
-      //     resolve(result);
-      //   })
-      //   .catch((error) => {
-      //     console.log('failed to submit a vote', error);
-      //     reject(error);
-      //   });
-
-      client.broadcast
-        .vote(vote, privateKey)
+      const op = ['vote', vote];
+      sendOperations([op], privateKey)
         .then((result) => {
           console.log('voting result', result);
           resolve(result);
@@ -1004,6 +1109,17 @@ export const submitVote = async (
           console.log('failed to submit a vote', error);
           reject(error);
         });
+
+      // client.broadcast
+      //   .vote(vote, privateKey)
+      //   .then((result) => {
+      //     console.log('voting result', result);
+      //     resolve(result);
+      //   })
+      //   .catch((error) => {
+      //     console.log('failed to submit a vote', error);
+      //     reject(error);
+      //   });
     });
   }
 
