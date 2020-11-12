@@ -1041,13 +1041,43 @@ const sendOperations = async (
     signedTransaction.signatures = [];
   }
 
+  console.log('[sendOperations] initial signedTransaction', signedTransaction);
+
   if (!Array.isArray(keys)) {
     keys = [keys];
   }
+
   for (const key of keys) {
-    const signature = sign(key, digest);
+    const signature = sign(key.key, digest);
     console.log('[sendOperations] signature', signature);
-    signedTransaction.signatures.push(signature.toString());
+
+    const buffer = Buffer.alloc(65);
+    buffer.writeUInt8(signature.recovery + 31, 0);
+    console.log('[sendOperations] signature. buffer0', buffer);
+    signature.data.copy(buffer, 1);
+    console.log('[sendOperations] signature. buffer1', buffer);
+    console.log('[sendOperations] signature. sig data', signature.data);
+    const sigString = buffer.toString('hex');
+    console.log('[sendOperations] signature.tostring', sigString);
+
+    const sigStringBuffer = signature.toBuffer();
+    console.log('[sendOperations] signature.toBuffer', sigStringBuffer);
+
+    console.log('[sendOperations] signature.buffer type', typeof buffer);
+    console.log(
+      '[sendOperations] signature.sigStringBuffer type',
+      typeof sigStringBuffer,
+    );
+
+    console.log(
+      '[sendOperations] signature. equal?',
+      buffer.equals(sigStringBuffer),
+    );
+
+    const sigString2 = sigStringBuffer.toString('hex');
+    console.log('[sendOperations] signature.tostring2', sigString2);
+
+    signedTransaction.signatures.push(sigString);
   }
 
   console.log('[sendOperations] signedTransaction', signedTransaction);
