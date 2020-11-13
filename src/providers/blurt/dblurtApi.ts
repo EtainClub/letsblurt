@@ -997,9 +997,14 @@ const sendOperations = async (
   console.log('[sendOperations] tx', tx);
   console.log('[sendOperations] chainId', client.chainId);
 
-  //  const signature = cryptoUtils.signTransaction(tx, key, client.chainId);
-  //  const tx2 = signTransaction(tx, key, client.chainId);
+  const signedTransaction = cryptoUtils.signTransaction(
+    tx,
+    keys,
+    client.chainId,
+  );
+  //const signedTransaction = signTransaction(tx, keys, client.chainId);
 
+  /*
   // serialize
   const ByteBuffer = require('bytebuffer');
   const buffer = new ByteBuffer(
@@ -1080,6 +1085,7 @@ const sendOperations = async (
     signedTransaction.signatures.push(sigString);
   }
 
+  */
   console.log('[sendOperations] signedTransaction', signedTransaction);
 
   //  console.log('[sendOperations] signed transaction', signature);
@@ -1127,7 +1133,13 @@ export const submitVote = async (
   console.log('[sendOperations] password', password);
 
   if (privateKey) {
-    console.log('[sendOperations] privateKey', privateKey);
+    // const operations = ['vote', vote];
+    // const result = await client.broadcast.sendOperations(
+    //   [operations],
+    //   privateKey,
+    // );
+    // console.log('[submitVote] transaction result', result);
+
     return new Promise((resolve, reject) => {
       const op = ['vote', vote];
       sendOperations([op], privateKey)
@@ -1140,16 +1152,16 @@ export const submitVote = async (
           reject(error);
         });
 
-      // client.broadcast
-      //   .vote(vote, privateKey)
-      //   .then((result) => {
-      //     console.log('voting result', result);
-      //     resolve(result);
-      //   })
-      //   .catch((error) => {
-      //     console.log('failed to submit a vote', error);
-      //     reject(error);
-      //   });
+      //   client.broadcast
+      //     .vote(vote, privateKey)
+      //     .then((result) => {
+      //       console.log('voting result', result);
+      //       resolve(result);
+      //     })
+      //     .catch((error) => {
+      //       console.log('failed to submit a vote', error);
+      //       reject(error);
+      //     });
     });
   }
 

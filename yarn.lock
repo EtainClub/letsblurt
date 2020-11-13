@@ -2829,7 +2829,7 @@ dayjs@^1.8.15:
 
 "dblurt@https://github.com/EtainLove/dhive":
   version "0.14.11"
-  resolved "https://github.com/EtainLove/dhive#c45340c09915f6aabbe8fbde2f598252df3b3a74"
+  resolved "https://github.com/EtainLove/dhive#001b8ceb6cc4372a737e3e0d067fa87b07121459"
   dependencies:
     bs58 "^4.0.1"
     bytebuffer "^5.0.1"
