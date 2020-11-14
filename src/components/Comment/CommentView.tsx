@@ -16,13 +16,17 @@ import {
 import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
 import HTML from 'react-native-render-html';
 import {argonTheme} from '../../constants/argonTheme';
-import {PostData, CommentData} from '../../contexts/types';
+import {PostData, CommentData, PostingContent} from '../../contexts/types';
 import {Avatar} from '../../components/Avatar';
 import {ActionBarContainer} from '../ActionBar';
 import {ActionBarStyleComment} from '../../constants/actionBarTypes';
 import {AuthContext, PostsContext} from '../../contexts';
 import {getTimeFromNow} from '~/utils/time';
-
+import {
+  extractMetadata,
+  generatePermlink,
+  makeJsonMetadata,
+} from '~/utils/editor';
 const {height, width} = Dimensions.get('window');
 
 // component
@@ -37,7 +41,7 @@ interface Props {
 }
 const Comment = (props: Props): JSX.Element => {
   const {authState} = useContext(AuthContext);
-  const {postsState, submitComment, submitPostEdit} = useContext(PostsContext);
+  const {postsState, submitPost, updatePost} = useContext(PostsContext);
 
   const [submitting, setSubmitting] = useState(false);
   const [showReply, setShowReply] = useState(false);
@@ -57,16 +61,25 @@ const Comment = (props: Props): JSX.Element => {
     // set submitted flag
     setSubmitting(true);
 
-    const parentRef = {
-      author: comment.state.parent_ref.author,
-      permlink: comment.state.parent_ref.permlink,
-    };
-    const postRef = {
+    // extract meta
+    const _meta = extractMetadata(text);
+    // split tags by space
+    const _tags = [];
+    const jsonMeta = makeJsonMetadata(_meta, _tags);
+
+    // build posting content
+    const postingContent: PostingContent = {
       author: comment.state.post_ref.author,
+      title: '',
+      body: comment.body,
+      parent_author: comment.state.parent_ref.author,
+      parent_permlink: comment.state.parent_ref.permlink,
+      json_metadata: JSON.stringify(jsonMeta) || '',
       permlink: comment.state.post_ref.permlink,
     };
+
     if (editMode) {
-      await submitPostEdit(
+      await updatePost(
         props.postIndex,
         comment.body,
         text,
@@ -75,12 +88,10 @@ const Comment = (props: Props): JSX.Element => {
         authState.currentCredentials.password,
       );
     } else {
-      const {success, message} = await submitComment(
-        props.postIndex,
-        authState.currentCredentials.username,
+      const {success, message} = await submitPost(
+        postingContent,
         authState.currentCredentials.password,
-        text,
-        postRef,
+        true,
       );
     }
     // fetch comments
