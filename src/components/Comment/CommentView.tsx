@@ -18,7 +18,7 @@ import HTML from 'react-native-render-html';
 import {argonTheme} from '../../constants/argonTheme';
 import {PostData, CommentData, PostingContent} from '../../contexts/types';
 import {Avatar} from '../../components/Avatar';
-import {ActionBarContainer} from '../ActionBar';
+import {ActionBar} from '../ActionBar';
 import {ActionBarStyleComment} from '../../constants/actionBarTypes';
 import {AuthContext, PostsContext} from '../../contexts';
 import {getTimeFromNow} from '~/utils/time';
@@ -246,7 +246,7 @@ const Comment = (props: Props): JSX.Element => {
         <Block style={[styles.messageCard, styles.shadow]}>
           <HTML html={comment.body} />
         </Block>
-        <ActionBarContainer
+        <ActionBar
           actionBarStyle={ActionBarStyleComment}
           postIndex={props.postIndex}
           postState={comment.state}

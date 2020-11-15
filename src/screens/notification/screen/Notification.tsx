@@ -58,8 +58,7 @@ const NotificationScreen = (props: Props): JSX.Element => {
     let text = '';
     let avatar = '';
     let author = item.author;
-    let parent_author = null;
-    let parent_permlink = null;
+    let permlink = null;
     switch (notiType) {
       case 'follow':
         iconName = 'adduser';
@@ -73,15 +72,14 @@ const NotificationScreen = (props: Props): JSX.Element => {
         iconFamily = 'material-community';
         avatar = `${IMAGE_SERVER}/u/${author}/avatar`;
         text = intl.formatMessage({id: 'Notifications.reply'});
-        parent_author = props.username;
-        parent_permlink = item.parent_permlink;
+        permlink = item.permlink;
         break;
       case 'mention':
         iconName = 'at';
         iconFamily = 'font-awesome';
         avatar = `${IMAGE_SERVER}/u/${author}/avatar`;
         text = intl.formatMessage({id: 'Notifications.mention'});
-        parent_permlink = item.parent_permlink;
+        permlink = item.permlink;
         break;
       default:
         break;
@@ -89,7 +87,7 @@ const NotificationScreen = (props: Props): JSX.Element => {
 
     return (
       <TouchableWithoutFeedback
-        onPress={() => props.handlePressItem(item.author, item.permlink)}>
+        onPress={() => props.handlePressItem(author, permlink)}>
         <Block
           flex
           row

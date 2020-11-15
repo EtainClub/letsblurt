@@ -88,6 +88,10 @@ export interface PostData {
   json_metadata: string;
   metadata: MetaData;
 
+  // children
+  depth: number;
+  children: number;
+
   // state
   state: PostState;
 }
@@ -95,7 +99,6 @@ export interface PostData {
 // comment data, including comments tree
 export interface CommentData extends PostData {
   comments: CommentData[];
-  depth: number;
 }
 
 // initial post data
@@ -115,6 +118,10 @@ export const INIT_POST_DATA = {
     image: [],
     tags: [],
   },
+
+  // children
+  depth: 0,
+  children: 0,
 
   // stats
   state: {

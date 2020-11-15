@@ -40,7 +40,9 @@ const PostDetails = (props: Props): JSX.Element => {
   const [comments, setComments] = useState<CommentData[]>(null);
   const [submitted, setSubmitted] = useState(false);
   const [editMode, setEditMode] = useState(false);
-
+  const [parentPost, setParentPost] = useState<PostData>(null);
+  //////// events
+  //// event: component creation
   useEffect(() => {
     _fetchPostDetailsEntry();
     // update vote amount
@@ -48,21 +50,39 @@ const PostDetails = (props: Props): JSX.Element => {
       updateVoteAmount(authState.currentCredentials.username);
     }
   }, []);
-
+  //// event: new post ref set
+  useEffect(() => {
+    if (postsState.postRef) {
+      // fetch post
+      _fetchPostDetailsEntry();
+    }
+  }, [postsState.postRef]);
+  //// event: comment submitted
   useEffect(() => {
     // clear submitted
     setSubmitted(false);
     // fetch comments
     _fetchComments();
   }, [submitted]);
+  //// event: parent post exists
+  useEffect(() => {
+    // parent post exist?
+    if (postDetails && postDetails.depth > 0) {
+      // fetch parent post
+      _fetchParentPost(postDetails.state.parent_ref);
+    }
+  }, [postDetails]);
 
   const _fetchPostDetailsEntry = async () => {
     console.log('_fetchPostDetailsEntry postRef', postsState.postRef);
+    // remove the parent post
+    setParentPost(null);
     // get post details
     const details = await getPostDetails(
       postsState.postRef,
       authState.currentCredentials.username,
     );
+    if (!details) return;
     // fetch database
     const {bookmarked} = await fetchDatabaseState(
       postsState.postRef,
@@ -73,6 +93,24 @@ const PostDetails = (props: Props): JSX.Element => {
     setPostDetails(details);
     // fetch comments
     _fetchComments();
+  };
+
+  const _fetchParentPost = async (postRef: PostRef) => {
+    console.log('_fetchParentPost. postRef', postRef);
+    // get post details
+    const details = await getPostDetails(
+      postRef,
+      authState.currentCredentials.username,
+    );
+    // go up the tree to the root
+    if (details.depth > 0) {
+      await _fetchParentPost(details.state.parent_ref);
+      console.log('_fetchParentPost. details', details);
+      return details;
+    }
+    console.log('_fetchParentPost. parent details', details);
+    // set parent post
+    setParentPost(details);
   };
 
   const _fetchComments = async () => {
@@ -133,6 +171,7 @@ const PostDetails = (props: Props): JSX.Element => {
     postDetails && (
       <PostDetailsScreen
         post={postDetails}
+        parentPost={parentPost}
         index={index}
         comments={comments}
         handleRefresh={_onRefresh}

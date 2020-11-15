@@ -31,8 +31,10 @@ interface Props {}
 const Notification = (props: Props): JSX.Element => {
   //// props
   //// contexts
+  const {setPostRef} = useContext(PostsContext);
   const {getNotifications} = useContext(UserContext);
   const {authState} = useContext(AuthContext);
+  const {setAuthorParam} = useContext(UIContext);
   //// states
   const [username, setUsername] = useState('');
   const [fetching, setFetching] = useState(false);
@@ -66,12 +68,18 @@ const Notification = (props: Props): JSX.Element => {
   };
 
   //// handle press item
-  const _handlePressItem = (author: string, permlink?: string) => {
+  const _handlePressItem = (author: string, permlink: string) => {
     // check if permlink exists
     if (permlink) {
+      // set post ref
+      setPostRef({author, permlink});
       // navigate to the post
+      navigate({name: 'PostDetails'});
     } else {
+      // set author param
+      setAuthorParam(author);
       // navigate to the author profile
+      navigate({name: 'AuthorProfile'});
     }
   };
 

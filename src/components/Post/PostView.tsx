@@ -23,7 +23,7 @@ import {PostData, PostState} from '~/contexts/types';
 
 import {materialTheme} from '~/constants/materialTheme';
 
-import {ActionBarContainer} from '../ActionBar';
+import {ActionBar} from '../ActionBar';
 import {ActionBarStyle} from '~/constants/actionBarTypes';
 import {Avatar} from '~/components/Avatar';
 
@@ -90,7 +90,7 @@ const PostView = (props: Props): JSX.Element => {
             />
           </Block>
           <Block style={{marginBottom: 0}}>
-            <ActionBarContainer
+            <ActionBar
               actionBarStyle={props.actionBarStyle}
               postState={post.state}
               postIndex={props.index}

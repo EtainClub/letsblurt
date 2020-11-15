@@ -224,6 +224,9 @@ export const verifyPassoword = async (username: string, password: string) => {
   } catch (error) {
     console.log('failed to get account', error);
   }
+  if (!account) {
+    return null;
+  }
   console.log('account', account);
   // get public posting key
   const postingPublicKey = account.posting.key_auths[0][0];

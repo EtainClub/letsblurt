@@ -45,6 +45,10 @@ export const parsePost = async (
       tags: [],
     },
 
+    // children
+    depth: post.depth,
+    children: post.children,
+
     state: {
       createdAt: post.created,
       // stats
@@ -264,7 +268,9 @@ export const parseComment = async (comment: Discussion, username: string) => {
     image: '',
     // comment
     comments: [],
+    // children
     depth: comment.depth,
+    children: comment.children,
 
     // meta
     json_metadata: '',

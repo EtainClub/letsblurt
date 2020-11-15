@@ -19,20 +19,16 @@ const {height, width} = Dimensions.get('window');
 import {useIntl} from 'react-intl';
 import {navigate} from '~/navigation/service';
 import {PostData, CommentData} from '~/contexts/types';
-import {ActionBarContainer} from '~/components/ActionBar';
 import {ActionBarStylePost} from '~/constants/actionBarTypes';
-
-import {Avatar} from '~/components/Avatar';
-import {Comment} from '~/components/Comment';
+import {Avatar, Comment, ParentPost, PostBody, ActionBar} from '~/components';
 import {argonTheme} from '~/constants/argonTheme';
-
-import {PostBody} from '~/components';
 import {UIContext} from '~/contexts';
 
 import {getTimeFromNow} from '~/utils/time';
 
 interface Props {
   post: PostData;
+  parentPost: PostData;
   index: number;
   comments: CommentData[];
   handleRefresh: () => void;
@@ -164,6 +160,7 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
 
   return !refreshing ? (
     <Block style={{marginHorizontal: 5, marginBottom: 150}}>
+      {props.parentPost && <ParentPost post={props.parentPost} />}
       <Text size={24}>{post.state.title}</Text>
       <Block row space="between">
         <Avatar
@@ -178,7 +175,7 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
         <Text style={{top: 10, marginRight: 20}}>{formatedTime}</Text>
       </Block>
       <Block style={{}}>
-        <ActionBarContainer
+        <ActionBar
           actionBarStyle={ActionBarStylePost}
           postState={state}
           postIndex={props.index}

@@ -287,5 +287,10 @@
     "follow": " started following you",
     "reply": " replied to your post",
     "mention": "mentioned you in this post"
+  },
+  "ParentPost": {
+    "info": "You are seeing the single post of the following:",
+    "title": "Title",
+    "parent_button": "See the full post"
   }
 }
