@@ -120,7 +120,7 @@ export interface UserContextType {
   // get user profile data
   getUserProfileData: (usernmae: string) => Promise<any>;
   // get user notifications
-  getNotifications: (username: string) => void;
+  getNotifications: (username: string) => Promise<any[]>;
   // add bookmark
   addBookmark: (postRef: PostRef, username: string, title: string) => void;
 }

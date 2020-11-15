@@ -7,7 +7,6 @@ import {useIntl} from 'react-intl';
 //// ui
 import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
 import {TabView, SceneMap} from 'react-native-tab-view';
-import Swiper from 'react-native-swiper';
 import {argonTheme} from '~/constants';
 
 import {Tabs} from '~/components';

@@ -40,9 +40,11 @@ interface Props {
   //  updateComment: () => void;
 }
 const Comment = (props: Props): JSX.Element => {
+  //// contexts
   const {authState} = useContext(AuthContext);
   const {postsState, submitPost, updatePost} = useContext(PostsContext);
-
+  //// stats
+  const [originalPost, setOriginalPost] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [showReply, setShowReply] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -60,16 +62,27 @@ const Comment = (props: Props): JSX.Element => {
 
     // set submitted flag
     setSubmitting(true);
-
+    const {username, password} = authState.currentCredentials;
     // extract meta
     const _meta = extractMetadata(text);
     // split tags by space
     const _tags = [];
     const jsonMeta = makeJsonMetadata(_meta, _tags);
+    let permlink = '';
+
+    // generate permlink for a new post
+    // if (!originalPost) {
+    //   permlink = generatePermlink('');
+    //   //// check duplicate permlink, if so generate a random
+    //   let duplicate: Discussion = await fetchRawPost(username, permlink);
+    //   if (duplicate && duplicate.id) {
+    //     permlink = generatePermlink(title, true);
+    //   }
+    // }
 
     // build posting content
     const postingContent: PostingContent = {
-      author: comment.state.post_ref.author,
+      author: username,
       title: '',
       body: comment.body,
       parent_author: comment.state.parent_ref.author,
@@ -79,14 +92,16 @@ const Comment = (props: Props): JSX.Element => {
     };
 
     if (editMode) {
-      await updatePost(
-        props.postIndex,
-        comment.body,
-        text,
-        parentRef,
-        postRef,
-        authState.currentCredentials.password,
-      );
+      // TODO: use submitPost after patching instead of updatePost
+      // patch = utils editors createPatch
+      // await updatePost(
+      //   props.postIndex,
+      //   comment.body,
+      //   text,
+      //   parentRef,
+      //   postRef,
+      //   authState.currentCredentials.password,
+      // );
     } else {
       const {success, message} = await submitPost(
         postingContent,

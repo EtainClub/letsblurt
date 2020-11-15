@@ -185,6 +185,7 @@ const UserProvider = ({children}: Props) => {
     if (!username) return null;
     const notifications = await fetchNotifications(username);
     console.log('[getNotifications] notifications', notifications);
+    return notifications;
   };
 
   return (

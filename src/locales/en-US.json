@@ -282,5 +282,10 @@
   "Favorite": {
     "already": "You already favorited the author",
     "done": "favorited the author"
+  },
+  "Notifications": {
+    "follow": " started following you",
+    "reply": " replied to your post",
+    "mention": "mentioned you in this post"
   }
 }

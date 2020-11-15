@@ -1,4 +1,9 @@
 import Config from 'react-native-config';
+//
+import axios from 'axios';
+//
+import {Client as NotiClient} from '@busyorg/busyjs';
+
 // crypto-js
 import CryptoJS from 'crypto-js';
 import {get, has} from 'lodash';
@@ -1236,26 +1241,49 @@ export const fetchWalletData = async (username: string) => {
 };
 
 export const fetchNotifications = async (username: string) => {
-  debugger;
-  try {
-    const data = {
-      id: 0,
-      jsonrpc: '2.0',
-      method: 'get_notifications',
-      params: [username],
-    };
-    fetch('wss://notifications.blurt.world', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        console.log('[fetchNotifications] username, account', res.result);
-        debugger;
-      });
-  } catch (error) {
-    console.log('failed to fetch notifications', error);
-  }
+  return new Promise((resolve, reject) => {
+    const notiClient = new NotiClient('wss://notifications.blurt.world');
+    notiClient.call('get_notifications', [username], (err, result) => {
+      if (err) reject(err);
+      resolve(result);
+    });
+  });
+
+  // try {
+  //   const params = {
+  //     id: 0,
+  //     jsonrpc: '2.0',
+  //     method: 'get_notifications',
+  //     params: [username],
+  //   };
+  //   const notifications = await axios.post(
+  //     'wss://notifications.blurt.world',
+  //     params,
+  //   );
+  //   console.log('[fetchNotifications] notifications', notifications);
+  //   debugger;
+  // } catch (error) {
+  //   console.log('failed to fetch notifications', error);
+  // }
+  // try {
+  //   const data = {
+  //     id: 0,
+  //     jsonrpc: '2.0',
+  //     method: 'get_notifications',
+  //     params: [username],
+  //   };
+  //   fetch('wss://notifications.blurt.world', {
+  //     method: 'POST',
+  //     body: JSON.stringify(data),
+  //   })
+  //     .then((res) => res.json())
+  //     .then((res) => {
+  //       console.log('[fetchNotifications] username, account', res.result);
+  //       debugger;
+  //     });
+  // } catch (error) {
+  //   console.log('failed to fetch notifications', error);
+  // }
 
   // try {
   //   const params = `@${username}/notifications`;

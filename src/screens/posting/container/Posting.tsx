@@ -152,6 +152,8 @@ const Posting = (props: Props): JSX.Element => {
     let success = false;
     let message = '';
     if (originalPost) {
+      // TODO: use submitPost after patching instead of updatePost
+      // patch = utils editors createPatch
       ({success, message} = await updatePost(
         originalPost.body,
         originalPost.state.post_ref.permlink,
