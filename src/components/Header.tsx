@@ -236,7 +236,7 @@ const Header = (props: Props): JSX.Element => {
     let communityOptions: string[] = [];
     switch (title) {
       case 'Feed':
-        tagList.forEach((item) => communityOptions.push(item[1]));
+        tagList.forEach((item) => communityOptions.push(item.tag));
         return (
           <Block row space="between">
             <Block row space="between" style={{left: 150}}>

@@ -391,6 +391,8 @@ export interface PostsContextType {
 
   // set post ref
   setPostRef: (postRef: PostRef) => void;
+  // fetch tag list
+  getTagList: (username?: string) => void;
   // set communities
   fetchCommunities: (username: string) => void;
   // set tag index

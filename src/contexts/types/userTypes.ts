@@ -13,6 +13,7 @@ export enum UserActionTypes {
   SET_GLOBAL_PROPS,
   SET_WALLET_DATA,
   SET_PROFILE_DATA,
+  SET_PRICE,
 }
 
 // profile data type
@@ -53,6 +54,8 @@ export interface UserState {
   profileData: ProfileData;
   globalProps: BlockchainGlobalProps;
   walletData: WalletData;
+  // price in usd
+  price?: number;
 }
 
 //// actions
@@ -106,6 +109,11 @@ interface SetProfileDataAction {
   type: UserActionTypes.SET_PROFILE_DATA;
   payload: ProfileData;
 }
+// set price
+interface SetPriceAction {
+  type: UserActionTypes.SET_PRICE;
+  payload: number;
+}
 // user context type
 export interface UserContextType {
   // ui state
@@ -121,8 +129,8 @@ export interface UserContextType {
   getUserProfileData: (usernmae: string) => Promise<any>;
   // get user notifications
   getNotifications: (username: string) => Promise<any[]>;
-  // add bookmark
-  addBookmark: (postRef: PostRef, username: string, title: string) => void;
+  // get price
+  getPrice: () => Promise<number>;
 }
 
 export type UserAction =
@@ -135,4 +143,5 @@ export type UserAction =
   | AddFavoriteAction
   | RemoveFavoriteAction
   | SetWalletDataAction
-  | SetProfileDataAction;
+  | SetProfileDataAction
+  | SetPriceAction;

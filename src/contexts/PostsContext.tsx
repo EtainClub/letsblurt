@@ -11,6 +11,7 @@ import {
   broadcastPostUpdate,
   fetchComments,
   fetchCommunityList,
+  fetchTagList,
   fetchPostDetails,
 } from '~/providers/blurt/dblurtApi';
 import {renderPostBody} from '~/utils/render-helpers';
@@ -178,6 +179,18 @@ const PostsProvider = ({children}: Props) => {
   console.log('[posts provider] posts', postsState);
 
   ////// action creators
+  //// fetch tag list
+  const getTagList = async (username?: string) => {
+    // fetch communities
+    const tagList = await fetchTagList();
+    // dispatch action
+    dispatch({
+      type: PostsActionTypes.SET_TAG_LIST,
+      payload: tagList,
+    });
+    return tagList;
+  };
+
   //// fetch community list
   const fetchCommunities = async (username: string) => {
     console.log('[fetchCommunities] username', username);
@@ -289,8 +302,9 @@ const PostsProvider = ({children}: Props) => {
           tag = username ? username : '';
           filter = 'blog';
         } else if (tagIndex > 1) {
-          tag = postsState.tagList[tagIndex][0];
+          // tag = postsState.tagList[tagIndex][0];
           filter = postsState.filterList[filterIndex];
+          tag = postsState.tagList[tagIndex].tag;
         } else {
           console.error(
             '[PostsContext|fetchPosts] tagIndex is wrong',
@@ -661,6 +675,7 @@ const PostsProvider = ({children}: Props) => {
     <PostsContext.Provider
       value={{
         postsState,
+        getTagList,
         fetchCommunities,
         fetchPosts,
         setPostRef,

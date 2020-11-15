@@ -14,31 +14,35 @@ const Wallet = (props: Props): JSX.Element => {
   console.log('[WalletContainer] props', props);
   //// contexts
   const {authState} = useContext(AuthContext);
-  const {userState, getWalletData} = useContext(UserContext);
+  const {userState, getWalletData, getPrice} = useContext(UserContext);
   //// states
   const [walletData, setWalletData] = useState<WalletData>(
     userState.walletData,
   );
-  const [tabIndex, setTabIndex] = useState(0);
-  //// effect
+  const [price, setPrice] = useState(0);
+  //////// events
+  //// event: creation
   useEffect(() => {
     if (authState.loggedIn) {
       // fetch user data
       getWalletData(authState.currentCredentials.username);
+      // fetch price
+      getPrice();
     }
   }, []);
+  //// event: wallet fetched
   useEffect(() => {
     if (userState.walletData) {
       setWalletData(userState.walletData);
     }
   }, [userState.walletData]);
+  //// event: price fetched
+  useEffect(() => {
+    setPrice(userState.price);
+    console.log('[Wallet] set price', userState.price);
+  }, [userState.price]);
 
-  ////
-  const _handleTabIndexChanged = (index: number) => {
-    console.log('tab index changed', index);
-    setTabIndex(index);
-  };
-  return <WalletScreen walletData={walletData} />;
+  return <WalletScreen walletData={walletData} price={price} />;
 };
 
 export {Wallet};

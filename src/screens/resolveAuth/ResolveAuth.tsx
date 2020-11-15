@@ -12,7 +12,7 @@ export const ResolveAuth = (props) => {
   //// contexts
   const {authState, setAuthResolved, setCredentials} = useContext(AuthContext)!;
   const {fetchBlockchainGlobalProps} = useContext(UserContext);
-  const {postsState, fetchCommunities} = useContext(PostsContext);
+  const {postsState, getTagList, fetchCommunities} = useContext(PostsContext);
   // state
   const [fetched, setFetched] = useState(false);
   const [username, setUsername] = useState(null);
@@ -41,10 +41,11 @@ export const ResolveAuth = (props) => {
 
   //// resolve auth
   const _resolveEntry = async () => {
+    // fetch tags
+    const tagList = await getTagList();
+    console.log('[_resolveEntry] tagList', tagList);
     // get user login token from storage
     let username = await AsyncStorage.getItem(LOGIN_TOKEN);
-    // @test
-    //    username = 'letsblurt';
     // set category to feed if username exists
     if (username) {
       // set username

@@ -18,6 +18,7 @@ import {WalletData} from '~/contexts/types';
 
 interface Props {
   walletData: WalletData;
+  price: number;
   //  tabIndex: number;
   //  handleTabIndexChanged: (index: number) => void;
 }
@@ -32,7 +33,7 @@ const WalletScreen = (props: Props): JSX.Element => {
   ]);
 
   const WalletStats = () => (
-    <WalletStatsView walletData={props.walletData} isUser />
+    <WalletStatsView walletData={props.walletData} isUser price={props.price} />
   );
 
   const WalletKeys = () => <WalletKeysView />;

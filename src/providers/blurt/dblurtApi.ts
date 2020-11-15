@@ -33,7 +33,12 @@ import {
   WalletData,
 } from '~/contexts/types';
 
-import {NUM_FETCH_POSTS, TRUNCATE_BODY_LENGTH} from '~/constants/blockchain';
+import {
+  NUM_FETCH_POSTS,
+  TRUNCATE_BODY_LENGTH,
+  BLURT_TAG_ENDPOINT,
+  BLURT_PRICE_ENDPOINT,
+} from '~/constants/blockchain';
 
 // TODO: check if the voting in release mode is working on steem blockchain
 // blurt
@@ -590,7 +595,21 @@ export const isFollowing = (username: string, author: string) =>
     }
   });
 
-///// communities
+//// blurt tags
+export const fetchTagList = async () => {
+  const {data} = await axios.get(BLURT_TAG_ENDPOINT, {timeout: 5000});
+  console.log('[fetchTagList] data', data);
+  return data;
+};
+
+//// blurt price
+export const fetchPrice = async () => {
+  const {data} = await axios.get(BLURT_PRICE_ENDPOINT, {
+    timeout: 5000,
+  });
+  return data;
+};
+
 // fetch community list of a user
 export const fetchCommunityList = async (username: string): Promise<any[]> => {
   try {
@@ -1243,7 +1262,7 @@ export const fetchWalletData = async (username: string) => {
   }
 };
 
-export const fetchNotifications = async (username: string) => {
+export const fetchNotifications = async (username: string): Promise<any[]> => {
   return new Promise((resolve, reject) => {
     const notiClient = new NotiClient('wss://notifications.blurt.world');
     notiClient.call('get_notifications', [username], (err, result) => {

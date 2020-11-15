@@ -2,7 +2,7 @@ import React, {useRef, useState, useContext} from 'react';
 import {get} from 'lodash';
 import {useIntl} from 'react-intl';
 import {PostBodyView} from './PostBodyView';
-import {UIContext, AuthContext} from '~/contexts';
+import {UIContext, AuthContext, PostsContext} from '~/contexts';
 import {navigate} from '~/navigation/service';
 
 interface Props {
@@ -15,11 +15,14 @@ const PostBodyContainer = (props: Props): JSX.Element => {
   //// contexts
   const {uiState, setAuthorParam, setToastMessage} = useContext(UIContext);
   const {authState} = useContext(AuthContext);
+  const {setPostRef} = useContext(PostsContext);
   //// states
   const [selectedLink, setSelectedLink] = useState(null);
 
   const _handlePostPress = (author: string, permlink: string) => {
     if (permlink) {
+      // set post ref
+      setPostRef({author, permlink});
       navigate({
         name: 'PostDetails',
         params: {

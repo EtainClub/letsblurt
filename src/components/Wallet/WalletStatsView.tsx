@@ -24,6 +24,7 @@ interface Props {
   walletData: WalletData;
   isUser?: boolean;
   showTransactions?: boolean;
+  price?: number;
 }
 const WalletStatsView = (props: Props): JSX.Element => {
   //// props
@@ -106,6 +107,10 @@ const WalletStatsView = (props: Props): JSX.Element => {
           <Block row space="between">
             <Text>Voting Power:</Text>
             <Text>{parseInt(votePower) / 100}%</Text>
+          </Block>
+          <Block row space="between">
+            <Text>Blurt Price:</Text>
+            <Text>${props.price.toFixed(3)}</Text>
           </Block>
         </Block>
         {props.isUser ? (

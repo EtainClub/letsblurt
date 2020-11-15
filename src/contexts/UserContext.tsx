@@ -8,6 +8,7 @@ import {
   parseToken,
   vestsToRshares,
   fetchNotifications,
+  fetchPrice,
 } from '../providers/blurt/dblurtApi';
 import {estimateVoteAmount} from '~/utils/estimateVoteAmount';
 import {parseBlurtTransaction} from '~/utils/parseTransaction';
@@ -59,6 +60,7 @@ const initialState = {
     votePower: '0',
     transactions: [],
   },
+  price: 0,
 };
 // create user context
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -75,9 +77,8 @@ const userReducer = (state: UserState, action: UserAction) => {
       return state;
     case UserActionTypes.SET_WALLET_DATA:
       return {...state, walletData: action.payload};
-    case UserActionTypes.ADD_BOOKMARK:
-      // TODO: update bookmark state
-      return state;
+    case UserActionTypes.SET_PRICE:
+      return {...state, price: action.payload};
     default:
       return state;
   }
@@ -188,6 +189,16 @@ const UserProvider = ({children}: Props) => {
     return notifications;
   };
 
+  const getPrice = async () => {
+    const {price_usd} = await fetchPrice();
+    console.log('[getPrice] price', price_usd);
+    dispatch({
+      type: UserActionTypes.SET_PRICE,
+      payload: price_usd,
+    });
+    return price_usd;
+  };
+
   return (
     <UserContext.Provider
       value={{
@@ -197,6 +208,7 @@ const UserProvider = ({children}: Props) => {
         getWalletData,
         getUserProfileData,
         getNotifications,
+        getPrice,
       }}>
       {children}
     </UserContext.Provider>
