@@ -26,17 +26,15 @@ import {fetchUserProfile, fetchWalletData} from '~/providers/blurt/dblurtApi';
 import {get, has} from 'lodash';
 import {NotificationScreen} from '../screen/Notification';
 
-interface Props {
-  username: string;
-}
+interface Props {}
 
 const Notification = (props: Props): JSX.Element => {
   //// props
-  const {username} = props;
   //// contexts
   const {getNotifications} = useContext(UserContext);
   const {authState} = useContext(AuthContext);
   //// states
+  const [username, setUsername] = useState('');
   const [fetching, setFetching] = useState(false);
   const [notifications, setNotifications] = useState(null);
 
@@ -45,20 +43,51 @@ const Notification = (props: Props): JSX.Element => {
   useFocusEffect(
     useCallback(() => {
       if (authState.loggedIn)
-        _fetchNotifications(authState.currentCredentials.username);
+        setUsername(authState.currentCredentials.username);
+      _fetchNotifications(authState.currentCredentials.username);
     }, []),
   );
-
+  //// username change event
+  useEffect(() => {
+    if (authState.loggedIn) {
+      setUsername(authState.currentCredentials.username);
+      // fetch notifications
+      _fetchNotifications(authState.currentCredentials.username);
+    }
+  }, [authState.currentCredentials]);
   //// fetch notifications
   const _fetchNotifications = async (username) => {
+    // clear notification
+    setNotifications(null);
     setFetching(true);
     const _notifications = await getNotifications(username);
     setNotifications(_notifications);
     setFetching(false);
   };
 
+  //// handle press item
+  const _handlePressItem = (author: string, permlink?: string) => {
+    // check if permlink exists
+    if (permlink) {
+      // navigate to the post
+    } else {
+      // navigate to the author profile
+    }
+  };
+
+  //// handle refresh list
+  const _handleRefresh = async () => {
+    // fetch notifications
+    _fetchNotifications(username);
+  };
   return (
-    <NotificationScreen notifications={notifications} fetching={fetching} />
+    <NotificationScreen
+      notifications={notifications}
+      fetching={fetching}
+      username={authState.currentCredentials.username}
+      handlePressItem={_handlePressItem}
+      handleRefresh={_handleRefresh}
+    />
   );
 };
 

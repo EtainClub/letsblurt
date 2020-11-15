@@ -34,12 +34,23 @@ const BACKGROUND_COLORS = [
 interface Props {
   notifications: any[];
   fetching: boolean;
+  username: string;
+  handlePressItem: (
+    author: string,
+    parent_permlink: string,
+    root?: boolean,
+  ) => void;
+  handleRefresh: () => void;
 }
 const NotificationScreen = (props: Props): JSX.Element => {
   console.log('[NotificationScreen] props', props);
   //// lanugage
   const intl = useIntl();
 
+  //// TODO: need author, permlink, parent_author, parent_author to track the post
+  //// show blurt world like view: if comment, show comment only and
+  //// add a button to go to the main post
+  //// render item
   const _renderItem = ({item, index}) => {
     const notiType = item.type;
     let iconName = '';
@@ -47,6 +58,8 @@ const NotificationScreen = (props: Props): JSX.Element => {
     let text = '';
     let avatar = '';
     let author = item.author;
+    let parent_author = null;
+    let parent_permlink = null;
     switch (notiType) {
       case 'follow':
         iconName = 'adduser';
@@ -60,54 +73,61 @@ const NotificationScreen = (props: Props): JSX.Element => {
         iconFamily = 'material-community';
         avatar = `${IMAGE_SERVER}/u/${author}/avatar`;
         text = intl.formatMessage({id: 'Notifications.reply'});
+        parent_author = props.username;
+        parent_permlink = item.parent_permlink;
         break;
       case 'mention':
         iconName = 'at';
         iconFamily = 'font-awesome';
         avatar = `${IMAGE_SERVER}/u/${author}/avatar`;
         text = intl.formatMessage({id: 'Notifications.mention'});
+        parent_permlink = item.parent_permlink;
         break;
       default:
         break;
     }
 
     return (
-      <Block
-        flex
-        row
-        space="between"
-        style={{
-          marginBottom: 5,
-          padding: 5,
-          backgroundColor: BACKGROUND_COLORS[index % BACKGROUND_COLORS.length],
-        }}>
-        <Block row middle>
-          <Block left middle with={20}>
-            <Icon size={20} name={iconName} family={iconFamily} />
-          </Block>
+      <TouchableWithoutFeedback
+        onPress={() => props.handlePressItem(item.author, item.permlink)}>
+        <Block
+          flex
+          row
+          space="between"
+          style={{
+            marginBottom: 5,
+            padding: 5,
+            backgroundColor:
+              BACKGROUND_COLORS[index % BACKGROUND_COLORS.length],
+          }}>
           <Block row middle>
-            <Block center width={100}>
-              <Image
-                source={{
-                  uri: avatar || null,
-                }}
-                style={styles.avatar}
-              />
-              {<Text size={10}>{item.author}</Text>}
+            <Block left middle with={20}>
+              <Icon size={20} name={iconName} family={iconFamily} />
+            </Block>
+            <Block row middle>
+              <Block center width={100}>
+                <Image
+                  source={{
+                    uri: avatar || null,
+                  }}
+                  style={styles.avatar}
+                />
+                {<Text size={10}>{author}</Text>}
+              </Block>
+            </Block>
+            <Block middle>
+              <Text>{text}</Text>
             </Block>
           </Block>
           <Block middle>
-            <Text>{text}</Text>
+            {
+              <Text>
+                {getTimeFromNow(moment.unix(item.timestamp)).split('ago')[0]}
+              </Text>
+            }
           </Block>
         </Block>
-        <Block middle>
-          {
-            <Text>
-              {getTimeFromNow(moment.unix(item.timestamp)).split('ago')[0]}
-            </Text>
-          }
-        </Block>
-      </Block>
+      </TouchableWithoutFeedback>
     );
   };
 
@@ -118,6 +138,8 @@ const NotificationScreen = (props: Props): JSX.Element => {
       renderItem={_renderItem}
       keyExtractor={(item, index) => String(index)}
       initialNumToRender={20}
+      refreshing={false}
+      onRefresh={props.handleRefresh}
       showsVerticalScrollIndicator={false}
     />
   ) : (
