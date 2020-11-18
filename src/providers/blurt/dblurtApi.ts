@@ -1048,26 +1048,27 @@ export const submitVote = async (
 
   if (privateKey) {
     // use dblur library --> has signing problem in release mode
-    //    const result = await client.broadcast.vote(vote, privateKey);
+    const result = await client.broadcast.vote(vote, privateKey);
 
     // const operations = ['vote', vote];
     // const result = await client.broadcast.sendOperations(
     //   [operations],
     //   privateKey,
     // );
+    return result;
 
-    return new Promise((resolve, reject) => {
-      const op = ['vote', vote];
-      sendVoteOperations([op], privateKey)
-        .then((result) => {
-          console.log('voting result', result);
-          resolve(result);
-        })
-        .catch((error) => {
-          console.log('failed to submit a vote', error);
-          reject(error);
-        });
-    });
+    // return new Promise((resolve, reject) => {
+    //   const op = ['vote', vote];
+    //   sendVoteOperations([op], privateKey)
+    //     .then((result) => {
+    //       console.log('voting result', result);
+    //       resolve(result);
+    //     })
+    //     .catch((error) => {
+    //       console.log('failed to submit a vote', error);
+    //       reject(error);
+    //     });
+    // });
   }
   // wrong private key
   return Promise.reject(
@@ -1132,9 +1133,11 @@ const signTransaction = async (
   // convert byte buffer to actual buffer
   buffer.flip();
   const transactionData = Buffer.from(buffer.toBuffer());
+  console.log('[dblurt|signTransaction] transactionData', transactionData);
   const digest = cryptoUtils.sha256(
     Buffer.concat([client.chainId, transactionData]),
   );
+  console.log('[dblurt|signTransaction] digest', digest);
 
   const signedTransaction = copy(tx) as SignedTransaction;
   if (!signedTransaction.signatures) {
@@ -1147,10 +1150,21 @@ const signTransaction = async (
 
   for (const key of keys) {
     const signature = _signTransaction(key.key, digest);
+    console.log('[dblurt|signTransaction] signature', signature);
+
     const buffer = Buffer.alloc(65);
     buffer.writeUInt8(signature.recovery + 31, 0);
     signature.data.copy(buffer, 1);
+    console.log('[dblurt|signTransaction] buffer', buffer);
+
+    // const sigString = Array.prototype.map
+    //   .call(new Uint8Array(buffer), (x) => ('00' + x.toString(16)).slice(-2))
+    //   .join('')
+    //   .match(/[a-fA-F0-9]{2}/g)
+    //   .join('');
+
     const sigString = buffer.toString('hex');
+    console.log('[dblurt|signTransaction] sigString', sigString);
     signedTransaction.signatures.push(sigString);
   }
 
@@ -1160,7 +1174,7 @@ const signTransaction = async (
     [signedTransaction],
   );
 
-  console.log('[sendOperations] result', result);
+  console.log('[dblurt|signTransaction] result', result);
 
   return result;
 };
@@ -1178,13 +1192,13 @@ function _signTransaction(key: Buffer, message: Buffer): Signature {
         Buffer.concat([message, Buffer.alloc(1, ++attempts)]),
       ),
     };
-    console.log('[signTransaction] sign, options', options);
+    console.log('[dblurt|signTransaction] sign, options', options);
 
     rv = secp256k1.sign(message, key, options);
-    console.log('[signTransaction] sign, rv', rv);
+    console.log('[dblurt|signTransaction] sign, rv', rv);
   } while (!isCanonicalSignature(rv.signature));
   const signature = new Signature(rv.signature, rv.recovery);
-  console.log('[signTransaction] sign. signature', signature);
+  console.log('[dblurt|signTransaction] sign. signature', signature);
 
   return signature;
 }
