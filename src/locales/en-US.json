@@ -230,7 +230,12 @@
     "power": "Blurt Power",
     "balance": "Blurt",
     "sp": "Steem Power",
-    "vote_amount": "Voting Value"
+    "vote_amount": "Voting Value",
+    "display_name": "Display Name",
+    "introduction": "Introduction",
+    "location": "Location",
+    "website": "website",
+    "update_button": "Update"
   },
   "Settings": {
     "blockchain_settings": "Blockchain",

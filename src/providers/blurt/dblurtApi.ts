@@ -262,7 +262,7 @@ export const verifyPassoword = async (username: string, password: string) => {
     let valid = wifIsValid(password, postingPublicKey);
     if (valid) {
       console.log('input is the posting private key, which is valid');
-      return true;
+      return account;
     }
     //// check active key
     // get publich active key
@@ -924,8 +924,8 @@ export const signImage = async (photo, username, password) => {
   // verify the user and password
   // @test
   //  password = Config.ETAINCLUB_POSTING_WIF;
-  const verified = await verifyPassoword(username, password);
-  if (!verified) {
+  const account = await verifyPassoword(username, password);
+  if (!account) {
     console.log('[signImage] failed to verify password');
     return null;
   }
@@ -1049,7 +1049,7 @@ export const submitVote = async (
 
 //////// profile
 //// update profile
-export const broadcasteProfileUpdate = async (
+export const broadcastProfileUpdate = async (
   username: string,
   password: string,
   params: {},
@@ -1060,6 +1060,7 @@ export const broadcasteProfileUpdate = async (
     return {success: false, message: 'the password is invalid'};
   }
 
+  debugger;
   // get privake key from password wif
   const privateKey = PrivateKey.from(password);
 

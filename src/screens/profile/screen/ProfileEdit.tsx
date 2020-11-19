@@ -1,5 +1,11 @@
 //// react
-import React, {useState, useEffect, useContext, useCallback} from 'react';
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useContext,
+  useCallback,
+} from 'react';
 //// react native
 import {
   View,
@@ -20,6 +26,7 @@ import {navigate} from '~/navigation/service';
 import {useIntl} from 'react-intl';
 //// ui, styles
 import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
+import ActionSheet from 'react-native-actions-sheet';
 import {materialTheme} from '~/constants/';
 
 import {
@@ -40,6 +47,12 @@ import {getNumberStat} from '~/utils/stats';
 //// props
 interface Props {
   profileData: ProfileData;
+  uploading: boolean;
+  updating: boolean;
+  avatarUrl: string;
+  handlePressUpdate: (profile: any) => void;
+  handlePhotoUpload: () => void;
+  handleCameraUpload: () => void;
 }
 //// component with default props
 const ProfileEditForm = (props: Props): JSX.Element => {
@@ -50,6 +63,50 @@ const ProfileEditForm = (props: Props): JSX.Element => {
   const intl = useIntl();
   //// contexts
   //// stats
+  const [name, setName] = useState(profile.metadata.name);
+  const [introduction, setIntroduction] = useState(profile.metadata.about);
+  const [location, setLocation] = useState(profile.metadata.location);
+  const [website, setWebsite] = useState(profile.metadata.website);
+  // ref
+  const photoUploadRef = useRef(null);
+
+  ////
+  const _handlePressUpdate = () => {
+    const profile = {
+      name,
+      introduction,
+      location,
+      website,
+    };
+    props.handlePressUpdate(profile);
+  };
+
+  //// handle press photo upload
+  const _handlePressPhotoUpload = () => {
+    console.log('[Posting');
+    // show the action modal
+    photoUploadRef.current?.setModalVisible(true);
+  };
+
+  ////
+  const _openImagePicker = () => {
+    props.handlePhotoUpload();
+    // hide the modal
+    photoUploadRef.current?.setModalVisible(false);
+  };
+
+  ///
+  const _openCamera = () => {
+    props.handleCameraUpload();
+    // hide the modal
+    photoUploadRef.current?.setModalVisible(false);
+  };
+
+  ////
+  const _closeActionSheet = () => {
+    // hide the modal
+    photoUploadRef.current?.setModalVisible(false);
+  };
 
   return (
     <Block flex style={styles.profileScreen}>
@@ -59,16 +116,44 @@ const ProfileEditForm = (props: Props): JSX.Element => {
         imageStyle={styles.profileBackground}>
         <ScrollView
           showsVerticalScrollIndicator={false}
-          style={{marginTop: '1%', maxHeight: height / 3}}>
+          style={{marginTop: '1%'}}>
           <Block flex style={styles.profileCard}>
             <Block middle style={styles.avatarContainer}>
               <Block row>
                 <Image
                   source={{
-                    uri: `${IMAGE_SERVER}/u/${profile.name}/avatar`,
+                    uri: props.avatarUrl,
                   }}
                   style={[styles.avatar, {left: 10}]}
                 />
+                <Button
+                  onPress={_handlePressPhotoUpload}
+                  loading={props.uploading}
+                  onlyIcon
+                  icon="pencil"
+                  iconFamily="font-awesome"
+                  iconSize={15}
+                  color={argonTheme.COLORS.ERROR}
+                  style={{
+                    position: 'absolute',
+                    left: 80,
+                    top: 80,
+                  }}
+                />
+
+                <ActionSheet ref={photoUploadRef}>
+                  <Block center>
+                    <Button color="primary" onPress={_openImagePicker}>
+                      {intl.formatMessage({id: 'Actionsheet.gallery'})}
+                    </Button>
+                    <Button color="warning" onPress={_openCamera}>
+                      {intl.formatMessage({id: 'Actionsheet.camera'})}
+                    </Button>
+                    <Button color="gray" onPress={_closeActionSheet}>
+                      {intl.formatMessage({id: 'Actionsheet.close'})}
+                    </Button>
+                  </Block>
+                </ActionSheet>
               </Block>
             </Block>
           </Block>
@@ -76,24 +161,52 @@ const ProfileEditForm = (props: Props): JSX.Element => {
             <Input
               borderless
               color="white"
-              placeholder="Username"
-              type="email-address"
+              placeholder={intl.formatMessage({id: 'Profile.display_name'})}
+              placeholderTextColor={theme.COLORS.PLACEHOLDER}
               autoCapitalize="none"
               bgColor="transparent"
-              onBlur={() => console.log('onBlur username')}
-              onFocus={() => console.log('onFocus username')}
               style={[styles.input, styles.inputActive]}
+              defaultValue={profile.metadata.name}
+              onChangeText={(text: string) => setName(text)}
             />
             <Input
               borderless
               color="white"
-              iconColor="white"
-              placeholder="Password"
+              placeholder={intl.formatMessage({id: 'Profile.introduction'})}
+              placeholderTextColor={theme.COLORS.PLACEHOLDER}
               bgColor="transparent"
-              onBlur={() => console.log('onBlur password')}
-              onFocus={() => console.log('onFocus password')}
               style={[styles.input, styles.inputActive]}
+              defaultValue={profile.metadata.about}
             />
+            <Input
+              borderless
+              color="white"
+              placeholder={intl.formatMessage({id: 'Profile.location'})}
+              placeholderTextColor={theme.COLORS.PLACEHOLDER}
+              bgColor="transparent"
+              style={[styles.input, styles.inputActive]}
+              defaultValue={profile.metadata.location}
+            />
+            <Input
+              borderless
+              color="white"
+              placeholder={intl.formatMessage({id: 'Profile.website'})}
+              placeholderTextColor={theme.COLORS.PLACEHOLDER}
+              bgColor="transparent"
+              style={[styles.input, styles.inputActive]}
+              defaultValue={profile.metadata.website}
+            />
+            <Button
+              onPress={_handlePressUpdate}
+              loading={props.updating}
+              center
+              style={{
+                padding: 0,
+                width: 100,
+                backgroundColor: argonTheme.COLORS.ERROR,
+              }}>
+              {intl.formatMessage({id: 'Profile.update_button'})}
+            </Button>
           </Block>
         </ScrollView>
       </ImageBackground>
@@ -117,7 +230,7 @@ const styles = StyleSheet.create({
   },
   profileBackground: {
     width: width,
-    height: height / 3,
+    height: '100%',
     flex: 1,
   },
   profileCard: {
