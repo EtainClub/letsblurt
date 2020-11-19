@@ -40,6 +40,8 @@ import {
   BLURT_PRICE_ENDPOINT,
 } from '~/constants/blockchain';
 
+import {jsonStringify} from '~/utils/jsonUtils';
+
 // TODO: check if the voting in release mode is working on steem blockchain
 // blurt
 const MAINNET_OFFICIAL = [
@@ -248,10 +250,10 @@ export const verifyPassoword = async (username: string, password: string) => {
     const valid = wifIsValid(postingPrivateKey, postingPublicKey);
     if (valid) {
       console.log('master password is valid');
-      return true;
+      return account;
     } else {
       console.log('master password is not valid');
-      return false;
+      return null;
     }
   } else {
     ////// handle posting/active/owner private key
@@ -269,7 +271,7 @@ export const verifyPassoword = async (username: string, password: string) => {
     valid = wifIsValid(password, activePublicKey);
     if (valid) {
       console.log('input is the active private key, which is valid');
-      return true;
+      return account;
     }
     //// check owner key
     // get public owner key
@@ -278,11 +280,11 @@ export const verifyPassoword = async (username: string, password: string) => {
     valid = wifIsValid(password, ownerPublicKey);
     if (valid) {
       console.log('input is the owner private key, which is valid');
-      return true;
+      return account;
     }
     // input password is not valid
     console.log('input password is not valid');
-    return false;
+    return null;
   }
 };
 
@@ -829,35 +831,18 @@ export const broadcastPost = async (
   const privateKey = PrivateKey.from(password);
 
   if (privateKey) {
-    return new Promise((resolve, reject) => {
-      const op = ['comment', postingData];
-      sendCommentOperations([op], privateKey)
-        .then((result) => {
-          console.log('voting result', result);
-          resolve(result);
-        })
-        .catch((error) => {
-          console.log('failed to submit a vote', error);
-          reject(error);
-        });
-    });
+    try {
+      const result = await client.broadcast.comment(postingData, privateKey);
+      return result;
+    } catch (error) {
+      console.log('failed to broadcast a post', error);
+      return null;
+    }
   }
   // wrong private key
   return Promise.reject(
     new Error('Check private key. Required private posting key or above'),
   );
-
-  // TODO: use this after dblurt handles the NaN signature
-  // try {
-  //   await client.broadcast.comment(postingData, privateKey).then((result) => {
-  //     console.log('result of post submission', result);
-  //     return {success: true, message: 'submitted'};
-  //   });
-  // } catch (error) {
-  //   console.log('failed to submit a post', error);
-  //   return {success: false, message: error.message};
-  // }
-  // return {success: true, message: 'submitted'};
 };
 
 export const broadcastPostUpdate = async (
@@ -1048,32 +1033,121 @@ export const submitVote = async (
 
   if (privateKey) {
     // use dblur library --> has signing problem in release mode
-    const result = await client.broadcast.vote(vote, privateKey);
-
-    // const operations = ['vote', vote];
-    // const result = await client.broadcast.sendOperations(
-    //   [operations],
-    //   privateKey,
-    // );
-    return result;
-
-    // return new Promise((resolve, reject) => {
-    //   const op = ['vote', vote];
-    //   sendVoteOperations([op], privateKey)
-    //     .then((result) => {
-    //       console.log('voting result', result);
-    //       resolve(result);
-    //     })
-    //     .catch((error) => {
-    //       console.log('failed to submit a vote', error);
-    //       reject(error);
-    //     });
-    // });
+    try {
+      const result = await client.broadcast.vote(vote, privateKey);
+      return result;
+    } catch (error) {
+      console.log('failed to submit a vote', error);
+      return null;
+    }
   }
   // wrong private key
   return Promise.reject(
     new Error('Check private key. Required private posting key or above'),
   );
+};
+
+//////// profile
+//// update profile
+export const broadcasteProfileUpdate = async (
+  username: string,
+  password: string,
+  params: {},
+) => {
+  // verify the key
+  const account = await verifyPassoword(username, password);
+  if (!account) {
+    return {success: false, message: 'the password is invalid'};
+  }
+
+  // get privake key from password wif
+  const privateKey = PrivateKey.from(password);
+
+  //// broadcast update
+  if (privateKey) {
+    const opArray = [
+      [
+        'account_update2',
+        {
+          account: username,
+          posting: get(account, 'memo_key'),
+          json_metadata: jsonStringify({profile: params}),
+          posting_json_metadata: jsonStringify({profile: params}),
+          extensions: [],
+        },
+      ],
+    ];
+    // broadcast
+    try {
+      const result = await client.broadcast.sendOperations(opArray, privateKey);
+      return result;
+    } catch (error) {
+      console.log('failed to broadcast profile update', error);
+      return null;
+    }
+  }
+  // wrong private key
+  return Promise.reject(
+    new Error('Check private key. Required private posting key or above'),
+  );
+};
+
+/////// wallet
+//// fetch wallet data
+export const fetchWalletData = async (username: string) => {
+  try {
+    const params = `@${username}/transfers`;
+    const accountState = await client.call('condenser_api', `get_state`, [
+      params,
+    ]);
+    console.log('[fetchWalletData] accountState', accountState);
+    // build wallet data
+    if (accountState) {
+      const account = get(accountState.accounts, username, '');
+      console.log('[fetchWalletData] account', account);
+      const {
+        balance,
+        savings_balance,
+        voting_power,
+        vesting_shares,
+        received_vesting_shares,
+        delegated_vesting_shares,
+        reward_blurt_balance,
+        reward_vesting_balance,
+        reward_vesting_blurt,
+        transfer_history,
+      } = account;
+      const power =
+        parseInt(vesting_shares.split(' ')[0]) +
+        parseInt(received_vesting_shares.split(' ')[0]) -
+        parseInt(delegated_vesting_shares.split(' ')[0]);
+      const rewards = reward_vesting_balance;
+      const walletData: WalletData = {
+        blurt: balance.split(' ')[0],
+        power: String(power),
+        savings: savings_balance.split(' ')[0],
+        rewards: rewards.split(' ')[0],
+        voteAmount: '0',
+        votePower: String(voting_power),
+        transactions: transfer_history
+          ? transfer_history.slice(Math.max(transfer_history.length - 50, 0))
+          : [],
+      };
+      return walletData;
+    }
+  } catch (error) {
+    console.log('failed to fetch wallet data', error);
+  }
+};
+
+export const fetchNotifications = async (username: string): Promise<any[]> => {
+  return new Promise((resolve, reject) => {
+    const notiClient = new NotiClient('wss://notifications.blurt.world');
+    notiClient.call('get_notifications', [username], (err, result) => {
+      if (err) reject(err);
+      resolve(result);
+    });
+  });
 };
 
 /////////////// Blockchain Operations Helpers ////////////////////////
@@ -1226,114 +1300,6 @@ export const getAvatar = (about) => {
     return about.profile.profile_image;
   }
   return null;
-};
-
-/////// wallet
-//// fetch wallet data
-export const fetchWalletData = async (username: string) => {
-  try {
-    const params = `@${username}/transfers`;
-    const accountState = await client.call('condenser_api', `get_state`, [
-      params,
-    ]);
-    console.log('[fetchWalletData] accountState', accountState);
-    // build wallet data
-    if (accountState) {
-      const account = get(accountState.accounts, username, '');
-      console.log('[fetchWalletData] account', account);
-      const {
-        balance,
-        savings_balance,
-        voting_power,
-        vesting_shares,
-        received_vesting_shares,
-        delegated_vesting_shares,
-        reward_blurt_balance,
-        reward_vesting_balance,
-        reward_vesting_blurt,
-        transfer_history,
-      } = account;
-      const power =
-        parseInt(vesting_shares.split(' ')[0]) +
-        parseInt(received_vesting_shares.split(' ')[0]) -
-        parseInt(delegated_vesting_shares.split(' ')[0]);
-      const rewards = reward_vesting_balance;
-      const walletData: WalletData = {
-        blurt: balance.split(' ')[0],
-        power: String(power),
-        savings: savings_balance.split(' ')[0],
-        rewards: rewards.split(' ')[0],
-        voteAmount: '0',
-        votePower: String(voting_power),
-        transactions: transfer_history
-          ? transfer_history.slice(Math.max(transfer_history.length - 50, 0))
-          : [],
-      };
-      return walletData;
-    }
-  } catch (error) {
-    console.log('failed to fetch wallet data', error);
-  }
-};
-
-export const fetchNotifications = async (username: string): Promise<any[]> => {
-  return new Promise((resolve, reject) => {
-    const notiClient = new NotiClient('wss://notifications.blurt.world');
-    notiClient.call('get_notifications', [username], (err, result) => {
-      if (err) reject(err);
-      resolve(result);
-    });
-  });
-
-  // try {
-  //   const params = {
-  //     id: 0,
-  //     jsonrpc: '2.0',
-  //     method: 'get_notifications',
-  //     params: [username],
-  //   };
-  //   const notifications = await axios.post(
-  //     'wss://notifications.blurt.world',
-  //     params,
-  //   );
-  //   console.log('[fetchNotifications] notifications', notifications);
-  //   debugger;
-  // } catch (error) {
-  //   console.log('failed to fetch notifications', error);
-  // }
-  // try {
-  //   const data = {
-  //     id: 0,
-  //     jsonrpc: '2.0',
-  //     method: 'get_notifications',
-  //     params: [username],
-  //   };
-  //   fetch('wss://notifications.blurt.world', {
-  //     method: 'POST',
-  //     body: JSON.stringify(data),
-  //   })
-  //     .then((res) => res.json())
-  //     .then((res) => {
-  //       console.log('[fetchNotifications] username, account', res.result);
-  //       debugger;
-  //     });
-  // } catch (error) {
-  //   console.log('failed to fetch notifications', error);
-  // }
-
-  // try {
-  //   const params = `@${username}/notifications`;
-  //   const accountState = await client.call('condenser_api', `get_state`, [
-  //     params,
-  //   ]);
-  //   console.log('[fetchNotifications] accountState', accountState);
-
-  //   // const params = username;
-  //   // const notifications = await client.call('get_notifications', [params]);
-  //   // console.log('[fetchNotifications] notifications', notifications);
-  // } catch (error) {
-  //   console.log('Failed to fetch notifications', error);
-  // }
 };
 
 /*

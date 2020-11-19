@@ -40,6 +40,7 @@ interface Props {
   isUser?: boolean;
   favoriting: boolean;
   handlePressFavorite: () => void;
+  handlePressEdit: () => void;
 }
 //// component with default props
 const ProfileView: React.FC<Props> = ({
@@ -106,7 +107,7 @@ const ProfileView: React.FC<Props> = ({
                     color={argonTheme.COLORS.ERROR}
                     name="pencil"
                     family="font-awesome"
-                    onPress={() => console.log('edit profile')}
+                    onPress={props.handlePressEdit}
                   />
                 )}
               </Block>

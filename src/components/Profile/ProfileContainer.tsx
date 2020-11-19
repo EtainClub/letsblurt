@@ -31,6 +31,7 @@ import {ProfileView} from './ProfileView';
 interface Props {
   profileData: ProfileData;
   isUser?: boolean;
+  handlePressEdit: () => void;
 }
 //// component
 const ProfileContainer = (props: Props): JSX.Element => {
@@ -55,6 +56,7 @@ const ProfileContainer = (props: Props): JSX.Element => {
     );
     setFavoriting(false);
   };
+
   return (
     <ProfileView
       profileData={props.profileData}
@@ -62,6 +64,7 @@ const ProfileContainer = (props: Props): JSX.Element => {
       isUser={props.isUser}
       favoriting={favoriting}
       handlePressFavorite={_handlePressFavorite}
+      handlePressEdit={props.handlePressEdit}
     />
   );
 };

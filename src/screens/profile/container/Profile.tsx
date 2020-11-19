@@ -3,6 +3,7 @@ import {View} from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
 import {get, has} from 'lodash';
 import {ProfileScreen} from '../screen/Profile';
+import {ProfileEditForm} from '../screen/ProfileEdit';
 import {AuthContext, UserContext, UIContext, PostsContext} from '~/contexts';
 import {PostsTypes, PostData, ProfileData} from '~/contexts/types';
 import {getVoteAmount} from '~/providers/blurt/dblurtApi';
@@ -36,6 +37,7 @@ const Profile = ({navigation}): JSX.Element => {
   const [bookmarks, setBookmarks] = useState(null);
   const [favorites, setFavorites] = useState(null);
   const [postsFetching, setPostsFetching] = useState(true);
+  const [editMode, setEditMode] = useState(false);
 
   console.log('[ProfileContainer] navigation', navigation);
 
@@ -110,24 +112,29 @@ const Profile = ({navigation}): JSX.Element => {
     navigate({name: 'AuthorProfile'});
   };
 
+  ////
+  const _handlePressEdit = () => {
+    setEditMode(true);
+  };
   //// clear posts
   const _clearPosts = async () => {
     console.log('[ProfileContainer] clear posts');
     clearPosts(PostsTypes.FEED);
   };
 
-  return (
-    profileData && (
-      <ProfileScreen
-        profileData={profileData}
-        blogs={blogs}
-        bookmarks={bookmarks}
-        favorites={favorites}
-        handlePressFavoriteItem={_handlePressFavoriteItem}
-        clearPosts={_clearPosts}
-      />
-    )
-  );
+  return !editMode
+    ? profileData && (
+        <ProfileScreen
+          profileData={profileData}
+          blogs={blogs}
+          bookmarks={bookmarks}
+          favorites={favorites}
+          handlePressFavoriteItem={_handlePressFavoriteItem}
+          handlePressEdit={_handlePressEdit}
+          clearPosts={_clearPosts}
+        />
+      )
+    : profileData && <ProfileEditForm profileData={profileData} />;
 };
 
 export {Profile};
