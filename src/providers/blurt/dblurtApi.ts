@@ -223,7 +223,11 @@ export const verifyPassoword = async (username: string, password: string) => {
   // @test master password for playdreams
   // posting key in wif: etainclub
   //  password = Config.ETAINCLUB_POSTING_WIF;
-
+  // check if the password is wif
+  if (!cryptoUtils.isWif(password)) {
+    console.log('The password is not wif', password);
+    return null;
+  }
   // get accounts by username
   let account = null;
   try {
@@ -308,17 +312,55 @@ export const checkUsernameAvailable = async (username: string) => {
   }
 };
 
-//// global properties
-export const getDynamicGlobalProperties = () =>
-  client.database.getDynamicGlobalProperties();
-export const getRewardFund = () =>
-  client.database.call('get_reward_fund', ['post']);
+//////// global properties
+export const getDynamicGlobalProperties = async () => {
+  try {
+    const result = await client.database.getDynamicGlobalProperties();
+    return result;
+  } catch (error) {
+    console.log('failed to get getDynamicGlobalProperties', error);
+    return null;
+  }
+};
+
+export const getRewardFund = async () => {
+  try {
+    const result = await client.call('condenser_api', 'get_reward_fund', [
+      'post',
+    ]);
+    return result;
+  } catch (error) {
+    console.log('failed to get reward fund', error);
+    return null;
+  }
+};
+
 export const getFeedHistory = async (): Promise<any> => {
   try {
-    const feedHistory = await client.database.call('get_feed_history');
+    const feedHistory = await client.call(
+      'condenser_api',
+      'get_feed_history',
+      [],
+    );
     return feedHistory;
   } catch (error) {
-    return error;
+    console.log('failed to get feed history', error);
+    return null;
+  }
+};
+
+////
+export const getChainProperties = async () => {
+  try {
+    const chainProperties = await client.call(
+      'condenser_api',
+      `get_chain_properties`,
+      [],
+    );
+    return chainProperties;
+  } catch (error) {
+    console.log('Failed to get chain properties', error);
+    return null;
   }
 };
 
@@ -362,35 +404,28 @@ export interface BlockchainGlobalProps {
   fundRewardBalance: number;
   sbdPrintRate: number;
   dynamicProps: {};
+  chainProps: {};
 }
 
 //// global props
 let globalProps: BlockchainGlobalProps = null;
 
-// fetch global propperties
+// fetch global properties
 export const fetchGlobalProps = async (): Promise<BlockchainGlobalProps> => {
-  let globalDynamic;
-  let feedHistory;
-  let rewardFund;
-
-  try {
-    globalDynamic = await getDynamicGlobalProperties();
-    //    feedHistory = await getFeedHistory();
-    rewardFund = await getRewardFund();
-  } catch (error) {
-    console.log('failed to fetch steem global properties', error);
-    return null;
-  }
-
-  console.log('[fetchGlobalProps] globalDynamic', globalDynamic);
-  //  console.log('[fetchGlobalProps] feedHistory', feedHistory);
+  // const globalDynamic = await getDynamicGlobalProperties();
+  // console.log('[fetchGlobalProps] globalDynamic', globalDynamic);
+  const rewardFund = await getRewardFund();
   console.log('[fetchGlobalProps] rewardFund', rewardFund);
+  const chainProperties = await getChainProperties();
+  console.log('[fetchGlobalProps] chainProperties', chainProperties);
+  // const  feedHistory = await getFeedHistory();
+  //    console.log('[fetchGlobalProps] feedHistory', feedHistory);
 
-  const steemPerMVests =
-    (parseToken(globalDynamic.total_vesting_fund_steem as string) /
-      parseToken(globalDynamic.total_vesting_shares as string)) *
-    1e6;
-  const sbdPrintRate = globalDynamic.sbd_print_rate;
+  // const steemPerMVests =
+  //   (parseToken(globalDynamic.total_vesting_fund_steem as string) /
+  //     parseToken(globalDynamic.total_vesting_shares as string)) *
+  //   1e6;
+  // const sbdPrintRate = globalDynamic.sbd_print_rate;
   //  const base = parseToken(feedHistory.current_median_history.base);
   //  const quote = parseToken(feedHistory.current_median_history.quote);
   const fundRecentClaims = rewardFund.recent_claims;
@@ -398,13 +433,14 @@ export const fetchGlobalProps = async (): Promise<BlockchainGlobalProps> => {
 
   // update the globalProps
   globalProps = {
-    steemPerMVests,
+    steemPerMVests: 1,
     base: 1,
     quote: 1,
     fundRecentClaims,
     fundRewardBalance,
-    sbdPrintRate,
-    dynamicProps: globalDynamic,
+    sbdPrintRate: 1,
+    dynamicProps: {},
+    chainProps: chainProperties,
   };
 
   return globalProps;
@@ -542,7 +578,45 @@ export const getState = async (url: string): Promise<any> => {
   }
 };
 
-//// following
+//////// following
+//// update follow
+export const updateFollow = async (
+  follower: string,
+  password: string,
+  following: string,
+  action: string,
+  operationFlatFee: number,
+  bandwidthKbytesFee: number,
+) => {
+  // verify the key
+  const account = await verifyPassoword(follower, password);
+  if (!account) {
+    return {success: false, message: 'the password is invalid'};
+  }
+  // get privake key from password
+  const privateKey = PrivateKey.from(password);
+
+  if (privateKey) {
+    const what = action ? [action] : [];
+    const json = ['follow', {follower, following, what}];
+    let operation = {
+      required_auths: [],
+      required_posting_auths: [follower],
+      id: 'follow',
+      json: JSON.stringify(json),
+    };
+    let opSize = JSON.stringify(operation).replace(/[\[\]\,\"]/g, '').length;
+    let bwFee = Math.max(0.001, (opSize / 1024) * bandwidthKbytesFee);
+    let fee = (operationFlatFee + bwFee).toFixed(3);
+    try {
+      const result = await client.broadcast.json(operation, privateKey);
+      return result;
+    } catch (error) {
+      console.log('Failed to broadcast update follow state', error);
+    }
+  }
+};
+
 // get followers/following counts
 export const getFollows = (username: string) =>
   client.call('condenser_api', 'get_follow_count', [username]);
@@ -1023,8 +1097,8 @@ export const submitVote = async (
   console.log('[submitVote] vote', vote);
 
   // verify the key
-  const verified = await verifyPassoword(voter, password);
-  if (!verified) {
+  const account = await verifyPassoword(voter, password);
+  if (!account) {
     return {success: false, message: 'the password is invalid'};
   }
 
@@ -1054,24 +1128,39 @@ export const broadcastProfileUpdate = async (
   password: string,
   params: {},
 ) => {
-  // verify the key
+  // verify the key, require active or above
+  // @test
+  console.log('Config', Config);
+  password = Config.ETAINCLUB_ACTIVE_WIF;
   const account = await verifyPassoword(username, password);
   if (!account) {
     return {success: false, message: 'the password is invalid'};
   }
 
-  debugger;
   // get privake key from password wif
   const privateKey = PrivateKey.from(password);
 
   //// broadcast update
   if (privateKey) {
+    // const role = 'active';
+    // const updatedAuthority = account[role];
+    // const totalAuthorizedKey = updatedAuthority.key_auths.length;
+    // for (let i = 0; i < totalAuthorizedKey; i++) {
+    //   const user = updatedAuthority.key_auths[i];
+    //   if (user[0] === authorizedKey) {
+    //     updatedAuthority.key_auths.splice(i, 1);
+    //     break;
+    //   }
+    // }
     const opArray = [
       [
-        'account_update2',
+        'account_update',
         {
           account: username,
-          posting: get(account, 'memo_key'),
+          owner: undefined,
+          active: undefined,
+          posting: undefined,
+          memo_key: get(account, 'memo_key'),
           json_metadata: jsonStringify({profile: params}),
           posting_json_metadata: jsonStringify({profile: params}),
           extensions: [],
@@ -1079,8 +1168,17 @@ export const broadcastProfileUpdate = async (
       ],
     ];
     // broadcast
+    const updateParams = {
+      account: username,
+      memo_key: get(account, 'memo_key'),
+      json_metadata: jsonStringify({profile: params}),
+    };
     try {
       const result = await client.broadcast.sendOperations(opArray, privateKey);
+      // const result = await client.broadcast.updateAccount(
+      //   updateParams,
+      //   privateKey,
+      // );
       return result;
     } catch (error) {
       console.log('failed to broadcast profile update', error);
@@ -1302,6 +1400,61 @@ export const getAvatar = (about) => {
   }
   return null;
 };
+
+/* 
+from blutjs ChainTypes.js
+
+ChainTypes.operations= {
+    vote: 0,
+    comment: 1,
+    transfer: 2,
+    transfer_to_vesting: 3,
+    withdraw_vesting: 4,
+    account_create: 5,
+    account_update: 6,
+    witness_update: 7,
+    account_witness_vote: 8,
+    account_witness_proxy: 9,
+    custom: 10,
+    delete_comment: 11,
+    custom_json: 12,
+    comment_options: 13,
+    set_withdraw_vesting_route: 14,
+    claim_account: 15,
+    create_claimed_account: 16,
+    request_account_recovery: 17,
+    recover_account: 18,
+    change_recovery_account: 19,
+    escrow_transfer: 20,
+    escrow_dispute: 21,
+    escrow_release: 22,
+    escrow_approve: 23,
+    transfer_to_savings: 24,
+    transfer_from_savings: 25,
+    cancel_transfer_from_savings: 26,
+    custom_binary: 27,
+    decline_voting_rights: 28,
+    reset_account: 29,
+    set_reset_account: 30,
+    claim_reward_balance: 31,
+    delegate_vesting_shares: 32,
+    witness_set_properties: 33,
+    create_proposal: 34,
+    update_proposal_votes: 35,
+    remove_proposal: 36,
+    author_reward: 37,
+    curation_reward: 38,
+    comment_reward: 39,
+    fill_vesting_withdraw: 40,
+    shutdown_witness: 41,
+    fill_transfer_from_savings: 42,
+    hardfork: 43,
+    comment_payout_update: 44,
+    return_vesting_delegation: 45,
+    comment_benefactor_reward: 46,
+    account_update2: 47
+};
+*/
 
 /*
 

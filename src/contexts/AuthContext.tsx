@@ -204,7 +204,7 @@ const _getCredentials = async (username: string) => {
         (key) => Object.keys(key)[0] === username,
       );
       if (credentials) {
-        console.log('[_getCredentials] user exists, credentials', credentials);
+        console.log('[_getCredentials] user exists');
 
         return {
           credentials: {

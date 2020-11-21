@@ -9,6 +9,7 @@ import {
   vestsToRshares,
   fetchNotifications,
   fetchPrice,
+  updateFollow,
 } from '../providers/blurt/dblurtApi';
 import {estimateVoteAmount} from '~/utils/estimateVoteAmount';
 import {parseBlurtTransaction} from '~/utils/parseTransaction';
@@ -50,6 +51,7 @@ const initialState = {
     fundRewardBalance: 0,
     sbdPrintRate: 0,
     dynamicProps: {},
+    chainProps: {},
   },
   walletData: {
     blurt: '0',
@@ -99,7 +101,8 @@ const UserProvider = ({children}: Props) => {
   //// set steem global props
   const fetchBlockchainGlobalProps = async (username: string = null) => {
     const globalProps = await fetchGlobalProps();
-    console.log('[fetchBlockchainGlobalProps', globalProps);
+    console.log('[fetchBlockchainGlobalProps]', globalProps);
+
     // dispatch action
     dispatch({
       type: UserActionTypes.SET_GLOBAL_PROPS,
@@ -199,6 +202,29 @@ const UserProvider = ({children}: Props) => {
     return price_usd;
   };
 
+  //// follow, unfollow
+  const updateFollowState = async (
+    follower: string,
+    password: string,
+    following: string,
+    action: string,
+  ) => {
+    const {chainProps} = userState.globalProps;
+    const op_fee = parseFloat(chainProps.operation_flat_fee.split(' ')[0]);
+    const bw_fee = parseFloat(chainProps.bandwidth_kbytes_fee.split(' ')[0]);
+
+    const result = await updateFollow(
+      follower,
+      password,
+      following,
+      action,
+      op_fee,
+      bw_fee,
+    );
+    console.log('[updateFollowState] transaction result', result);
+    return result;
+  };
+
   return (
     <UserContext.Provider
       value={{
@@ -209,6 +235,7 @@ const UserProvider = ({children}: Props) => {
         getUserProfileData,
         getNotifications,
         getPrice,
+        updateFollowState,
       }}>
       {children}
     </UserContext.Provider>

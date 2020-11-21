@@ -39,8 +39,10 @@ interface Props {
   blockchain?: BlockchainTypes;
   isUser?: boolean;
   favoriting: boolean;
+  following: boolean;
   handlePressFavorite: () => void;
   handlePressEdit: () => void;
+  handlePressFollow: () => void;
 }
 //// component with default props
 const ProfileView: React.FC<Props> = ({
@@ -80,7 +82,8 @@ const ProfileView: React.FC<Props> = ({
               <Text color="blue">{intl.formatMessage({id: 'followers'})}</Text>
               {!isUser ? (
                 <Button
-                  onPress={() => console.log('Follow')}
+                  onPress={props.handlePressFollow}
+                  loading={props.following}
                   small
                   center
                   style={{

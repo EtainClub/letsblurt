@@ -22,6 +22,7 @@ import {
   PostsContext,
   SettingsContext,
   UIContext,
+  UserContext,
 } from '~/contexts';
 import {PostData, PostRef, PostsTypes, ProfileData} from '~/contexts/types';
 //// etc
@@ -31,7 +32,7 @@ import {ProfileView} from './ProfileView';
 interface Props {
   profileData: ProfileData;
   isUser?: boolean;
-  handlePressEdit: () => void;
+  handlePressEdit?: () => void;
 }
 //// component
 const ProfileContainer = (props: Props): JSX.Element => {
@@ -40,8 +41,10 @@ const ProfileContainer = (props: Props): JSX.Element => {
   const {settingsState} = useContext(SettingsContext);
   const {favoriteAuthor, fetchFavorites} = useContext(PostsContext);
   const {setToastMessage} = useContext(UIContext);
+  const {updateFollowState} = useContext(UserContext);
   //// states
   const [favoriting, setFavoriting] = useState(false);
+  const [following, setFollowing] = useState(false);
   ////
   const _handlePressFavorite = async () => {
     console.log('[_handlePressFavorite]');
@@ -56,6 +59,19 @@ const ProfileContainer = (props: Props): JSX.Element => {
     );
     setFavoriting(false);
   };
+  ////
+  const _handlePressFollow = async () => {
+    setFollowing(true);
+    const {username, password} = authState.currentCredentials;
+    const result = await updateFollowState(
+      username,
+      password,
+      props.profileData.profile.name,
+      'blog',
+    );
+    setToastMessage('Following Successful');
+    setFollowing(false);
+  };
 
   return (
     <ProfileView
@@ -65,6 +81,8 @@ const ProfileContainer = (props: Props): JSX.Element => {
       favoriting={favoriting}
       handlePressFavorite={_handlePressFavorite}
       handlePressEdit={props.handlePressEdit}
+      handlePressFollow={_handlePressFollow}
+      following={following}
     />
   );
 };

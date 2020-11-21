@@ -110,7 +110,7 @@ const WalletStatsView = (props: Props): JSX.Element => {
           </Block>
           <Block row space="between">
             <Text>Blurt Price:</Text>
-            <Text>${props.price.toFixed(3)}</Text>
+            {props.price ? <Text>${props.price.toFixed(3)}</Text> : null}
           </Block>
         </Block>
         {props.isUser ? (

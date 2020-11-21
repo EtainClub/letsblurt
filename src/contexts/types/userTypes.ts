@@ -56,6 +56,7 @@ export interface UserState {
   walletData: WalletData;
   // price in usd
   price?: number;
+  voteAmount: string;
 }
 
 //// actions
@@ -131,6 +132,12 @@ export interface UserContextType {
   getNotifications: (username: string) => Promise<any[]>;
   // get price
   getPrice: () => Promise<number>;
+  updateFollowState: (
+    follower: string,
+    password: string,
+    following: string,
+    action: string,
+  ) => Promise<any>;
 }
 
 export type UserAction =

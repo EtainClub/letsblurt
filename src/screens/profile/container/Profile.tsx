@@ -221,7 +221,7 @@ const Profile = ({navigation}): JSX.Element => {
         cover_image: profileData.profile.metadata.cover_image,
       };
       // broadcast the update to blockchain
-      const resutl = await broadcastProfileUpdate(username, password, params);
+      const result = await broadcastProfileUpdate(username, password, params);
       setUpdating(false);
       //      setEditMode(false);
     }
