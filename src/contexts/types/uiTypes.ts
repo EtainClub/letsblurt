@@ -5,6 +5,7 @@ export enum UIActionTypes {
   SET_TOAST,
   SET_TAG_PARAM,
   SET_AUTHOR_PARAM,
+  SET_AUTHORS_PARAM,
   SET_EDIT_MODE,
   SET_SEARCH_PARAM,
 }
@@ -16,6 +17,7 @@ export interface UIState {
   // author param
   // authorParam: string;
   selectedAuthor: string;
+  authorList: string[];
   // selected tag
   selectedTag: string;
   // search text param
@@ -50,7 +52,11 @@ interface SetSearchParamAction {
   type: UIActionTypes.SET_SEARCH_PARAM;
   payload: string;
 }
-
+//
+interface SetAuthorsParamAction {
+  type: UIActionTypes.SET_AUTHORS_PARAM;
+  payload: string[];
+}
 // ui context type
 export interface UIContextType {
   // ui state
@@ -62,6 +68,8 @@ export interface UIContextType {
   setTagParam: (tag: string) => void;
   // set author to use it as a param betwen navigation
   setAuthorParam: (author: string) => void;
+  // set author list
+  setAuthorListParam: (authors: string[]) => void;
   //
   setEditMode: (edit: boolean) => void;
   // set search param
@@ -72,5 +80,6 @@ export type UIAction =
   | SetToastAction
   | SetTagParamAction
   | SetAuthorParamAction
+  | SetAuthorsParamAction
   | SetEditModeAction
   | SetSearchParamAction;

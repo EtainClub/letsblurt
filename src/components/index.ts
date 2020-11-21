@@ -15,6 +15,7 @@ import {ProfileContainer} from './Profile';
 import {WalletStatsView} from './Wallet';
 import {DraggableList} from './DraggableList';
 import {ParentPost} from './ParentPost';
+import {AuthorList} from './AuthorList';
 
 //import Switch from "./Switch";
 //import Voting from "./Voting";
@@ -36,4 +37,5 @@ export {
   WalletStatsView,
   DraggableList,
   ParentPost,
+  AuthorList,
 };

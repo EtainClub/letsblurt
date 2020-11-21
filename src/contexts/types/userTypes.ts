@@ -14,6 +14,8 @@ export enum UserActionTypes {
   SET_WALLET_DATA,
   SET_PROFILE_DATA,
   SET_PRICE,
+  SET_FOLLOWINGS,
+  SET_FOLLOWERS,
 }
 
 // profile data type
@@ -57,6 +59,8 @@ export interface UserState {
   // price in usd
   price?: number;
   voteAmount: string;
+  followings: string[];
+  followers: string[];
 }
 
 //// actions
@@ -115,6 +119,16 @@ interface SetPriceAction {
   type: UserActionTypes.SET_PRICE;
   payload: number;
 }
+// set following
+interface SetFollowingsAction {
+  type: UserActionTypes.SET_FOLLOWINGS;
+  payload: string[];
+}
+// set followers
+interface SetFollowersAction {
+  type: UserActionTypes.SET_FOLLOWERS;
+  payload: string[];
+}
 // user context type
 export interface UserContextType {
   // ui state
@@ -132,12 +146,17 @@ export interface UserContextType {
   getNotifications: (username: string) => Promise<any[]>;
   // get price
   getPrice: () => Promise<number>;
+  // update follow state
   updateFollowState: (
     follower: string,
     password: string,
     following: string,
     action: string,
   ) => Promise<any>;
+  // get followings of the follower
+  getFollowings: (follower: string) => Promise<string[]>;
+  // get followers of the user
+  getFollowers: (username: string) => Promise<string[]>;
 }
 
 export type UserAction =
@@ -151,4 +170,6 @@ export type UserAction =
   | RemoveFavoriteAction
   | SetWalletDataAction
   | SetProfileDataAction
-  | SetPriceAction;
+  | SetPriceAction
+  | SetFollowingsAction
+  | SetFollowersAction;

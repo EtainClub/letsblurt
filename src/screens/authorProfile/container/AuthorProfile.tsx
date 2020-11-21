@@ -26,12 +26,7 @@ import {fetchUserProfile, fetchWalletData} from '~/providers/blurt/dblurtApi';
 import {AuthorProfileScreen} from '../screen/AuthorProfile';
 import {get, has} from 'lodash';
 
-import {
-  Images,
-  argonTheme,
-  BLURT_IMAGE_SERVER,
-  STEEM_IMAGE_SERVER,
-} from '~/constants';
+import {argonTheme, BLURT_IMAGE_SERVER, STEEM_IMAGE_SERVER} from '~/constants';
 
 //// props
 interface Props {
@@ -115,7 +110,7 @@ const AuthorProfile = (props: Props): JSX.Element => {
       />
     )
   ) : (
-    <ActivityIndicator size="large" color="black" />
+    <ActivityIndicator size="large" color={argonTheme.COLORS.ERROR} />
   );
 };
 

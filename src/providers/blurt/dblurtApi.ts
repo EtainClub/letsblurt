@@ -538,7 +538,7 @@ export const fetchUserProfile = async (username: string) => {
     account.nickname = getName(get(account, 'about'));
 
     // get followers/following count
-    const followCount = await getFollows(username);
+    const followCount = await fetchFollows(username);
     console.log('[fetchUserProfile] follow count', followCount);
 
     // build profile data
@@ -618,58 +618,65 @@ export const updateFollow = async (
 };
 
 // get followers/following counts
-export const getFollows = (username: string) =>
+export const fetchFollows = (username: string) =>
   client.call('condenser_api', 'get_follow_count', [username]);
 
-export const getFollowing = (
+export const fetchFollowings = async (
   follower: string,
   startFollowing: string,
   followType = 'blog',
-  limit = 100,
+  limit = 1000,
+) => {
+  try {
+    const result = await client.call('condenser_api', 'get_following', [
+      follower,
+      startFollowing,
+      followType,
+      limit,
+    ]);
+    return result;
+  } catch (error) {
+    console.log('failed to fetch following', error);
+    return null;
+  }
+};
+
+export const fetchFollowers = (
+  username: string,
+  startFollowing: string,
+  followType = 'blog',
+  limit = 1000,
 ) =>
-  client.database.call('get_following', [
-    follower,
+  client.call('condenser_api', 'get_followers', [
+    username,
     startFollowing,
     followType,
     limit,
   ]);
 
-export const getFollowers = (
-  follower: string,
-  startFollowing: string,
-  followType = 'blog',
-  limit = 100,
-) =>
-  client.database.call('get_followers', [
-    follower,
-    startFollowing,
-    followType,
-    limit,
-  ]);
-
-export const isFollowing = (username: string, author: string) =>
-  new Promise((resolve, reject) => {
-    if (author) {
-      client.database
-        .call('get_following', [author, username, 'blog', 1])
-        .then((result) => {
-          if (
-            result[0] &&
-            result[0].follower === author &&
-            result[0].following === username
-          ) {
-            resolve(true);
-          } else {
-            resolve(false);
-          }
-        })
-        .catch((err) => {
-          reject(err);
-        });
+export const isFollowing = async (username: string, author: string) => {
+  try {
+    const result = await client.call('condenser_api', 'get_following', [
+      username,
+      author,
+      'blog',
+      1,
+    ]);
+    debugger;
+    if (
+      result[0] &&
+      result[0].follower === username &&
+      result[0].following === author
+    ) {
+      return true;
     } else {
-      resolve(false);
+      return false;
     }
-  });
+  } catch (error) {
+    console.log('failed to check isFollowing', error);
+    return null;
+  }
+};
 
 //// blurt tags
 export const fetchTagList = async () => {

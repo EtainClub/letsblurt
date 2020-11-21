@@ -16,6 +16,7 @@ import {
   SearchFeed,
   Profile,
   AuthorProfile,
+  AuthorList,
   Posting,
   Wallet,
   Notification,
@@ -293,6 +294,22 @@ const AuthorStack = () => {
   );
 };
 
+const AuthorListStack = () => {
+  return (
+    <Stack.Navigator mode="card" headerMode="screen">
+      <Stack.Screen
+        name="AuthorList"
+        component={AuthorList}
+        options={{
+          header: ({navigation}) => {
+            return <Header title="Author List" navigation={navigation} />;
+          },
+        }}
+      />
+    </Stack.Navigator>
+  );
+};
+
 const SettingsStack = () => {
   return (
     <Stack.Navigator mode="card" headerMode="screen">
@@ -345,6 +362,7 @@ const DrawerNavigator = (props) => {
       <Drawer.Screen name="Feed" component={TabNavigator} />
       <Drawer.Screen name="Add" component={Login} />
       <Drawer.Screen name="AuthorProfile" component={AuthorStack} />
+      <Drawer.Screen name="AuthorList" component={AuthorListStack} />
       {!authState.loggedIn ? (
         <Drawer.Screen name="Login" component={Login} />
       ) : (

@@ -380,15 +380,17 @@ export interface PostsContextType {
   ) => Promise<{bookmarked: boolean}>;
   // fetch all bookmarks
   fetchBookmarks: (username: string) => Promise<any[]>;
-  // bookmark
-  favoriteAuthor: (
+  // update favorite author
+  updateFavoriteAuthor: (
     author: string,
     username: string,
+    remove: boolean,
     setToastMessage?: (message: string) => void,
-  ) => void;
+  ) => Promise<boolean>;
   // fetch all favorite authurs
   fetchFavorites: (username: string) => Promise<any[]>;
-
+  // check if the author is in the favorites
+  isFavoriteAuthor: (username: string, author: string) => Promise<boolean>;
   // set post ref
   setPostRef: (postRef: PostRef) => void;
   // fetch tag list

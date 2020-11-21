@@ -220,8 +220,10 @@
     "post-button": "Postings",
     "follow_button": "Follow",
     "unfollow_button": "Unfollow",
-    "favorite_button": "Add Favorite",
-    "unfavorite_button": "Cancel Favoriate",
+    "favorite_button": "Favorite",
+    "unfavorite_button": "Unfavoriate",
+    "unfavorite_ok": "Unfavorite successful",
+    "unfavorite_error": "Failed to Unfavorite",
     "steemit_button": "Change",
     "bookmarks": "Bookmarked Dreams",
     "viewall": "View All",
@@ -235,7 +237,8 @@
     "introduction": "Introduction",
     "location": "Location",
     "website": "website",
-    "update_button": "Update"
+    "update_button": "Update",
+    "search_author": "Search account"
   },
   "Settings": {
     "blockchain_settings": "Blockchain",

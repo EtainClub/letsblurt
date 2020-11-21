@@ -1,5 +1,6 @@
 import {Profile} from './profile';
 import {AuthorProfile} from './authorProfile';
+import {AuthorList} from './AuthorList';
 import {Posting} from './posting';
 import {Wallet} from './wallet';
 import {Feed} from './feed';
@@ -15,6 +16,7 @@ import {Signup} from './signup';
 export {
   Profile,
   AuthorProfile,
+  AuthorList,
   Posting,
   Wallet,
   Feed,

@@ -614,33 +614,49 @@ const PostsProvider = ({children}: Props) => {
     return bookmarks;
   };
 
-  //// favorite author
-  const favoriteAuthor = async (
+  //// update favorite author
+  const updateFavoriteAuthor = async (
     author: string,
     username: string,
+    remove: boolean,
     setToastMessage?: (message: string) => void,
   ) => {
     console.log('[favoriteAuthor] author', author);
-    //// get the firebase user doc ref
     // create a reference to the doc
     const docRef = firestore()
       .doc(`users/${username}`)
       .collection('favorites')
       .doc(author);
 
-    // check saniy if the user already favorited the author
-    const favorite = await docRef.get();
-    if (favorite.exists) {
-      console.log('[favoriteAuthor] User favorited the author already');
-      setToastMessage(intl.formatMessage({id: 'Favorite.already'}));
-      return;
+    //// get the firebase user doc ref
+    // remove
+    if (remove) {
+      docRef
+        .delete()
+        .then(() => {
+          setToastMessage(intl.formatMessage({id: 'Profile.unfavorite_ok'}));
+          return true;
+        })
+        .catch((error) => {
+          setToastMessage(intl.formatMessage({id: 'Profile.unfavorite_error'}));
+          return false;
+        });
+    } else {
+      // check saniy if the user already favorited the author
+      const favorite = await docRef.get();
+      if (favorite.exists) {
+        console.log('[favoriteAuthor] User favorited the author already');
+        setToastMessage(intl.formatMessage({id: 'Favorite.already'}));
+        return false;
+      }
+      // add new doc
+      docRef.set({
+        author: author,
+        createdAt: new Date(),
+      });
+      setToastMessage(intl.formatMessage({id: 'Favorite.done'}));
+      return true;
     }
-    // add new doc
-    docRef.set({
-      author: author,
-      createdAt: new Date(),
-    });
-    setToastMessage(intl.formatMessage({id: 'Favorite.done'}));
   };
 
   //// fetch favorites
@@ -661,6 +677,18 @@ const PostsProvider = ({children}: Props) => {
         console.log('failed to get bookmarks', e);
       });
     return favorites;
+  };
+
+  //// check if the author is in the favorite list
+  const isFavoriteAuthor = async (username: string, author: string) => {
+    console.log('[isFavorite] username, author', username, author);
+    // get user's favorite collection
+    const result = await firestore()
+      .doc(`users/${username}`)
+      .collection('favorites')
+      .doc(`${author}`)
+      .get();
+    return result.exists;
   };
 
   //// set post ref
@@ -689,8 +717,9 @@ const PostsProvider = ({children}: Props) => {
         bookmarkPost,
         fetchBookmarks,
         fetchDatabaseState,
-        favoriteAuthor,
+        updateFavoriteAuthor,
         fetchFavorites,
+        isFavoriteAuthor,
       }}>
       {children}
     </PostsContext.Provider>

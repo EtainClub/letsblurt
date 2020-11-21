@@ -35,9 +35,13 @@ const Profile = ({navigation}): JSX.Element => {
   const intl = useIntl();
   // contexts
   const {authState} = useContext(AuthContext)!;
-  const {userState, getUserProfileData, getNotifications} = useContext(
-    UserContext,
-  );
+  const {
+    userState,
+    getUserProfileData,
+    getNotifications,
+    getFollowings,
+    getFollowers,
+  } = useContext(UserContext);
   const {uiState, setAuthorParam, setToastMessage} = useContext(UIContext);
   const {
     postsState,

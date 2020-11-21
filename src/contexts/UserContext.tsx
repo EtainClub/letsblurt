@@ -10,6 +10,8 @@ import {
   fetchNotifications,
   fetchPrice,
   updateFollow,
+  fetchFollowings,
+  fetchFollowers,
 } from '../providers/blurt/dblurtApi';
 import {estimateVoteAmount} from '~/utils/estimateVoteAmount';
 import {parseBlurtTransaction} from '~/utils/parseTransaction';
@@ -63,7 +65,10 @@ const initialState = {
     transactions: [],
   },
   price: 0,
+  followings: [],
+  followers: [],
 };
+
 // create user context
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
@@ -81,6 +86,10 @@ const userReducer = (state: UserState, action: UserAction) => {
       return {...state, walletData: action.payload};
     case UserActionTypes.SET_PRICE:
       return {...state, price: action.payload};
+    case UserActionTypes.SET_FOLLOWINGS:
+      return {...state, followings: action.payload};
+    case UserActionTypes.SET_FOLLOWERS:
+      return {...state, followers: action.payload};
     default:
       return state;
   }
@@ -202,6 +211,7 @@ const UserProvider = ({children}: Props) => {
     return price_usd;
   };
 
+  //////// follow
   //// follow, unfollow
   const updateFollowState = async (
     follower: string,
@@ -225,6 +235,52 @@ const UserProvider = ({children}: Props) => {
     return result;
   };
 
+  //// get followings
+  const getFollowings = async (follower: string) => {
+    const startFollowing: string = '';
+    const followingType: string = 'blog';
+    const limit: number = 1000;
+    const result = await fetchFollowings(
+      follower,
+      startFollowing,
+      followingType,
+      limit,
+    );
+    // get the followings
+    const followings = result.map((item) => {
+      return item.following;
+    });
+    // dispatch action
+    dispatch({
+      type: UserActionTypes.SET_FOLLOWINGS,
+      payload: followings,
+    });
+    return followings;
+  };
+
+  //// get followings
+  const getFollowers = async (username: string) => {
+    const startFollowing: string = '';
+    const followingType: string = 'blog';
+    const limit: number = 1000;
+    const result = await fetchFollowers(
+      username,
+      startFollowing,
+      followingType,
+      limit,
+    );
+    // get the followers
+    const followers = result.map((item) => {
+      return item.follower;
+    });
+    // dispatch action
+    dispatch({
+      type: UserActionTypes.SET_FOLLOWERS,
+      payload: followers,
+    });
+    return followers;
+  };
+
   return (
     <UserContext.Provider
       value={{
@@ -236,6 +292,8 @@ const UserProvider = ({children}: Props) => {
         getNotifications,
         getPrice,
         updateFollowState,
+        getFollowings,
+        getFollowers,
       }}>
       {children}
     </UserContext.Provider>

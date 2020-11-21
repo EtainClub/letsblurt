@@ -12,6 +12,7 @@ const initialState = {
   selectedTag: null,
   editMode: false,
   searchText: '',
+  authorList: [],
 };
 
 // create ui context
@@ -19,18 +20,19 @@ const UIContext = createContext<UIContextType | undefined>(undefined);
 
 // ui reducer
 const uiReducer = (state: UIState, action: UIAction) => {
-  const {type, payload} = action;
-  switch (type) {
+  switch (action.type) {
     case UIActionTypes.SET_TOAST:
-      return {...state, toastMessage: payload};
+      return {...state, toastMessage: action.payload};
     case UIActionTypes.SET_AUTHOR_PARAM:
-      return {...state, selectedAuthor: payload};
+      return {...state, selectedAuthor: action.payload};
+    case UIActionTypes.SET_AUTHORS_PARAM:
+      return {...state, authorList: action.payload};
     case UIActionTypes.SET_TAG_PARAM:
-      return {...state, selectedTag: payload};
+      return {...state, selectedTag: action.payload};
     case UIActionTypes.SET_EDIT_MODE:
-      return {...state, editMode: payload};
+      return {...state, editMode: action.payload};
     case UIActionTypes.SET_SEARCH_PARAM:
-      return {...state, searchText: payload};
+      return {...state, searchText: action.payload};
     default:
       return state;
   }
@@ -78,6 +80,16 @@ const UIProvider = ({children}: Props) => {
     });
   };
 
+  // set author param
+  const setAuthorListParam = (authors: string[]) => {
+    console.log('[setAuthorList] author', authors);
+    // dispatch action
+    dispatch({
+      type: UIActionTypes.SET_AUTHORS_PARAM,
+      payload: authors,
+    });
+  };
+
   // set edit mode
   const setEditMode = (edit: boolean) => {
     dispatch({
@@ -101,6 +113,7 @@ const UIProvider = ({children}: Props) => {
         setToastMessage,
         setTagParam,
         setAuthorParam,
+        setAuthorListParam,
         setEditMode,
         setSearchParam,
       }}>

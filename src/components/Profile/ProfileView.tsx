@@ -32,6 +32,7 @@ import {PostData, PostRef, PostsTypes, ProfileData} from '~/contexts/types';
 //// etc
 import {BlockchainTypes} from '~/contexts/types';
 import {getNumberStat} from '~/utils/stats';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 
 //// props
 interface Props {
@@ -39,10 +40,14 @@ interface Props {
   blockchain?: BlockchainTypes;
   isUser?: boolean;
   favoriting: boolean;
+  favoriteState: boolean;
   following: boolean;
+  followingState: boolean;
   handlePressFavorite: () => void;
   handlePressEdit: () => void;
   handlePressFollow: () => void;
+  handlePressFollowers: () => void;
+  handlePressFollowings: () => void;
 }
 //// component with default props
 const ProfileView: React.FC<Props> = ({
@@ -71,14 +76,12 @@ const ProfileView: React.FC<Props> = ({
       <Block flex style={styles.profileCard}>
         <Block middle style={styles.avatarContainer}>
           <Block flex row center>
-            <Block
-              center
-              flex={1}
-              style={{top: 40}}
-              onPress={() => console.log('show follower list')}>
-              <Text size={16} color="orange">
-                {getNumberStat(profile.stats.followers)}
-              </Text>
+            <Block center flex={1} style={{top: 40}}>
+              <TouchableOpacity onPress={props.handlePressFollowers}>
+                <Text size={16} color="orange">
+                  {getNumberStat(profile.stats.followers)}
+                </Text>
+              </TouchableOpacity>
               <Text color="blue">{intl.formatMessage({id: 'followers'})}</Text>
               {!isUser ? (
                 <Button
@@ -91,7 +94,9 @@ const ProfileView: React.FC<Props> = ({
                     width: 100,
                     backgroundColor: argonTheme.COLORS.BUTTON_COLOR,
                   }}>
-                  {intl.formatMessage({id: 'Profile.follow_button'})}
+                  {props.followingState
+                    ? intl.formatMessage({id: 'Profile.unfollow_button'})
+                    : intl.formatMessage({id: 'Profile.follow_button'})}
                 </Button>
               ) : null}
             </Block>
@@ -117,14 +122,12 @@ const ProfileView: React.FC<Props> = ({
               <Text>{profile.metadata.name}</Text>
               <Text color="orange">@{profile.name}</Text>
             </Block>
-            <Block
-              center
-              flex={1}
-              style={{top: 40}}
-              onPress={() => console.log('show following list')}>
-              <Text size={16} color="orange">
-                {getNumberStat(profile.stats.following)}
-              </Text>
+            <Block center flex={1} style={{top: 40}}>
+              <TouchableOpacity onPress={props.handlePressFollowings}>
+                <Text size={16} color="orange">
+                  {getNumberStat(profile.stats.following)}
+                </Text>
+              </TouchableOpacity>
               <Text color="blue">{intl.formatMessage({id: 'following'})}</Text>
               {!isUser ? (
                 <Button
@@ -137,7 +140,9 @@ const ProfileView: React.FC<Props> = ({
                     width: 100,
                     backgroundColor: argonTheme.COLORS.ERROR,
                   }}>
-                  {intl.formatMessage({id: 'Profile.favorite_button'})}
+                  {props.favoriteState
+                    ? intl.formatMessage({id: 'Profile.unfavorite_button'})
+                    : intl.formatMessage({id: 'Profile.favorite_button'})}
                 </Button>
               ) : null}
             </Block>
@@ -155,34 +160,6 @@ const ProfileView: React.FC<Props> = ({
             {profile.metadata.location}
           </Text>
         </Block>
-
-        {/* <Block
-        middle
-        row
-        space="evenly"
-        style={{marginTop: 0, paddingBottom: 0}}>
-        <Button
-          onPress={() => console.log('Follow')}
-          small
-          center
-          style={{
-            padding: 0,
-            backgroundColor: argonTheme.COLORS.INFO,
-          }}>
-          {intl.formatMessage({id: 'Profile.follow_button'})}
-        </Button>
-        <Button
-          onPress={() => console.log('follow the author')}
-          small
-          center
-          color={argonTheme.COLORS.ERROR}
-          style={{
-            backgroundColor: argonTheme.COLORS.ERROR,
-          }}>
-          {intl.formatMessage({id: 'Profile.favorite_button'})}
-        </Button>
-      </Block> */}
-
         <Block row space="between" style={styles.stats}>
           <Block middle>
             <Text
