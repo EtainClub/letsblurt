@@ -662,7 +662,6 @@ export const isFollowing = async (username: string, author: string) => {
       'blog',
       1,
     ]);
-    debugger;
     if (
       result[0] &&
       result[0].follower === username &&

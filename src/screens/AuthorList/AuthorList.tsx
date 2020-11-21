@@ -52,6 +52,7 @@ const AuthorListScreen = (props: Props): JSX.Element => {
   const {setPostRef} = useContext(PostsContext);
   //// states
   const [searchText, setSearchText] = useState('');
+  const [searchedItems, setSearchedItems] = useState(uiState.authorList);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -87,6 +88,21 @@ const AuthorListScreen = (props: Props): JSX.Element => {
     //    setSearchParam(searchText);
   };
 
+  const _handleTextChange = (text: string) => {
+    console.log('search text', searchText);
+    // filter
+    if (text === '') {
+      setSearchedItems(authors);
+    } else {
+      const _filterdItems = authors.filter(
+        (author) => text && author.includes(text),
+      );
+      setSearchedItems(_filterdItems);
+    }
+    // set text
+    setSearchText(text);
+  };
+
   const _renderHeader = () => {
     const iconSearch =
       searchText === '' ? (
@@ -114,16 +130,15 @@ const AuthorListScreen = (props: Props): JSX.Element => {
         <Input
           style={styles.searchContainer}
           right
-          color="black"
-          autoFocus={false}
+          color={argonTheme.COLORS.ERROR}
+          autoFocus={true}
           autoCorrect={false}
           autoCapitalize="none"
           iconContent={iconSearch}
           defaultValue={searchText}
-          returnKeyType="search"
           placeholder={intl.formatMessage({id: 'Profile.search_author'})}
-          onChangeText={(text: string) => setSearchText(text)}
-          onSubmitEditing={_onSubmitSearch}
+          placehoderTextColor={argonTheme.COLORS.INPUT}
+          onChangeText={_handleTextChange}
         />
       </Block>
     );
@@ -185,11 +200,7 @@ const AuthorListScreen = (props: Props): JSX.Element => {
   return !loading ? (
     <FlatList
       contentContainerStyle={styles.posts}
-      refreshing={refreshing}
-      onRefresh={_onRefresh}
-      onEndReached={_onLoadMore}
-      onEndReachedThreshold={1}
-      data={authors}
+      data={searchedItems}
       renderItem={({item, index}) => _renderItem(item, index)}
       keyExtractor={(item, index) => String(index)}
       initialNumToRender={5}
