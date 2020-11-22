@@ -181,8 +181,15 @@ const PostsProvider = ({children}: Props) => {
   ////// action creators
   //// fetch tag list
   const getTagList = async (username?: string) => {
-    // fetch communities
-    const tagList = await fetchTagList();
+    // fetch tag list
+    const _tagList = await fetchTagList();
+    const _tags = _tagList.map((tag) => tag.tag);
+    let tagList = _tags;
+    if (username) {
+      tagList = ['Feed', 'All', ..._tags];
+    } else {
+      tagList = ['All', ..._tags];
+    }
     // dispatch action
     dispatch({
       type: PostsActionTypes.SET_TAG_LIST,
@@ -191,35 +198,35 @@ const PostsProvider = ({children}: Props) => {
     return tagList;
   };
 
-  //// fetch community list
-  const fetchCommunities = async (username: string) => {
-    console.log('[fetchCommunities] username', username);
-    let tagList = [];
-    let filterList = INIT_FILTER_LIST;
-    let tagIndex = 0;
-    let filterIndex = 0;
-    // check sanity
-    if (!username) {
-      console.log('[fetchCommunities] username is not defined', username);
-      return;
-    }
-    // fetch communities
-    const communityList = await fetchCommunityList(username);
-    //// set tag filter list and tag list
-    tagList = [
-      [username, ...INIT_FRIENDS_TAG],
-      [username, ...INIT_MY_TAG],
-      ...communityList,
-    ];
+  // //// fetch community list
+  // const fetchCommunities = async (username: string) => {
+  //   console.log('[fetchCommunities] username', username);
+  //   let tagList = [];
+  //   let filterList = INIT_FILTER_LIST;
+  //   let tagIndex = 0;
+  //   let filterIndex = 0;
+  //   // check sanity
+  //   if (!username) {
+  //     console.log('[fetchCommunities] username is not defined', username);
+  //     return;
+  //   }
+  //   // fetch communities
+  //   const communityList = await fetchCommunityList(username);
+  //   //// set tag filter list and tag list
+  //   tagList = [
+  //     [username, ...INIT_FRIENDS_TAG],
+  //     [username, ...INIT_MY_TAG],
+  //     ...communityList,
+  //   ];
 
-    // dispatch action
-    dispatch({
-      type: PostsActionTypes.SET_TAG_LIST,
-      payload: tagList,
-    });
+  //   // dispatch action
+  //   dispatch({
+  //     type: PostsActionTypes.SET_TAG_LIST,
+  //     payload: tagList,
+  //   });
 
-    return communityList;
-  };
+  //   return communityList;
+  // };
 
   //// fetch posts action creator
   const fetchPosts = async (
@@ -240,12 +247,6 @@ const PostsProvider = ({children}: Props) => {
       inputTag,
     );
 
-    // dispatch action: clear fetched flag
-    dispatch({
-      type: PostsActionTypes.SET_FETCHED,
-      payload: false,
-    });
-
     //// set start post ref
     let startPostRef = {
       author: null,
@@ -259,39 +260,28 @@ const PostsProvider = ({children}: Props) => {
     let tag = '';
     let filter = '';
     switch (postsType) {
-      case PostsTypes.AUTHOR:
-        // check sanity
-        if (!inputTag) {
-          console.log(
-            '[PostsContext|fetchPosts] input tag is necessary for profile posts fetching',
-          );
-          return;
-        }
-        tag = inputTag;
-        filter = 'blog';
-        break;
       case PostsTypes.HASH_TAG:
-        // TODO: need to handle change filter event with the same
-        // check sanity
-        if (!inputTag) {
-          // console.log(
-          //   '[PostsContext|fetchPosts] input tag is necessary for Hash tag posts fetching',
-          // );
-          tag = postsState.tagList[postsState.tagIndex][0];
-        } else {
-          tag = inputTag;
-        }
-        filter = postsState.filterList[postsState.filterIndex];
-        // TODO: append the tag to the tag list
-        // dispatch action
-        dispatch({
-          type: PostsActionTypes.SET_TAG_LIST,
-          payload: postsState.tagList.concat([[tag, tag, '', '']]),
-        });
-        dispatch({
-          type: PostsActionTypes.SET_TAG_INDEX,
-          payload: postsState.tagList.length,
-        });
+        // // TODO: need to handle change filter event with the same
+        // // check sanity
+        // if (!inputTag) {
+        //   // console.log(
+        //   //   '[PostsContext|fetchPosts] input tag is necessary for Hash tag posts fetching',
+        //   // );
+        //   tag = postsState.tagList[postsState.tagIndex];
+        // } else {
+        //   tag = inputTag;
+        // }
+        // filter = postsState.filterList[postsState.filterIndex];
+        // // TODO: append the tag to the tag list
+        // // dispatch action
+        // dispatch({
+        //   type: PostsActionTypes.SET_TAG_LIST,
+        //   payload: postsState.tagList.concat([[tag, tag, '', '']]),
+        // });
+        // dispatch({
+        //   type: PostsActionTypes.SET_TAG_INDEX,
+        //   payload: postsState.tagList.length,
+        // });
 
         break;
       case PostsTypes.FEED:
@@ -302,9 +292,8 @@ const PostsProvider = ({children}: Props) => {
           tag = username ? username : '';
           filter = 'blog';
         } else if (tagIndex > 1) {
-          // tag = postsState.tagList[tagIndex][0];
           filter = postsState.filterList[filterIndex];
-          tag = postsState.tagList[tagIndex].tag;
+          tag = postsState.tagList[tagIndex];
         } else {
           console.error(
             '[PostsContext|fetchPosts] tagIndex is wrong',
@@ -315,23 +304,8 @@ const PostsProvider = ({children}: Props) => {
         break;
     }
 
-    console.log(
-      '[PostsContext|fetchPosts] tag, filter, startpostRef',
-      tag,
-      filter,
-      startPostRef,
-    );
-
-    //    debugger;
-
     // now fetch posts
     const _posts = await _fetchPosts(filter, tag, startPostRef, username);
-    console.log('[PostsContext|fetchPosts] posts', _posts);
-    console.log(
-      '[PostsContext|fetchPosts] after fetching, fetched?',
-      postsState.fetched,
-    );
-
     // check sanity
     if (!_posts) return null;
 
@@ -345,7 +319,6 @@ const PostsProvider = ({children}: Props) => {
     // augmented posts
     let posts = _posts.slice(0, _posts.length - 1);
     if (appending) {
-      console.log('[PostsContext|fetchPosts] appending', appending);
       posts = postsState[postsType].posts.concat(posts);
     }
     // dispatch set posts action
@@ -704,7 +677,7 @@ const PostsProvider = ({children}: Props) => {
       value={{
         postsState,
         getTagList,
-        fetchCommunities,
+        //        fetchCommunities,
         fetchPosts,
         setPostRef,
         clearPosts,

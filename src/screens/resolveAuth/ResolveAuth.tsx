@@ -32,13 +32,12 @@ export const ResolveAuth = (props) => {
 
   //// resolve auth
   const _resolveEntry = async () => {
-    // fetch tags
-    const tagList = await getTagList();
-    console.log('[_resolveEntry] tagList', tagList);
     // get user login token from storage
     let username = await AsyncStorage.getItem(LOGIN_TOKEN);
     // set category to feed if username exists
     if (username) {
+      // fetch tags
+      getTagList(username);
       // set username
       setUsername(username);
       // retrieve all credentials
@@ -49,6 +48,8 @@ export const ResolveAuth = (props) => {
       setFetched(true);
     } else {
       // @todo no communiy list at first, handle this
+      // fetch tags
+      await getTagList();
       navigate({name: 'Welcome'});
     }
   };
