@@ -36,6 +36,7 @@ const Settings = (props: Props): JSX.Element => {
   const _handleToggleSwitch = async (key: string) => {
     switch (key) {
       case 'logout':
+        _handleLogout();
         break;
       default:
         break;

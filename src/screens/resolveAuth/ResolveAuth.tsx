@@ -8,7 +8,6 @@ export const LOGIN_TOKEN = 'loginToken';
 
 export const ResolveAuth = (props) => {
   //// props
-  console.log('[ResolveAuth] props', props);
   //// contexts
   const {authState, setAuthResolved, setCredentials} = useContext(AuthContext)!;
   const {fetchBlockchainGlobalProps} = useContext(UserContext);
@@ -17,21 +16,13 @@ export const ResolveAuth = (props) => {
   const [fetched, setFetched] = useState(false);
   const [username, setUsername] = useState(null);
 
-  console.log('ResolveAuthScreen, auth state', authState);
-
   useEffect(() => {
     _resolveEntry();
   }, []);
 
   useEffect(() => {
-    console.log('[ResolveAuthScreen], fetched effect, fetched', fetched);
-
     if (fetched) {
-      console.log(
-        '[ResolveAuth|useEffect] fetched Community list',
-        postsState.communityList,
-      );
-      // get steem global props and get user's vote amount
+      // get blurt global props and get user's vote amount
       fetchBlockchainGlobalProps(username);
       setAuthResolved(true);
       // TODO is this not necessary, why?

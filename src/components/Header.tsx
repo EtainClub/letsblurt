@@ -135,26 +135,33 @@ const Header = (props: Props): JSX.Element => {
   };
 
   const Avatar = () => {
-    return (
-      username && (
-        <ModalDropdown
-          options={accounts}
-          renderRow={_renderAccountRow}
-          dropdownButtonStyle={styles.avatarButton}
-          selectedOptionIndex={0}
-          rowTextStyle={styles.rowTextStyle}
-          style={styles.dropdown}
-          dropdownStyle={styles.dropdownStyle}
-          textStyle={styles.dropdownText}
-          onSelect={_handleChangeAccount}>
-          <Image
-            source={{
-              uri: `${BLURT_IMAGE_SERVER}/u/${username}/avatar`,
-            }}
-            style={[styles.avatar]}
-          />
-        </ModalDropdown>
-      )
+    return username ? (
+      <ModalDropdown
+        options={accounts}
+        renderRow={_renderAccountRow}
+        style={styles.dropdown}
+        dropdownButtonStyle={styles.avatarButton}
+        selectedOptionIndex={0}
+        rowTextStyle={styles.rowTextStyle}
+        dropdownStyle={styles.dropdownAvatarStyle}
+        textStyle={styles.dropdownText}
+        onSelect={_handleChangeAccount}>
+        <Image
+          source={{
+            uri: `${BLURT_IMAGE_SERVER}/u/${username}/avatar`,
+          }}
+          style={[styles.avatar]}
+        />
+      </ModalDropdown>
+    ) : (
+      <Block style={styles.dropdown}>
+        <Icon
+          onPress={() => navigate({name: 'Login'})}
+          name="user-secret"
+          family="font-awesome"
+          size={40}
+        />
+      </Block>
     );
   };
 
@@ -239,7 +246,7 @@ const Header = (props: Props): JSX.Element => {
         tagList.forEach((item) => communityOptions.push(item.tag));
         return (
           <Block row space="between">
-            <Block row space="between" style={{left: 150}}>
+            <Block row space="around" style={{left: 100}}>
               <DropdownModal
                 key={communityOptions[tagIndex]}
                 defaultText={defaultCommunityText || communityOptions[tagIndex]}
@@ -265,54 +272,21 @@ const Header = (props: Props): JSX.Element => {
                 onSelect={_handleOnFilterChange}
               />
             </Block>
-            <Block style={{left: 140, top: 2}}>
+            <Block style={{left: 120, top: 2}}>
               <Avatar />
             </Block>
-
-            {/* <Icon
-              onPress={() => navigation.navigate('SearchFeed')}
-              style={{top: 12, left: 20}}
-              size={20}
-              color={theme.COLORS.MUTED}
-              name="magnifying-glass"
-              family="entypo"
-            /> */}
           </Block>
         );
       case 'Search':
         return <SearchBar />;
       case 'Posting':
-      // tagList.forEach((item, index) => {
-      //   if (index === 0) return;
-      //   communityOptions.push(item[1]);
-      // });
-      // return (
-      //   <Block row space="around">
-      //     <Text style={{top: 13}}>Posting to</Text>
-      //     <DropdownModal
-      //       key={communityOptions[tagIndex]}
-      //       defaultText={defaultCommunityText || communityOptions[tagIndex]}
-      //       dropdownButtonStyle={styles.dropdownButtonStyle}
-      //       selectedOptionIndex={tagIndex}
-      //       rowTextStyle={styles.rowTextStyle}
-      //       style={styles.dropdown}
-      //       dropdownStyle={styles.dropdownStyle}
-      //       textStyle={styles.dropdownText}
-      //       options={communityOptions}
-      //       onSelect={_handleOnTagChangeForPosting}
-      //     />
-      //     <Block style={{left: 107, top: 2}}>
-      //       <Avatar />
-      //     </Block>
-      //   </Block>
-      // );
       case 'Profile':
       case 'Author':
       case 'Notification':
       case 'Wallet':
       case 'Settings':
         return (
-          <Block style={{left: 140, top: 10}}>
+          <Block style={{left: 120, top: 0}}>
             <Avatar />
           </Block>
         );
@@ -438,16 +412,21 @@ const styles = StyleSheet.create({
   },
   dropdownText: {
     fontSize: 14,
-    paddingLeft: 16,
+    paddingLeft: 0,
     paddingHorizontal: 14,
     color: '#788187',
   },
   rowTextStyle: {
     fontSize: 12,
     color: '#788187',
-    padding: 5,
   },
   dropdownStyle: {
+    marginTop: 15,
+    minWidth: 120,
+    width: 120,
+    backgroundColor: argonTheme.COLORS.DEFAULT,
+  },
+  dropdownAvatarStyle: {
     marginTop: 15,
     minWidth: 150,
     width: 200,
@@ -457,13 +436,12 @@ const styles = StyleSheet.create({
     borderColor: '#f5f5f5',
     borderWidth: 1,
     height: 44,
-    width: 120,
+    width: 100,
     borderRadius: 8,
-    marginRight: 20,
+    marginRight: 10,
   },
   dropdown: {
-    flexGrow: 1,
-    width: 120,
+    width: 100,
   },
   textStyle: {
     color: '#357ce6',
@@ -478,8 +456,3 @@ const styles = StyleSheet.create({
     borderWidth: 0,
   },
 });
-
-/*
-
-
-      */

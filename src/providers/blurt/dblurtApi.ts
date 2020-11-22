@@ -1149,7 +1149,6 @@ export const broadcastProfileUpdate = async (
       ],
     ];
     console.log('[broadcastProfileUpdate] opArray', opArray);
-    debugger;
     try {
       const result = await client.broadcast.sendOperations(opArray, privateKey);
       // const result = await client.broadcast.updateAccount(

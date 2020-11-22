@@ -123,7 +123,6 @@ const ActionBarContainer = (props: Props): JSX.Element => {
       op_fee,
       bw_fee,
     );
-    debugger;
   };
 
   return (

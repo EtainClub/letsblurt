@@ -110,7 +110,7 @@ const SettingScreen = (props: Props): JSX.Element => {
 
   return (
     <ScrollView>
-      <FlatList
+      {/* <FlatList
         data={blockchainItems}
         keyExtractor={(item, index) => item.id}
         renderItem={props.renderItem}
@@ -121,7 +121,7 @@ const SettingScreen = (props: Props): JSX.Element => {
             </Text>
           </Block>
         }
-      />
+      /> */}
       <FlatList
         data={securityItems}
         keyExtractor={(item, index) => item.id}

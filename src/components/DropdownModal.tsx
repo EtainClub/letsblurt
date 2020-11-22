@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   dropdownRow: {
-    marginLeft: 30,
+    marginLeft: 10,
     justifyContent: 'center',
   },
   highlightedRow: {
@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     paddingLeft: 11,
     paddingRight: 11,
-    marginLeft: 20,
+    marginLeft: 0,
   },
   highlightedRowText: {
     color: '#FFFFFF',
