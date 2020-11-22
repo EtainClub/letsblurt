@@ -45,6 +45,7 @@ interface Props {
   handlePressShare?: () => void;
   handlePressReply?: () => void;
   handlePressVoter?: (voter: string) => void;
+  handlePressReblog?: () => void;
 }
 
 const ActionBarView = (props: Props): JSX.Element => {
@@ -108,51 +109,6 @@ const ActionBarView = (props: Props): JSX.Element => {
     const _voted = await handlePressVoting(votingWeight);
     setVoted(_voted);
     setVoting(false);
-  };
-  const _onPressVotesCount = () => {
-    console.log('[ActionBar] onPressVoteCounts', voters);
-    // @todo show active votes
-  };
-
-  //// handle press comment icon of action bar
-  const _onPressComments = () => {
-    console.log('[ActionBar] onPressComments');
-    // @todo go to the comment section
-    props.handlePressComments();
-  };
-
-  //// handle press bookmark icon of action bar
-  const _onPressBookmark = () => {
-    console.log('[ActionBar] onPressBookMark');
-    // @todo add bookmark
-    props.handlePressBookmark();
-  };
-
-  //// handle press reply button of action bar
-  const _onPressReply = () => {
-    console.log('[ActionBar] onPressReply');
-    // @todo open comment form
-    props.handlePressReply();
-  };
-
-  //// handle press edit button of action bar
-  const _onPressEditPost = () => {
-    console.log('[ActionBar] onPressEditPost');
-    // @todo open comment form
-    props.handlePressEditPost();
-  };
-
-  //// handle press edit button of action bar
-  const _onPressEditComment = () => {
-    console.log('[ActionBar] onPressEditComment');
-    // open comment form
-    props.handlePressEditComment();
-  };
-
-  //// handle press resteem button of action bar
-  const _onPressResteem = () => {
-    console.log('[ActionBar] onPressResteem');
-    // @todo process resteem
   };
 
   //// handle press share icon of action bar
@@ -250,7 +206,7 @@ const ActionBarView = (props: Props): JSX.Element => {
 
         {actionBarStyle.reply ? (
           <Block row>
-            <TouchableWithoutFeedback onPress={_onPressReply}>
+            <TouchableWithoutFeedback onPress={props.handlePressReply}>
               <Block row style={{paddingRight: 10}}>
                 <Text size={actionBarStyle.textSize}>
                   {intl.formatMessage({id: 'reply'})}
@@ -258,7 +214,7 @@ const ActionBarView = (props: Props): JSX.Element => {
               </Block>
             </TouchableWithoutFeedback>
             {isUser ? (
-              <TouchableWithoutFeedback onPress={_onPressEditComment}>
+              <TouchableWithoutFeedback onPress={props.handlePressEditComment}>
                 <Block row style={{paddingRight: 10}}>
                   <Text size={actionBarStyle.textSize}>
                     {intl.formatMessage({id: 'edit'})}
@@ -268,7 +224,7 @@ const ActionBarView = (props: Props): JSX.Element => {
             ) : null}
           </Block>
         ) : (
-          <TouchableWithoutFeedback onPress={_onPressComments}>
+          <TouchableWithoutFeedback onPress={props.handlePressComments}>
             <Block row style={{paddingRight: 10}}>
               <Icon
                 size={actionBarStyle.iconSize}
@@ -282,7 +238,7 @@ const ActionBarView = (props: Props): JSX.Element => {
           </TouchableWithoutFeedback>
         )}
         {actionBarStyle.bookmark ? (
-          <TouchableWithoutFeedback onPress={_onPressBookmark}>
+          <TouchableWithoutFeedback onPress={props.handlePressBookmark}>
             <Block row style={{paddingRight: 10}}>
               <Icon
                 size={actionBarStyle.iconSize}
@@ -295,7 +251,7 @@ const ActionBarView = (props: Props): JSX.Element => {
           </TouchableWithoutFeedback>
         ) : null}
         {actionBarStyle.resteem ? (
-          <TouchableWithoutFeedback onPress={_onPressResteem}>
+          <TouchableWithoutFeedback onPress={props.handlePressReblog}>
             <Block row style={{paddingRight: 10}}>
               <Icon
                 size={actionBarStyle.iconSize}
@@ -321,7 +277,7 @@ const ActionBarView = (props: Props): JSX.Element => {
           </TouchableWithoutFeedback>
         ) : null}
         {actionBarStyle.bookmark && isUser ? (
-          <TouchableWithoutFeedback onPress={_onPressEditPost}>
+          <TouchableWithoutFeedback onPress={props.handlePressEditPost}>
             <Text>{intl.formatMessage({id: 'edit'})}</Text>
           </TouchableWithoutFeedback>
         ) : null}

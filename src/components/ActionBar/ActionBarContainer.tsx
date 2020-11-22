@@ -6,6 +6,7 @@ import {AuthContext, PostsContext, UserContext, UIContext} from '~/contexts';
 import {PostRef} from '~/contexts/types';
 import {ActionBarView} from './ActionBarView';
 import {ActionBarStyle} from '~/constants/actionBarTypes';
+import {reblog} from '~/providers/blurt/dblurtApi';
 
 interface Props {
   actionBarStyle: ActionBarStyle;
@@ -105,6 +106,26 @@ const ActionBarContainer = (props: Props): JSX.Element => {
     );
   };
 
+  ////
+  const _handlePressReblog = async () => {
+    if (!authState.loggedIn) return;
+    const {username, password} = authState.currentCredentials;
+    const {author, permlink} = postState.post_ref;
+    const {chainProps} = userState.globalProps;
+    const op_fee = parseFloat(chainProps.operation_flat_fee.split(' ')[0]);
+    const bw_fee = parseFloat(chainProps.bandwidth_kbytes_fee.split(' ')[0]);
+
+    const result = await reblog(
+      username,
+      password,
+      author,
+      permlink,
+      op_fee,
+      bw_fee,
+    );
+    debugger;
+  };
+
   return (
     <ActionBarView
       actionBarStyle={props.actionBarStyle}
@@ -122,6 +143,7 @@ const ActionBarContainer = (props: Props): JSX.Element => {
       handlePressEditComment={props.handlePressEditComment}
       handlePressVoter={_handlePressVoter}
       handlePressBookmark={_handlePressBookmark}
+      handlePressReblog={_handlePressReblog}
     />
   );
 };

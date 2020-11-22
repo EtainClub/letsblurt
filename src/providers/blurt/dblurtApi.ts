@@ -865,35 +865,6 @@ export const fetchComments = async (
 };
 //
 
-//// send comment operations to blockchain
-const sendCommentOperations = async (
-  operations: Operation[],
-  keys: PrivateKey | PrivateKey[],
-) => {
-  // setup operations
-  const {buffer, tx} = await setupTransactionOperations(operations);
-
-  // serialize, order matters
-  buffer.writeUInt16(tx.ref_block_num);
-  buffer.writeUInt32(tx.ref_block_prefix);
-  buffer.writeUint32(
-    Math.floor(new Date(tx.expiration + 'Z').getTime() / 1000),
-  );
-  buffer.writeVarint32(tx.operations.length); // number of operations
-  buffer.writeVarint32(1); // comment operation id
-  buffer.writeVString(operations[0][1].parent_author);
-  buffer.writeVString(operations[0][1].parent_permlink);
-  buffer.writeVString(operations[0][1].author);
-  buffer.writeVString(operations[0][1].permlink);
-  buffer.writeVString(operations[0][1].title);
-  buffer.writeVString(operations[0][1].body);
-  buffer.writeVString(operations[0][1].json_metadata);
-  buffer.writeVarint32(tx.extensions.length);
-
-  const result = await signTransaction(buffer, tx, keys);
-  return result;
-};
-
 //// broadcast post
 export const broadcastPost = async (
   postingData: PostingContent,
@@ -1054,31 +1025,41 @@ export const getActiveVotes = (
       });
   });
 
-//// send vote operations to blockchain
-const sendVoteOperations = async (
-  operations: Operation[],
-  keys: PrivateKey | PrivateKey[],
+//// reblog a post
+export const reblog = async (
+  username: string,
+  password: string,
+  author: string,
+  permlink: string,
+  operationFlatFee: number,
+  bandwidthKbytesFee: number,
 ) => {
-  const {buffer, tx} = await setupTransactionOperations(operations);
+  // verify the key
+  const account = await verifyPassoword(username, password);
+  if (!account) {
+    return {success: false, message: 'the password is invalid'};
+  }
+  // get privake key from password
+  const privateKey = PrivateKey.from(password);
 
-  // serialize
-  buffer.writeUInt16(tx.ref_block_num);
-  buffer.writeUInt32(tx.ref_block_prefix);
-  //buffer.writeUInt32(tx.expiration);
-  buffer.writeUint32(
-    Math.floor(new Date(tx.expiration + 'Z').getTime() / 1000),
-  );
-  buffer.writeVarint32(tx.operations.length); // number of operations
-  buffer.writeVarint32(0); // operation id
-  buffer.writeVString(operations[0][1].voter);
-  buffer.writeVString(operations[0][1].author);
-  buffer.writeVString(operations[0][1].permlink);
-  buffer.writeInt16(operations[0][1].weight);
-  buffer.writeVarint32(tx.extensions.length); // number of extensions
-
-  const result = await signTransaction(buffer, tx, keys);
-
-  return result;
+  if (privateKey) {
+    const json = ['reblog', {account: username, author, permlink}];
+    let operation = {
+      required_auths: [],
+      required_posting_auths: [username],
+      id: 'follow',
+      json: JSON.stringify(json),
+    };
+    let opSize = JSON.stringify(operation).replace(/[\[\]\,\"]/g, '').length;
+    let bwFee = Math.max(0.001, (opSize / 1024) * bandwidthKbytesFee);
+    let fee = (operationFlatFee + bwFee).toFixed(3);
+    try {
+      const result = await client.broadcast.json(operation, privateKey);
+      return result;
+    } catch (error) {
+      console.log('Failed to broadcast reblog', error);
+    }
+  }
 };
 
 // submit a vote
@@ -1255,133 +1236,6 @@ export const fetchNotifications = async (username: string): Promise<any[]> => {
   });
 };
 
-/////////////// Blockchain Operations Helpers ////////////////////////
-//// setup transation operation
-const setupTransactionOperations = async (operations: Operation[]) => {
-  const props = await getDynamicGlobalProperties();
-  const ref_block_num = props.head_block_number & 0xffff;
-  const ref_block_prefix = Buffer.from(props.head_block_id, 'hex').readUInt32LE(
-    4,
-  );
-  const expireTime = 60 * 1000;
-  const expiration = new Date(new Date(props.time + 'Z').getTime() + expireTime)
-    .toISOString()
-    .slice(0, -5);
-  const extensions = [];
-
-  const tx: Transaction = {
-    expiration,
-    extensions,
-    operations,
-    ref_block_num,
-    ref_block_prefix,
-  };
-
-  // serialize
-  const ByteBuffer = require('bytebuffer');
-
-  const buffer = new ByteBuffer(
-    ByteBuffer.DEFAULT_CAPACITY,
-    ByteBuffer.LITTLE_ENDIAN,
-  );
-  return {buffer, tx};
-};
-
-/**
- * Return a deep copy of a JSON-serializable object.
- */
-function copy<T>(object: T): T {
-  return JSON.parse(JSON.stringify(object));
-}
-
-function isCanonicalSignature(signature: Buffer): boolean {
-  return (
-    !(signature[0] & 0x80) &&
-    !(signature[0] === 0 && !(signature[1] & 0x80)) &&
-    !(signature[32] & 0x80) &&
-    !(signature[32] === 0 && !(signature[33] & 0x80))
-  );
-}
-
-//// sign transation
-const signTransaction = async (
-  buffer,
-  tx: Transaction,
-  keys: PrivateKey | PrivateKey[],
-) => {
-  // convert byte buffer to actual buffer
-  buffer.flip();
-  const transactionData = Buffer.from(buffer.toBuffer());
-  console.log('[dblurt|signTransaction] transactionData', transactionData);
-  const digest = cryptoUtils.sha256(
-    Buffer.concat([client.chainId, transactionData]),
-  );
-  console.log('[dblurt|signTransaction] digest', digest);
-
-  const signedTransaction = copy(tx) as SignedTransaction;
-  if (!signedTransaction.signatures) {
-    signedTransaction.signatures = [];
-  }
-
-  if (!Array.isArray(keys)) {
-    keys = [keys];
-  }
-
-  for (const key of keys) {
-    const signature = _signTransaction(key.key, digest);
-    console.log('[dblurt|signTransaction] signature', signature);
-
-    const buffer = Buffer.alloc(65);
-    buffer.writeUInt8(signature.recovery + 31, 0);
-    signature.data.copy(buffer, 1);
-    console.log('[dblurt|signTransaction] buffer', buffer);
-
-    // const sigString = Array.prototype.map
-    //   .call(new Uint8Array(buffer), (x) => ('00' + x.toString(16)).slice(-2))
-    //   .join('')
-    //   .match(/[a-fA-F0-9]{2}/g)
-    //   .join('');
-
-    const sigString = buffer.toString('hex');
-    console.log('[dblurt|signTransaction] sigString', sigString);
-    signedTransaction.signatures.push(sigString);
-  }
-
-  const result = await client.call(
-    'condenser_api',
-    'broadcast_transaction_synchronous',
-    [signedTransaction],
-  );
-
-  console.log('[dblurt|signTransaction] result', result);
-
-  return result;
-};
-
-/**
- * Sign message.
- * @param message 32-byte message.
- */
-function _signTransaction(key: Buffer, message: Buffer): Signature {
-  let rv: {signature: Buffer; recovery: number};
-  let attempts = 0;
-  do {
-    const options = {
-      data: cryptoUtils.sha256(
-        Buffer.concat([message, Buffer.alloc(1, ++attempts)]),
-      ),
-    };
-    console.log('[dblurt|signTransaction] sign, options', options);
-
-    rv = secp256k1.sign(message, key, options);
-    console.log('[dblurt|signTransaction] sign, rv', rv);
-  } while (!isCanonicalSignature(rv.signature));
-  const signature = new Signature(rv.signature, rv.recovery);
-  console.log('[dblurt|signTransaction] sign. signature', signature);
-
-  return signature;
-}
-
 //////////////// Utils /////////////////////////////////
 
 export const calculateReputation = (reputation: number) => {
@@ -1460,6 +1314,189 @@ ChainTypes.operations= {
     comment_benefactor_reward: 46,
     account_update2: 47
 };
+*/
+
+/*
+
+/////////////// Blockchain Operations Helpers ////////////////////////
+//// setup transation operation
+const setupTransactionOperations = async (operations: Operation[]) => {
+  const props = await getDynamicGlobalProperties();
+  const ref_block_num = props.head_block_number & 0xffff;
+  const ref_block_prefix = Buffer.from(props.head_block_id, 'hex').readUInt32LE(
+    4,
+  );
+  const expireTime = 60 * 1000;
+  const expiration = new Date(new Date(props.time + 'Z').getTime() + expireTime)
+    .toISOString()
+    .slice(0, -5);
+  const extensions = [];
+
+  const tx: Transaction = {
+    expiration,
+    extensions,
+    operations,
+    ref_block_num,
+    ref_block_prefix,
+  };
+
+  // serialize
+  const ByteBuffer = require('bytebuffer');
+
+  const buffer = new ByteBuffer(
+    ByteBuffer.DEFAULT_CAPACITY,
+    ByteBuffer.LITTLE_ENDIAN,
+  );
+  return {buffer, tx};
+};
+
+// Return a deep copy of a JSON-serializable object.
+function copy<T>(object: T): T {
+  return JSON.parse(JSON.stringify(object));
+}
+
+function isCanonicalSignature(signature: Buffer): boolean {
+  return (
+    !(signature[0] & 0x80) &&
+    !(signature[0] === 0 && !(signature[1] & 0x80)) &&
+    !(signature[32] & 0x80) &&
+    !(signature[32] === 0 && !(signature[33] & 0x80))
+  );
+}
+
+
+//// send comment operations to blockchain
+const sendCommentOperations = async (
+  operations: Operation[],
+  keys: PrivateKey | PrivateKey[],
+) => {
+  // setup operations
+  const {buffer, tx} = await setupTransactionOperations(operations);
+
+  // serialize, order matters
+  buffer.writeUInt16(tx.ref_block_num);
+  buffer.writeUInt32(tx.ref_block_prefix);
+  buffer.writeUint32(
+    Math.floor(new Date(tx.expiration + 'Z').getTime() / 1000),
+  );
+  buffer.writeVarint32(tx.operations.length); // number of operations
+  buffer.writeVarint32(1); // comment operation id
+  buffer.writeVString(operations[0][1].parent_author);
+  buffer.writeVString(operations[0][1].parent_permlink);
+  buffer.writeVString(operations[0][1].author);
+  buffer.writeVString(operations[0][1].permlink);
+  buffer.writeVString(operations[0][1].title);
+  buffer.writeVString(operations[0][1].body);
+  buffer.writeVString(operations[0][1].json_metadata);
+  buffer.writeVarint32(tx.extensions.length);
+
+  const result = await signTransaction(buffer, tx, keys);
+  return result;
+};
+
+//// send vote operations to blockchain
+const sendVoteOperations = async (
+  operations: Operation[],
+  keys: PrivateKey | PrivateKey[],
+) => {
+  const {buffer, tx} = await setupTransactionOperations(operations);
+
+  // serialize
+  buffer.writeUInt16(tx.ref_block_num);
+  buffer.writeUInt32(tx.ref_block_prefix);
+  //buffer.writeUInt32(tx.expiration);
+  buffer.writeUint32(
+    Math.floor(new Date(tx.expiration + 'Z').getTime() / 1000),
+  );
+  buffer.writeVarint32(tx.operations.length); // number of operations
+  buffer.writeVarint32(0); // operation id
+  buffer.writeVString(operations[0][1].voter);
+  buffer.writeVString(operations[0][1].author);
+  buffer.writeVString(operations[0][1].permlink);
+  buffer.writeInt16(operations[0][1].weight);
+  buffer.writeVarint32(tx.extensions.length); // number of extensions
+
+  const result = await signTransaction(buffer, tx, keys);
+
+  return result;
+};
+
+//// sign transation
+const signTransaction = async (
+  buffer,
+  tx: Transaction,
+  keys: PrivateKey | PrivateKey[],
+) => {
+  // convert byte buffer to actual buffer
+  buffer.flip();
+  const transactionData = Buffer.from(buffer.toBuffer());
+  console.log('[dblurt|signTransaction] transactionData', transactionData);
+  const digest = cryptoUtils.sha256(
+    Buffer.concat([client.chainId, transactionData]),
+  );
+  console.log('[dblurt|signTransaction] digest', digest);
+
+  const signedTransaction = copy(tx) as SignedTransaction;
+  if (!signedTransaction.signatures) {
+    signedTransaction.signatures = [];
+  }
+
+  if (!Array.isArray(keys)) {
+    keys = [keys];
+  }
+
+  for (const key of keys) {
+    const signature = _signTransaction(key.key, digest);
+    console.log('[dblurt|signTransaction] signature', signature);
+
+    const buffer = Buffer.alloc(65);
+    buffer.writeUInt8(signature.recovery + 31, 0);
+    signature.data.copy(buffer, 1);
+    console.log('[dblurt|signTransaction] buffer', buffer);
+
+    // const sigString = Array.prototype.map
+    //   .call(new Uint8Array(buffer), (x) => ('00' + x.toString(16)).slice(-2))
+    //   .join('')
+    //   .match(/[a-fA-F0-9]{2}/g)
+    //   .join('');
+
+    const sigString = buffer.toString('hex');
+    console.log('[dblurt|signTransaction] sigString', sigString);
+    signedTransaction.signatures.push(sigString);
+  }
+
+  const result = await client.call(
+    'condenser_api',
+    'broadcast_transaction_synchronous',
+    [signedTransaction],
+  );
+
+  console.log('[dblurt|signTransaction] result', result);
+
+  return result;
+};
+
+// sign message
+function _signTransaction(key: Buffer, message: Buffer): Signature {
+  let rv: {signature: Buffer; recovery: number};
+  let attempts = 0;
+  do {
+    const options = {
+      data: cryptoUtils.sha256(
+        Buffer.concat([message, Buffer.alloc(1, ++attempts)]),
+      ),
+    };
+    console.log('[dblurt|signTransaction] sign, options', options);
+
+    rv = secp256k1.sign(message, key, options);
+    console.log('[dblurt|signTransaction] sign, rv', rv);
+  } while (!isCanonicalSignature(rv.signature));
+  const signature = new Signature(rv.signature, rv.recovery);
+  console.log('[dblurt|signTransaction] sign. signature', signature);
+
+  return signature;
+}
+
 */
 
 /*
