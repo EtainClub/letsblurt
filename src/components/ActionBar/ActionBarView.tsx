@@ -160,6 +160,14 @@ const ActionBarView = (props: Props): JSX.Element => {
     );
   };
 
+  const _renderVoterRow = (option, index, isSelect) => (
+    <View style={{backgroundColor: argonTheme.COLORS.DEFAULT}}>
+      <Text color="white" style={{margin: 5}}>
+        {option}
+      </Text>
+    </View>
+  );
+
   return (
     <Block>
       <Block row style={actionBarStyle.styles}>
@@ -189,6 +197,10 @@ const ActionBarView = (props: Props): JSX.Element => {
         </Block>
         <ModalDropdown
           options={voters}
+          renderRow={_renderVoterRow}
+          dropdownStyle={{
+            backgroundColor: argonTheme.COLORS.DEFAULT,
+          }}
           onSelect={(index, value) => {
             const voter = value.split(' ')[0];
             props.handlePressVoter(voter);
