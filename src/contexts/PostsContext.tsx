@@ -237,16 +237,6 @@ const PostsProvider = ({children}: Props) => {
     appending?: boolean,
     inputTag?: string,
   ) => {
-    console.log(
-      '[PostsContext|fetchPosts] input. type, tagIndex, filterIndex, username, appending, inputTag',
-      postsType,
-      tagIndex,
-      filterIndex,
-      username,
-      appending,
-      inputTag,
-    );
-
     //// set start post ref
     let startPostRef = {
       author: null,
@@ -303,6 +293,14 @@ const PostsProvider = ({children}: Props) => {
         }
         break;
     }
+
+    console.log(
+      '[PostsContext|fetchPosts] filter, tag, startPostRef, username',
+      filter,
+      tag,
+      startPostRef,
+      username,
+    );
 
     // now fetch posts
     const _posts = await _fetchPosts(filter, tag, startPostRef, username);

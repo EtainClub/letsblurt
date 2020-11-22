@@ -35,9 +35,9 @@ const Feed = (props: Props): JSX.Element => {
 
   //////// effects
   //// mount event
-  // useEffect(() => {
-  //   _fetchPosts(false);
-  // }, []);
+  useEffect(() => {
+    _fetchPosts(false);
+  }, []);
   //// account change event
   useEffect(() => {
     _fetchPosts(false);
@@ -46,7 +46,7 @@ const Feed = (props: Props): JSX.Element => {
   useFocusEffect(
     useCallback(() => {
       // check if selected tag exists
-      if (uiState.selectedTag != '') {
+      if (uiState.selectedTag) {
         // fetch posts of hash tag
         _fetchPosts(false);
       } else {
