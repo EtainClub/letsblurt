@@ -121,8 +121,9 @@ const ProfileContainer = (props: Props): JSX.Element => {
       username,
       password,
       props.profileData.profile.name,
-      'blog',
+      followingState ? '' : 'blog',
     );
+    setFollowingState(followingState ? false : true);
     setToastMessage('Following Successful');
     setFollowing(false);
   };
