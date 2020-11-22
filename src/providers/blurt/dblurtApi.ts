@@ -1174,7 +1174,7 @@ export const broadcastProfileUpdate = async (
   }
   // wrong private key
   return Promise.reject(
-    new Error('Check private key. Required private posting key or above'),
+    new Error('Check private key. Required private active key or above'),
   );
 };
 
@@ -1198,21 +1198,20 @@ export const fetchWalletData = async (username: string) => {
         vesting_shares,
         received_vesting_shares,
         delegated_vesting_shares,
-        reward_blurt_balance,
-        reward_vesting_balance,
         reward_vesting_blurt,
+        reward_vesting_balance,
         transfer_history,
       } = account;
       const power =
         parseInt(vesting_shares.split(' ')[0]) +
         parseInt(received_vesting_shares.split(' ')[0]) -
         parseInt(delegated_vesting_shares.split(' ')[0]);
-      const rewards = reward_vesting_balance;
       const walletData: WalletData = {
         blurt: balance.split(' ')[0],
         power: String(power),
         savings: savings_balance.split(' ')[0],
-        rewards: rewards.split(' ')[0],
+        rewardBlurt: reward_vesting_blurt.split(' ')[0],
+        rewardVests: reward_vesting_balance.split(' ')[0],
         voteAmount: '0',
         votePower: String(voting_power),
         transactions: transfer_history
@@ -1236,6 +1235,44 @@ export const fetchNotifications = async (username: string): Promise<any[]> => {
   });
 };
 
+//// claim reward balance
+export const claimRewardBalance = async (
+  username: string,
+  password: string,
+) => {
+  const account = await verifyPassoword(username, password);
+  if (!account) {
+    return {success: false, message: 'the password is invalid'};
+  }
+  // get privake key from password wif
+  const privateKey = PrivateKey.from(password);
+  if (privateKey) {
+    const balance = account.reward_blurt_balance;
+    const vests = account.reward_vesting_balance;
+    const opArray = [
+      [
+        'claim_reward_balance',
+        {
+          account: username,
+          reward_blurt: balance,
+          reward_vests: vests,
+        },
+      ],
+    ];
+    try {
+      const result = await client.broadcast.sendOperations(opArray, privateKey);
+      return result;
+    } catch (error) {
+      console.log('failed to claim reward', error);
+      return null;
+    }
+  }
+
+  // wrong private key
+  return Promise.reject(
+    new Error('Check private key. Required private posting key or above'),
+  );
+};
 //////////////// Utils /////////////////////////////////
 
 export const calculateReputation = (reputation: number) => {

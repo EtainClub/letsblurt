@@ -8,6 +8,7 @@ import {
   ScrollView,
   Image,
   Platform,
+  Linking,
   FlatList,
   ActivityIndicator,
   Animated,
@@ -68,6 +69,15 @@ const ProfileView: React.FC<Props> = ({
     blockchain === BlockchainTypes.BLURT
       ? BLURT_IMAGE_SERVER
       : STEEM_IMAGE_SERVER;
+
+  const _handlePressWebsite = () => {
+    // open link
+    Linking.canOpenURL(profile.metadata.website).then((supported) => {
+      if (supported) {
+        Linking.openURL(profile.metadata.website);
+      }
+    });
+  };
   //// render
   return (
     <ScrollView
@@ -78,11 +88,13 @@ const ProfileView: React.FC<Props> = ({
           <Block flex row center>
             <Block center flex={1} style={{top: 40}}>
               <TouchableOpacity onPress={props.handlePressFollowers}>
-                <Text size={16} color="orange">
+                <Text size={16} color="blue">
                   {getNumberStat(profile.stats.followers)}
                 </Text>
               </TouchableOpacity>
-              <Text color="blue">{intl.formatMessage({id: 'followers'})}</Text>
+              <Text color="#32325D">
+                {intl.formatMessage({id: 'followers'})}
+              </Text>
               {!isUser ? (
                 <Button
                   onPress={props.handlePressFollow}
@@ -124,11 +136,13 @@ const ProfileView: React.FC<Props> = ({
             </Block>
             <Block center flex={1} style={{top: 40}}>
               <TouchableOpacity onPress={props.handlePressFollowings}>
-                <Text size={16} color="orange">
+                <Text size={16} color="blue">
                   {getNumberStat(profile.stats.following)}
                 </Text>
               </TouchableOpacity>
-              <Text color="blue">{intl.formatMessage({id: 'following'})}</Text>
+              <Text color="#32325D">
+                {intl.formatMessage({id: 'following'})}
+              </Text>
               {!isUser ? (
                 <Button
                   onPress={props.handlePressFavorite}
@@ -159,6 +173,9 @@ const ProfileView: React.FC<Props> = ({
             style={{marginTop: 10, fontFamily: 'open-sans-light'}}>
             {profile.metadata.location}
           </Text>
+          <TouchableOpacity onPress={_handlePressWebsite}>
+            <Text color="blue">{profile.metadata.website}</Text>
+          </TouchableOpacity>
         </Block>
         <Block row space="between" style={styles.stats}>
           <Block middle>

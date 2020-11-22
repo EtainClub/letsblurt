@@ -1,3 +1,4 @@
 import {WalletStatsView} from './WalletStatsView';
+import {WalletKeyView} from './WalletKeyView';
 
-export {WalletStatsView};
+export {WalletStatsView, WalletKeyView};

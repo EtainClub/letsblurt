@@ -2,9 +2,14 @@
 import React, {useState, useEffect, useContext} from 'react';
 //// react native
 import {WalletScreen} from '../screen/Wallet';
+//// language
+import {useIntl} from 'react-intl';
 ////
-import {AuthContext, UserContext} from '~/contexts';
+import {AuthContext, UIContext, UserContext} from '~/contexts';
 import {WalletData} from '~/contexts/types';
+//// blockchain
+import {claimRewardBalance} from '~/providers/blurt/dblurtApi';
+
 //// props
 interface Props {
   username: string;
@@ -12,13 +17,17 @@ interface Props {
 const Wallet = (props: Props): JSX.Element => {
   //// props
   console.log('[WalletContainer] props', props);
+  //// language
+  const intl = useIntl();
   //// contexts
   const {authState} = useContext(AuthContext);
   const {userState, getWalletData, getPrice} = useContext(UserContext);
+  const {setToastMessage} = useContext(UIContext);
   //// states
   const [walletData, setWalletData] = useState<WalletData>(
     userState.walletData,
   );
+  const [claiming, setClaiming] = useState(false);
   const [price, setPrice] = useState(0);
   //////// events
   //// event: creation
@@ -42,7 +51,30 @@ const Wallet = (props: Props): JSX.Element => {
     console.log('[Wallet] set price', userState.price);
   }, [userState.price]);
 
-  return <WalletScreen walletData={walletData} price={price} />;
+  //// claim reward balance
+  const _handlePressClaim = async () => {
+    setClaiming(true);
+    // claim balance reward
+    const {username, password} = authState.currentCredentials;
+    const result = await claimRewardBalance(username, password);
+    setClaiming(false);
+    // set toast message
+    setToastMessage(intl.formatMessage({id: 'Wallet.claim_ok'}));
+  };
+
+  //// show password
+  const _handlePressShowPassword = async () => {
+    console.log('handlePressShowPassword');
+  };
+  return (
+    <WalletScreen
+      walletData={walletData}
+      handlePressClaim={_handlePressClaim}
+      claiming={claiming}
+      handlePressShowPassword={_handlePressShowPassword}
+      price={price}
+    />
+  );
 };
 
 export {Wallet};

@@ -6,7 +6,6 @@ import {FlatList, StyleSheet} from 'react-native';
 import {useIntl} from 'react-intl';
 //// ui
 import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
-import Swiper from 'react-native-swiper';
 import {argonTheme} from '~/constants';
 import moment from 'moment';
 import {WalletData} from '~/contexts/types';
@@ -23,23 +22,26 @@ const BACKGROUND_COLORS = [
 interface Props {
   walletData: WalletData;
   isUser?: boolean;
+  handlePressClaim?: () => void;
+  claiming?: boolean;
   showTransactions?: boolean;
   price?: number;
 }
 const WalletStatsView = (props: Props): JSX.Element => {
   //// props
   let {
-    rewards,
     blurt,
     power,
     savings,
+    rewardBlurt,
     transactions,
     votePower,
   } = props.walletData;
-  blurt = putComma(blurt);
-  power = putComma(power);
+  blurt = putComma(parseFloat(blurt).toFixed(3));
+  power = putComma(parseFloat(power).toFixed(3));
   savings = putComma(savings);
-  rewards = putComma(rewards);
+  const needToClaim = parseFloat(rewardBlurt) > 0 ? true : false;
+  rewardBlurt = putComma(rewardBlurt);
   //// language
   const intl = useIntl();
 
@@ -113,9 +115,12 @@ const WalletStatsView = (props: Props): JSX.Element => {
             {props.price ? <Text>${props.price.toFixed(3)}</Text> : null}
           </Block>
         </Block>
-        {props.isUser ? (
+        {props.isUser && needToClaim ? (
           <Block center>
-            <Button>Claim Reward</Button>
+            <Text>Reward: {rewardBlurt}</Text>
+            <Button onPress={props.handlePressClaim} loading={props.claiming}>
+              Claim Reward
+            </Button>
           </Block>
         ) : null}
         <Block style={styles.notification}>

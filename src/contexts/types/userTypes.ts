@@ -45,7 +45,8 @@ export interface WalletData {
   blurt: string;
   power: string;
   savings: string;
-  rewards: string;
+  rewardBlurt: string;
+  rewardVests: string;
   voteAmount?: string;
   votePower?: string;
   transactions: any[];

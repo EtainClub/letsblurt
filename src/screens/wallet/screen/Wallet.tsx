@@ -1,31 +1,30 @@
 //// react
 import React, {useState, useEffect, useContext} from 'react';
 //// react native
-import {FlatList, Animated, StyleSheet, View} from 'react-native';
+import {FlatList, Animated, StyleSheet, ScrollView, View} from 'react-native';
 //// language
 import {useIntl} from 'react-intl';
 //// ui
 import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
 import {TabView, SceneMap} from 'react-native-tab-view';
 import {argonTheme} from '~/constants';
-
-import {Tabs} from '~/components';
-import moment from 'moment';
-//import {WalletStatsView} from './WalletStats';
-import {WalletStatsView} from '~/components';
-import {WalletKeysView} from './WalletKeys';
+import {WalletStatsView, WalletKeyView} from '~/components';
 import {WalletData} from '~/contexts/types';
 
 interface Props {
   walletData: WalletData;
   price: number;
+  handlePressClaim: () => void;
+  claiming: boolean;
+  handlePressShowPassword: (type: string) => void;
   //  tabIndex: number;
   //  handleTabIndexChanged: (index: number) => void;
 }
 const WalletScreen = (props: Props): JSX.Element => {
+  //// language
+  const intl = useIntl();
   //// contexts
   //// states
-  const [tabIndex, setTabIndex] = useState(0);
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
     {key: 'stats', title: 'Balances'},
@@ -33,10 +32,44 @@ const WalletScreen = (props: Props): JSX.Element => {
   ]);
 
   const WalletStats = () => (
-    <WalletStatsView walletData={props.walletData} isUser price={props.price} />
+    <WalletStatsView
+      walletData={props.walletData}
+      isUser
+      handlePressClaim={props.handlePressClaim}
+      claiming={props.claiming}
+      price={props.price}
+    />
   );
 
-  const WalletKeys = () => <WalletKeysView />;
+  const WalletKeys = () => {
+    return (
+      <ScrollView>
+        <Text h6>{intl.formatMessage({id: 'Wallet.keys_header'})}</Text>
+        <Text>{intl.formatMessage({id: 'Wallet.keys_guide'})}</Text>
+
+        <WalletKeyView
+          type="posting"
+          handlePressShowPassword={() =>
+            props.handlePressShowPassword('posting')
+          }
+        />
+        <WalletKeyView
+          type="active"
+          handlePressShowPassword={() =>
+            props.handlePressShowPassword('active')
+          }
+        />
+        <WalletKeyView
+          type="owner"
+          handlePressShowPassword={() => props.handlePressShowPassword('owner')}
+        />
+        <WalletKeyView
+          type="memo"
+          handlePressShowPassword={() => props.handlePressShowPassword('memo')}
+        />
+      </ScrollView>
+    );
+  };
 
   const renderScene = SceneMap({
     stats: WalletStats,

@@ -12,7 +12,7 @@ import {PostsFeed} from './PostsFeed';
 import {PostsListView} from './PostsList';
 import {PostBody} from './PostBody';
 import {ProfileContainer} from './Profile';
-import {WalletStatsView} from './Wallet';
+import {WalletStatsView, WalletKeyView} from './Wallet';
 import {DraggableList} from './DraggableList';
 import {ParentPost} from './ParentPost';
 
@@ -34,6 +34,7 @@ export {
   PostBody,
   ProfileContainer,
   WalletStatsView,
+  WalletKeyView,
   DraggableList,
   ParentPost,
 };
