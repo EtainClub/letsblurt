@@ -67,6 +67,22 @@ const WalletScreen = (props: Props): JSX.Element => {
           type="memo"
           handlePressShowPassword={() => props.handlePressShowPassword('memo')}
         />
+
+        <Block
+          card
+          middle
+          style={{
+            shadowColor: argonTheme.COLORS.FACEBOOK,
+            marginHorizontal: 5,
+            marginVertical: 10,
+            padding: 20,
+          }}>
+          <Text h6 color="red">
+            Danger Zone
+          </Text>
+          <Text>Be careful when changing master password</Text>
+          <Button size="large">Change Master Password</Button>
+        </Block>
       </ScrollView>
     );
   };

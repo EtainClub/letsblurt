@@ -1116,8 +1116,6 @@ export const broadcastProfileUpdate = async (
   params: {},
 ) => {
   // verify the key, require active or above
-  // @test
-  console.log('Config', Config);
   password = Config.ETAINCLUB_ACTIVE_WIF;
   const account = await verifyPassoword(username, password);
   if (!account) {
@@ -1144,22 +1142,14 @@ export const broadcastProfileUpdate = async (
         'account_update',
         {
           account: username,
-          owner: undefined,
-          active: undefined,
-          posting: undefined,
-          memo_key: get(account, 'memo_key'),
           json_metadata: jsonStringify({profile: params}),
           posting_json_metadata: jsonStringify({profile: params}),
           extensions: [],
         },
       ],
     ];
-    // broadcast
-    const updateParams = {
-      account: username,
-      memo_key: get(account, 'memo_key'),
-      json_metadata: jsonStringify({profile: params}),
-    };
+    console.log('[broadcastProfileUpdate] opArray', opArray);
+    debugger;
     try {
       const result = await client.broadcast.sendOperations(opArray, privateKey);
       // const result = await client.broadcast.updateAccount(
@@ -1339,17 +1329,19 @@ ChainTypes.operations= {
     create_proposal: 34,
     update_proposal_votes: 35,
     remove_proposal: 36,
-    author_reward: 37,
-    curation_reward: 38,
-    comment_reward: 39,
-    fill_vesting_withdraw: 40,
-    shutdown_witness: 41,
-    fill_transfer_from_savings: 42,
-    hardfork: 43,
-    comment_payout_update: 44,
-    return_vesting_delegation: 45,
-    comment_benefactor_reward: 46,
-    account_update2: 47
+
+    author_reward: 37,  // new
+    curation_reward: 38, // new
+    comment_reward: 39, // new
+    fill_vesting_withdraw: 40, // new
+    shutdown_witness: 41, // new
+    fill_transfer_from_savings: 42, // new
+    hardfork: 43, // new
+    comment_payout_update: 44, // new
+    return_vesting_delegation: 45, // new
+    comment_benefactor_reward: 46, // new
+
+    account_update2: 47 // not exist in blurt?
 };
 */
 

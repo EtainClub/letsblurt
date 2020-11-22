@@ -66,6 +66,7 @@ const Wallet = (props: Props): JSX.Element => {
   const _handlePressShowPassword = async () => {
     console.log('handlePressShowPassword');
   };
+
   return (
     <WalletScreen
       walletData={walletData}
