@@ -1,3 +1,13 @@
+export function sliceByByte(str, maxByte) {
+  let b, i, c;
+  for (b = i = 0; (c = str.charCodeAt(i)); ) {
+    b += c >> 7 ? 2 : 1;
+    if (b > maxByte) break;
+    i++;
+  }
+  return str.substring(0, i);
+}
+
 export function getCharacterLength(str) {
   // The string iterator that is used here iterates over characters,
   //  not mere code units

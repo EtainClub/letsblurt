@@ -18,7 +18,7 @@ import {navigate} from '~/navigation/service';
 // steem api
 import {UIContext, AuthContext, PostsContext, UserContext} from '~/contexts';
 // types
-import {PostRef, PostsTypes} from '~/contexts/types';
+import {PostRef, PostsState, PostsTypes} from '~/contexts/types';
 import {materialTheme} from '~/constants/materialTheme';
 import {DropdownModal} from './DropdownModal';
 import {indexOf} from 'lodash';
@@ -240,23 +240,23 @@ const Header = (props: Props): JSX.Element => {
     const defaultCommunityText = '';
     const defaultCategoryText = '';
     const {tagList, filterList, tagIndex, filterIndex} = postsState;
-    let communityOptions: string[] = [];
+    let tagOptions = postsState.tagList;
     switch (title) {
       case 'Feed':
-        tagList.forEach((item) => communityOptions.push(item.tag));
+        //        tagList.forEach((item) => tagOptions.push(item.tag));
         return (
           <Block row space="between">
             <Block row space="around" style={{left: 100}}>
               <DropdownModal
-                key={communityOptions[tagIndex]}
-                defaultText={defaultCommunityText || communityOptions[tagIndex]}
+                key={tagOptions[tagIndex]}
+                defaultText={defaultCommunityText || tagOptions[tagIndex]}
                 dropdownButtonStyle={styles.dropdownButtonStyle}
                 selectedOptionIndex={tagIndex}
                 rowTextStyle={styles.rowTextStyle}
                 style={styles.dropdown}
                 dropdownStyle={styles.dropdownStyle}
                 textStyle={styles.dropdownText}
-                options={communityOptions}
+                options={tagOptions}
                 onSelect={_handleOnTagChange}
               />
               <DropdownModal

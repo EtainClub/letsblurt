@@ -278,9 +278,9 @@ const PostsProvider = ({children}: Props) => {
         if (tagIndex === 0) {
           tag = username ? username : '';
           filter = username ? 'feed' : 'trending';
-        } else if (tagIndex === 1) {
-          tag = username ? username : '';
-          filter = 'blog';
+        } else if (postsState.tagList[tagIndex] === 'All') {
+          tag = '';
+          filter = 'trending';
         } else if (tagIndex > 1) {
           filter = postsState.filterList[filterIndex];
           tag = postsState.tagList[tagIndex];
@@ -331,6 +331,7 @@ const PostsProvider = ({children}: Props) => {
         },
       },
     });
+    return posts;
   };
 
   //// clear posts

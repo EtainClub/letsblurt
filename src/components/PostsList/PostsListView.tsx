@@ -18,7 +18,7 @@ import {useIntl} from 'react-intl';
 import {getCharacterLength} from '~/utils/strings';
 import {substr_utf8_bytes} from '~/utils/strings';
 const runes = require('runes');
-
+import {sliceByByte} from '~/utils/strings';
 //// ui, styles
 import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
 import {argonTheme} from '~/constants/argonTheme';
@@ -137,7 +137,8 @@ const PostsListView = (props: Props): JSX.Element => {
               {props.isUser && <Text size={10}>{item.author}</Text>}
             </Block>
             {/* <Text>{substr_utf8_bytes(item.title, 0, 30)}</Text> */}
-            <Text>{runes.substr(item.title, 0, 30)}</Text>
+            {<Text>{runes.substr(item.title, 0, 30)}</Text>}
+            {/* {<Text>{sliceByByte(item.title, 30)}</Text>} */}
           </Block>
           <Block middle>
             <Text>{getTimeFromNow(item.createdAt).split('ago')[0]}</Text>

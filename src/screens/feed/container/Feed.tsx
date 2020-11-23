@@ -27,7 +27,7 @@ const Feed = (props: Props): JSX.Element => {
   // states
   const [posts, setPosts] = useState<PostData[]>(null);
   //  const [postsType, setPostsType] = useState(PostsTypes.FEED);
-  const [fetching, setFetching] = useState(true);
+  const [fetching, setFetching] = useState(false);
   const [startPostRef, setStartPostRef] = useState<PostRef>({
     author: null,
     permlink: null,
@@ -35,39 +35,43 @@ const Feed = (props: Props): JSX.Element => {
 
   //////// effects
   //// mount event
-  useEffect(() => {
-    _fetchPosts(false);
-  }, []);
+  // useEffect(() => {
+  //   _fetchPosts(false);
+  // }, []);
   //// account change event
   useEffect(() => {
-    _fetchPosts(false);
+    if (!fetching) {
+      _fetchPosts(false);
+    }
   }, [authState.currentCredentials]);
   //// focus event with tag param
   useFocusEffect(
     useCallback(() => {
-      // check if selected tag exists
-      if (uiState.selectedTag) {
-        // fetch posts of hash tag
-        _fetchPosts(false);
-      } else {
-        // fetch posts of feed
-        _fetchPosts(false);
+      if (!fetching) {
+        // check if selected tag exists
+        if (uiState.selectedTag) {
+          // fetch posts of hash tag
+          _fetchPosts(false);
+        } else {
+          // fetch posts of feed
+          _fetchPosts(false);
+        }
       }
     }, [uiState.selectedTag]),
   );
 
-  //// set posts after fetching
-  useEffect(() => {
-    if (postsState.fetched) {
-      console.log('[Feed|useEffect] fetched event, postsState', postsState);
-      console.log(
-        '[Feed|useEffect] fetched event, postsState posts',
-        postsState[postsState.postsType].posts,
-      );
-      // this will re-render screen
-      setPosts(postsState[postsState.postsType].posts);
-    }
-  }, [postsState.fetched]);
+  // //// set posts after fetching
+  // useEffect(() => {
+  //   if (postsState.fetched) {
+  //     console.log('[Feed|useEffect] fetched event, postsState', postsState);
+  //     console.log(
+  //       '[Feed|useEffect] fetched event, postsState posts',
+  //       postsState[postsState.postsType].posts,
+  //     );
+  //     // this will re-render screen
+  //     setPosts(postsState[postsState.postsType].posts);
+  //   }
+  // }, [postsState.fetched]);
 
   const _fetchPosts = async (appending: boolean) => {
     console.log('fetching posts, authState', authState);
@@ -85,7 +89,7 @@ const Feed = (props: Props): JSX.Element => {
     if (!appending) {
       await clearPosts(postsType);
     }
-    await fetchPosts(
+    const _posts = await fetchPosts(
       postsType,
       postsState.tagIndex,
       postsState.filterIndex,
@@ -95,6 +99,9 @@ const Feed = (props: Props): JSX.Element => {
     );
     console.log('postsState', postsState);
     setFetching(false);
+    // set posts
+    setPosts(_posts);
+    console.log('[Feed]_fetchPosts, posts', _posts);
   };
 
   const _clearPosts = async () => {

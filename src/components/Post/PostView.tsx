@@ -18,6 +18,7 @@ import FAB from 'react-native-fab';
 
 // unicode substring
 const runes = require('runes');
+import {sliceByByte} from '~/utils/strings';
 
 import {PostData, PostState} from '~/contexts/types';
 
@@ -84,6 +85,7 @@ const PostView = (props: Props): JSX.Element => {
           <Block>
             <Text size={16} style={{color: materialTheme.COLORS.ERROR}}>
               {runes.substr(post.state.title, 0, 45)}
+              {/* {sliceByByte(post.state.title, 60)} */}
             </Text>
             <HTML
               html={post.summary.replace(/\p{Emoji_Presentation}/gu, ' ')}
