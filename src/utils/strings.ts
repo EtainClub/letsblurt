@@ -10,7 +10,6 @@ export function sliceByByte(str, maxByte) {
   // console.log('[sliceByByte] init str', initSub, initSub.length);
   if (initLength > maxByte) {
     sub = str.substr(0, Math.floor(maxByte / 1.5)).concat('...');
-    console.log('[sliceByByte] unicode str', sub, sub.length);
   }
   return sub;
 }

@@ -76,7 +76,13 @@ const Profile = ({navigation}): JSX.Element => {
       _fetchFavorites(username);
     }
   }, [authState.currentCredentials]);
-  //// TODO: fetch user's bookmark and favorites
+  //// edit event
+  useEffect(() => {
+    if (!editMode && profileData) {
+      const {username} = authState.currentCredentials;
+      _getUserProfileData(username);
+    }
+  }, [editMode]);
 
   const _getUserProfileData = async (author: string) => {
     // fetch user profile data
@@ -226,8 +232,9 @@ const Profile = ({navigation}): JSX.Element => {
       };
       // broadcast the update to blockchain
       const result = await broadcastProfileUpdate(username, password, params);
+      setToastMessage('updated');
       setUpdating(false);
-      //      setEditMode(false);
+      setEditMode(false);
     }
   };
 

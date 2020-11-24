@@ -177,6 +177,7 @@ const ProfileEditForm = (props: Props): JSX.Element => {
               bgColor="transparent"
               style={[styles.input, styles.inputActive]}
               defaultValue={profile.metadata.about}
+              onChangeText={(text: string) => setIntroduction(text)}
             />
             <Input
               borderless
@@ -186,6 +187,7 @@ const ProfileEditForm = (props: Props): JSX.Element => {
               bgColor="transparent"
               style={[styles.input, styles.inputActive]}
               defaultValue={profile.metadata.location}
+              onChangeText={(text: string) => setLocation(text)}
             />
             <Input
               borderless
@@ -195,6 +197,7 @@ const ProfileEditForm = (props: Props): JSX.Element => {
               bgColor="transparent"
               style={[styles.input, styles.inputActive]}
               defaultValue={profile.metadata.website}
+              onChangeText={(text: string) => setWebsite(text)}
             />
             <Button
               onPress={_handlePressUpdate}

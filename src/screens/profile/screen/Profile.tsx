@@ -72,7 +72,6 @@ const ProfileScreen = (props: Props): JSX.Element => {
 
   ////
   const _renderFavoriteItem = ({item, index, drag, isActive}) => {
-    console.log('[DraggableListContainer] _renderItem, item', item);
     const avatar = `${IMAGE_SERVER}/u/${item.author}/avatar`;
     return (
       <TouchableWithoutFeedback

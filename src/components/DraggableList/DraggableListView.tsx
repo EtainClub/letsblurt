@@ -35,18 +35,27 @@ interface Props {
 //// component
 const DraggableListView = (props: Props): JSX.Element => {
   //// contexts
-
+  // return (
+  //   <View style={{flex: 1}}>
+  //     <DraggableFlatList
+  //       style={{marginTop: 15, marginHorizontal: 20}}
+  //       data={props.data}
+  //       renderItem={props.renderItem}
+  //       keyExtractor={(item, index) => `draggable-item-${item.author}`}
+  //       onDragBegin={() => console.log('onDragBegin')}
+  //       onDragEnd={({data}) => console.log('drag end data', data)}
+  //     />
+  //   </View>
+  // );
   return (
-    <View style={{flex: 1}}>
-      <DraggableFlatList
-        style={{marginTop: 15, marginHorizontal: 20}}
-        data={props.data}
-        renderItem={props.renderItem}
-        keyExtractor={(item, index) => `draggable-item-${item.author}`}
-        onDragBegin={() => console.log('onDragBegin')}
-        onDragEnd={({data}) => console.log('drag end data', data)}
-      />
-    </View>
+    <FlatList
+      contentContainerStyle={{marginTop: 15, marginHorizontal: 20}}
+      data={props.data}
+      renderItem={props.renderItem}
+      keyExtractor={(item, index) => String(index)}
+      initialNumToRender={5}
+      showsVerticalScrollIndicator={false}
+    />
   );
 };
 
