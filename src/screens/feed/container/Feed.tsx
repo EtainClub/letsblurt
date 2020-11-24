@@ -54,7 +54,7 @@ const Feed = (props: Props): JSX.Element => {
           _fetchPosts(false);
         } else {
           // fetch posts of feed
-          _fetchPosts(false);
+          //          _fetchPosts(false);
         }
       }
     }, [uiState.selectedTag]),
