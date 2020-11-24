@@ -136,9 +136,9 @@ const PostsListView = (props: Props): JSX.Element => {
               />
               {props.isUser && <Text size={10}>{item.author}</Text>}
             </Block>
-            {/* <Text>{substr_utf8_bytes(item.title, 0, 30)}</Text> */}
-            {<Text>{runes.substr(item.title, 0, 30)}</Text>}
-            {/* {<Text>{sliceByByte(item.title, 30)}</Text>} */}
+            {/* <Text>{substr_utf8_bytes(item.title, 0, 32)}</Text> */}
+            {/* {<Text>{runes.substr(item.title, 0, 30)}</Text>} */}
+            {<Text>{sliceByByte(item.title, 35)}</Text>}
           </Block>
           <Block middle>
             <Text>{getTimeFromNow(item.createdAt).split('ago')[0]}</Text>

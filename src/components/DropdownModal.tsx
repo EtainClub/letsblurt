@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
   dropdownIcon: {
     fontSize: 22,
     color: '#788187',
-    marginLeft: -10,
+    marginLeft: -5,
   },
   dropdown: {
     marginTop: 5,

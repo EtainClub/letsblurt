@@ -279,6 +279,7 @@ const Header = (props: Props): JSX.Element => {
         );
       case 'Search':
         return <SearchBar />;
+      case 'Post':
       case 'Posting':
       case 'Profile':
       case 'Author':
@@ -412,7 +413,7 @@ const styles = StyleSheet.create({
   },
   dropdownText: {
     fontSize: 14,
-    paddingLeft: 0,
+    paddingLeft: 10,
     paddingHorizontal: 14,
     color: '#788187',
   },

@@ -1,7 +1,7 @@
 import he from 'he';
 import {makeEntryCacheKey} from './helper';
 import {cacheGet, cacheSet} from './cache';
-
+import {sliceByByte} from '~/utils/strings';
 import Remarkable from 'remarkable';
 const md = new Remarkable({html: true, breaks: true, linkify: false});
 
@@ -30,7 +30,8 @@ const postBodySummary = (entryBody, length) => {
 
   if (length) {
     // Truncate
-    text = text.substring(0, length);
+    //    text = text.substring(0, length);
+    text = sliceByByte(text, length);
   }
 
   text = he.decode(text); // decode html entities

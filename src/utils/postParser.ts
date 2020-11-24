@@ -129,7 +129,7 @@ export const parsePost = async (
   postData.state.avatar = getResizedAvatar(post.author);
   postData.state.voters!.sort((a, b) => b.rshares - a.rshares);
   postData.body = renderPostBody(post.body, true, webp);
-  postData.summary = postBodySummary(post, 50) + '...';
+  postData.summary = postBodySummary(post, 120);
   //  extPost.is_declined_payout = Number(parseFloat(post.max_accepted_payout)) === 0;
 
   if (username && postData.state.voters) {

@@ -1,12 +1,29 @@
 export function sliceByByte(str, maxByte) {
-  let b, i, c;
-  for (b = i = 0; (c = str.charCodeAt(i)); ) {
-    b += c >> 7 ? 2 : 1;
-    if (b > maxByte) break;
-    i++;
+  // initial substring
+  const initSub = str.substr(0, maxByte);
+  // if the length is over the max, that is unicode,
+  let sub = initSub;
+  const initLength = Buffer.from(sub).length;
+
+  if (str.length > maxByte) sub = initSub.concat('...');
+  // console.log('[sliceByByte] org str', str, Buffer.from(str).length);
+  // console.log('[sliceByByte] init str', initSub, initSub.length);
+  if (initLength > maxByte) {
+    sub = str.substr(0, Math.floor(maxByte / 1.5)).concat('...');
+    console.log('[sliceByByte] unicode str', sub, sub.length);
   }
-  return str.substring(0, i);
+  return sub;
 }
+
+// export function sliceByByte(str, maxByte) {
+//   let b, i, c;
+//   for (b = i = 0; (c = str.charCodeAt(i)); ) {
+//     b += c >> 7 ? 2 : 1;
+//     if (b > maxByte) break;
+//     i++;
+//   }
+//   return str.substring(0, i);
+// }
 
 export function getCharacterLength(str) {
   // The string iterator that is used here iterates over characters,
