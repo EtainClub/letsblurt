@@ -88,9 +88,10 @@ const Feed = (props: Props): JSX.Element => {
       postsState,
       postsType,
     );
-    setFetching(true);
     // clear posts if not appending
+    // loading for appening will be handled by load more
     if (!appending) {
+      setFetching(true);
       setPosts([]);
       await clearPosts(postsType);
     }
@@ -104,12 +105,12 @@ const Feed = (props: Props): JSX.Element => {
       setToastMessage,
     );
     console.log('postsState', postsState);
-    setFetching(false);
     if (appending) {
       setPosts(posts.concat(_posts));
     } else {
       // set posts
       setPosts(_posts);
+      setFetching(false);
     }
     console.log('[Feed]_fetchPosts, posts', _posts);
   };
