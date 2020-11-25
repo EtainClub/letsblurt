@@ -23,8 +23,11 @@ const Feed = (props: Props): JSX.Element => {
   // contexts
   const {postsState, fetchPosts, clearPosts} = useContext(PostsContext);
   const {authState} = useContext(AuthContext);
-  const {uiState} = useContext(UIContext);
+  const {uiState, setToastMessage} = useContext(UIContext);
   // states
+  const [username, setUsername] = useState(
+    authState.currentCredentials.username,
+  );
   const [posts, setPosts] = useState<PostData[]>(null);
   //  const [postsType, setPostsType] = useState(PostsTypes.FEED);
   const [fetching, setFetching] = useState(false);
@@ -34,31 +37,32 @@ const Feed = (props: Props): JSX.Element => {
   });
 
   //////// effects
-  //// mount event
-  // useEffect(() => {
-  //   _fetchPosts(false);
-  // }, []);
-  //// account change event
+  //// header tag/fiter change event
+  useEffect(() => {
+    _fetchPosts(false);
+  }, [postsState.filterIndex, postsState.tagIndex]);
+  // account change event
   useEffect(() => {
     if (!fetching) {
-      _fetchPosts(false);
+      // fetch only the user account has been changed
+      if (username != authState.currentCredentials.username) _fetchPosts(false);
     }
   }, [authState.currentCredentials]);
   //// focus event with tag param
-  useFocusEffect(
-    useCallback(() => {
-      if (!fetching) {
-        // check if selected tag exists
-        if (uiState.selectedTag) {
-          // fetch posts of hash tag
-          _fetchPosts(false);
-        } else {
-          // fetch posts of feed
-          //          _fetchPosts(false);
-        }
-      }
-    }, [uiState.selectedTag]),
-  );
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     if (!fetching) {
+  //       // check if selected tag exists
+  //       if (uiState.selectedTag) {
+  //         // fetch posts of hash tag
+  //         _fetchPosts(false);
+  //       } else {
+  //         // fetch posts of feed
+  //         //          _fetchPosts(false);
+  //       }
+  //     }
+  //   }, [uiState.selectedTag]),
+  // );
 
   // //// set posts after fetching
   // useEffect(() => {
@@ -74,7 +78,7 @@ const Feed = (props: Props): JSX.Element => {
   // }, [postsState.fetched]);
 
   const _fetchPosts = async (appending: boolean) => {
-    console.log('fetching posts, authState', authState);
+    console.log('[Feed|fetchingPosts] appending', appending);
     let postsType = PostsTypes.FEED;
     if (uiState.selectedTag) {
       postsType = PostsTypes.HASH_TAG;
@@ -87,6 +91,7 @@ const Feed = (props: Props): JSX.Element => {
     setFetching(true);
     // clear posts if not appending
     if (!appending) {
+      setPosts([]);
       await clearPosts(postsType);
     }
     const _posts = await fetchPosts(
@@ -96,11 +101,16 @@ const Feed = (props: Props): JSX.Element => {
       authState.currentCredentials.username,
       appending,
       uiState.selectedTag,
+      setToastMessage,
     );
     console.log('postsState', postsState);
     setFetching(false);
-    // set posts
-    setPosts(_posts);
+    if (appending) {
+      setPosts(posts.concat(_posts));
+    } else {
+      // set posts
+      setPosts(_posts);
+    }
     console.log('[Feed]_fetchPosts, posts', _posts);
   };
 

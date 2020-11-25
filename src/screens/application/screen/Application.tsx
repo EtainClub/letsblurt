@@ -7,6 +7,9 @@ import {
   NavigationContainerRef,
 } from '@react-navigation/native';
 import {View} from 'react-native';
+// SafeAreaView provider
+import {SafeAreaProvider} from 'react-native-safe-area-context';
+
 // routes
 import Screens from '~/navigation/routes';
 // navigation helper
@@ -35,7 +38,7 @@ const ApplicationScreen = ({toastMessage, clearMessage}: Props) => {
   };
 
   return (
-    <View style={{flex: 1}}>
+    <SafeAreaProvider style={{flex: 1}}>
       <NavigationContainer
         ref={(navigationRef: NavigationContainerRef) => {
           setTopLevelNavigator(navigationRef);
@@ -49,7 +52,7 @@ const ApplicationScreen = ({toastMessage, clearMessage}: Props) => {
           onHide={_onHideToastMessage}
         />
       )}
-    </View>
+    </SafeAreaProvider>
   );
 };
 

@@ -56,18 +56,20 @@ const PostsFeed = (props: Props): JSX.Element => {
   const _refreshPosts = async () => {
     console.log('PostsFeed] refresh event');
     // clear the posts
-    clearPosts();
+    await clearPosts();
     // fetch posts
     // @todo this takes time, so fetchposts is executed with some post reference
     setLoading(true);
-    fetchPosts(false);
+    await fetchPosts(false);
+    setLoading(false);
   };
 
   const _fetchMorePosts = async () => {
     console.log('[Feed] fetchMorePosts');
     setLoading(true);
     // fetch posts with appending
-    fetchPosts(true);
+    await fetchPosts(true);
+    setLoading(false);
   };
 
   const _handleSubmitSearch = (searchText: string) => {
@@ -81,7 +83,7 @@ const PostsFeed = (props: Props): JSX.Element => {
   return (
     <PostsFeedView
       posts={posts}
-      loading={loading || props.fetching}
+      loading={props.fetching || loading}
       handleSubmitSearch={_handleSubmitSearch}
       refreshPosts={_refreshPosts}
       fetchMorePosts={_fetchMorePosts}

@@ -756,23 +756,18 @@ export const fetchPostsSummary = async (
       [query],
     );
 
-    console.log('[fetchPostsSummary] posts', posts);
     let postDataList: PostData[];
-    if (posts.length > 0) {
-      postDataList = await parsePosts(posts, username);
+    postDataList = await parsePosts(posts, username);
 
-      // TODO: implement later
-      // if (filterNsfw) {
-      //   const updatedPosts = filterNSFWPosts(extPosts);
-      //   return updatedPosts;
-      // }
-      return postDataList;
-    } else {
-      return null;
-    }
+    // TODO: implement later
+    // if (filterNsfw) {
+    //   const updatedPosts = filterNSFWPosts(extPosts);
+    //   return updatedPosts;
+    // }
+    return postDataList;
   } catch (error) {
-    console.log('failed to get posts summaries', error);
-    return null;
+    console.log('failed to get posts summaries', error.message);
+    return error;
   }
 };
 

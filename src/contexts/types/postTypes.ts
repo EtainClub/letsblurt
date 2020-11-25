@@ -327,6 +327,7 @@ export interface PostsContextType {
     username?: string,
     appending?: boolean,
     inputTag?: string,
+    setToastMessage?: (message: string) => void,
   ) => Promise<PostData[]>;
   // clear posts
   clearPosts: (postsType: PostsTypes) => void;

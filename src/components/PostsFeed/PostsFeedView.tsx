@@ -52,7 +52,7 @@ const PostsFeedView = (props: Props): JSX.Element => {
   //// states
   const [searchFAB, setSearchFAB] = useState(false);
   const [searchText, setSearchText] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(props.loading);
   const [refreshing, setRefreshing] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [loadedAll, setLoadedAll] = useState(false);
@@ -79,7 +79,8 @@ const PostsFeedView = (props: Props): JSX.Element => {
   const _onLoadMore = async () => {
     console.log('on load more');
     setLoadingMore(true);
-    props.fetchMorePosts();
+    await props.fetchMorePosts();
+    setLoadingMore(false);
   };
 
   const _renderHeader = () => {
@@ -107,7 +108,7 @@ const PostsFeedView = (props: Props): JSX.Element => {
           marginBottom: 10,
           borderColor: theme.COLORS.PINK,
         }}>
-        <ActivityIndicator color={argonTheme.COLORS.ERROR} size="large" />
+        <ActivityIndicator color={argonTheme.COLORS.ERROR} size="small" />
       </View>
     );
   };
@@ -132,7 +133,7 @@ const PostsFeedView = (props: Props): JSX.Element => {
     const posts = props.posts.slice(0, props.posts.length - 1);
     const username = props.username;
 
-    return !loading ? (
+    return !props.loading ? (
       <FlatList
         contentContainerStyle={styles.posts}
         refreshing={refreshing}
@@ -156,7 +157,7 @@ const PostsFeedView = (props: Props): JSX.Element => {
   return (
     <View>
       {_renderPosts()}
-      {!loading && (
+      {!props.loading && (
         <FAB
           buttonColor="red"
           iconTextColor="#FFFFFF"

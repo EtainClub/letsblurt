@@ -28,6 +28,8 @@ import {ActionBar} from '../ActionBar';
 import {ActionBarStyle} from '~/constants/actionBarTypes';
 import {Avatar} from '~/components/Avatar';
 
+const POST_TITLE_LENGTH = 50;
+
 interface Props {
   post: PostData;
   index: number;
@@ -85,7 +87,7 @@ const PostView = (props: Props): JSX.Element => {
           <Block>
             <Text size={16} style={{color: materialTheme.COLORS.ERROR}}>
               {/* {runes.substr(post.state.title, 0, 45)} */}
-              {sliceByByte(post.state.title, 55)}
+              {sliceByByte(post.state.title, POST_TITLE_LENGTH)}
             </Text>
             <HTML
               html={post.summary.replace(/\p{Emoji_Presentation}/gu, ' ')}

@@ -14,7 +14,6 @@ import {AppContainer} from './screens/application';
 // locales
 import {flattenMessages} from './utils/flattenMessages';
 import messages from './locales';
-
 // contexts
 import {
   AuthProvider,

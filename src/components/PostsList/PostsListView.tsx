@@ -39,6 +39,8 @@ const BACKGROUND_COLORS = [
   argonTheme.COLORS.SECONDARY,
 ];
 
+const LIST_TITLE_LENGTH = 35;
+
 //// props
 interface Props {
   posts: any[];
@@ -138,7 +140,7 @@ const PostsListView = (props: Props): JSX.Element => {
             </Block>
             {/* <Text>{substr_utf8_bytes(item.title, 0, 32)}</Text> */}
             {/* {<Text>{runes.substr(item.title, 0, 30)}</Text>} */}
-            {<Text>{sliceByByte(item.title, 35)}</Text>}
+            {<Text>{sliceByByte(item.title, LIST_TITLE_LENGTH)}</Text>}
           </Block>
           <Block middle>
             <Text>{getTimeFromNow(item.createdAt).split('ago')[0]}</Text>

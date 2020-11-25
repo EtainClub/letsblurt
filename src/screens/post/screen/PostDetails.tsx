@@ -13,6 +13,8 @@ import {
   ScrollView,
   RefreshControl,
 } from 'react-native';
+// SafeAreaView
+import {SafeAreaView} from 'react-native-safe-area-context';
 //import { ScrollView } from 'react-native-gesture-handler';
 import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
 const {height, width} = Dimensions.get('window');
@@ -159,62 +161,64 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
   };
 
   return !refreshing ? (
-    <Block style={{marginHorizontal: 5, marginBottom: 150}}>
-      {props.parentPost && <ParentPost post={props.parentPost} />}
-      <Text size={24}>{post.state.title}</Text>
-      <Block row space="between">
-        <Avatar
-          avatar={post.state.avatar}
-          avatarSize={40}
-          account={post.state.post_ref.author}
-          nickname={nickname ? nickname : post.state.post_ref.author}
-          reputation={reputation}
-          textSize={14}
-          truncate={false}
-        />
-        <Text style={{top: 10, marginRight: 20}}>{formatedTime}</Text>
-      </Block>
-      <Block style={{}}>
-        <ActionBar
-          actionBarStyle={ActionBarStylePost}
-          postState={state}
-          postIndex={props.index}
-          handlePressComments={_handlePressComments}
-        />
-      </Block>
-
-      <ScrollView
-        ref={commentRef}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={_onRefresh} />
-        }>
-        <Block>
-          <Block style={{padding: theme.SIZES.BASE / 3}}>
-            <PostBody body={post.body} />
-          </Block>
-          <Block row style={{flexWrap: 'wrap'}}>
-            {(tags || []).map((tag, id) => {
-              return (
-                <Block
-                  card
-                  key={id}
-                  style={{
-                    backgroundColor: argonTheme.COLORS.INPUT_ERROR,
-                    paddingHorizontal: 5,
-                    marginHorizontal: 2,
-                    marginVertical: 3,
-                  }}>
-                  <Text onPress={() => _onPressHashTag(tag)}>{tag}</Text>
-                </Block>
-              );
-            })}
-          </Block>
-          {_renderCommentForm()}
-          {_renderComments()}
+    <SafeAreaView style={{flex: 1, marginBottom: 170}}>
+      <Block style={{marginHorizontal: 5, marginBottom: 0}}>
+        {props.parentPost && <ParentPost post={props.parentPost} />}
+        <Text size={24}>{post.state.title}</Text>
+        <Block row space="between">
+          <Avatar
+            avatar={post.state.avatar}
+            avatarSize={40}
+            account={post.state.post_ref.author}
+            nickname={nickname ? nickname : post.state.post_ref.author}
+            reputation={reputation}
+            textSize={14}
+            truncate={false}
+          />
+          <Text style={{top: 10, marginRight: 20}}>{formatedTime}</Text>
         </Block>
-      </ScrollView>
-    </Block>
+        <Block style={{}}>
+          <ActionBar
+            actionBarStyle={ActionBarStylePost}
+            postState={state}
+            postIndex={props.index}
+            handlePressComments={_handlePressComments}
+          />
+        </Block>
+
+        <ScrollView
+          ref={commentRef}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={_onRefresh} />
+          }>
+          <Block>
+            <Block style={{padding: theme.SIZES.BASE / 3}}>
+              <PostBody body={post.body} />
+            </Block>
+            <Block row style={{flexWrap: 'wrap'}}>
+              {(tags || []).map((tag, id) => {
+                return (
+                  <Block
+                    card
+                    key={id}
+                    style={{
+                      backgroundColor: argonTheme.COLORS.INPUT_ERROR,
+                      paddingHorizontal: 5,
+                      marginHorizontal: 2,
+                      marginVertical: 3,
+                    }}>
+                    <Text onPress={() => _onPressHashTag(tag)}>{tag}</Text>
+                  </Block>
+                );
+              })}
+            </Block>
+            {_renderCommentForm()}
+            {_renderComments()}
+          </Block>
+        </ScrollView>
+      </Block>
+    </SafeAreaView>
   ) : (
     <View>
       <ActivityIndicator color={argonTheme.COLORS.ERROR} />

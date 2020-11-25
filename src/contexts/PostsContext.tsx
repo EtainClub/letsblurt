@@ -236,6 +236,7 @@ const PostsProvider = ({children}: Props) => {
     username?: string,
     appending?: boolean,
     inputTag?: string,
+    setToastMessage?: (message: string) => void,
   ) => {
     //// set start post ref
     let startPostRef = {
@@ -377,10 +378,10 @@ const PostsProvider = ({children}: Props) => {
       payload: tagIndex,
     });
     // fetch with the given tag, empty start ref
-    fetchPosts(postsType, tagIndex, postsState.filterIndex, username, false);
+    //    fetchPosts(postsType, tagIndex, postsState.filterIndex, username, false);
   };
 
-  //// set Filter index
+  //// set filter index
   const setFilterIndex = async (filterIndex: number, username?: string) => {
     console.log('[PostsContext|setfilter] filter Index', filterIndex);
     // check sanity
@@ -394,14 +395,14 @@ const PostsProvider = ({children}: Props) => {
       payload: filterIndex,
     });
 
-    // fetch with the given tag, empty start ref
-    fetchPosts(
-      postsState.postsType,
-      postsState.tagIndex,
-      filterIndex,
-      username,
-      false,
-    );
+    // // fetch with the given tag, empty start ref
+    // fetchPosts(
+    //   postsState.postsType,
+    //   postsState.tagIndex,
+    //   filterIndex,
+    //   username,
+    //   false,
+    // );
   };
 
   //// voting action creator
@@ -704,6 +705,7 @@ const _fetchPosts = async (
   tag: string,
   startPostRef: PostRef,
   username?: string,
+  setToastMessage?: (message: string) => void,
 ) => {
   console.log('[fetchPosts] category, tag', filter, tag);
   // fetch summary of posts

@@ -9,6 +9,7 @@ import {getResizedAvatar, getResizedImage} from './image';
 
 import {PostState, PostData, CommentData, MetaData} from '~/contexts/types';
 
+const POST_SUMMARY_LENGTH = 100;
 const webp = Platform.OS === 'ios' ? false : true;
 
 export const parsePosts = async (posts: Discussion[], username: string) => {
@@ -129,7 +130,7 @@ export const parsePost = async (
   postData.state.avatar = getResizedAvatar(post.author);
   postData.state.voters!.sort((a, b) => b.rshares - a.rshares);
   postData.body = renderPostBody(post.body, true, webp);
-  postData.summary = postBodySummary(post, 120);
+  postData.summary = postBodySummary(post, POST_SUMMARY_LENGTH);
   //  extPost.is_declined_payout = Number(parseFloat(post.max_accepted_payout)) === 0;
 
   if (username && postData.state.voters) {
