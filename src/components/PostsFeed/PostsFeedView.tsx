@@ -38,7 +38,8 @@ import {ActionBarStyleFeed} from '~/constants/actionBarTypes';
 interface Props {
   posts: PostData[];
   username?: string;
-  loading: boolean;
+  reloading: boolean;
+  loadingMore: boolean;
   handleSubmitSearch: (searchText: string) => void;
   refreshPosts: () => void;
   fetchMorePosts: () => void;
@@ -52,10 +53,6 @@ const PostsFeedView = (props: Props): JSX.Element => {
   //// states
   const [searchFAB, setSearchFAB] = useState(false);
   const [searchText, setSearchText] = useState('');
-  const [loading, setLoading] = useState(props.loading);
-  const [refreshing, setRefreshing] = useState(false);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [loadedAll, setLoadedAll] = useState(false);
   //// ref
   const searchRef = useRef(null);
 
@@ -68,19 +65,15 @@ const PostsFeedView = (props: Props): JSX.Element => {
   //// handle refresh event on posts
   const _onRefresh = async () => {
     console.log('on refresh');
-    setLoading(true);
     setSearchFAB(false);
     await props.refreshPosts();
-    setLoading(false);
     setSearchFAB(true);
   };
 
   //// load more posts with bottom-reached event
   const _onLoadMore = async () => {
     console.log('on load more');
-    setLoadingMore(true);
     await props.fetchMorePosts();
-    setLoadingMore(false);
   };
 
   const _renderHeader = () => {
@@ -94,7 +87,7 @@ const PostsFeedView = (props: Props): JSX.Element => {
 
   //// render footer when loading more
   const _renderFooter = () => {
-    if (!loadingMore) return null;
+    if (!props.loadingMore) return null;
 
     return (
       <View
@@ -133,10 +126,10 @@ const PostsFeedView = (props: Props): JSX.Element => {
     const posts = props.posts.slice(0, props.posts.length - 1);
     const username = props.username;
 
-    return !props.loading ? (
+    return !props.reloading ? (
       <FlatList
         contentContainerStyle={styles.posts}
-        refreshing={refreshing}
+        refreshing={props.reloading}
         onRefresh={_onRefresh}
         onEndReached={_onLoadMore}
         onEndReachedThreshold={1}
@@ -157,7 +150,7 @@ const PostsFeedView = (props: Props): JSX.Element => {
   return (
     <View>
       {_renderPosts()}
-      {!props.loading && (
+      {!props.reloading && (
         <FAB
           buttonColor="red"
           iconTextColor="#FFFFFF"

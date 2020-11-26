@@ -30,7 +30,7 @@ const Feed = (props: Props): JSX.Element => {
   );
   const [posts, setPosts] = useState<PostData[]>(null);
   //  const [postsType, setPostsType] = useState(PostsTypes.FEED);
-  const [fetching, setFetching] = useState(false);
+  const [reloading, setReloading] = useState(false);
   const [startPostRef, setStartPostRef] = useState<PostRef>({
     author: null,
     permlink: null,
@@ -43,7 +43,7 @@ const Feed = (props: Props): JSX.Element => {
   }, [postsState.filterIndex, postsState.tagIndex]);
   // account change event
   useEffect(() => {
-    if (!fetching) {
+    if (!reloading) {
       // fetch only the user account has been changed
       if (username != authState.currentCredentials.username) _fetchPosts(false);
     }
@@ -91,9 +91,8 @@ const Feed = (props: Props): JSX.Element => {
     // clear posts if not appending
     // loading for appening will be handled by load more
     if (!appending) {
-      setFetching(true);
-      setPosts([]);
       await clearPosts(postsType);
+      setReloading(true);
     }
     const _posts = await fetchPosts(
       postsType,
@@ -105,27 +104,21 @@ const Feed = (props: Props): JSX.Element => {
       setToastMessage,
     );
     console.log('postsState', postsState);
-    if (appending) {
-      setPosts(posts.concat(_posts));
-    } else {
-      // set posts
-      setPosts(_posts);
-      setFetching(false);
+    setPosts(_posts);
+    if (!appending) {
+      setReloading(false);
     }
     console.log('[Feed]_fetchPosts, posts', _posts);
   };
 
+  ////
   const _clearPosts = async () => {
     console.log('[FeedContainer] clear posts');
     clearPosts(PostsTypes.FEED);
   };
+
   return (
-    <PostsFeed
-      posts={posts}
-      fetching={fetching}
-      fetchPosts={_fetchPosts}
-      clearPosts={_clearPosts}
-    />
+    <PostsFeed posts={posts} reloading={reloading} fetchPosts={_fetchPosts} />
   );
 };
 

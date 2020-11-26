@@ -26,18 +26,17 @@ import {PostsFeedView} from './PostsFeedView';
 //// props
 interface Props {
   posts: PostData[];
-  fetching: boolean;
+  reloading: boolean;
   fetchPosts: (appending?: boolean) => void;
-  clearPosts: () => void;
 }
 //// component
 const PostsFeed = (props: Props): JSX.Element => {
   //// props
-  const {posts, fetchPosts, clearPosts} = props;
+  const {posts, fetchPosts} = props;
   //// context
   const {setSearchParam} = useContext(UIContext);
   //// state
-  const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   ////// effects
   //// fetch posts
@@ -55,21 +54,16 @@ const PostsFeed = (props: Props): JSX.Element => {
   //// handle refresh event
   const _refreshPosts = async () => {
     console.log('PostsFeed] refresh event');
-    // clear the posts
-    await clearPosts();
-    // fetch posts
-    // @todo this takes time, so fetchposts is executed with some post reference
-    setLoading(true);
+    // clear the
     await fetchPosts(false);
-    setLoading(false);
   };
 
   const _fetchMorePosts = async () => {
     console.log('[Feed] fetchMorePosts');
-    setLoading(true);
+    setLoadingMore(true);
     // fetch posts with appending
     await fetchPosts(true);
-    setLoading(false);
+    setLoadingMore(false);
   };
 
   const _handleSubmitSearch = (searchText: string) => {
@@ -83,7 +77,8 @@ const PostsFeed = (props: Props): JSX.Element => {
   return (
     <PostsFeedView
       posts={posts}
-      loading={props.fetching || loading}
+      reloading={props.reloading}
+      loadingMore={loadingMore}
       handleSubmitSearch={_handleSubmitSearch}
       refreshPosts={_refreshPosts}
       fetchMorePosts={_fetchMorePosts}
