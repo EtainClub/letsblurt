@@ -281,7 +281,7 @@ const PostsProvider = ({children}: Props) => {
           filter = username ? 'feed' : 'trending';
         } else if (postsState.tagList[tagIndex] === 'All') {
           tag = '';
-          filter = 'trending';
+          filter = postsState.filterList[filterIndex];
         } else if (tagIndex > 1) {
           filter = postsState.filterList[filterIndex];
           tag = postsState.tagList[tagIndex];
@@ -307,7 +307,7 @@ const PostsProvider = ({children}: Props) => {
     const _posts = await _fetchPosts(filter, tag, startPostRef, username);
     // check sanity
     if (!_posts) return null;
-
+    console.log('[PostsContext|fetchPosts] fetched post', _posts);
     // set start post ref
     const lastPost = _posts[_posts.length - 1];
     console.log(
@@ -315,8 +315,12 @@ const PostsProvider = ({children}: Props) => {
       lastPost,
       appending,
     );
+    let posts;
+    // TODO: check sanity
+    //    if (lastPost) {
     // augmented posts
-    let posts = _posts.slice(0, _posts.length - 1);
+    posts = _posts.slice(0, _posts.length - 1);
+    //    }
     if (appending) {
       posts = postsState[postsType].posts.concat(posts);
     }
