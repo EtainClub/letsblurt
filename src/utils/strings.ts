@@ -1,6 +1,9 @@
+const runes = require('runes');
+
 export function sliceByByte(str, maxByte) {
   // initial substring
-  const initSub = str.substr(0, maxByte);
+  //  const initSub = str.substr(0, maxByte);
+  const initSub = runes.substr(str, 0, maxByte);
   // if the length is over the max, that is unicode,
   let sub = initSub;
   const initLength = Buffer.from(sub).length;
@@ -9,7 +12,8 @@ export function sliceByByte(str, maxByte) {
   // console.log('[sliceByByte] org str', str, Buffer.from(str).length);
   // console.log('[sliceByByte] init str', initSub, initSub.length);
   if (initLength > maxByte) {
-    sub = str.substr(0, Math.floor(maxByte / 1.5)).concat('...');
+    //    sub = str.substr(0, Math.floor(maxByte / 1.5)).concat('...');
+    sub = runes.substr(str, 0, Math.floor(maxByte / 1.5)).concat('...');
   }
   return sub;
 }
