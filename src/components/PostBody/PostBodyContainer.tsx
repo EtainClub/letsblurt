@@ -15,7 +15,7 @@ const PostBodyContainer = (props: Props): JSX.Element => {
   //// contexts
   const {uiState, setAuthorParam, setToastMessage} = useContext(UIContext);
   const {authState} = useContext(AuthContext);
-  const {setPostRef} = useContext(PostsContext);
+  const {setPostRef, appendTag} = useContext(PostsContext);
   //// states
   const [selectedLink, setSelectedLink] = useState(null);
 
@@ -54,12 +54,11 @@ const PostBodyContainer = (props: Props): JSX.Element => {
 
   const _handleTagPress = (tag: string) => {
     console.log('[PostBodyContainer] _handleTagPress');
+    // append tag
+    appendTag(tag);
     if (tag) {
       navigate({
         name: 'Feed',
-        params: {
-          tag,
-        },
       });
     }
   };
