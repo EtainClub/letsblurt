@@ -30,6 +30,7 @@ import {getTimeFromNow} from '~/utils/time';
 
 interface Props {
   post: PostData;
+  loading: boolean;
   parentPost: PostData;
   index: number;
   comments: CommentData[];
@@ -45,7 +46,6 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState('');
   const [commentNewHeight, setCommentNeeHeight] = useState(40);
-  const [refreshing, setRefreshing] = useState(false);
 
   const {post} = props;
 
@@ -64,10 +64,10 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
 
   const _onPressSendComment = async () => {
     console.log('[PostDetails] onPressSendComment');
-    // set loading
+    // set submitting
     setSubmitting(true);
     const result = await props.handleSubmitComment(message);
-    // clear loading
+    // clear submitting
     setSubmitting(false);
     // clear message
     setMessage('');
@@ -75,7 +75,7 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
     setToastMessage(result);
   };
 
-  const _onPressHashTag = (tag: string) => {
+  const _handlePressHashTag = (tag: string) => {
     props.handlePressTag(tag);
   };
 
@@ -157,10 +157,9 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
   const _onRefresh = async () => {
     console.log('[PostDetailsView] onRefresh');
     await props.handleRefresh();
-    setRefreshing(false);
   };
 
-  return !refreshing ? (
+  return !props.loading ? (
     <SafeAreaView style={{flex: 1, marginBottom: 170}}>
       <Block style={{marginHorizontal: 5, marginBottom: 0}}>
         {props.parentPost && <ParentPost post={props.parentPost} />}
@@ -190,7 +189,7 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
           ref={commentRef}
           showsVerticalScrollIndicator={false}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={_onRefresh} />
+            <RefreshControl refreshing={props.loading} onRefresh={_onRefresh} />
           }>
           <Block>
             <Block style={{padding: theme.SIZES.BASE / 3}}>
@@ -199,17 +198,21 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
             <Block row style={{flexWrap: 'wrap'}}>
               {(tags || []).map((tag, id) => {
                 return (
-                  <Block
-                    card
+                  <TouchableWithoutFeedback
                     key={id}
-                    style={{
-                      backgroundColor: argonTheme.COLORS.INPUT_ERROR,
-                      paddingHorizontal: 5,
-                      marginHorizontal: 2,
-                      marginVertical: 3,
-                    }}>
-                    <Text onPress={() => _onPressHashTag(tag)}>{tag}</Text>
-                  </Block>
+                    onPress={() => _handlePressHashTag(tag)}>
+                    <Block
+                      card
+                      key={id}
+                      style={{
+                        backgroundColor: argonTheme.COLORS.INPUT_SUCCESS,
+                        paddingHorizontal: 5,
+                        marginHorizontal: 2,
+                        marginVertical: 3,
+                      }}>
+                      <Text>{tag}</Text>
+                    </Block>
+                  </TouchableWithoutFeedback>
                 );
               })}
             </Block>
@@ -221,7 +224,7 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
     </SafeAreaView>
   ) : (
     <View>
-      <ActivityIndicator color={argonTheme.COLORS.ERROR} />
+      <ActivityIndicator color={argonTheme.COLORS.ERROR} size="large" />
     </View>
   );
 };

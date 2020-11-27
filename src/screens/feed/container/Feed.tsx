@@ -30,7 +30,7 @@ const Feed = (props: Props): JSX.Element => {
   );
   const [posts, setPosts] = useState<PostData[]>(null);
   //  const [postsType, setPostsType] = useState(PostsTypes.FEED);
-  const [reloading, setReloading] = useState(false);
+  const [reloading, setReloading] = useState(true);
   const [startPostRef, setStartPostRef] = useState<PostRef>({
     author: null,
     permlink: null,

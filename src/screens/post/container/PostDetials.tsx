@@ -1,10 +1,12 @@
 // post details container
+// react
 import React, {useState, useEffect, useContext} from 'react';
-
+// react native
+import {View, ActivityIndicator} from 'react-native';
 import {PostDetailsScreen} from '../screen/PostDetails';
-// steem api
+// blurt api
 import {fetchComments} from '~/providers/blurt/dblurtApi';
-
+import {argonTheme} from '~/constants/argonTheme';
 import {navigate} from '~/navigation/service';
 import {
   PostRef,
@@ -33,9 +35,11 @@ const PostDetails = (props: Props): JSX.Element => {
     submitPost,
     getPostDetails,
     fetchDatabaseState,
+    appendTag,
   } = useContext(PostsContext);
-  const {uiState, setTagParam} = useContext(UIContext);
+  const {uiState} = useContext(UIContext);
   // states
+  const [loading, setLoading] = useState(true);
   const [postDetails, setPostDetails] = useState<PostData>(null);
   const [comments, setComments] = useState<CommentData[]>(null);
   const [submitted, setSubmitted] = useState(false);
@@ -77,11 +81,13 @@ const PostDetails = (props: Props): JSX.Element => {
     console.log('_fetchPostDetailsEntry postRef', postsState.postRef);
     // remove the parent post
     setParentPost(null);
+    setLoading(true);
     // get post details
     const details = await getPostDetails(
       postsState.postRef,
       authState.currentCredentials.username,
     );
+    setLoading(false);
     if (!details) return;
     // fetch database
     const {bookmarked} = await fetchDatabaseState(
@@ -159,27 +165,31 @@ const PostDetails = (props: Props): JSX.Element => {
     return message;
   };
 
+  //// handle press hash tag
   const _handlePressTag = (tag: string) => {
     console.log('[PostDetailsContainer] handlePressTag, tag', tag);
-    // set tag param
-    setTagParam(tag);
+    // append a new tag to tag list
+    appendTag(tag);
     // navigate to feed
     navigate({name: 'Feed'});
   };
 
-  return (
-    postDetails && (
-      <PostDetailsScreen
-        post={postDetails}
-        parentPost={parentPost}
-        index={index}
-        comments={comments}
-        handleRefresh={_onRefresh}
-        fetchComments={_fetchComments}
-        handleSubmitComment={_onSubmitComment}
-        handlePressTag={_handlePressTag}
-      />
-    )
+  return postDetails ? (
+    <PostDetailsScreen
+      post={postDetails}
+      loading={loading}
+      parentPost={parentPost}
+      index={index}
+      comments={comments}
+      handleRefresh={_onRefresh}
+      fetchComments={_fetchComments}
+      handleSubmitComment={_onSubmitComment}
+      handlePressTag={_handlePressTag}
+    />
+  ) : (
+    <View>
+      <ActivityIndicator color={argonTheme.COLORS.ERROR} size="large" />
+    </View>
   );
 };
 

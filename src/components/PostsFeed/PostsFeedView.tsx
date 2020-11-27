@@ -101,7 +101,7 @@ const PostsFeedView = (props: Props): JSX.Element => {
           marginBottom: 10,
           borderColor: theme.COLORS.PINK,
         }}>
-        <ActivityIndicator color={argonTheme.COLORS.ERROR} size="small" />
+        <ActivityIndicator color={argonTheme.COLORS.ERROR} size="large" />
       </View>
     );
   };

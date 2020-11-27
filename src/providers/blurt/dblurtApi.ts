@@ -767,7 +767,7 @@ export const fetchPostsSummary = async (
     return postDataList;
   } catch (error) {
     console.log('failed to get posts summaries', error.message);
-    return error;
+    return [];
   }
 };
 

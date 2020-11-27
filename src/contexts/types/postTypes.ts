@@ -18,6 +18,8 @@ export enum PostsActionTypes {
   SET_COMMUNITIES,
   SELECT_TAG,
   SELECT_FILTER,
+  RETRY_FETCHING,
+  APPEND_TAG,
 }
 
 // post meta data
@@ -181,6 +183,8 @@ export interface PostsState {
   postDetails: PostData;
   // fetched flag
   fetched: boolean;
+  // fetch retry count;
+  retryCount: number;
 
   //// tag, filter selection
   tagList: any[];
@@ -255,6 +259,16 @@ interface SetTagListAction {
   type: PostsActionTypes.SET_TAG_LIST;
   payload: any[];
 }
+// append a tag
+interface AppendTagAction {
+  type: PostsActionTypes.APPEND_TAG;
+  payload: {
+    tagList: any[];
+    tagIndex: number;
+    filterIndex: number;
+  };
+}
+
 // set tag index
 interface SetTagIndexAction {
   type: PostsActionTypes.SET_TAG_INDEX;
@@ -313,7 +327,10 @@ interface SetCommunitiesAction {
   type: PostsActionTypes.SET_COMMUNITIES;
   payload: any[];
 }
-
+// retry fetching
+interface RetryFetchingAction {
+  type: PostsActionTypes.RETRY_FETCHING;
+}
 // posts context type
 export interface PostsContextType {
   // posts state
@@ -406,6 +423,8 @@ export interface PostsContextType {
   ) => void;
   // set filter index
   setFilterIndex: (index: number, username?: string) => void;
+  // append a tag
+  appendTag: (tag: string) => void;
 }
 
 export type PostsAction =
@@ -422,7 +441,9 @@ export type PostsAction =
   | SetCommunitiesAction
   | SetTagIndexAction
   | SetTagListAction
-  | SetFilterIndexAction;
+  | SetFilterIndexAction
+  | RetryFetchingAction
+  | AppendTagAction;
 
 /*
   export interface PostsQuery {

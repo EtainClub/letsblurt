@@ -33,6 +33,9 @@ import {
   INIT_MY_TAG,
   INIT_FILTER_LIST,
 } from '~/contexts/types';
+import {filter} from 'lodash';
+
+const MAX_RETRY = 10;
 
 //// initial state
 const initialState: PostsState = {
@@ -50,6 +53,8 @@ const initialState: PostsState = {
   postDetails: INIT_POST_DATA,
   // fetched flag
   fetched: false,
+  // retry count
+  retryCount: 0,
   //// tag, filter
   tagList: [],
   // tag index
@@ -88,6 +93,7 @@ const postsReducer = (state: PostsState, action: PostsAction) => {
         [action.payload.postsType]: action.payload.metaposts,
         postsType: action.payload.postsType,
         fetched: true,
+        retryCount: 0,
       };
 
     case PostsActionTypes.APPEND_POSTS:
@@ -108,6 +114,8 @@ const postsReducer = (state: PostsState, action: PostsAction) => {
         fetched: true,
       };
 
+    case PostsActionTypes.RETRY_FETCHING:
+      return {...state, retryCount: state.retryCount++};
     case PostsActionTypes.SET_FETCHED:
       console.log('[postsReducer] set fetched. payload', action.payload);
       return {...state, fetched: action.payload};
@@ -130,7 +138,13 @@ const postsReducer = (state: PostsState, action: PostsAction) => {
 
     case PostsActionTypes.SET_TAG_INDEX:
       return {...state, tagIndex: action.payload};
-
+    case PostsActionTypes.APPEND_TAG:
+      return {
+        ...state,
+        tagList: action.payload.tagList,
+        tagIndex: action.payload.tagIndex,
+        filterIndex: action.payload.filterIndex,
+      };
     case PostsActionTypes.SET_FILTER_INDEX:
       return {...state, filterIndex: action.payload};
 
@@ -198,35 +212,30 @@ const PostsProvider = ({children}: Props) => {
     return tagList;
   };
 
-  // //// fetch community list
-  // const fetchCommunities = async (username: string) => {
-  //   console.log('[fetchCommunities] username', username);
-  //   let tagList = [];
-  //   let filterList = INIT_FILTER_LIST;
-  //   let tagIndex = 0;
-  //   let filterIndex = 0;
-  //   // check sanity
-  //   if (!username) {
-  //     console.log('[fetchCommunities] username is not defined', username);
-  //     return;
-  //   }
-  //   // fetch communities
-  //   const communityList = await fetchCommunityList(username);
-  //   //// set tag filter list and tag list
-  //   tagList = [
-  //     [username, ...INIT_FRIENDS_TAG],
-  //     [username, ...INIT_MY_TAG],
-  //     ...communityList,
-  //   ];
-
-  //   // dispatch action
-  //   dispatch({
-  //     type: PostsActionTypes.SET_TAG_LIST,
-  //     payload: tagList,
-  //   });
-
-  //   return communityList;
-  // };
+  //// append a tag
+  const appendTag = (tag: string) => {
+    let tagList = postsState.tagList;
+    let tagIndex = 0;
+    // cannot fetch posts with 'trending' filter
+    let filterIndex = 2;
+    // append a tag
+    if (!tagList.includes(tag)) {
+      tagList.push(tag);
+      tagIndex = tagList.length - 1;
+    } else {
+      tagIndex = tagList.indexOf(tag);
+    }
+    console.log('[appendTag] tagIndex', tagIndex);
+    // dispatch action
+    dispatch({
+      type: PostsActionTypes.APPEND_TAG,
+      payload: {
+        tagList,
+        tagIndex,
+        filterIndex,
+      },
+    });
+  };
 
   //// fetch posts action creator
   const fetchPosts = async (
@@ -303,11 +312,27 @@ const PostsProvider = ({children}: Props) => {
       username,
     );
 
-    // now fetch posts
-    const _posts = await _fetchPosts(filter, tag, startPostRef, username);
-    // check sanity
-    if (!_posts) return null;
+    //// now fetch posts
+    let _posts = null;
+    for (let i = 0; i < MAX_RETRY; i++) {
+      // increase retry count
+      dispatch({
+        type: PostsActionTypes.RETRY_FETCHING,
+      });
+      const result = await _fetchPosts(filter, tag, startPostRef, username);
+      // check fetching result
+      if (result.length != 0) {
+        _posts = result;
+        break;
+      }
+      setToastMessage('failed to fetch posts, retry fetching...');
+    }
     console.log('[PostsContext|fetchPosts] fetched post', _posts);
+    // check result of trying
+    if (!_posts) {
+      setToastMessage('failed to fetch posts, retried 3 times');
+      return null;
+    }
     // set start post ref
     const lastPost = _posts[_posts.length - 1];
     console.log(
@@ -398,15 +423,6 @@ const PostsProvider = ({children}: Props) => {
       type: PostsActionTypes.SET_FILTER_INDEX,
       payload: filterIndex,
     });
-
-    // // fetch with the given tag, empty start ref
-    // fetchPosts(
-    //   postsState.postsType,
-    //   postsState.tagIndex,
-    //   filterIndex,
-    //   username,
-    //   false,
-    // );
   };
 
   //// voting action creator
@@ -687,6 +703,7 @@ const PostsProvider = ({children}: Props) => {
         clearPosts,
         getPostDetails,
         setTagIndex,
+        appendTag,
         setFilterIndex,
         upvote,
         submitPost,
@@ -709,17 +726,12 @@ const _fetchPosts = async (
   tag: string,
   startPostRef: PostRef,
   username?: string,
-  setToastMessage?: (message: string) => void,
 ) => {
   console.log('[fetchPosts] category, tag', filter, tag);
   // fetch summary of posts
-  const posts = await fetchPostsSummary(filter, tag, startPostRef, username);
-  // check sanity
-  if (!posts) {
-    console.log('failed to fetch posts');
-    return null;
-  }
-  return posts;
+  const result = await fetchPostsSummary(filter, tag, startPostRef, username);
+  console.log('[_fetchPosts] fetched posts result', result);
+  return result;
 };
 
 ////
@@ -848,4 +860,35 @@ const postsReducer = (state: PostsState, action: PostsAction) => {
       return state;
   }
 };
+
+  // //// fetch community list
+  // const fetchCommunities = async (username: string) => {
+  //   console.log('[fetchCommunities] username', username);
+  //   let tagList = [];
+  //   let filterList = INIT_FILTER_LIST;
+  //   let tagIndex = 0;
+  //   let filterIndex = 0;
+  //   // check sanity
+  //   if (!username) {
+  //     console.log('[fetchCommunities] username is not defined', username);
+  //     return;
+  //   }
+  //   // fetch communities
+  //   const communityList = await fetchCommunityList(username);
+  //   //// set tag filter list and tag list
+  //   tagList = [
+  //     [username, ...INIT_FRIENDS_TAG],
+  //     [username, ...INIT_MY_TAG],
+  //     ...communityList,
+  //   ];
+
+  //   // dispatch action
+  //   dispatch({
+  //     type: PostsActionTypes.SET_TAG_LIST,
+  //     payload: tagList,
+  //   });
+
+  //   return communityList;
+  // };
+
 */

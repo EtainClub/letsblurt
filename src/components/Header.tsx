@@ -47,7 +47,7 @@ const Header = (props: Props): JSX.Element => {
   // contexts
   const {authState, changeAccount} = useContext(AuthContext);
   const {userState} = useContext(UserContext);
-  const {uiState, setTagParam, setSearchParam} = useContext(UIContext);
+  const {uiState, setSearchParam} = useContext(UIContext);
   const {postsState, setTagIndex, setFilterIndex, clearPosts} = useContext(
     PostsContext,
   );
@@ -212,8 +212,6 @@ const Header = (props: Props): JSX.Element => {
     console.log('header tag index, value', index, value);
     // set tag index
     setTagIndex(index, PostsTypes.FEED, authState.currentCredentials.username);
-    // clear tag param
-    setTagParam(null);
   };
 
   //// update category index of uiState
