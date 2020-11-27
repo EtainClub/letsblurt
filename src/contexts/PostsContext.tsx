@@ -16,6 +16,7 @@ import {
 } from '~/providers/blurt/dblurtApi';
 import {renderPostBody} from '~/utils/render-helpers';
 import firestore from '@react-native-firebase/firestore';
+import {NUM_FETCH_POSTS} from '~/constants/blockchain';
 
 //// types
 import {
@@ -35,7 +36,7 @@ import {
 } from '~/contexts/types';
 import {filter} from 'lodash';
 
-const MAX_RETRY = 10;
+const MAX_RETRY = 3;
 
 //// initial state
 const initialState: PostsState = {
@@ -141,6 +142,7 @@ const postsReducer = (state: PostsState, action: PostsAction) => {
     case PostsActionTypes.APPEND_TAG:
       return {
         ...state,
+        postsType: PostsTypes.HASH_TAG,
         tagList: action.payload.tagList,
         tagIndex: action.payload.tagIndex,
         filterIndex: action.payload.filterIndex,
@@ -216,12 +218,13 @@ const PostsProvider = ({children}: Props) => {
   const appendTag = (tag: string) => {
     let tagList = postsState.tagList;
     let tagIndex = 0;
-    // cannot fetch posts with 'trending' filter
+    // cannot fetch posts with 'trending' filter; sometimes 'hot' is not working, either
     let filterIndex = 2;
     // append a tag
     if (!tagList.includes(tag)) {
       tagList.push(tag);
       tagIndex = tagList.length - 1;
+      filterIndex = 1;
     } else {
       tagIndex = tagList.indexOf(tag);
     }
@@ -261,29 +264,6 @@ const PostsProvider = ({children}: Props) => {
     let filter = '';
     switch (postsType) {
       case PostsTypes.HASH_TAG:
-        // // TODO: need to handle change filter event with the same
-        // // check sanity
-        // if (!inputTag) {
-        //   // console.log(
-        //   //   '[PostsContext|fetchPosts] input tag is necessary for Hash tag posts fetching',
-        //   // );
-        //   tag = postsState.tagList[postsState.tagIndex];
-        // } else {
-        //   tag = inputTag;
-        // }
-        // filter = postsState.filterList[postsState.filterIndex];
-        // // TODO: append the tag to the tag list
-        // // dispatch action
-        // dispatch({
-        //   type: PostsActionTypes.SET_TAG_LIST,
-        //   payload: postsState.tagList.concat([[tag, tag, '', '']]),
-        // });
-        // dispatch({
-        //   type: PostsActionTypes.SET_TAG_INDEX,
-        //   payload: postsState.tagList.length,
-        // });
-
-        break;
       case PostsTypes.FEED:
         if (tagIndex === 0) {
           tag = username ? username : '';
@@ -335,16 +315,13 @@ const PostsProvider = ({children}: Props) => {
     }
     // set start post ref
     const lastPost = _posts[_posts.length - 1];
-    console.log(
-      '[PostsContext|fetchPosts] last post. appending',
-      lastPost,
-      appending,
-    );
+    const lastPostRef = lastPost.state.post_ref;
     let posts;
-    // TODO: check sanity
-    //    if (lastPost) {
-    // augmented posts
-    posts = _posts.slice(0, _posts.length - 1);
+    if (_posts.length < NUM_FETCH_POSTS) {
+      posts = _posts;
+    } else {
+      posts = _posts.slice(0, _posts.length - 1);
+    }
     //    }
     if (appending) {
       posts = postsState[postsType].posts.concat(posts);
@@ -356,7 +333,7 @@ const PostsProvider = ({children}: Props) => {
         postsType: postsType,
         metaposts: {
           posts: posts,
-          startPostRef: lastPost.state.post_ref,
+          startPostRef: lastPostRef,
           index: 0,
         },
       },

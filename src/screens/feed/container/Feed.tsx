@@ -79,10 +79,11 @@ const Feed = (props: Props): JSX.Element => {
 
   const _fetchPosts = async (appending: boolean) => {
     console.log('[Feed|fetchingPosts] appending', appending);
-    let postsType = PostsTypes.FEED;
-    if (uiState.selectedTag) {
-      postsType = PostsTypes.HASH_TAG;
-    }
+    // let postsType = PostsTypes.FEED;
+    // if (uiState.selectedTag) {
+    //   postsType = PostsTypes.HASH_TAG;
+    // }
+    const {postsType} = postsState;
     console.log(
       'fetching posts, postsState, posts type',
       postsState,

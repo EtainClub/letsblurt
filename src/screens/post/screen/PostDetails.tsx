@@ -160,68 +160,66 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
   };
 
   return !props.loading ? (
-    <SafeAreaView style={{flex: 1, marginBottom: 170}}>
-      <Block style={{marginHorizontal: 5, marginBottom: 0}}>
-        {props.parentPost && <ParentPost post={props.parentPost} />}
-        <Text size={24}>{post.state.title}</Text>
-        <Block row space="between">
-          <Avatar
-            avatar={post.state.avatar}
-            avatarSize={40}
-            account={post.state.post_ref.author}
-            nickname={nickname ? nickname : post.state.post_ref.author}
-            reputation={reputation}
-            textSize={14}
-            truncate={false}
-          />
-          <Text style={{top: 10, marginRight: 20}}>{formatedTime}</Text>
-        </Block>
-        <Block style={{}}>
-          <ActionBar
-            actionBarStyle={ActionBarStylePost}
-            postState={state}
-            postIndex={props.index}
-            handlePressComments={_handlePressComments}
-          />
-        </Block>
-
-        <ScrollView
-          ref={commentRef}
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl refreshing={props.loading} onRefresh={_onRefresh} />
-          }>
-          <Block>
-            <Block style={{padding: theme.SIZES.BASE / 3}}>
-              <PostBody body={post.body} />
-            </Block>
-            <Block row style={{flexWrap: 'wrap'}}>
-              {(tags || []).map((tag, id) => {
-                return (
-                  <TouchableWithoutFeedback
-                    key={id}
-                    onPress={() => _handlePressHashTag(tag)}>
-                    <Block
-                      card
-                      key={id}
-                      style={{
-                        backgroundColor: argonTheme.COLORS.INPUT_SUCCESS,
-                        paddingHorizontal: 5,
-                        marginHorizontal: 2,
-                        marginVertical: 3,
-                      }}>
-                      <Text>{tag}</Text>
-                    </Block>
-                  </TouchableWithoutFeedback>
-                );
-              })}
-            </Block>
-            {_renderCommentForm()}
-            {_renderComments()}
-          </Block>
-        </ScrollView>
+    <Block style={{marginHorizontal: 5, marginBottom: 170}}>
+      {props.parentPost && <ParentPost post={props.parentPost} />}
+      <Text size={24}>{post.state.title}</Text>
+      <Block row space="between">
+        <Avatar
+          avatar={post.state.avatar}
+          avatarSize={40}
+          account={post.state.post_ref.author}
+          nickname={nickname ? nickname : post.state.post_ref.author}
+          reputation={reputation}
+          textSize={14}
+          truncate={false}
+        />
+        <Text style={{top: 10, marginRight: 20}}>{formatedTime}</Text>
       </Block>
-    </SafeAreaView>
+      <Block style={{}}>
+        <ActionBar
+          actionBarStyle={ActionBarStylePost}
+          postState={state}
+          postIndex={props.index}
+          handlePressComments={_handlePressComments}
+        />
+      </Block>
+
+      <ScrollView
+        ref={commentRef}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={props.loading} onRefresh={_onRefresh} />
+        }>
+        <Block>
+          <Block style={{padding: theme.SIZES.BASE / 3}}>
+            <PostBody body={post.body} />
+          </Block>
+          <Block row style={{flexWrap: 'wrap'}}>
+            {(tags || []).map((tag, id) => {
+              return (
+                <TouchableWithoutFeedback
+                  key={id}
+                  onPress={() => _handlePressHashTag(tag)}>
+                  <Block
+                    card
+                    key={id}
+                    style={{
+                      backgroundColor: argonTheme.COLORS.INPUT_SUCCESS,
+                      paddingHorizontal: 5,
+                      marginHorizontal: 2,
+                      marginVertical: 3,
+                    }}>
+                    <Text>{tag}</Text>
+                  </Block>
+                </TouchableWithoutFeedback>
+              );
+            })}
+          </Block>
+          {_renderCommentForm()}
+          {_renderComments()}
+        </Block>
+      </ScrollView>
+    </Block>
   ) : (
     <View>
       <ActivityIndicator color={argonTheme.COLORS.ERROR} size="large" />

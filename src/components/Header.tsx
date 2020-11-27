@@ -73,17 +73,6 @@ const Header = (props: Props): JSX.Element => {
       setAccounts(_accounts);
     }
   }, [authState.currentCredentials]);
-  /*
-  // effects
-  useEffect(() => {
-    // set posts type to feed
-    setPostsType(
-      PostsTypes.FEED,
-      uiState.categoryList[category],
-      uiState.tagList[community],
-    );
-  }, []);
-  */
 
   const _onSubmitSearch = () => {
     console.log('_onSubmitSearch');

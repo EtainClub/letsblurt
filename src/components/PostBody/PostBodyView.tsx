@@ -360,14 +360,6 @@ const PostBodyView = (props: Props): JSX.Element => {
 
   return (
     <Block flex>
-      {/* <FAB
-        buttonColor="red"
-        iconTextColor="#FFFFFF"
-        onClickAction={() => {}}
-        visible={searchFAB}
-        iconTextComponent={<Icon family="antdesign" size={16} name="search1" />}
-      /> */}
-
       <AutoHeightWebView
         source={{html}}
         allowsFullscreenVideo={true}
