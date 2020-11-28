@@ -170,6 +170,7 @@ const PostsFeedView = (props: Props): JSX.Element => {
             right
             color="black"
             style={styles.search}
+            autoFocus
             onChangeText={(text: string) => setSearchText(text)}
             onSubmitEditing={() => {
               searchRef.current?.setModalVisible(false);

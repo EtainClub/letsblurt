@@ -29,15 +29,18 @@ import {PostsListView} from '~/components';
 //// props
 interface Props {
   items: any[];
+  autoFocus: boolean;
   handleSearch: (search: string) => void;
   handleLoadMore: () => void;
 }
 //// component
 const SearchScreen = (props: Props): JSX.Element => {
+  //// props
   //// language
   const intl = useIntl();
   //// states
   const [searchText, setSearchText] = useState('');
+  const [autoFocus, setAutoFocus] = useState(props.autoFocus);
 
   const SearchBar = () => {
     const iconSearch =
@@ -68,51 +71,35 @@ const SearchScreen = (props: Props): JSX.Element => {
           style={styles.searchContainer}
           right
           color="black"
-          autoFocus={true}
+          autoFocus={autoFocus || props.autoFocus}
           autoCorrect={false}
           autoCapitalize="none"
           iconContent={iconSearch}
           defaultValue={searchText}
           returnKeyType="search"
           placeholder={intl.formatMessage({id: 'Header.search_placeholder'})}
-          onChangeText={(text: string) => setSearchText(text)}
-          onSubmitEditing={() => props.handleSearch(searchText)}
+          onChangeText={(text: string) => {
+            setAutoFocus(true);
+            setSearchText(text);
+          }}
+          onSubmitEditing={() => {
+            setAutoFocus(false);
+            props.handleSearch(searchText);
+          }}
         />
       </Block>
     );
   };
 
-  const _renderItem = (item) => {
-    return (
-      <TouchableOpacity
-        style={styles.item}
-        onPress={() => console.log('item pressed')}>
-        <Block flex row middle space="between">
-          <Text size={14}>{item.title}</Text>
-          <Icon
-            name="chevron-right"
-            family="evilicon"
-            style={{paddingRight: 5}}
-          />
-        </Block>
-      </TouchableOpacity>
-    );
-  };
   return (
     <Block>
       <SearchBar />
-      <PostsListView posts={props.items} isUser={false} />
+      <PostsListView
+        posts={props.items}
+        isUser={false}
+        fetchMore={props.handleLoadMore}
+      />
     </Block>
-  );
-  return (
-    <FlatList
-      ListHeaderComponent={SearchBar}
-      onEndReached={props.handleLoadMore}
-      onEndReachedThreshold={0.5}
-      data={props.items}
-      keyExtractor={(item, index) => String(index)}
-      renderItem={({item}) => _renderItem(item)}
-    />
   );
 };
 

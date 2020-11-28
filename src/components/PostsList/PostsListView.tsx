@@ -48,7 +48,7 @@ interface Props {
   loading?: boolean;
   handlePressPosting?: () => void;
   refreshPosts?: () => void;
-  fetchMorePosts?: () => void;
+  fetchMore?: () => void;
 }
 
 const PostsListView = (props: Props): JSX.Element => {
@@ -76,9 +76,8 @@ const PostsListView = (props: Props): JSX.Element => {
 
   //// load more posts with bottom-reached event
   const _onLoadMore = async () => {
-    console.log('on load more');
     //    setLoadingMore(true);
-    //    props.fetchMorePosts();
+    props.fetchMore();
   };
 
   const _onPressPost = (index: number) => {
@@ -129,7 +128,7 @@ const PostsListView = (props: Props): JSX.Element => {
             backgroundColor:
               BACKGROUND_COLORS[index % BACKGROUND_COLORS.length],
           }}>
-          <Block row middle>
+          <Block row middle style={{left: -20}}>
             <Block center width={70}>
               <Image
                 source={{

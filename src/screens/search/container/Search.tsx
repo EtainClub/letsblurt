@@ -42,8 +42,10 @@ const SearchFeed = (props: Props): JSX.Element => {
   //// contexts
   const {uiState, setToastMessage} = useContext(UIContext);
   //// states
-  const [items, setItems] = useState([]);
+  const [searchItems, setSearchItems] = useState([]);
+  const [searchText, setSearchText] = useState('');
   const [startIndex, setStartIndex] = useState(1);
+  const [autoFocus, setAutoFocus] = useState(true);
   //// effects
   useEffect(() => {
     if (uiState.searchText != '') {
@@ -51,15 +53,33 @@ const SearchFeed = (props: Props): JSX.Element => {
       _fetchSearch(uiState.searchText);
     }
   }, [uiState.searchText]);
+  ////
+  useEffect(() => {
+    if (searchText.length > 0) {
+      // start search
+      _fetchSearch(searchText);
+    }
+  }, [startIndex]);
 
   const _handleSearch = async (search: string) => {
-    await _fetchSearch(search);
+    console.log('_handleSearch. text', search);
+    // clear search items
+    setSearchItems([]);
+
+    // set search text
+    setSearchText(search);
+
+    // clear start index
+    setStartIndex(1);
   };
 
-  const _handleLoadMore = () => {};
+  const _handleLoadMore = async () => {
+    console.log('[search] _handleLoadMore');
+    // fetch more
+    _fetchSearch(searchText);
+  };
 
   const _fetchSearch = async (text: string) => {
-    console.log('_fetchSearch');
     const key = Config.GOOGLE_SEARCH_BLURT_KEY;
     const cx = Config.GOOGLE_SEARCH_BLURT_cx;
     //
@@ -71,6 +91,9 @@ const SearchFeed = (props: Props): JSX.Element => {
     const sort = '';
     const search = `https://www.googleapis.com/customsearch/v1?key=${key}&cx=${cx}&q=${query}&num=${num}&start=${start}&sort=${sort}`;
 
+    console.log('_fetchSearch. start', start);
+    console.log('_fetchSearch. search', search);
+
     // google search
     try {
       const response = await axios.get(search);
@@ -81,7 +104,7 @@ const SearchFeed = (props: Props): JSX.Element => {
         console.log('search items link', items);
         // clear search result
         if (!items) {
-          setItems([]);
+          setToastMessage('Nothing Found');
           return null;
         }
         // filtering first
@@ -105,7 +128,11 @@ const SearchFeed = (props: Props): JSX.Element => {
             });
         });
         console.log('filtered items', _items);
-        setItems(_items);
+        setSearchItems(searchItems.concat(_items));
+        // update start index
+        setStartIndex(startIndex + _items.length);
+        // clear auto focus
+        setAutoFocus(false);
       }
     } catch (error) {
       console.error('search error', error);
@@ -114,7 +141,8 @@ const SearchFeed = (props: Props): JSX.Element => {
 
   return (
     <SearchScreen
-      items={items}
+      items={searchItems}
+      autoFocus={autoFocus}
       handleSearch={_handleSearch}
       handleLoadMore={_handleLoadMore}
     />
