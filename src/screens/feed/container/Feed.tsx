@@ -83,7 +83,9 @@ const Feed = (props: Props): JSX.Element => {
     // if (uiState.selectedTag) {
     //   postsType = PostsTypes.HASH_TAG;
     // }
-    const {postsType} = postsState;
+    // TODO: how to handle different types of posts
+    //    const {postsType} = postsState;
+    let postsType = PostsTypes.FEED;
     console.log(
       'fetching posts, postsState, posts type',
       postsState,

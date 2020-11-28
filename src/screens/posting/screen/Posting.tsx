@@ -4,8 +4,10 @@ import {
   StyleSheet,
   Dimensions,
   ScrollView,
+  Image,
   Platform,
   FlatList,
+  TouchableWithoutFeedback,
   ActivityIndicator,
   Animated,
   Alert,
@@ -20,7 +22,13 @@ import renderPostBody from '~/utils/render-helpers/markdown-2-html';
 import {PostData} from '~/contexts/types';
 const {width, height} = Dimensions.get('screen');
 
+import {Images, BLURT_IMAGE_SERVER, STEEM_IMAGE_SERVER} from '~/constants';
+const IMAGE_SERVER = BLURT_IMAGE_SERVER;
 const MAX_TAGS = 5;
+const BACKGROUND_COLORS = [
+  argonTheme.COLORS.BORDER,
+  argonTheme.COLORS.SECONDARY,
+];
 
 type Position = {
   start: number;
@@ -35,6 +43,8 @@ interface Props {
   handlePhotoUpload: () => void;
   handleCameraUpload: () => void;
   handlePressPostSumbit: (title: string, body: string, tags: string) => void;
+  followingList: string[];
+  handleMentionAuthor: (text: string) => void;
 }
 
 const PostingScreen = (props: Props): JSX.Element => {
@@ -56,13 +66,45 @@ const PostingScreen = (props: Props): JSX.Element => {
     start: 0,
     end: 0,
   });
-  // ref
+  const [mentioning, setMentioning] = useState(false);
+  const [searchAuthor, setSearchAuthor] = useState('');
+  //// refs
+  // photo
   const photoUploadRef = useRef(null);
+  // mention
+  const mentionRef = useRef(null);
+
+  const renderMentionActionSheet = () => {
+    return (
+      <ActionSheet ref={mentionRef}>
+        <FlatList
+          contentContainerStyle={styles.mentionList}
+          data={props.followingList}
+          renderItem={({item, index}) => _renderMentionItem(item, index)}
+          keyExtractor={(item, index) => String(index)}
+          initialNumToRender={5}
+          showsVerticalScrollIndicator={false}
+        />
+        <Block center style={styles.searchBar}>
+          <Input
+            right
+            color="black"
+            style={styles.search}
+            onChangeText={_handleChangeMention}
+            placeholder={intl.formatMessage({
+              id: 'Actionsheet.search_placeholder',
+            })}
+            placeholderTextColor={'#8898AA'}
+          />
+        </Block>
+      </ActionSheet>
+    );
+  };
 
   //// set original post event
   useEffect(() => {
     if (originalPost) {
-      setTitle(originalPost.title);
+      setTitle(originalPost.state.title);
       setBody(originalPost.markdownBody);
       // tags
       const _tags = originalPost.metadata.tags.reduce(
@@ -90,6 +132,36 @@ const PostingScreen = (props: Props): JSX.Element => {
     }
   }, [uploadedImage]);
 
+  //// handle newly typed character
+  useEffect(() => {
+    if (body.length > 0) {
+      const char = _getTypedCharacter();
+      console.log(
+        '_handleBodyChange. typed character',
+        char,
+        props.followingList,
+      );
+      // handle mentioning
+      if (char === '@') {
+        // show following list
+        setMentioning(true);
+      }
+      if (char === ' ') {
+        setMentioning(false);
+        setSearchAuthor('');
+      }
+    }
+  }, [bodySelection]);
+
+  //// handle mentioning
+  useEffect(() => {
+    if (mentioning) {
+      mentionRef.current?.setModalVisible(true);
+    } else {
+      //      mentionRef.current?.setModalVisible(false);
+    }
+  }, [mentioning]);
+
   const _handleTitleChange = (text: string) => {
     // check validity: max-length
     setTitle(text);
@@ -104,13 +176,22 @@ const PostingScreen = (props: Props): JSX.Element => {
     setPreviewBody(_body);
   };
 
+  const _getTypedCharacter = () => {
+    /// get newly typed character
+    const {start, end} = bodySelection;
+    const char = start === end ? body[start - 1] : body[body.length - 1];
+    return char;
+  };
+
+  //// handle change mention
+  const _handleChangeMention = (text) => {
+    console.log('_handleChangeMention', text, props.followingList);
+    props.handleMentionAuthor(text);
+  };
+
   //// update input selection
   const _handleOnSelectionChange = async (event) => {
     setBodySelection(event.nativeEvent.selection);
-    console.log(
-      '[handleOnSelectionChange] selection',
-      event.nativeEvent.selection,
-    );
   };
 
   const _handleTagsChange = (text: string) => {
@@ -122,7 +203,6 @@ const PostingScreen = (props: Props): JSX.Element => {
     _validateTags(cats);
   };
 
-  //// validate the tags
   //// validate the tags
   const _validateTags = (tags: string[]) => {
     if (tags.length > 0) {
@@ -187,6 +267,54 @@ const PostingScreen = (props: Props): JSX.Element => {
     setMessage(null);
   };
 
+  //// render mention modal
+  const _renderMentionModal = () => {
+    console.log('_renderMentionModal. following list', props.followingList);
+  };
+
+  ////
+  const _finalizeMention = (text: string) => {
+    console.log('_finalizeMention. author', text);
+    // append the author int the body
+    const _body =
+      body.substring(0, bodySelection.start) +
+      text +
+      body.substring(bodySelection.end, body.length);
+    console.log('_finalizeMention. body', _body);
+    setBody(_body);
+  };
+
+  const _renderMentionItem = (author: string, index: number) => {
+    const avatar = `${IMAGE_SERVER}/u/${author}/avatar`;
+    return (
+      <TouchableWithoutFeedback onPress={() => _finalizeMention(author)}>
+        <Block
+          flex
+          card
+          row
+          space="between"
+          style={{
+            marginBottom: 5,
+            padding: 5,
+            backgroundColor:
+              BACKGROUND_COLORS[index % BACKGROUND_COLORS.length],
+          }}>
+          <Block row middle>
+            <Image
+              source={{
+                uri: avatar || null,
+              }}
+              style={styles.avatar}
+            />
+            <Text size={14} style={{marginHorizontal: 5}}>
+              {author}
+            </Text>
+          </Block>
+        </Block>
+      </TouchableWithoutFeedback>
+    );
+  };
+
   //// handle reward option chnage
   const _handleRewardChange = (index: number, value: string) => {
     console.log('_handleRewardChange index', index);
@@ -206,47 +334,50 @@ const PostingScreen = (props: Props): JSX.Element => {
   const rewardOptions = ['Power Up 100%', 'No Reward'];
   const defaultOptionText = '';
   return (
-    <ScrollView>
-      <Block flex>
-        <Block style={{paddingHorizontal: theme.SIZES.BASE}}>
-          <Input
-            value={title}
-            onChangeText={_handleTitleChange}
-            maxLength={100}
-            borderless
-            color="black"
-            placeholder={intl.formatMessage({id: 'Posting.title_placeholder'})}
-            placeholderTextColor={argonTheme.COLORS.FACEBOOK}
-            bgColor="transparent"
-            style={[styles.input, styles.inputDefault]}
-          />
-        </Block>
-        <Block style={{paddingHorizontal: theme.SIZES.BASE}}>
-          <Input
-            innerRef={inputRef}
-            value={body}
-            onChangeText={_handleBodyChange}
-            onSelectionChange={_handleOnSelectionChange}
-            style={[styles.input, styles.bodyContainer]}
-            placeholder={intl.formatMessage({id: 'Posting.body_placeholder'})}
-            placeholderTextColor={argonTheme.COLORS.FACEBOOK}
-            color="black"
-            multiline
-            textAlignVertical="top"
-            autoCorrect={false}
-          />
-        </Block>
-        <Block row>
-          <Button
-            onPress={_handlePressPhotoUpload}
-            loading={props.uploading}
-            onlyIcon
-            icon="picture-o"
-            iconFamily="font-awesome"
-            iconSize={14}
-            color={argonTheme.COLORS.ERROR}
-          />
-          {/* <Button
+    <View>
+      <ScrollView>
+        <Block flex>
+          <Block style={{paddingHorizontal: theme.SIZES.BASE}}>
+            <Input
+              value={title}
+              onChangeText={_handleTitleChange}
+              maxLength={100}
+              borderless
+              color="black"
+              placeholder={intl.formatMessage({
+                id: 'Posting.title_placeholder',
+              })}
+              placeholderTextColor={argonTheme.COLORS.FACEBOOK}
+              bgColor="transparent"
+              style={[styles.input, styles.inputDefault]}
+            />
+          </Block>
+          <Block style={{paddingHorizontal: theme.SIZES.BASE}}>
+            <Input
+              innerRef={inputRef}
+              value={body}
+              onChangeText={_handleBodyChange}
+              onSelectionChange={_handleOnSelectionChange}
+              style={[styles.input, styles.bodyContainer]}
+              placeholder={intl.formatMessage({id: 'Posting.body_placeholder'})}
+              placeholderTextColor={argonTheme.COLORS.FACEBOOK}
+              color="black"
+              multiline
+              textAlignVertical="top"
+              autoCorrect={false}
+            />
+          </Block>
+          <Block row>
+            <Button
+              onPress={_handlePressPhotoUpload}
+              loading={props.uploading}
+              onlyIcon
+              icon="picture-o"
+              iconFamily="font-awesome"
+              iconSize={14}
+              color={argonTheme.COLORS.ERROR}
+            />
+            {/* <Button
             onPress={() => {}}
             onlyIcon
             icon="speaker"
@@ -254,66 +385,67 @@ const PostingScreen = (props: Props): JSX.Element => {
             iconSize={14}
             color={argonTheme.COLORS.FACEBOOK}
           /> */}
-        </Block>
-        <ActionSheet ref={photoUploadRef}>
-          <Block center>
-            <Button color="primary" onPress={_openImagePicker}>
-              {intl.formatMessage({id: 'Actionsheet.gallery'})}
+          </Block>
+          <Block style={{paddingHorizontal: theme.SIZES.BASE}}>
+            <Input
+              color="black"
+              placeholder={intl.formatMessage({id: 'Posting.tags_placeholder'})}
+              placeholderTextColor={argonTheme.COLORS.FACEBOOK}
+              bgColor="transparent"
+              style={styles.input}
+              value={tags}
+              onChangeText={_handleTagsChange}
+            />
+            {message && <Text color="red">{message}</Text>}
+          </Block>
+          {
+            <DropdownModal
+              key={rewardOptions[rewardIndex]}
+              defaultText={defaultOptionText || rewardOptions[rewardIndex]}
+              dropdownButtonStyle={styles.dropdownButtonStyle}
+              selectedOptionIndex={rewardIndex}
+              rowTextStyle={styles.rowTextStyle}
+              style={styles.dropdown}
+              dropdownStyle={styles.dropdownStyle}
+              textStyle={styles.dropdownText}
+              options={rewardOptions}
+              onSelect={_handleRewardChange}
+            />
+          }
+
+          <Block center row>
+            <Button
+              onPress={_onPressPostSubmit}
+              shadowless
+              loading={props.posting}
+              lodingSize="large"
+              color={argonTheme.COLORS.ERROR}>
+              {props.originalPost
+                ? intl.formatMessage({id: 'Posting.update_button'})
+                : intl.formatMessage({id: 'Posting.post_button'})}
             </Button>
-            <Button color="warning" onPress={_openCamera}>
-              {intl.formatMessage({id: 'Actionsheet.camera'})}
-            </Button>
-            <Button color="gray" onPress={_closeActionSheet}>
-              {intl.formatMessage({id: 'Actionsheet.close'})}
+            <Button onPress={_onPressClear} shadowless color="gray">
+              {intl.formatMessage({id: 'Posting.clear_button'})}
             </Button>
           </Block>
-        </ActionSheet>
-
-        <Block style={{paddingHorizontal: theme.SIZES.BASE}}>
-          <Input
-            color="black"
-            placeholder={intl.formatMessage({id: 'Posting.tags_placeholder'})}
-            placeholderTextColor={argonTheme.COLORS.FACEBOOK}
-            bgColor="transparent"
-            style={styles.input}
-            value={tags}
-            onChangeText={_handleTagsChange}
-          />
-          {message && <Text color="red">{message}</Text>}
+          {_renderPreview()}
         </Block>
-        {
-          <DropdownModal
-            key={rewardOptions[rewardIndex]}
-            defaultText={defaultOptionText || rewardOptions[rewardIndex]}
-            dropdownButtonStyle={styles.dropdownButtonStyle}
-            selectedOptionIndex={rewardIndex}
-            rowTextStyle={styles.rowTextStyle}
-            style={styles.dropdown}
-            dropdownStyle={styles.dropdownStyle}
-            textStyle={styles.dropdownText}
-            options={rewardOptions}
-            onSelect={_handleRewardChange}
-          />
-        }
-
-        <Block center row>
-          <Button
-            onPress={_onPressPostSubmit}
-            shadowless
-            loading={props.posting}
-            lodingSize="large"
-            color={argonTheme.COLORS.ERROR}>
-            {props.originalPost
-              ? intl.formatMessage({id: 'Posting.update_button'})
-              : intl.formatMessage({id: 'Posting.post_button'})}
+      </ScrollView>
+      <ActionSheet ref={photoUploadRef}>
+        <Block center>
+          <Button color="primary" onPress={_openImagePicker}>
+            {intl.formatMessage({id: 'Actionsheet.gallery'})}
           </Button>
-          <Button onPress={_onPressClear} shadowless color="gray">
-            {intl.formatMessage({id: 'Posting.clear_button'})}
+          <Button color="warning" onPress={_openCamera}>
+            {intl.formatMessage({id: 'Actionsheet.camera'})}
+          </Button>
+          <Button color="gray" onPress={_closeActionSheet}>
+            {intl.formatMessage({id: 'Actionsheet.close'})}
           </Button>
         </Block>
-        {_renderPreview()}
-      </Block>
-    </ScrollView>
+      </ActionSheet>
+      {mentioning ? renderMentionActionSheet() : null}
+    </View>
   );
 };
 
@@ -346,6 +478,27 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
+  },
+  searchBar: {
+    backgroundColor: argonTheme.COLORS.ERROR,
+  },
+  search: {
+    height: 48,
+    width: width - 32,
+    marginHorizontal: 16,
+    borderWidth: 1,
+    borderRadius: 3,
+    borderColor: argonTheme.COLORS.BORDER,
+  },
+  mentionList: {
+    width: '100%',
+    paddingHorizontal: theme.SIZES.BASE,
+    paddingVertical: theme.SIZES.BASE * 1,
+  },
+  avatar: {
+    width: 24,
+    height: 24,
+    borderRadius: 24 / 2,
   },
   // dropdown
   text: {

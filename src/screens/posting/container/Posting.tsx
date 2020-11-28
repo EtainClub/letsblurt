@@ -1,7 +1,7 @@
 import React, {useState, useContext, useEffect} from 'react';
 import {useIntl} from 'react-intl';
 import ImagePicker, {ImageOrVideo} from 'react-native-image-crop-picker';
-import {AuthContext, PostsContext, UIContext} from '~/contexts';
+import {AuthContext, PostsContext, UIContext, UserContext} from '~/contexts';
 import {PostingScreen} from '../screen/Posting';
 import {signImage, fetchRawPost} from '~/providers/blurt/dblurtApi';
 import {Discussion} from 'dblurt';
@@ -26,13 +26,23 @@ const Posting = (props: Props): JSX.Element => {
   const {authState} = useContext(AuthContext);
   const {uiState, setToastMessage, setTagParam} = useContext(UIContext);
   const {postsState, submitPost, updatePost} = useContext(PostsContext);
+  const {getFollowings} = useContext(UserContext);
   // states
   //  const [editMode, setEditMode] = useState(route.params?.editMode);
   const [originalPost, setOriginalPost] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [uploadedImage, setUploadedImage] = useState(null);
   const [posting, setPosting] = useState(false);
+  const [followingList, setFollowingList] = useState([]);
+  const [filteredFollowings, setFilteredFollowings] = useState([]);
 
+  //// mount event
+  useEffect(() => {
+    // get following
+    if (authState.loggedIn) {
+      _getFollowingList(authState.currentCredentials.username);
+    }
+  }, []);
   //// edit mode event
   useEffect(() => {
     //
@@ -42,6 +52,25 @@ const Posting = (props: Props): JSX.Element => {
       setOriginalPost(postsState.postDetails);
     }
   }, [uiState.editMode]);
+
+  //// get followings
+  const _getFollowingList = async (username: string) => {
+    const _followings = await getFollowings(username);
+    console.log('_getFollowingList', _followings);
+    setFollowingList(_followings);
+    setFilteredFollowings(_followings);
+  };
+
+  //// handle mentioning: filter following list
+  const _showAuthorsModal = (text: string) => {
+    //    console.log('_showAuthorList. text', text);
+    let _filtered = followingList;
+    debugger;
+    if (text != '') {
+      _filtered = followingList.filter((author) => author.includes(text));
+    }
+    setFilteredFollowings(_filtered);
+  };
 
   ////
   const _handlePhotoUpload = () => {
@@ -190,6 +219,8 @@ const Posting = (props: Props): JSX.Element => {
       handlePhotoUpload={_handlePhotoUpload}
       handleCameraUpload={_handleCameraUpload}
       handlePressPostSumbit={_handlePressPostSumbit}
+      followingList={filteredFollowings}
+      handleMentionAuthor={_showAuthorsModal}
     />
   );
 };

@@ -204,7 +204,7 @@ const PostBodyView = (props: Props): JSX.Element => {
   `;
 
   const _handleLinkPress = (event) => {
-    console.log('post body link pressed. event', event);
+    //    console.log('post body link pressed. event', event);
     try {
       const data = JSON.parse(get(event, 'nativeEvent.data'));
       const {
@@ -219,7 +219,7 @@ const PostBodyView = (props: Props): JSX.Element => {
         proposal,
         videoHref,
       } = data;
-      console.log('post body link pressed. type', type);
+      //      console.log('post body link pressed. type', type);
 
       switch (type) {
         case '_external':
