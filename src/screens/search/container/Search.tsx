@@ -10,6 +10,10 @@ import {
   Animated,
   Alert,
 } from 'react-native';
+//// config
+import Config from 'react-native-config';
+////
+import axios from 'axios';
 //// react navigation
 import {useFocusEffect} from '@react-navigation/native';
 import {navigate} from '~/navigation/service';
@@ -23,6 +27,7 @@ import {PostData, PostRef, PostsTypes} from '~/contexts/types';
 //// etc
 import {SearchScreen} from '../screen/Search';
 import {parseCatAuthorPermlink} from '~/utils/postUrlParser';
+import {get} from 'lodash';
 
 //// props
 interface Props {
@@ -47,12 +52,16 @@ const SearchFeed = (props: Props): JSX.Element => {
     }
   }, [uiState.searchText]);
 
+  const _handleSearch = async (search: string) => {
+    await _fetchSearch(search);
+  };
+
   const _handleLoadMore = () => {};
+
   const _fetchSearch = async (text: string) => {
     console.log('_fetchSearch');
-    const key = 'AIzaSyC3AWzEKCU3JtU112tayMfSzxRmXGYGBzE';
-    // blurt.world search engine id
-    const cx = '946f41dfec67a33ce';
+    const key = Config.GOOGLE_SEARCH_BLURT_KEY;
+    const cx = Config.GOOGLE_SEARCH_BLURT_cx;
     //
     const query = text;
     // search start index
@@ -64,17 +73,36 @@ const SearchFeed = (props: Props): JSX.Element => {
 
     // google search
     try {
-      const response = await fetch(search);
+      const response = await axios.get(search);
       console.log('search results', response);
       // check response
-      if (response.ok) {
-        const data = await response.json();
-        console.log('search items link', data.items);
-        // filter
-        const _items = data.items.filter((item) => {
+      if (response.status) {
+        const {items} = response.data;
+        console.log('search items link', items);
+        // clear search result
+        if (!items) {
+          setItems([]);
+          return null;
+        }
+        // filtering first
+        // map
+        let _items = [];
+        items.forEach((item) => {
           const match = parseCatAuthorPermlink(item.link);
-          //          return match && match.permlink;
-          return true;
+          console.log('match', match);
+          match &&
+            _items.push({
+              author: match.author,
+              postRef: {
+                author: match.author,
+                permlink: match.permlink,
+              },
+              title: item.title,
+              createdAt: get(
+                item.pagemap.metatags[0],
+                'article:published_time',
+              ),
+            });
         });
         console.log('filtered items', _items);
         setItems(_items);
@@ -84,7 +112,13 @@ const SearchFeed = (props: Props): JSX.Element => {
     }
   };
 
-  return <SearchScreen items={items} handleLoadMore={_handleLoadMore} />;
+  return (
+    <SearchScreen
+      items={items}
+      handleSearch={_handleSearch}
+      handleLoadMore={_handleLoadMore}
+    />
+  );
 };
 
 export {SearchFeed};

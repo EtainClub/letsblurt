@@ -119,10 +119,6 @@ const PostingScreen = (props: Props): JSX.Element => {
         // show following list
         setMentioning(true);
       }
-      if (char === ' ') {
-        setMentioning(false);
-        setSearchAuthor('');
-      }
     }
   }, [bodySelection]);
 
@@ -443,7 +439,7 @@ const PostingScreen = (props: Props): JSX.Element => {
             style={styles.search}
             onChangeText={_handleChangeMention}
             placeholder={intl.formatMessage({
-              id: 'Actionsheet.search_placeholder',
+              id: 'Actionsheet.posting_search',
             })}
             placeholderTextColor={'#8898AA'}
           />

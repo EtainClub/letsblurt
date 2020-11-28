@@ -182,7 +182,7 @@ const Header = (props: Props): JSX.Element => {
           style={styles.searchContainer}
           right
           color="black"
-          autoFocus={false}
+          autoFocus={true}
           autoCorrect={false}
           autoCapitalize="none"
           iconContent={iconSearch}
@@ -265,7 +265,6 @@ const Header = (props: Props): JSX.Element => {
           </Block>
         );
       case 'Search':
-        return <SearchBar />;
       case 'Post':
       case 'Posting':
       case 'Profile':

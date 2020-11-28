@@ -286,7 +286,8 @@
     "gallery": "Upload from Gallery",
     "camera": "Take a photo",
     "search": "Search Posts",
-    "search_placeholder": "Which posts are your looking for?"
+    "search_placeholder": "Which posts are your looking for?",
+    "posting_search": "Search an author"
   },
   "Bookmark": {
     "already": "You already bookmarked this post"

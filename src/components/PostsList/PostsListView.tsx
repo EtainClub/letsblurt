@@ -53,6 +53,7 @@ interface Props {
 
 const PostsListView = (props: Props): JSX.Element => {
   //// props
+  console.log('props posts', props.posts);
   // const posts = props.posts.slice(0, props.posts.length - 1);
   const posts = props.posts;
   //// language
@@ -143,7 +144,9 @@ const PostsListView = (props: Props): JSX.Element => {
             {<Text>{sliceByByte(item.title, LIST_TITLE_LENGTH)}</Text>}
           </Block>
           <Block middle>
-            <Text>{getTimeFromNow(item.createdAt).split('ago')[0]}</Text>
+            {item.createdAt && (
+              <Text>{getTimeFromNow(item.createdAt).split('ago')[0]}</Text>
+            )}
           </Block>
         </Block>
       </TouchableWithoutFeedback>
