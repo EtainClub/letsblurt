@@ -65,7 +65,6 @@ const Posting = (props: Props): JSX.Element => {
   const _showAuthorsModal = (text: string) => {
     //    console.log('_showAuthorList. text', text);
     let _filtered = followingList;
-    debugger;
     if (text != '') {
       _filtered = followingList.filter((author) => author.includes(text));
     }

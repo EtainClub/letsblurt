@@ -43,7 +43,7 @@ interface Props {
   handlePhotoUpload: () => void;
   handleCameraUpload: () => void;
   handlePressPostSumbit: (title: string, body: string, tags: string) => void;
-  followingList: string[];
+  followingList?: string[];
   handleMentionAuthor: (text: string) => void;
 }
 
@@ -73,33 +73,6 @@ const PostingScreen = (props: Props): JSX.Element => {
   const photoUploadRef = useRef(null);
   // mention
   const mentionRef = useRef(null);
-
-  const renderMentionActionSheet = () => {
-    return (
-      <ActionSheet ref={mentionRef}>
-        <FlatList
-          contentContainerStyle={styles.mentionList}
-          data={props.followingList}
-          renderItem={({item, index}) => _renderMentionItem(item, index)}
-          keyExtractor={(item, index) => String(index)}
-          initialNumToRender={5}
-          showsVerticalScrollIndicator={false}
-        />
-        <Block center style={styles.searchBar}>
-          <Input
-            right
-            color="black"
-            style={styles.search}
-            onChangeText={_handleChangeMention}
-            placeholder={intl.formatMessage({
-              id: 'Actionsheet.search_placeholder',
-            })}
-            placeholderTextColor={'#8898AA'}
-          />
-        </Block>
-      </ActionSheet>
-    );
-  };
 
   //// set original post event
   useEffect(() => {
@@ -158,7 +131,7 @@ const PostingScreen = (props: Props): JSX.Element => {
     if (mentioning) {
       mentionRef.current?.setModalVisible(true);
     } else {
-      //      mentionRef.current?.setModalVisible(false);
+      mentionRef.current?.setModalVisible(false);
     }
   }, [mentioning]);
 
@@ -179,6 +152,7 @@ const PostingScreen = (props: Props): JSX.Element => {
   const _getTypedCharacter = () => {
     /// get newly typed character
     const {start, end} = bodySelection;
+    console.log('_getTypedCharacter', bodySelection);
     const char = start === end ? body[start - 1] : body[body.length - 1];
     return char;
   };
@@ -187,6 +161,73 @@ const PostingScreen = (props: Props): JSX.Element => {
   const _handleChangeMention = (text) => {
     console.log('_handleChangeMention', text, props.followingList);
     props.handleMentionAuthor(text);
+  };
+
+  ////
+  const _onCloseMentionSheet = () => {
+    // close list view
+  };
+
+  const _finalizeMention = (text: string) => {
+    console.log('_finalizeMention. author', text);
+    // close list view
+    setMentioning(false);
+    //
+    setSearchAuthor('');
+    props.handleMentionAuthor('');
+
+    // append the author int the body
+    const _body =
+      body.substring(0, bodySelection.start) +
+      text +
+      body.substring(bodySelection.end, body.length);
+    console.log('_finalizeMention. body', _body);
+    setBody(_body);
+  };
+
+  const _renderMentionActionSheet = (data) => {
+    return (
+      <FlatList
+        refreshing={false}
+        contentContainerStyle={styles.mentionList}
+        data={data}
+        renderItem={({item, index}) => _renderMentionItem(item, index)}
+        keyExtractor={(item, index) => String(index)}
+        initialNumToRender={5}
+        showsVerticalScrollIndicator={false}
+      />
+    );
+  };
+
+  const _renderMentionItem = (author: string, index: number) => {
+    const avatar = `${IMAGE_SERVER}/u/${author}/avatar`;
+    return (
+      <TouchableWithoutFeedback onPress={() => _finalizeMention(author)}>
+        <Block
+          flex
+          card
+          row
+          space="between"
+          style={{
+            marginBottom: 5,
+            padding: 5,
+            backgroundColor:
+              BACKGROUND_COLORS[index % BACKGROUND_COLORS.length],
+          }}>
+          <Block row middle>
+            <Image
+              source={{
+                uri: avatar || null,
+              }}
+              style={styles.avatar}
+            />
+            <Text size={14} style={{marginHorizontal: 5}}>
+              {author}
+            </Text>
+          </Block>
+        </Block>
+      </TouchableWithoutFeedback>
+    );
   };
 
   //// update input selection
@@ -267,54 +308,6 @@ const PostingScreen = (props: Props): JSX.Element => {
     setMessage(null);
   };
 
-  //// render mention modal
-  const _renderMentionModal = () => {
-    console.log('_renderMentionModal. following list', props.followingList);
-  };
-
-  ////
-  const _finalizeMention = (text: string) => {
-    console.log('_finalizeMention. author', text);
-    // append the author int the body
-    const _body =
-      body.substring(0, bodySelection.start) +
-      text +
-      body.substring(bodySelection.end, body.length);
-    console.log('_finalizeMention. body', _body);
-    setBody(_body);
-  };
-
-  const _renderMentionItem = (author: string, index: number) => {
-    const avatar = `${IMAGE_SERVER}/u/${author}/avatar`;
-    return (
-      <TouchableWithoutFeedback onPress={() => _finalizeMention(author)}>
-        <Block
-          flex
-          card
-          row
-          space="between"
-          style={{
-            marginBottom: 5,
-            padding: 5,
-            backgroundColor:
-              BACKGROUND_COLORS[index % BACKGROUND_COLORS.length],
-          }}>
-          <Block row middle>
-            <Image
-              source={{
-                uri: avatar || null,
-              }}
-              style={styles.avatar}
-            />
-            <Text size={14} style={{marginHorizontal: 5}}>
-              {author}
-            </Text>
-          </Block>
-        </Block>
-      </TouchableWithoutFeedback>
-    );
-  };
-
   //// handle reward option chnage
   const _handleRewardChange = (index: number, value: string) => {
     console.log('_handleRewardChange index', index);
@@ -335,6 +328,8 @@ const PostingScreen = (props: Props): JSX.Element => {
   const defaultOptionText = '';
   return (
     <View>
+      {mentioning ? _renderMentionActionSheet(props.followingList) : null}
+
       <ScrollView>
         <Block flex>
           <Block style={{paddingHorizontal: theme.SIZES.BASE}}>
@@ -377,14 +372,6 @@ const PostingScreen = (props: Props): JSX.Element => {
               iconSize={14}
               color={argonTheme.COLORS.ERROR}
             />
-            {/* <Button
-            onPress={() => {}}
-            onlyIcon
-            icon="speaker"
-            iconFamily="Feather"
-            iconSize={14}
-            color={argonTheme.COLORS.FACEBOOK}
-          /> */}
           </Block>
           <Block style={{paddingHorizontal: theme.SIZES.BASE}}>
             <Input
@@ -444,7 +431,24 @@ const PostingScreen = (props: Props): JSX.Element => {
           </Button>
         </Block>
       </ActionSheet>
-      {mentioning ? renderMentionActionSheet() : null}
+      <ActionSheet
+        ref={mentionRef}
+        onClose={_onCloseMentionSheet}
+        defaultOverlayOpacity={0.1}>
+        <Block center style={styles.searchBar}>
+          <Input
+            right
+            color="black"
+            autoFocus
+            style={styles.search}
+            onChangeText={_handleChangeMention}
+            placeholder={intl.formatMessage({
+              id: 'Actionsheet.search_placeholder',
+            })}
+            placeholderTextColor={'#8898AA'}
+          />
+        </Block>
+      </ActionSheet>
     </View>
   );
 };
