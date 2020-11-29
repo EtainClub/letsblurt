@@ -16,10 +16,9 @@ import {
   StatusBar,
   Dimensions,
 } from 'react-native';
-
 import {useIntl} from 'react-intl';
-
 import {Block, Text, Button, theme} from 'galio-framework';
+import SplashScreen from 'react-native-splash-screen';
 import LinearGradient from 'react-native-linear-gradient';
 const {height, width} = Dimensions.get('screen');
 // navigation
@@ -28,12 +27,11 @@ import {navigate} from '~/navigation/service';
 import {materialTheme} from '~/constants/materialTheme';
 import {argonTheme} from '~/constants';
 
-const Onboarding = require('~/assets/images/steemit2.jpeg');
-
 // ui context
 import {UIContext} from '~/contexts';
 
 const WelcomeScreen = () => {
+  SplashScreen.hide();
   const intl = useIntl();
   const {uiState, setToastMessage} = useContext(UIContext);
 

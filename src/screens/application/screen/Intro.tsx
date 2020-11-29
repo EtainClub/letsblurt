@@ -22,8 +22,6 @@ import {navigate} from '../../../navigation/service';
 import {materialTheme} from '../../../constants/materialTheme';
 import {argonTheme} from '../../../constants';
 
-const Onboarding = require('../../../assets/images/steemit2.jpeg');
-
 // ui context
 import {UIContext} from '../../../contexts';
 
@@ -39,12 +37,7 @@ const IntroScreen = () => {
   return (
     <Block flex style={styles.container}>
       <StatusBar barStyle="light-content" />
-      <Block flex center>
-        <ImageBackground
-          source={Onboarding}
-          style={{height: height / 1.8, width, zIndex: 1}}
-        />
-      </Block>
+      <Block flex center></Block>
       <Block flex={1.3} space="between" style={styles.padded}>
         <Block style={{paddingTop: 40, position: 'relative'}}>
           <LinearGradient

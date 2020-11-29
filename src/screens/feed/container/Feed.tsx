@@ -3,7 +3,7 @@ import React, {useState, useEffect, useContext, useCallback} from 'react';
 import * as Keychain from 'react-native-keychain';
 import {useFocusEffect} from '@react-navigation/native';
 import {FeedScreen} from '../screen/Feed';
-
+import SplashScreen from 'react-native-splash-screen';
 import {navigate} from '~/navigation/service';
 import {
   PostRef,
@@ -20,6 +20,7 @@ import {PostsFeed} from '~/components';
 interface Props {}
 
 const Feed = (props: Props): JSX.Element => {
+  SplashScreen.hide();
   // contexts
   const {postsState, fetchPosts, clearPosts} = useContext(PostsContext);
   const {authState} = useContext(AuthContext);

@@ -187,7 +187,7 @@ const PostDetails = (props: Props): JSX.Element => {
       handlePressTag={_handlePressTag}
     />
   ) : (
-    <View>
+    <View style={{top: 20}}>
       <ActivityIndicator color={argonTheme.COLORS.ERROR} size="large" />
     </View>
   );

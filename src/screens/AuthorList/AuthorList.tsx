@@ -209,8 +209,8 @@ const AuthorListScreen = (props: Props): JSX.Element => {
       showsVerticalScrollIndicator={false}
     />
   ) : (
-    <View>
-      <ActivityIndicator color={argonTheme.COLORS.ERROR} />
+    <View style={{top: 20}}>
+      <ActivityIndicator color={argonTheme.COLORS.ERROR} size="large" />
     </View>
   );
 };

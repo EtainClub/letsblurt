@@ -35,7 +35,7 @@ interface Props {
 const FeedScreen = (props: Props): JSX.Element => {
   const intl = useIntl();
   const [showFAB, setShowFAB] = useState(true);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [loadedAll, setLoadedAll] = useState(false);
@@ -115,8 +115,8 @@ const FeedScreen = (props: Props): JSX.Element => {
         showsVerticalScrollIndicator={false}
       />
     ) : (
-      <View>
-        <ActivityIndicator color={argonTheme.COLORS.ERROR} />
+      <View style={{top: 20}}>
+        <ActivityIndicator color={argonTheme.COLORS.ERROR} size="large" />
       </View>
     );
   };

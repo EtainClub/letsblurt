@@ -126,7 +126,7 @@ const PostsFeedView = (props: Props): JSX.Element => {
     const posts = props.posts.slice(0, props.posts.length - 1);
     const username = props.username;
 
-    return !props.reloading ? (
+    return (
       <FlatList
         contentContainerStyle={styles.posts}
         refreshing={props.reloading}
@@ -141,15 +141,18 @@ const PostsFeedView = (props: Props): JSX.Element => {
         ListFooterComponent={_renderFooter}
         showsVerticalScrollIndicator={false}
       />
-    ) : (
-      <View>
-        <ActivityIndicator color={argonTheme.COLORS.ERROR} />
-      </View>
     );
   };
+
   return (
     <View>
-      {_renderPosts()}
+      {!props.reloading ? (
+        _renderPosts()
+      ) : (
+        <View style={{top: 20}}>
+          <ActivityIndicator color={argonTheme.COLORS.ERROR} size="large" />
+        </View>
+      )}
       {!props.reloading && (
         <FAB
           buttonColor="red"
