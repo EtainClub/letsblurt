@@ -28,9 +28,10 @@ import {PostsListView} from '~/components';
 
 //// props
 interface Props {
+  initialText: string;
   items: any[];
-  autoFocus: boolean;
   handleSearch: (search: string) => void;
+  handleRefresh: (search: string) => void;
   handleLoadMore: () => void;
 }
 //// component
@@ -39,18 +40,19 @@ const SearchScreen = (props: Props): JSX.Element => {
   //// language
   const intl = useIntl();
   //// states
-  const [searchText, setSearchText] = useState('');
-  const [autoFocus, setAutoFocus] = useState(props.autoFocus);
+  const [searchText, setSearchText] = useState(props.initialText);
+  const [searching, setSearching] = useState(false);
+  const [active, setActive] = useState(false);
 
   const SearchBar = () => {
     const iconSearch =
-      searchText === '' ? (
-        <TouchableWithoutFeedback onPress={() => props.handleSearch('')}>
+      searchText != '' ? (
+        <TouchableWithoutFeedback onPress={() => setSearchText('')}>
           <Icon
             size={16}
             color={theme.COLORS.MUTED}
-            name="page-remove"
-            family="foundation"
+            name="remove"
+            family="font-awesome"
           />
         </TouchableWithoutFeedback>
       ) : (
@@ -65,38 +67,43 @@ const SearchScreen = (props: Props): JSX.Element => {
         </TouchableWithoutFeedback>
       );
 
+    console.log('search bar. search text', searchText);
+
     return (
       <Block center>
         <Input
-          style={styles.searchContainer}
           right
           color="black"
-          autoFocus={autoFocus || props.autoFocus}
+          autoFocus={true}
           autoCorrect={false}
           autoCapitalize="none"
           iconContent={iconSearch}
           defaultValue={searchText}
           returnKeyType="search"
+          style={[styles.search, active ? styles.shadow : null]}
           placeholder={intl.formatMessage({id: 'Header.search_placeholder'})}
+          onFocus={() => setActive(true)}
+          onBlur={() => setActive(false)}
           onChangeText={(text: string) => {
-            setAutoFocus(true);
             setSearchText(text);
           }}
-          onSubmitEditing={() => {
-            setAutoFocus(false);
-            props.handleSearch(searchText);
-          }}
+          onSubmitEditing={() => props.handleSearch(searchText)}
         />
       </Block>
     );
   };
 
+  const _handleRefresh = () => {
+    props.handleRefresh(searchText);
+  };
+
   return (
-    <Block>
-      <SearchBar />
+    <Block style={{marginBottom: 70}}>
+      {SearchBar()}
       <PostsListView
         posts={props.items}
         isUser={false}
+        refreshPosts={_handleRefresh}
         fetchMore={props.handleLoadMore}
       />
     </Block>
@@ -111,10 +118,31 @@ const styles = StyleSheet.create({
     marginBottom: theme.SIZES.BASE,
   },
   searchContainer: {
-    height: 38,
-    width: width * 0.6,
-    marginHorizontal: 16,
+    width: width,
+    paddingHorizontal: theme.SIZES.BASE,
+  },
+  search: {
+    height: 48,
+    width: width - 32,
+    marginHorizontal: theme.SIZES.BASE,
+    marginBottom: theme.SIZES.BASE,
     borderWidth: 1,
     borderRadius: 3,
+  },
+  shadow: {
+    shadowColor: 'black',
+    shadowOffset: {width: 0, height: 3},
+    shadowRadius: 4,
+    shadowOpacity: 0.1,
+    elevation: 2,
+  },
+  header: {
+    backgroundColor: theme.COLORS.WHITE,
+    shadowColor: 'rgba(0, 0, 0, 0.2)',
+    shadowOffset: {width: 0, height: 2},
+    shadowRadius: 8,
+    shadowOpacity: 1,
+    elevation: 2,
+    zIndex: 2,
   },
 });

@@ -39,7 +39,7 @@ const BACKGROUND_COLORS = [
   argonTheme.COLORS.SECONDARY,
 ];
 
-const LIST_TITLE_LENGTH = 35;
+const LIST_TITLE_LENGTH = 32;
 
 //// props
 interface Props {
@@ -68,16 +68,13 @@ const PostsListView = (props: Props): JSX.Element => {
 
   //// handle refresh event on posts
   const _onRefresh = async () => {
-    console.log('on refresh');
-    //    setLoading(true);
-    //    await props.refreshPosts();
-    //    setLoading(false);
+    //    props.refreshPosts();
   };
 
   //// load more posts with bottom-reached event
   const _onLoadMore = async () => {
     //    setLoadingMore(true);
-    props.fetchMore();
+    props.fetchMore && props.fetchMore();
   };
 
   const _onPressPost = (index: number) => {
