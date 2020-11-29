@@ -10,7 +10,8 @@ export const POST_CATEGORY = ['trending', 'created', 'feed', 'blog'];
 export const TARGET_BLOCKCHAIN = 'blurt';
 export const TARGET_APP = 'blurt';
 
-export const BLURT_IMAGE_SERVER = 'https://images.blurt.blog';
+//export const BLURT_IMAGE_SERVER = 'https://images.blurt.blog';
+export const BLURT_IMAGE_SERVER = 'https://images.blurt.buzz';
 export const STEEM_IMAGE_SERVER = 'https://steemitimages.com';
 
 export const BLURT_TAG_ENDPOINT = 'https://api.blurt.buzz/tags';

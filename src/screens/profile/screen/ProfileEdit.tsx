@@ -64,7 +64,7 @@ const ProfileEditForm = (props: Props): JSX.Element => {
   //// contexts
   //// stats
   const [name, setName] = useState(profile.metadata.name);
-  const [introduction, setIntroduction] = useState(profile.metadata.about);
+  const [about, setAbout] = useState(profile.metadata.about);
   const [location, setLocation] = useState(profile.metadata.location);
   const [website, setWebsite] = useState(profile.metadata.website);
   // ref
@@ -74,7 +74,7 @@ const ProfileEditForm = (props: Props): JSX.Element => {
   const _handlePressUpdate = () => {
     const profile = {
       name,
-      introduction,
+      about,
       location,
       website,
     };
@@ -83,7 +83,6 @@ const ProfileEditForm = (props: Props): JSX.Element => {
 
   //// handle press photo upload
   const _handlePressPhotoUpload = () => {
-    console.log('[Posting');
     // show the action modal
     photoUploadRef.current?.setModalVisible(true);
   };
@@ -177,7 +176,7 @@ const ProfileEditForm = (props: Props): JSX.Element => {
               bgColor="transparent"
               style={[styles.input, styles.inputActive]}
               defaultValue={profile.metadata.about}
-              onChangeText={(text: string) => setIntroduction(text)}
+              onChangeText={(text: string) => setAbout(text)}
             />
             <Input
               borderless

@@ -134,7 +134,8 @@ const ActionBarContainer = (props: Props): JSX.Element => {
       isUser={
         authState.currentCredentials.username === postState.post_ref.author
       }
-      voteAmount={parseFloat(userState.profileData.profile.voteAmount)}
+      //      voteAmount={parseFloat(userState.profileData.profile.voteAmount)}
+      voteAmount={parseFloat(userState.voteAmount)}
       handlePressVoting={_processVoting}
       handlePressEditPost={_handlePressEditPost}
       handlePressReply={props.handlePressReply}

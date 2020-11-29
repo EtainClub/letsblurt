@@ -87,7 +87,7 @@ const PostView = (props: Props): JSX.Element => {
           <Block>
             <Text size={16} style={{color: materialTheme.COLORS.ERROR}}>
               {/* {runes.substr(post.state.title, 0, 45)} */}
-              {/* {sliceByByte(post.state.title, POST_TITLE_LENGTH)} */}
+              {sliceByByte(post.state.title, POST_TITLE_LENGTH)}
             </Text>
             <HTML
               html={post.summary.replace(/\p{Emoji_Presentation}/gu, ' ')}

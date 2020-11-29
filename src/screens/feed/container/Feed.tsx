@@ -20,7 +20,6 @@ import {PostsFeed} from '~/components';
 interface Props {}
 
 const Feed = (props: Props): JSX.Element => {
-  SplashScreen.hide();
   // contexts
   const {postsState, fetchPosts, clearPosts} = useContext(PostsContext);
   const {authState} = useContext(AuthContext);
@@ -38,6 +37,12 @@ const Feed = (props: Props): JSX.Element => {
   });
 
   //////// effects
+  //// hide splash screen
+  useEffect(() => {
+    if (posts) {
+      SplashScreen.hide();
+    }
+  }, [posts]);
   //// header tag/fiter change event
   useEffect(() => {
     _fetchPosts(false);

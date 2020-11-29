@@ -82,8 +82,8 @@ const styles = StyleSheet.create({
     paddingLeft: 10,
   },
   avatar: {
-    borderColor: 'blue',
-    borderWidth: 1,
+    // borderColor: 'blue',
+    // borderWidth: 1,
     marginRight: 5,
   },
   reputation: {

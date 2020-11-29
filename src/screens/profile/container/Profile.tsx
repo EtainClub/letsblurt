@@ -1,5 +1,5 @@
 import React, {useState, useContext, useEffect, useCallback} from 'react';
-import {View} from 'react-native';
+import {View, ActivityIndicator} from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
 //// language
 import {useIntl} from 'react-intl';
@@ -238,29 +238,35 @@ const Profile = ({navigation}): JSX.Element => {
     }
   };
 
-  return !editMode
-    ? profileData && (
-        <ProfileScreen
-          profileData={profileData}
-          blogs={blogs}
-          bookmarks={bookmarks}
-          favorites={favorites}
-          handlePressFavoriteItem={_handlePressFavoriteItem}
-          clearPosts={_clearPosts}
-          handlePressEdit={_handlePressEdit}
-        />
-      )
-    : profileData && (
-        <ProfileEditForm
-          profileData={profileData}
-          uploading={uploading}
-          updating={updating}
-          avatarUrl={avatarUrl}
-          handlePressUpdate={_handlePressUpdate}
-          handlePhotoUpload={_handlePhotoUpload}
-          handleCameraUpload={_handleCameraUpload}
-        />
-      );
+  return !editMode ? (
+    profileData ? (
+      <ProfileScreen
+        profileData={profileData}
+        blogs={blogs}
+        bookmarks={bookmarks}
+        favorites={favorites}
+        handlePressFavoriteItem={_handlePressFavoriteItem}
+        clearPosts={_clearPosts}
+        handlePressEdit={_handlePressEdit}
+      />
+    ) : (
+      <View style={{top: 20}}>
+        <ActivityIndicator color={argonTheme.COLORS.ERROR} size="large" />
+      </View>
+    )
+  ) : (
+    profileData && (
+      <ProfileEditForm
+        profileData={profileData}
+        uploading={uploading}
+        updating={updating}
+        avatarUrl={avatarUrl}
+        handlePressUpdate={_handlePressUpdate}
+        handlePhotoUpload={_handlePhotoUpload}
+        handleCameraUpload={_handleCameraUpload}
+      />
+    )
+  );
 };
 
 export {Profile};
