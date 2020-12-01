@@ -13,6 +13,8 @@ const initialState = {
   editMode: false,
   searchText: '',
   authorList: [],
+  translateLanguages: [],
+  selectedLanguage: 'en',
 };
 
 // create ui context
@@ -33,6 +35,10 @@ const uiReducer = (state: UIState, action: UIAction) => {
       return {...state, editMode: action.payload};
     case UIActionTypes.SET_SEARCH_PARAM:
       return {...state, searchText: action.payload};
+    case UIActionTypes.SET_TRANSLATE_LANGUAGES:
+      return {...state, translateLanguages: action.payload};
+    case UIActionTypes.SET_LANGUAGE_PARAM:
+      return {...state, selectedLanguage: action.payload};
     default:
       return state;
   }
@@ -106,6 +112,22 @@ const UIProvider = ({children}: Props) => {
     });
   };
 
+  //// set supported translate languages
+  const setTranslateLanguages = (languages: []) => {
+    dispatch({
+      type: UIActionTypes.SET_TRANSLATE_LANGUAGES,
+      payload: languages,
+    });
+  };
+
+  ////
+  const setLanguageParam = (language: string) => {
+    dispatch({
+      type: UIActionTypes.SET_LANGUAGE_PARAM,
+      payload: language,
+    });
+  };
+
   return (
     <UIContext.Provider
       value={{
@@ -116,6 +138,8 @@ const UIProvider = ({children}: Props) => {
         setAuthorListParam,
         setEditMode,
         setSearchParam,
+        setTranslateLanguages,
+        setLanguageParam,
       }}>
       {children}
     </UIContext.Provider>

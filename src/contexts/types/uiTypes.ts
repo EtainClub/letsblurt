@@ -8,6 +8,8 @@ export enum UIActionTypes {
   SET_AUTHORS_PARAM,
   SET_EDIT_MODE,
   SET_SEARCH_PARAM,
+  SET_TRANSLATE_LANGUAGES,
+  SET_LANGUAGE_PARAM,
 }
 
 // ui state
@@ -24,6 +26,9 @@ export interface UIState {
   searchText: string;
   // edit mode
   editMode: boolean;
+  // supported translated languages;
+  translateLanguages: [];
+  selectedLanguage: string;
 }
 
 //// actions
@@ -57,6 +62,16 @@ interface SetAuthorsParamAction {
   type: UIActionTypes.SET_AUTHORS_PARAM;
   payload: string[];
 }
+//
+interface SetTranslateLanguagesAction {
+  type: UIActionTypes.SET_TRANSLATE_LANGUAGES;
+  payload: [];
+}
+//
+interface SetLanguageParamAction {
+  type: UIActionTypes.SET_LANGUAGE_PARAM;
+  payload: string;
+}
 // ui context type
 export interface UIContextType {
   // ui state
@@ -74,6 +89,10 @@ export interface UIContextType {
   setEditMode: (edit: boolean) => void;
   // set search param
   setSearchParam: (text: string) => void;
+  //
+  setTranslateLanguages: (languages: []) => void;
+  //
+  setLanguageParam: (language: string) => void;
 }
 
 export type UIAction =
@@ -82,4 +101,6 @@ export type UIAction =
   | SetAuthorParamAction
   | SetAuthorsParamAction
   | SetEditModeAction
-  | SetSearchParamAction;
+  | SetSearchParamAction
+  | SetTranslateLanguagesAction
+  | SetLanguageParamAction;

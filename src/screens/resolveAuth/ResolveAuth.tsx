@@ -1,7 +1,10 @@
 import React, {useEffect, useContext, useState} from 'react';
-
+// config
+import Config from 'react-native-config';
+//
+import axios from 'axios';
 import AsyncStorage from '@react-native-community/async-storage';
-import {AuthContext, UserContext, PostsContext} from '~/contexts';
+import {AuthContext, UserContext, PostsContext, UIContext} from '~/contexts';
 import {navigate} from '~/navigation/service';
 
 export const LOGIN_TOKEN = 'loginToken';
@@ -11,7 +14,8 @@ export const ResolveAuth = (props) => {
   //// contexts
   const {authState, setAuthResolved, setCredentials} = useContext(AuthContext)!;
   const {fetchBlockchainGlobalProps} = useContext(UserContext);
-  const {postsState, getTagList, fetchCommunities} = useContext(PostsContext);
+  const {postsState, getTagList} = useContext(PostsContext);
+  const {setTranslateLanguages} = useContext(UIContext);
   // state
   const [fetched, setFetched] = useState(false);
   const [username, setUsername] = useState(null);
@@ -34,6 +38,10 @@ export const ResolveAuth = (props) => {
   const _resolveEntry = async () => {
     // get user login token from storage
     let username = await AsyncStorage.getItem(LOGIN_TOKEN);
+    //
+    const languages = await _getSupportedLanguages();
+    // set languages
+    setTranslateLanguages(languages);
     // set category to feed if username exists
     if (username) {
       // fetch tags
@@ -51,6 +59,23 @@ export const ResolveAuth = (props) => {
       // fetch tags
       await getTagList();
       navigate({name: 'Welcome'});
+    }
+  };
+
+  /////
+  const _getSupportedLanguages = async () => {
+    const key = Config.GOOGLE_CLOUD_TRANSLATION_KEY;
+
+    let url = `https://translation.googleapis.com/language/translate/v2/languages?key=${key}`;
+    try {
+      const result = await axios.get(url);
+      console.log('_getSupportedLanguages', result.data.data.languages);
+      return result.data.data.languages.map((language) =>
+        language.language.toUpperCase(),
+      );
+    } catch (error) {
+      console.log('failed to get translate languages', error);
+      return null;
     }
   };
 

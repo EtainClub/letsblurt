@@ -263,7 +263,7 @@ const ActionBarView = (props: Props): JSX.Element => {
           </TouchableWithoutFeedback>
         ) : null}
         {actionBarStyle.resteem ? (
-          <TouchableWithoutFeedback onPress={props.handlePressReblog}>
+          <TouchableOpacity onPress={props.handlePressReblog}>
             <Block row style={{paddingRight: 10}}>
               <Icon
                 size={actionBarStyle.iconSize}
@@ -273,7 +273,7 @@ const ActionBarView = (props: Props): JSX.Element => {
                 style={{paddingHorizontal: 10}}
               />
             </Block>
-          </TouchableWithoutFeedback>
+          </TouchableOpacity>
         ) : null}
         {actionBarStyle.share ? (
           <TouchableWithoutFeedback onPress={_onPressShare}>

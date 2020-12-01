@@ -3,6 +3,10 @@
 import React, {useState, useEffect, useContext} from 'react';
 // react native
 import {View, ActivityIndicator} from 'react-native';
+// config
+import Config from 'react-native-config';
+// axios
+import axios from 'axios';
 import {PostDetailsScreen} from '../screen/PostDetails';
 // blurt api
 import {fetchComments} from '~/providers/blurt/dblurtApi';
@@ -18,6 +22,12 @@ import {
 import {PostsContext, AuthContext, UIContext, UserContext} from '~/contexts';
 import {generateCommentPermlink, makeJsonMetadataComment} from '~/utils/editor';
 import {TARGET_BLOCKCHAIN} from '~/constants/blockchain';
+
+// // google cloud translate api
+// const {Translate} = require('@google-cloud/translate').v3;
+// // Instantiates a client
+// const projectId = 'letsblurt';
+// const translate = new Translate({projectId});
 
 interface Props {
   route: any;
@@ -76,6 +86,16 @@ const PostDetails = (props: Props): JSX.Element => {
       _fetchParentPost(postDetails.state.parent_ref);
     }
   }, [postDetails]);
+  //// event: translate language change
+  useEffect(() => {
+    if (postDetails && uiState.selectedLanguage != '') {
+      _translateLanguage(
+        postDetails.state.title,
+        postDetails.body,
+        uiState.selectedLanguage,
+      );
+    }
+  }, [uiState.selectedLanguage]);
 
   const _fetchPostDetailsEntry = async () => {
     console.log('_fetchPostDetailsEntry postRef', postsState.postRef);
@@ -172,6 +192,44 @@ const PostDetails = (props: Props): JSX.Element => {
     appendTag(tag);
     // navigate to feed
     navigate({name: 'Feed'});
+  };
+
+  ////
+  const _translateLanguage = async (
+    title: string,
+    body: string,
+    targetLang: string,
+  ) => {
+    const key = Config.GOOGLE_CLOUD_TRANSLATION_KEY;
+    let url = `https://translation.googleapis.com/language/translate/v2?key=${key}`;
+    url += `&target=${targetLang}`;
+    const title_url = url + '&q=' + encodeURI(`${title}`);
+    const body_url = url + '&q=' + encodeURI(`${body}`);
+    try {
+      const titleTranslation = await axios.post(title_url);
+      const bodyTranslation = await axios.post(body_url);
+
+      console.log('_translateLanguage. original title', title);
+      console.log(
+        '_translateLanguage. translation',
+        titleTranslation.data.data.translations[0],
+      );
+      console.log('_translateLanguage. original body', body);
+      console.log('_translateLanguage. translation', bodyTranslation.data.data);
+
+      const {translatedTitle} = titleTranslation.data.data.translations[0];
+      const {translatedBpdy} = bodyTranslation.data.data.translations[0];
+      const newPostDetails = {
+        ...postDetails,
+        state: {...postDetails.state, title: translatedTitle},
+        body: translatedBpdy,
+      };
+      // set translation
+      //      setPostDetails(newPostDetails);
+      //return translation.data.translations[0].translatedText;
+    } catch (error) {
+      console.log('failed to translate', error);
+    }
   };
 
   return postDetails ? (

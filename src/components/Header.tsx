@@ -47,7 +47,7 @@ const Header = (props: Props): JSX.Element => {
   // contexts
   const {authState, changeAccount} = useContext(AuthContext);
   const {userState} = useContext(UserContext);
-  const {uiState, setSearchParam} = useContext(UIContext);
+  const {uiState, setSearchParam, setLanguageParam} = useContext(UIContext);
   const {postsState, setTagIndex, setFilterIndex, clearPosts} = useContext(
     PostsContext,
   );
@@ -209,6 +209,12 @@ const Header = (props: Props): JSX.Element => {
     setFilterIndex(index, authState.currentCredentials.username);
   };
 
+  //// handle on language change
+  const _handleOnLanguageChange = (index: number, value: string) => {
+    console.log('header _handleOnLanguageChange. index, value', index, value);
+    setLanguageParam(value.toLowerCase());
+  };
+
   //// update tag index of uiState
   const _handleOnTagChangeForPosting = (index: number, value: string) => {
     console.log('[Header] _handleOnTagChangeForPosting. community', value);
@@ -266,6 +272,26 @@ const Header = (props: Props): JSX.Element => {
         );
       case 'Search':
       case 'Post':
+        return (
+          <Block row space="around" style={{left: 0}}>
+            {/* <Text>{intl.formatMessage({id: 'Header.translate'})}</Text> */}
+            <DropdownModal
+              key={filterList[filterIndex]}
+              defaultText={intl.formatMessage({id: 'Header.language'})}
+              dropdownButtonStyle={styles.dropdownButtonStyle}
+              selectedOptionIndex={filterIndex}
+              rowTextStyle={styles.rowTextStyle}
+              style={styles.dropdown}
+              dropdownStyle={styles.dropdownStyle}
+              textStyle={styles.dropdownText}
+              options={uiState.translateLanguages}
+              onSelect={_handleOnLanguageChange}
+            />
+            <Block style={{left: 120, top: 2}}>
+              <Avatar />
+            </Block>
+          </Block>
+        );
       case 'Posting':
       case 'Profile':
       case 'Author':

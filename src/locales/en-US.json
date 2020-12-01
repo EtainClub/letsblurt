@@ -173,6 +173,8 @@
     "msg_password": "password is not valid"
   },
   "Header": {
+    "translate": "Translate to",
+    "language": "Language",
     "search_placeholder": "Search posts",
     "search": "Search"
   },
