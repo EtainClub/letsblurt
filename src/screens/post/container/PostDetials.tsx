@@ -22,6 +22,7 @@ import {
 import {PostsContext, AuthContext, UIContext, UserContext} from '~/contexts';
 import {generateCommentPermlink, makeJsonMetadataComment} from '~/utils/editor';
 import {TARGET_BLOCKCHAIN} from '~/constants/blockchain';
+import markdown2html from '~/utils/render-helpers/markdown-2-html';
 
 // // google cloud translate api
 // const {Translate} = require('@google-cloud/translate').v3;
@@ -203,29 +204,41 @@ const PostDetails = (props: Props): JSX.Element => {
     const key = Config.GOOGLE_CLOUD_TRANSLATION_KEY;
     let url = `https://translation.googleapis.com/language/translate/v2?key=${key}`;
     url += `&target=${targetLang}`;
+    console.log('_translateLanguage. original title', title);
+    console.log('_translateLanguage. original body', body);
+    // const html = markdown2html(body);
+    const text = body.replace(/<\/?[^>]+>/gi, ' ');
+    // console.log('_translateLanguage. original body html', html);
+    // console.log('_translateLanguage. original body plain text', body);
+
     const title_url = url + '&q=' + encodeURI(`${title}`);
-    const body_url = url + '&q=' + encodeURI(`${body}`);
+    const body_url = url + '&q=' + encodeURI(`${text}`);
     try {
       const titleTranslation = await axios.post(title_url);
       const bodyTranslation = await axios.post(body_url);
 
-      console.log('_translateLanguage. original title', title);
       console.log(
         '_translateLanguage. translation',
         titleTranslation.data.data.translations[0],
       );
-      console.log('_translateLanguage. original body', body);
-      console.log('_translateLanguage. translation', bodyTranslation.data.data);
+      console.log(
+        '_translateLanguage. translation',
+        bodyTranslation.data.data.translations[0],
+      );
 
-      const {translatedTitle} = titleTranslation.data.data.translations[0];
-      const {translatedBpdy} = bodyTranslation.data.data.translations[0];
+      const translatedTitle =
+        titleTranslation.data.data.translations[0].translatedText;
+      console.log('_translateLanguage. translatedTitle', translatedTitle);
+
+      const translatedBpdy =
+        bodyTranslation.data.data.translations[0].translatedText;
       const newPostDetails = {
         ...postDetails,
         state: {...postDetails.state, title: translatedTitle},
         body: translatedBpdy,
       };
       // set translation
-      //      setPostDetails(newPostDetails);
+      setPostDetails(newPostDetails);
       //return translation.data.translations[0].translatedText;
     } catch (error) {
       console.log('failed to translate', error);
