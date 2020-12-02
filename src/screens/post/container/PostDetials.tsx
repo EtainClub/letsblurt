@@ -195,27 +195,32 @@ const PostDetails = (props: Props): JSX.Element => {
     navigate({name: 'Feed'});
   };
 
-  ////
   const _translateLanguage = async (
     title: string,
     body: string,
     targetLang: string,
   ) => {
     const key = Config.GOOGLE_CLOUD_TRANSLATION_KEY;
-    let url = `https://translation.googleapis.com/language/translate/v2?key=${key}`;
-    url += `&target=${targetLang}`;
+    const url = `https://translation.googleapis.com/language/translate/v2?key=${key}`;
     console.log('_translateLanguage. original title', title);
     console.log('_translateLanguage. original body', body);
     // const html = markdown2html(body);
-    const text = body.replace(/<\/?[^>]+>/gi, ' ');
+    //    const text = body.replace(/<\/?[^>]+>/gi, ' ');
     // console.log('_translateLanguage. original body html', html);
     // console.log('_translateLanguage. original body plain text', body);
-
-    const title_url = url + '&q=' + encodeURI(`${title}`);
-    const body_url = url + '&q=' + encodeURI(`${text}`);
+    const titleOptions = {
+      target: targetLang,
+      q: title,
+      format: 'text',
+    };
+    const bodyOptions = {
+      q: body,
+      target: targetLang,
+      format: 'html',
+    };
     try {
-      const titleTranslation = await axios.post(title_url);
-      const bodyTranslation = await axios.post(body_url);
+      const titleTranslation = await axios.post(url, titleOptions);
+      const bodyTranslation = await axios.post(url, bodyOptions);
 
       console.log(
         '_translateLanguage. translation',
