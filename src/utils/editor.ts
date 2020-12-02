@@ -60,39 +60,56 @@ export const generateCommentPermlink = (toAuthor) => {
   return `re-${toAuthor.replace(/\./g, '')}-${timeFormat}`;
 };
 
-export const makeOptions = (author, permlink, operationType) => {
+export const addPostingOptions = (
+  author: string,
+  permlink: string,
+  operationType: string,
+  beneficiaries: any[],
+) => {
   if (!author || !permlink) {
     return {};
   }
 
-  const a = {
+  // beneficiaries
+  // "extensions": [
+  //   [
+  //     0,
+  //     {
+  //       "beneficiaries": [
+  //         {"account": "david", "weight": 500},
+  //         {"account": "erin", "weight": 500},
+  //         {"account": "faythe", "weight": 1000},
+  //         {"account": "frank", "weight": 500}
+  //       ]
+  //     }
+  //   ]
+  // ]
+
+  const options = {
     allow_curation_rewards: true,
     allow_votes: true,
     author,
     permlink,
-    max_accepted_payout: '1000000.000 HBD',
-    percent_steem_dollars: 10000,
-    extensions: [[0, {beneficiaries: [{account: 'etainclub', weight: 100}]}]],
+    max_accepted_payout: '1000000.000 BLURT',
+    //    extensions: [[0, {beneficiaries: [{account: 'letsblurt', weight: 500}]}]], // 5%
+    extensions: [[0, {beneficiaries: beneficiaries}]], // 5%
   };
 
   switch (operationType) {
-    case 'sp':
-      a.max_accepted_payout = '1000000.000 HBD';
-      a.percent_steem_dollars = 0;
+    case 'powerup':
+      options.max_accepted_payout = '1000000.000 BLURT';
       break;
 
-    case 'dp':
-      a.max_accepted_payout = '0.000 HBD';
-      a.percent_steem_dollars = 10000;
+    case 'decline':
+      options.max_accepted_payout = '0.000 BLURT';
       break;
 
     default:
-      a.max_accepted_payout = '1000000.000 HBD';
-      a.percent_steem_dollars = 10000;
+      options.max_accepted_payout = '1000000.000 BLURT';
       break;
   }
 
-  return a;
+  return options;
 };
 
 export const makeJsonMetadataComment = (tags) => ({

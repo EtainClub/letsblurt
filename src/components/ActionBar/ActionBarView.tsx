@@ -117,6 +117,7 @@ const ActionBarView = (props: Props): JSX.Element => {
     // @todo open sharing ui
   };
 
+  const _onPressTranslate = () => {};
   //// handle slide completion event
   const _onVotingSlidingComplete = (weight: number) => {
     const price = (voteAmount * weight) / 100;
@@ -293,6 +294,17 @@ const ActionBarView = (props: Props): JSX.Element => {
             <Text>{intl.formatMessage({id: 'edit'})}</Text>
           </TouchableWithoutFeedback>
         ) : null}
+        <TouchableWithoutFeedback onPress={_onPressTranslate}>
+          <Block row style={{top: 0}}>
+            <Icon
+              size={18}
+              color={argonTheme.COLORS.ERROR}
+              name="translate"
+              family="material-community"
+              style={{paddingHorizontal: 5}}
+            />
+          </Block>
+        </TouchableWithoutFeedback>
       </Block>
       {_renderVotingModal()}
     </Block>

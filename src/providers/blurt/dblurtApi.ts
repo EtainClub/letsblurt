@@ -864,21 +864,30 @@ export const fetchComments = async (
 export const broadcastPost = async (
   postingData: PostingContent,
   password: string,
+  options: any[],
 ) => {
   // @test: etainclub
   //  password = Config.ETAINCLUB_POSTING_WIF;
 
   // verify the key
-  const verified = await verifyPassoword(postingData.author, password);
-  if (!verified) {
+  const account = await verifyPassoword(postingData.author, password);
+  if (!account) {
     return {success: false, message: 'the password is invalid'};
   }
+  // build comment
+  const opArray = [['comment', postingData]];
+  // add options if exists
+  if (options) {
+    const _options = ['comment_options', options];
+    console.log('[broadcastPost] opArray', opArray);
+    //    opArray.push(_options);
+  }
+  console.log('[broadcastPost] opArray', opArray);
 
   const privateKey = PrivateKey.from(password);
-
   if (privateKey) {
     try {
-      const result = await client.broadcast.comment(postingData, privateKey);
+      const result = await client.broadcast.comment(opArray, privateKey);
       return result;
     } catch (error) {
       console.log('failed to broadcast a post', error);

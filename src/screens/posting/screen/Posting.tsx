@@ -109,11 +109,6 @@ const PostingScreen = (props: Props): JSX.Element => {
   useEffect(() => {
     if (body.length > 0) {
       const char = _getTypedCharacter();
-      console.log(
-        '_handleBodyChange. typed character',
-        char,
-        props.followingList,
-      );
       // handle mentioning
       if (char === '@') {
         // show following list

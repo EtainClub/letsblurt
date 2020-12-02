@@ -8,6 +8,7 @@ import {Discussion} from 'dblurt';
 import {PostingContent} from '~/contexts/types';
 import {uploadImage} from '~/providers/blurt/imageApi';
 import {
+  addPostingOptions,
   extractMetadata,
   generatePermlink,
   makeJsonMetadata,
@@ -56,7 +57,6 @@ const Posting = (props: Props): JSX.Element => {
   //// get followings
   const _getFollowingList = async (username: string) => {
     const _followings = await getFollowings(username);
-    console.log('_getFollowingList', _followings);
     setFollowingList(_followings);
     setFilteredFollowings(_followings);
   };
@@ -157,6 +157,7 @@ const Posting = (props: Props): JSX.Element => {
     const _tags = tags.split(' ');
     const jsonMeta = makeJsonMetadata(_meta, _tags);
     let permlink = '';
+    let options = null;
     // generate permlink for a new post
     if (!originalPost) {
       permlink = generatePermlink(title);
@@ -165,6 +166,11 @@ const Posting = (props: Props): JSX.Element => {
       if (duplicate && duplicate.id) {
         permlink = generatePermlink(title, true);
       }
+      // add options such as beneficiaries
+      options = addPostingOptions(username, permlink, 'powerup', [
+        {account: 'letsblurt', weight: 500},
+      ]);
+      console.log('_handlePressPostSumbit. options', options);
     }
     // build posting content
     const postingContent: PostingContent = {
@@ -192,7 +198,12 @@ const Posting = (props: Props): JSX.Element => {
       ));
     } else {
       //// submit the post
-      ({success, message} = await submitPost(postingContent, password, false));
+      ({success, message} = await submitPost(
+        postingContent,
+        password,
+        false,
+        options,
+      ));
       //// TODO: update post details.. here or in postsContext
     }
     // toast message

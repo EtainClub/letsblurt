@@ -366,6 +366,7 @@ export interface PostsContextType {
     postingContent: PostingContent,
     password: string,
     isComment: boolean,
+    options: any[],
     postIndex?: number,
   ) => Promise<{
     success: boolean;

@@ -459,13 +459,14 @@ const PostsProvider = ({children}: Props) => {
     postingContent: PostingContent,
     password: string,
     isComment: boolean,
+    options: any[],
     postIndex?: number,
   ) => {
     // broadcast comment
-    const {success, message} = await broadcastPost(postingContent, password);
+    const result = await broadcastPost(postingContent, password, options);
     // dispatch action
     // TODO; distinguish post and comment
-    return {success, message};
+    return result;
   };
 
   // update post
