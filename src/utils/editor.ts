@@ -86,13 +86,13 @@ export const addPostingOptions = (
   // ]
 
   const options = {
-    allow_curation_rewards: true,
-    allow_votes: true,
     author,
     permlink,
     max_accepted_payout: '1000000.000 BLURT',
-    //    extensions: [[0, {beneficiaries: [{account: 'letsblurt', weight: 500}]}]], // 5%
-    extensions: [[0, {beneficiaries: beneficiaries}]], // 5%
+    allow_votes: true,
+    allow_curation_rewards: true,
+    extensions: [[0, {beneficiaries: [{account: 'letsblurt', weight: 500}]}]], // 5%
+    //    extensions: [[0, {beneficiaries: beneficiaries}]], // 5%
   };
 
   switch (operationType) {

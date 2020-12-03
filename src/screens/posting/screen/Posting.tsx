@@ -143,7 +143,6 @@ const PostingScreen = (props: Props): JSX.Element => {
   const _getTypedCharacter = () => {
     /// get newly typed character
     const {start, end} = bodySelection;
-    console.log('_getTypedCharacter', bodySelection);
     const char = start === end ? body[start - 1] : body[body.length - 1];
     return char;
   };

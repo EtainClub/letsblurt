@@ -277,34 +277,36 @@ const ActionBarView = (props: Props): JSX.Element => {
           </TouchableOpacity>
         ) : null}
         {actionBarStyle.share ? (
-          <TouchableWithoutFeedback onPress={_onPressShare}>
-            <Block row style={{paddingRight: 10}}>
-              <Icon
-                size={actionBarStyle.iconSize}
-                color={argonTheme.COLORS.ERROR}
-                name="sharealt"
-                family="antdesign"
-                style={{paddingHorizontal: 10}}
-              />
-            </Block>
-          </TouchableWithoutFeedback>
+          <Block row>
+            <TouchableWithoutFeedback onPress={_onPressShare}>
+              <Block row style={{paddingRight: 10}}>
+                <Icon
+                  size={actionBarStyle.iconSize}
+                  color={argonTheme.COLORS.ERROR}
+                  name="sharealt"
+                  family="antdesign"
+                  style={{paddingHorizontal: 10}}
+                />
+              </Block>
+            </TouchableWithoutFeedback>
+            <TouchableWithoutFeedback onPress={_onPressTranslate}>
+              <Block row style={{top: 0}}>
+                <Icon
+                  size={18}
+                  color={argonTheme.COLORS.ERROR}
+                  name="translate"
+                  family="material-community"
+                  style={{paddingHorizontal: 5}}
+                />
+              </Block>
+            </TouchableWithoutFeedback>
+          </Block>
         ) : null}
         {actionBarStyle.bookmark && isUser ? (
           <TouchableWithoutFeedback onPress={props.handlePressEditPost}>
             <Text>{intl.formatMessage({id: 'edit'})}</Text>
           </TouchableWithoutFeedback>
         ) : null}
-        <TouchableWithoutFeedback onPress={_onPressTranslate}>
-          <Block row style={{top: 0}}>
-            <Icon
-              size={18}
-              color={argonTheme.COLORS.ERROR}
-              name="translate"
-              family="material-community"
-              style={{paddingHorizontal: 5}}
-            />
-          </Block>
-        </TouchableWithoutFeedback>
       </Block>
       {_renderVotingModal()}
     </Block>

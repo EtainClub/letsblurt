@@ -866,9 +866,6 @@ export const broadcastPost = async (
   password: string,
   options: any[],
 ) => {
-  // @test: etainclub
-  //  password = Config.ETAINCLUB_POSTING_WIF;
-
   // verify the key
   const account = await verifyPassoword(postingData.author, password);
   if (!account) {
@@ -880,14 +877,14 @@ export const broadcastPost = async (
   if (options) {
     const _options = ['comment_options', options];
     console.log('[broadcastPost] opArray', opArray);
-    //    opArray.push(_options);
+    opArray.push(_options);
   }
   console.log('[broadcastPost] opArray', opArray);
 
   const privateKey = PrivateKey.from(password);
   if (privateKey) {
     try {
-      const result = await client.broadcast.comment(opArray, privateKey);
+      const result = await client.broadcast.sendOperations(opArray, privateKey);
       return result;
     } catch (error) {
       console.log('failed to broadcast a post', error);

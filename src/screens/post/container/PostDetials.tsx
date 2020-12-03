@@ -22,13 +22,6 @@ import {
 import {PostsContext, AuthContext, UIContext, UserContext} from '~/contexts';
 import {generateCommentPermlink, makeJsonMetadataComment} from '~/utils/editor';
 import {TARGET_BLOCKCHAIN} from '~/constants/blockchain';
-import markdown2html from '~/utils/render-helpers/markdown-2-html';
-
-// // google cloud translate api
-// const {Translate} = require('@google-cloud/translate').v3;
-// // Instantiates a client
-// const projectId = 'letsblurt';
-// const translate = new Translate({projectId});
 
 interface Props {
   route: any;
@@ -204,6 +197,9 @@ const PostDetails = (props: Props): JSX.Element => {
     const url = `https://translation.googleapis.com/language/translate/v2?key=${key}`;
     console.log('_translateLanguage. original title', title);
     console.log('_translateLanguage. original body', body);
+
+    // TODO: detect the source language and compare it with the target
+    // if they are the same, disable the translating to save the code.
     // const html = markdown2html(body);
     //    const text = body.replace(/<\/?[^>]+>/gi, ' ');
     // console.log('_translateLanguage. original body html', html);
