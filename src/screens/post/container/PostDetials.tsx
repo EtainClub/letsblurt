@@ -104,11 +104,13 @@ const PostDetails = (props: Props): JSX.Element => {
     setLoading(false);
     if (!details) return;
     // fetch database
-    const {bookmarked} = await fetchDatabaseState(
-      postsState.postRef,
-      authState.currentCredentials.username,
-    );
-    details.state.bookmarked = bookmarked;
+    if (authState.loggedIn) {
+      const {bookmarked} = await fetchDatabaseState(
+        postsState.postRef,
+        authState.currentCredentials.username,
+      );
+      details.state.bookmarked = bookmarked;
+    }
     // set post details
     setPostDetails(details);
     // fetch comments

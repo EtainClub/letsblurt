@@ -1,5 +1,4 @@
 import React, {useState, useEffect} from 'react';
-
 import {
   StyleSheet,
   Dimensions,
@@ -9,6 +8,7 @@ import {
   TouchableOpacity,
   Linking,
 } from 'react-native';
+import Config from 'react-native-config';
 import {Block, Button, Input, Text, theme, Icon} from 'galio-framework';
 
 import {FirebaseAuthTypes} from '@react-native-firebase/auth';
@@ -61,7 +61,7 @@ const PhoneAuthScreen = (props: Props): JSX.Element => {
     console.log('country code', code);
 
     // message
-    setMessage(intl.formatMessage({id: 'Signup.phonenumber-guide'}));
+    setMessage(intl.formatMessage({id: 'Signup.phonenumber_guide'}));
   }, []);
 
   const _handlePhoneNumberChange = (value: string) => {
@@ -92,7 +92,7 @@ const PhoneAuthScreen = (props: Props): JSX.Element => {
             {intl.formatMessage({id: 'Signup.header'})}
           </Text>
           <Text color="orange" center size={theme.SIZES.FONT * 0.875}>
-            {intl.formatMessage({id: 'Signup.phone-guide'})}
+            {intl.formatMessage({id: 'Signup.phone_guide'})}
           </Text>
         </Block>
         <Block flex={1} center space="around">
@@ -118,7 +118,7 @@ const PhoneAuthScreen = (props: Props): JSX.Element => {
                 borderless
                 family="antdesign"
                 color="white"
-                placeholder={intl.formatMessage({id: 'Signup.phone-number'})}
+                placeholder={intl.formatMessage({id: 'Signup.phone_number'})}
                 value={phoneNumber.replace(/\-/g, '')}
                 autoCapitalize="none"
                 help={<Text>{message}</Text>}
@@ -135,7 +135,7 @@ const PhoneAuthScreen = (props: Props): JSX.Element => {
               style={styles.button}
               color={materialTheme.COLORS.BUTTON_COLOR}
               onPress={() => _onSendSMS()}>
-              {intl.formatMessage({id: 'Signup.phone-button'})}
+              {intl.formatMessage({id: 'Signup.phone_button'})}
             </Button>
           </Block>
         </Block>
@@ -149,7 +149,7 @@ const PhoneAuthScreen = (props: Props): JSX.Element => {
     setMessage('');
     // const phone = '+' + country.callingCode[0] + phoneNumber;
     // @test test phone number
-    const phone = '+16505559898';
+    const phone = Config.TEST_PHONE_NUMBER;
     // process sign in
     props.signinPhoneNumber(phone);
   };
@@ -176,7 +176,7 @@ const PhoneAuthScreen = (props: Props): JSX.Element => {
             {intl.formatMessage({id: 'Signup.header'})}
           </Text>
           <Text color="orange" center size={theme.SIZES.FONT * 0.875}>
-            {intl.formatMessage({id: 'Signup.sms-guide'})}
+            {intl.formatMessage({id: 'Signup.sms_guide'})}
           </Text>
         </Block>
 
@@ -188,7 +188,7 @@ const PhoneAuthScreen = (props: Props): JSX.Element => {
               borderless
               family="antdesign"
               color="white"
-              placeholder={intl.formatMessage({id: 'Signup.SMS-code'})}
+              placeholder={intl.formatMessage({id: 'Signup.SMS_code'})}
               value={smsCode}
               help={<Text style={{color: 'red'}}>{message}</Text>}
               bottomHelp

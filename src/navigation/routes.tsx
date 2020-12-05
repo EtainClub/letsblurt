@@ -358,16 +358,21 @@ const DrawerNavigator = (props) => {
           fontWeight: 'normal',
         },
       }}
-      initialRouteName="Feed">
+      initialRouteName="SignUp">
       <Drawer.Screen name="Feed" component={TabNavigator} />
+      <Drawer.Screen name="Login" component={Login} />
+
+      <Drawer.Screen name="SignUp" component={Signup} />
+
       <Drawer.Screen name="Add" component={Login} />
       <Drawer.Screen name="AuthorProfile" component={AuthorStack} />
       <Drawer.Screen name="AuthorList" component={AuthorListStack} />
       {!authState.loggedIn ? (
-        <Drawer.Screen name="Login" component={Login} />
+        <Drawer.Screen name="Logout" component={Login} />
       ) : (
         <>
-          <Drawer.Screen name="Logout" component={Login} />
+          <Drawer.Screen name="Login" component={Login} />
+
           <Drawer.Screen name="SignUp" component={Signup} />
         </>
       )}

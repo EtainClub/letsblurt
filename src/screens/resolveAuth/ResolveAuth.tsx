@@ -27,7 +27,7 @@ export const ResolveAuth = (props) => {
   useEffect(() => {
     if (fetched) {
       // get blurt global props and get user's vote amount
-      fetchBlockchainGlobalProps(username);
+      //      fetchBlockchainGlobalProps(username);
       setAuthResolved(true);
       // TODO is this not necessary, why?
       navigate({name: 'Drawer'});
@@ -36,6 +36,9 @@ export const ResolveAuth = (props) => {
 
   //// resolve auth
   const _resolveEntry = async () => {
+    // fetch global props
+    fetchBlockchainGlobalProps();
+
     // get user login token from storage
     let username = await AsyncStorage.getItem(LOGIN_TOKEN);
     //
@@ -58,7 +61,9 @@ export const ResolveAuth = (props) => {
       // @todo no communiy list at first, handle this
       // fetch tags
       await getTagList();
-      navigate({name: 'Welcome'});
+      // @test
+      navigate({name: 'Drawer'});
+      //      navigate({name: 'Welcome'});
     }
   };
 

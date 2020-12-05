@@ -118,6 +118,9 @@ const UserProvider = ({children}: Props) => {
       type: UserActionTypes.SET_GLOBAL_PROPS,
       payload: globalProps,
     });
+
+    if (!username) return;
+
     // estimate vote amount
     const account = await getAccount(username);
     if (account) {

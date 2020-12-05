@@ -1,6 +1,6 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import Config from 'react-native-config';
-
+import SplashScreen from 'react-native-splash-screen';
 import {SignupScreen} from '../screen/Signup';
 import {PhoneAuthScreen} from '../screen/PhoneAuth';
 import {AccountScreen} from '../screen/Account';
@@ -10,8 +10,6 @@ import firestore from '@react-native-firebase/firestore';
 
 import {
   checkUsernameAvailable,
-  checkClaimedToken,
-  claimAccountCreationToken,
   createAccount,
   getDynamicGlobalProperties,
 } from '~/providers/blurt/dblurtApi';
@@ -22,12 +20,17 @@ import {navigate} from '~/navigation/service';
 import Clipboard from '@react-native-community/clipboard';
 
 import {useIntl} from 'react-intl';
+import {UIContext, UserContext} from '~/contexts';
 
 interface Props {}
 
 const Signup = (props: Props): JSX.Element => {
-  console.log('[SignupContiner] props', props);
-  const [showSignupScreen, setShowSignupSCreen] = useState(true);
+  //// props
+  //// contexts
+  const {userState} = useContext(UserContext);
+  const {setToastMessage} = useContext(UIContext);
+  //// states
+  const [showSignupScreen, setShowSignupScreen] = useState(true);
   const [showAccountScreen, setShowAccountScreen] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -38,11 +41,12 @@ const Signup = (props: Props): JSX.Element => {
   const intl = useIntl();
 
   useEffect(() => {
-    setShowSignupSCreen(true);
+    SplashScreen.hide();
+    setShowSignupScreen(true);
   }, []);
 
   const _onStartSignup = async (username: string) => {
-    setShowSignupSCreen(false);
+    setShowSignupScreen(false);
   };
 
   const _checkUsernameAvailable = async (username: string) => {
@@ -89,8 +93,8 @@ const Signup = (props: Props): JSX.Element => {
 
   const _onCreateAccount = async (phoneNumber: string, smsCode: string) => {
     // @test
-    smsCode = '989898';
-
+    smsCode = Config.SMS_TEST_CODE;
+    console.log('sms code', smsCode);
     let user = null;
     try {
       user = await confirmation.confirm(smsCode);
@@ -102,27 +106,32 @@ const Signup = (props: Props): JSX.Element => {
     const newUser = await _checkNewUser();
     if (!newUser) {
       // @todo handle this message
-      //setMessage(intl.formatMessage({id: 'Signup.msg-exists'}));
+      setToastMessage(intl.formatMessage({id: 'Signup.msg_exists'}));
       return;
     }
     console.log('new user!');
-    //// generate steemit id
-    // check the ACT exists
-    const ACTavailable = await checkClaimedToken(Config.CREATOR_ACCOUNT);
-    console.log('ACT available', ACTavailable);
-    // create ACT in case of no ACT
-    if (!ACTavailable) {
-      const success = await claimAccountCreationToken(
-        Config.CREATOR_ACCOUNT,
-        Config.CREATOR__WIF,
-      );
-      console.log('succeeded to create an ACT?', success);
-    }
+
+    // //// generate steemit id
+    // // check the ACT exists
+    // const ACTavailable = await checkClaimedToken(Config.CREATOR_ACCOUNT);
+    // console.log('ACT available', ACTavailable);
+    // // create ACT in case of no ACT
+    // if (!ACTavailable) {
+    //   const success = await claimAccountCreationToken(
+    //     Config.CREATOR_ACCOUNT,
+    //     Config.CREATOR__WIF,
+    //   );
+    //   console.log('succeeded to create an ACT?', success);
+    // }
+
+    console.log('userState global props', userState.globalProps);
+
     // now create an account
     const password = await createAccount(
       username,
       Config.CREATOR_ACCOUNT,
       Config.CREATOR_ACTIVE_WIF,
+      userState.globalProps.chainProps.account_creation_fee,
     );
     // check sanity
     if (password) {

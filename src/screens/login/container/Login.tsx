@@ -31,7 +31,7 @@ const Login = (props: Props): JSX.Element => {
   const {authState, processLogin, processLogout} = useContext(AuthContext);
   const {uiState, setToastMessage} = useContext(UIContext);
   const {userState, updateVoteAmount} = useContext(UserContext);
-  const {fetchCommunities} = useContext(PostsContext);
+  // const {} = useContext(PostsContext);
 
   const _updateUserDB = async (username: string) => {
     // sign in firebase anonymously

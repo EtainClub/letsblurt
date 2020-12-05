@@ -94,62 +94,18 @@ const wifIsValid = (privWif: string, pubWif: string) => {
 //// signup
 // check availabled claimed token
 // @return availabivity of the token
-export const checkClaimedToken = async (creator: string) => {
-  try {
-    const accounts = await client.database.call('get_accounts', [[creator]]);
-    const numTokens = accounts[0].pending_claimed_accounts;
-    console.log('number of claimed tokens', numTokens);
-    if (numTokens > 0) return true;
-    else return false;
-  } catch (error) {
-    console.log('claimed token error', error);
-    return false;
-  }
-};
-
-// claim account creation token to create a new account
-// @return success of failure of the claim
-export const claimAccountCreationToken = async (
-  creator: string,
-  activeKey: string,
-) => {
-  try {
-    const creatorKey = PrivateKey.fromString(activeKey);
-    let ops = [];
-    const claim_op = [
-      'claim_account',
-      {
-        creator: creator,
-        fee: '0.000 STEEM',
-        extensions: [],
-      },
-    ];
-    ops.push(claim_op);
-    const result = await client.broadcast.sendOperations(ops, creatorKey);
-    console.log('claim ACT result', result);
-    if (result.block_num > 0) return true;
-    else return false;
-  } catch (error) {
-    console.log('error. claim failed', error);
-    return false;
-  }
-};
 
 // create an account
 export const createAccount = async (
   username: string,
   creator: string,
   creatorActiveKey: string,
+  creationFee: string,
 ) => {
-  //// check sanity: claimed account creation tokens
-  if (!checkClaimedToken(creator)) {
-    console.log('failed to create account due to no clamied token');
-    return null;
-  }
-  // generate random master password
+  // generate random master password wif
   const array = CryptoJS.lib.WordArray.random(10);
   const password = 'P' + PrivateKey.fromSeed(array.toString()).toString();
-  console.log('master password', password.toString());
+  console.log('creation fee', creationFee);
 
   // @test without actual account creation
   //return { result: "test", password: password };
@@ -180,13 +136,16 @@ export const createAccount = async (
     key_auths: [[postingKey.createPublic(client.addressPrefix), 1]],
   };
 
+  // get account creation fee
+  //  const fee = await
   //// send creation operation
   // operations
   let operations: Operation[] = [];
   //create operation to transmit
   const create_op: Operation = [
-    'create_claimed_account',
+    'account_create',
     {
+      fee: creationFee,
       creator: creator,
       new_account_name: username,
       owner: ownerAuth,
@@ -1787,6 +1746,132 @@ export const fetchUserProfile = async (username: string) => {
   } catch (error) {
     console.log('failed to fetch user data');
     return Promise.reject(error);
+  }
+};
+*/
+
+/*
+export const checkClaimedToken = async (creator: string) => {
+  try {
+    const accounts = await client.database.call('get_accounts', [[creator]]);
+    const numTokens = accounts[0].pending_claimed_accounts;
+    console.log('number of claimed tokens', numTokens);
+    if (numTokens > 0) return true;
+    else return false;
+  } catch (error) {
+    console.log('claimed token error', error);
+    return false;
+  }
+};
+
+// claim account creation token to create a new account
+// @return success of failure of the claim
+export const claimAccountCreationToken = async (
+  creator: string,
+  activeKey: string,
+) => {
+  try {
+    const creatorKey = PrivateKey.fromString(activeKey);
+    let ops = [];
+    const claim_op = [
+      'claim_account',
+      {
+        creator: creator,
+        fee: '0.000 STEEM',
+        extensions: [],
+      },
+    ];
+    ops.push(claim_op);
+    const result = await client.broadcast.sendOperations(ops, creatorKey);
+    console.log('claim ACT result', result);
+    if (result.block_num > 0) return true;
+    else return false;
+  } catch (error) {
+    console.log('error. claim failed', error);
+    return false;
+  }
+};
+
+// create an account
+export const createAccount = async (
+  username: string,
+  creator: string,
+  creatorActiveKey: string,
+) => {
+  //// check sanity: claimed account creation tokens
+  if (!checkClaimedToken(creator)) {
+    console.log('failed to create account due to no clamied token');
+    return null;
+  }
+  // generate random master password
+  const array = CryptoJS.lib.WordArray.random(10);
+  const password = 'P' + PrivateKey.fromSeed(array.toString()).toString();
+  console.log('master password', password.toString());
+
+  // @test without actual account creation
+  //return { result: "test", password: password };
+
+  // private active key of creator account
+  const creatorKey = PrivateKey.fromString(creatorActiveKey);
+  // create keys
+  const ownerKey = PrivateKey.fromLogin(username, password, 'owner');
+  const activeKey = PrivateKey.fromLogin(username, password, 'active');
+  const postingKey = PrivateKey.fromLogin(username, password, 'posting');
+  const memoKey = PrivateKey.fromLogin(username, password, 'memo').createPublic(
+    client.addressPrefix,
+  );
+
+  const ownerAuth = {
+    weight_threshold: 1,
+    account_auths: [],
+    key_auths: [[ownerKey.createPublic(client.addressPrefix), 1]],
+  };
+  const activeAuth = {
+    weight_threshold: 1,
+    account_auths: [],
+    key_auths: [[activeKey.createPublic(client.addressPrefix), 1]],
+  };
+  const postingAuth = {
+    weight_threshold: 1,
+    account_auths: [],
+    key_auths: [[postingKey.createPublic(client.addressPrefix), 1]],
+  };
+
+  //// send creation operation
+  // operations
+  let operations: Operation[] = [];
+  //create operation to transmit
+  const create_op: Operation = [
+    'create_claimed_account',
+    {
+      creator: creator,
+      new_account_name: username,
+      owner: ownerAuth,
+      active: activeAuth,
+      posting: postingAuth,
+      memo_key: memoKey,
+      json_metadata: '',
+      extensions: [],
+    },
+  ];
+  console.log(create_op);
+  // push the creation operation
+  operations.push(create_op);
+  // broadcast operation to blockchain
+  try {
+    const result = await client.broadcast.sendOperations(
+      operations,
+      creatorKey,
+    );
+    if (result) {
+      console.log('creation result', result);
+      return password;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.log('account creation failed', error);
+    return null;
   }
 };
 */

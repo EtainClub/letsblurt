@@ -17,7 +17,7 @@ import {
   Dimensions,
 } from 'react-native';
 import {useIntl} from 'react-intl';
-import {Block, Text, Button, theme} from 'galio-framework';
+import {Block, Text, Button, theme, Icon} from 'galio-framework';
 import SplashScreen from 'react-native-splash-screen';
 import LinearGradient from 'react-native-linear-gradient';
 const {height, width} = Dimensions.get('screen');
@@ -69,6 +69,22 @@ const WelcomeScreen = () => {
     }
   };
 
+  const _renderDots = (id: number) => {
+    return (
+      <Block row center style={{top: 100}}>
+        {WELCOME_MESSAGES.map((message, index) => (
+          <Icon
+            key={index}
+            style={{marginHorizontal: 10}}
+            size={20}
+            name={id === index ? 'circle' : 'circle-o'}
+            family="font-awesome"
+          />
+        ))}
+      </Block>
+    );
+  };
+
   const _renderSlides = () => {
     return WELCOME_MESSAGES.map((message, index) => {
       return (
@@ -79,6 +95,7 @@ const WelcomeScreen = () => {
             {message.text}
           </Text>
           {_renderLastSlide(index)}
+          {_renderDots(index)}
         </Block>
       );
     });
