@@ -62,8 +62,8 @@ export const ResolveAuth = (props) => {
       // fetch tags
       await getTagList();
       // @test
-      navigate({name: 'Drawer'});
-      //      navigate({name: 'Welcome'});
+      //navigate({name: 'Drawer'});
+      navigate({name: 'Welcome'});
     }
   };
 

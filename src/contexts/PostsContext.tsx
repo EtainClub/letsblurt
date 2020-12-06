@@ -459,7 +459,7 @@ const PostsProvider = ({children}: Props) => {
     postingContent: PostingContent,
     password: string,
     isComment: boolean,
-    options: any[],
+    options?: any[],
     postIndex?: number,
   ) => {
     // broadcast comment

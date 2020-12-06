@@ -94,7 +94,7 @@ const AccountScreen = (props: Props): JSX.Element => {
             style={styles.button}
             color={materialTheme.COLORS.BUTTON_COLOR}
             onPress={() => copyPasswordToClipboard(props.password)}>
-            {intl.formatMessage({id: 'Signup.copy-key'})}
+            {intl.formatMessage({id: 'Signup.copy_key'})}
           </Button>
           <Block style={{marginTop: 20}}>
             <Checkbox
@@ -102,7 +102,7 @@ const AccountScreen = (props: Props): JSX.Element => {
               labelStyle={{color: 'red'}}
               initialValue={false}
               flexDirection="row-reverse"
-              label={intl.formatMessage({id: 'Signup.confirm-check'})}
+              label={intl.formatMessage({id: 'Signup.confirm_check'})}
               onChange={async () => {
                 setKeyCopied(!keyCopied);
                 console.log('key copied', keyCopied);

@@ -28,7 +28,7 @@ import {ActionBar} from '../ActionBar';
 import {ActionBarStyle} from '~/constants/actionBarTypes';
 import {Avatar} from '~/components/Avatar';
 
-const POST_TITLE_LENGTH = 50;
+const POST_TITLE_LENGTH = 45;
 
 interface Props {
   post: PostData;

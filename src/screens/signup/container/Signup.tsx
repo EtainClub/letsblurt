@@ -5,6 +5,8 @@ import {SignupScreen} from '../screen/Signup';
 import {PhoneAuthScreen} from '../screen/PhoneAuth';
 import {AccountScreen} from '../screen/Account';
 
+import {OTP} from '~/components';
+
 import auth, {FirebaseAuthTypes, firebase} from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
@@ -102,8 +104,8 @@ const Signup = (props: Props): JSX.Element => {
       console.log('invalid code', error);
       return;
     }
-    // check if the user is new
-    const newUser = await _checkNewUser();
+    // // check if the user is new
+    const newUser = user.additionalUserInfo.isNewUser;
     if (!newUser) {
       // @todo handle this message
       setToastMessage(intl.formatMessage({id: 'Signup.msg_exists'}));
@@ -127,14 +129,14 @@ const Signup = (props: Props): JSX.Element => {
     console.log('userState global props', userState.globalProps);
 
     // now create an account
-    const password = await createAccount(
+    const _password = await createAccount(
       username,
       Config.CREATOR_ACCOUNT,
       Config.CREATOR_ACTIVE_WIF,
       userState.globalProps.chainProps.account_creation_fee,
     );
     // check sanity
-    if (password) {
+    if (_password) {
       setPassword(password);
       setShowAccountScreen(true);
       // update phone db
@@ -168,11 +170,22 @@ const Signup = (props: Props): JSX.Element => {
       checkUsernameAvailable={_checkUsernameAvailable}
     />
   ) : (
-    <PhoneAuthScreen
-      onCreateAccount={_onCreateAccount}
-      signinPhoneNumber={_signinPhoneNumber}
-    />
+    <OTP usePhoneNumber={true} />
   );
+
+  // return showAccountScreen ? (
+  //   <AccountScreen account={username} password={password} />
+  // ) : showSignupScreen ? (
+  //   <SignupScreen
+  //     onCreateAccount={_onStartSignup}
+  //     checkUsernameAvailable={_checkUsernameAvailable}
+  //   />
+  // ) : (
+  //   <PhoneAuthScreen
+  //     onCreateAccount={_onCreateAccount}
+  //     signinPhoneNumber={_signinPhoneNumber}
+  //   />
+  // );
 };
 
 export {Signup};

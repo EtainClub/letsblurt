@@ -358,7 +358,7 @@ const DrawerNavigator = (props) => {
           fontWeight: 'normal',
         },
       }}
-      initialRouteName="SignUp">
+      initialRouteName="Feed">
       <Drawer.Screen name="Feed" component={TabNavigator} />
       <Drawer.Screen name="Login" component={Login} />
 
@@ -371,9 +371,9 @@ const DrawerNavigator = (props) => {
         <Drawer.Screen name="Logout" component={Login} />
       ) : (
         <>
-          <Drawer.Screen name="Login" component={Login} />
+          {/* <Drawer.Screen name="Login" component={Login} />
 
-          <Drawer.Screen name="SignUp" component={Signup} />
+          <Drawer.Screen name="SignUp" component={Signup} /> */}
         </>
       )}
       <Drawer.Screen name="Settings" component={SettingsStack} />

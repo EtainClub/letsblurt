@@ -84,33 +84,21 @@ const Login = (props: Props): JSX.Element => {
 
   const _processLogin = async (username: string, password: string) => {
     console.log('[LoginContainer] _processLogin, username', username);
-    // first check account exists
-    const account = await getAccount(username);
-    if (!account) {
-      console.log('failed. login. username does not exist', username);
-      setToastMessage(intl.formatMessage({id: 'Login.msg_username'}));
-      return false;
-    }
-    // @test (etainclub)
-    //    password = Config.ETAINCLUB_POSTING_WIF;
-    // @test (letsblur)
-    //    password = Config.CREATOR_POSTING_WIF;
     // verify the private key
-    const valid = await verifyPassoword(username, password);
-    if (!valid) {
-      setToastMessage(intl.formatMessage({id: 'Login.msg_password'}));
+    const account = await verifyPassoword(username, password);
+    if (!account) {
+      setToastMessage(intl.formatMessage({id: 'Login.login_error'}));
       return false;
     }
-
     //// process login
     console.log('password is valid');
+
+    // start otp
+
     // process login action
     processLogin({username, password}, addingAccount);
     // process firestore login
     _updateUserDB(username);
-
-    // fetch communities of user
-    //      fetchCommunities(username);
 
     console.log('account info', account);
     // @test get the credentials

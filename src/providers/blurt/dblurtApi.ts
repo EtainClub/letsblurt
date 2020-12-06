@@ -21,7 +21,8 @@ import {
   Transaction,
   Signature,
 } from 'dblurt';
-import * as secp256k1 from 'secp256k1';
+
+import {PrivateKey as PrivateKey2} from '@esteemapp/dhive';
 
 import {ProfileData} from '~/contexts/types';
 
@@ -831,7 +832,18 @@ export const broadcastPost = async (
     return {success: false, message: 'the password is invalid'};
   }
   // build comment
-  const opArray = [['comment', postingData]];
+  //  const opArray = [['comment', postingData]];
+  const params = {
+    parent_author: postingData.parent_author,
+    parent_permlink: postingData.parent_permlink,
+    author: postingData.author,
+    permlink: postingData.permlink,
+    title: postingData.title,
+    body: postingData.body,
+    json_metadata: postingData.json_metadata,
+  };
+
+  const opArray = [['comment', params]];
   // add options if exists
   if (options) {
     const _options = ['comment_options', options];
@@ -840,7 +852,9 @@ export const broadcastPost = async (
   }
   console.log('[broadcastPost] opArray', opArray);
 
-  const privateKey = PrivateKey.from(password);
+  //  const privateKey = PrivateKey.from(password);
+  const privateKey = PrivateKey2.fromString(password);
+
   if (privateKey) {
     try {
       const result = await client.broadcast.sendOperations(opArray, privateKey);
