@@ -91,6 +91,7 @@ export const addPostingOptions = (
     max_accepted_payout: '1000000.000 BLURT',
     allow_votes: true,
     allow_curation_rewards: true,
+    //    extensions: [],
     extensions: [[0, {beneficiaries: [{account: 'letsblurt', weight: 500}]}]], // 5%
     //    extensions: [[0, {beneficiaries: beneficiaries}]], // 5%
   };

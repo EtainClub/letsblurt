@@ -832,28 +832,25 @@ export const broadcastPost = async (
     return {success: false, message: 'the password is invalid'};
   }
   // build comment
-  //  const opArray = [['comment', postingData]];
-  const params = {
-    parent_author: postingData.parent_author,
-    parent_permlink: postingData.parent_permlink,
-    author: postingData.author,
-    permlink: postingData.permlink,
-    title: postingData.title,
-    body: postingData.body,
-    json_metadata: postingData.json_metadata,
-  };
-
-  const opArray = [['comment', params]];
+  const opArray = [['comment', postingData]];
   // add options if exists
   if (options) {
-    const _options = ['comment_options', options];
-    console.log('[broadcastPost] opArray', opArray);
-    opArray.push(_options);
+    // const _options = [
+    //   'comment_options',
+    //   {
+    //     author: options.author,
+    //     permlink: options.permlink,
+    //     max_accepted_payout: options.max_accepted_payout,
+    //     allow_votes: options.allow_votes,
+    //     allow_curation_rewards: options.allow_curation_rewards,
+    //     extensions: options.extensions,
+    //   },
+    // ];
+    opArray.push(['comment_options', options]);
   }
   console.log('[broadcastPost] opArray', opArray);
 
-  //  const privateKey = PrivateKey.from(password);
-  const privateKey = PrivateKey2.fromString(password);
+  const privateKey = PrivateKey.from(password);
 
   if (privateKey) {
     try {
