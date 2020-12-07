@@ -39,10 +39,15 @@ const Feed = (props: Props): JSX.Element => {
   //////// effects
   //// hide splash screen
   useEffect(() => {
-    if (posts) {
-      SplashScreen.hide();
-    }
-  }, [posts]);
+    SplashScreen.hide();
+  }, []);
+
+  // useEffect(() => {
+  //   if (posts) {
+  //     SplashScreen.hide();
+  //   }
+  // }, [posts]);
+
   //// header tag/fiter change event
   useEffect(() => {
     _fetchPosts(false);

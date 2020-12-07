@@ -835,17 +835,6 @@ export const broadcastPost = async (
   const opArray = [['comment', postingData]];
   // add options if exists
   if (options) {
-    // const _options = [
-    //   'comment_options',
-    //   {
-    //     author: options.author,
-    //     permlink: options.permlink,
-    //     max_accepted_payout: options.max_accepted_payout,
-    //     allow_votes: options.allow_votes,
-    //     allow_curation_rewards: options.allow_curation_rewards,
-    //     extensions: options.extensions,
-    //   },
-    // ];
     opArray.push(['comment_options', options]);
   }
   console.log('[broadcastPost] opArray', opArray);

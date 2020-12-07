@@ -198,12 +198,11 @@ const Posting = (props: Props): JSX.Element => {
       ));
     } else {
       //// submit the post
-      ({success, message} = await submitPost(
-        postingContent,
-        password,
-        false,
-        options,
-      ));
+      const result = await submitPost(postingContent, password, false, options);
+      if (result) {
+        // TODO: set tag or feed
+        navigate({name: 'Feed'});
+      }
       //// TODO: update post details.. here or in postsContext
     }
     // toast message
