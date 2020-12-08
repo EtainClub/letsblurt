@@ -9,6 +9,8 @@ import {navigate} from '~/navigation/service';
 
 export const LOGIN_TOKEN = 'loginToken';
 
+import {OTP} from '~/components';
+
 export const ResolveAuth = (props) => {
   //// props
   //// contexts
@@ -83,6 +85,11 @@ export const ResolveAuth = (props) => {
       return null;
     }
   };
+
+  // const _handleOTPResult = (result: boolean) => {
+  //   console.log('opt result', result);
+  // };
+  // return <OTP usePhoneNumber={true} handleOTPResult={_handleOTPResult} />;
 
   return null;
 };

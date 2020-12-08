@@ -60,7 +60,7 @@ const AccountScreen = (props: Props): JSX.Element => {
           fadeInDuration={300}
           fadeOutDuration={300}
           color="warning">
-          {intl.formatMessage({id: 'Signup.msg-copied'})}
+          {intl.formatMessage({id: 'Signup.msg_copied'})}
         </Toast>
         <Block
           middle
@@ -75,7 +75,7 @@ const AccountScreen = (props: Props): JSX.Element => {
             {`${intl.formatMessage({id: 'account'})}: ${props.account}`}
           </Text>
           <Text color="red" center size={theme.SIZES.FONT * 0.875}>
-            {intl.formatMessage({id: 'Signup.key-guide'})}
+            {intl.formatMessage({id: 'Signup.key_guide'})}
           </Text>
         </Block>
         <Block
@@ -122,7 +122,7 @@ const AccountScreen = (props: Props): JSX.Element => {
               setFinalized(true);
               console.log('finish button, key copied?', keyCopied);
             }}>
-            {intl.formatMessage({id: 'Signup.finish-button'})}
+            {intl.formatMessage({id: 'Signup.finish_button'})}
           </Button>
         </Block>
       </Block>
@@ -139,10 +139,10 @@ const AccountScreen = (props: Props): JSX.Element => {
             paddingHorizontal: 50,
           }}>
           <Text color="#fff" center size={theme.SIZES.FONT * 1.475}>
-            {intl.formatMessage({id: 'Signup.welcome-header'})}
+            {intl.formatMessage({id: 'Signup.welcome_header'})}
           </Text>
           <Text color="red" center size={theme.SIZES.FONT * 0.875}>
-            {intl.formatMessage({id: 'Signup.welcome-guide'})}
+            {intl.formatMessage({id: 'Signup.welcome_guide'})}
           </Text>
         </Block>
         <Block flex center style={{marginTop: 20}}>
@@ -151,7 +151,7 @@ const AccountScreen = (props: Props): JSX.Element => {
             style={styles.button}
             color={materialTheme.COLORS.BUTTON_COLOR}
             onPress={() => navigate({name: 'Login'})}>
-            {intl.formatMessage({id: 'Signup.login-button'})}
+            {intl.formatMessage({id: 'Signup.login_button'})}
           </Button>
           <Button
             color="transparent"
@@ -162,7 +162,7 @@ const AccountScreen = (props: Props): JSX.Element => {
               center
               color={theme.COLORS.WHITE}
               size={theme.SIZES.FONT * 0.75}>
-              {intl.formatMessage({id: 'Signup.home-button'})}
+              {intl.formatMessage({id: 'Signup.home_button'})}
             </Text>
           </Button>
         </Block>

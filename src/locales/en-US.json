@@ -144,7 +144,7 @@
     "phone_guide": "Enter your phone number. We will send you a text message with a verification code that you will need to enter on the next screen.",
     "phone_number": "Phone number",
     "phonenumber_guide": "e.g. +1-650-555-4567",
-    "phone_button": "Send SMS",
+    "phone_button": "Request Code",
     "sms_guide": "Enter the verification code that you just received.",
     "SMS_code": "SMS code here",
     "terms": "Terms",
@@ -173,7 +173,7 @@
     "phone_guide": "Enter your phone number. We will send you a text message with a verification code.",
     "phone_number": "Phone number",
     "phonenumber_guide": "e.g. +1-650-555-4567",
-    "phone_button": "Send SMS",
+    "phone_button": "Request Code",
     "sms_guide": "Enter the verification code that you've just received.",
     "SMS_code": "SMS code here",
     "confirm_button": "Confirm"

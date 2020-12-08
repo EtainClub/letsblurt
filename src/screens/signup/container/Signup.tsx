@@ -59,75 +59,8 @@ const Signup = (props: Props): JSX.Element => {
     return available;
   };
 
-  const _validatePhoneNumber = (phoneNumber: string): boolean => {
-    let regexp = /^\+[0-9]?()[0-9](\s|\S)(\d[0-9]{8,16})$/;
-    return regexp.test(phoneNumber);
-  };
-
-  const _signinPhoneNumber = async (phoneNumber: string) => {
-    console.log('phone number', phoneNumber);
-
-    const valid = _validatePhoneNumber(phoneNumber);
-    if (!valid) {
-      console.log('[signinPhoneNumber] phone number is not valid', phoneNumber);
-      return;
-    }
-    // setup language
-    //    auth().languageCode = 'en';
-
-    const confirmation = await auth().signInWithPhoneNumber(phoneNumber);
-    console.log('[_signinPhoneNumber] confirmation', confirmation);
-    // set confirmation
-    setConfirmation(confirmation);
-  };
-
-  const _checkNewUser = async () => {
-    const user = auth().currentUser;
-
-    console.log('[checkNewUser] user', user);
-    const userDoc = await firestore().collection('phones').doc(user.uid).get();
-    if (userDoc.exists) {
-      console.log('the phone number exists. try another phonenumber');
-      return false;
-    }
-    return true;
-  };
-
-  const _onCreateAccount = async (phoneNumber: string, smsCode: string) => {
-    // @test
-    smsCode = Config.SMS_TEST_CODE;
-    console.log('sms code', smsCode);
-    let user = null;
-    try {
-      user = await confirmation.confirm(smsCode);
-    } catch (error) {
-      console.log('invalid code', error);
-      return;
-    }
-    // // check if the user is new
-    const newUser = user.additionalUserInfo.isNewUser;
-    if (!newUser) {
-      // @todo handle this message
-      setToastMessage(intl.formatMessage({id: 'Signup.msg_exists'}));
-      return;
-    }
-    console.log('new user!');
-
-    // //// generate steemit id
-    // // check the ACT exists
-    // const ACTavailable = await checkClaimedToken(Config.CREATOR_ACCOUNT);
-    // console.log('ACT available', ACTavailable);
-    // // create ACT in case of no ACT
-    // if (!ACTavailable) {
-    //   const success = await claimAccountCreationToken(
-    //     Config.CREATOR_ACCOUNT,
-    //     Config.CREATOR__WIF,
-    //   );
-    //   console.log('succeeded to create an ACT?', success);
-    // }
-
+  const _createAccount = async () => {
     console.log('userState global props', userState.globalProps);
-
     // now create an account
     const _password = await createAccount(
       username,
@@ -162,6 +95,17 @@ const Signup = (props: Props): JSX.Element => {
     });
   };
 
+  const _handleOTPResult = (result: boolean) => {
+    console.log('opt result', result);
+    // TODO: creat account after user clicks the 'finish' since it takes money
+    // generated password first, then display the password
+    /// then, user clicks confirm or submit
+    // then finally create an account
+    if (result) {
+      setShowAccountScreen(true);
+    }
+  };
+
   return showAccountScreen ? (
     <AccountScreen account={username} password={password} />
   ) : showSignupScreen ? (
@@ -170,7 +114,7 @@ const Signup = (props: Props): JSX.Element => {
       checkUsernameAvailable={_checkUsernameAvailable}
     />
   ) : (
-    <OTP usePhoneNumber={true} />
+    <OTP usePhoneNumber={true} handleOTPResult={_handleOTPResult} />
   );
 
   // return showAccountScreen ? (

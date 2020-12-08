@@ -10,6 +10,7 @@ import {OTPView} from './OTPView';
 
 interface Props {
   usePhoneNumber: boolean;
+  handleOTPResult: (confirm: boolean) => void;
 }
 const OTPContainer = (props: Props): JSX.Element => {
   //// props
@@ -48,10 +49,13 @@ const OTPContainer = (props: Props): JSX.Element => {
     try {
       user = await confirmation.confirm(smsCode);
       console.log('[_confirmOTP] user', user);
+      // send back the result
+      props.handleOTPResult(true);
       return true;
     } catch (error) {
       console.log('invalid code', error);
-      return false;
+      // send back the result
+      props.handleOTPResult(false);
     }
   };
 
