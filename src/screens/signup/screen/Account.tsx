@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import {
   StyleSheet,
   Dimensions,
@@ -24,16 +24,21 @@ import {HeaderHeight, iPhoneX} from '~/constants/utils';
 import {navigate} from '~/navigation/service';
 
 import {useIntl} from 'react-intl';
-
+import {UIContext} from '~/contexts';
 const {width, height} = Dimensions.get('window');
 
 interface Props {
   account: string;
   password: string;
+  createAccount: () => void;
 }
 
 const AccountScreen = (props: Props): JSX.Element => {
+  //// language
   const intl = useIntl();
+  //// contexts
+  const {setToastMessage} = useContext(UIContext);
+
   const [copied, setCopied] = useState(false);
   const [keyCopied, setKeyCopied] = useState(false);
   const [finalized, setFinalized] = useState(false);
@@ -46,22 +51,21 @@ const AccountScreen = (props: Props): JSX.Element => {
     console.log('copied text', text);
     // update state to show toast
     setCopied(true);
+    // set toast message
+    setToastMessage(intl.formatMessage({id: 'Signup.msg_copied'}));
+  };
+
+  const _createAccount = () => {
+    // create an account
+    props.createAccount();
+    // set finalized
+    setFinalized(true);
+    console.log('finish button, key copied?', keyCopied);
   };
 
   const _renderKey = () => {
     return (
       <Block flex={1} center space="between">
-        <Toast
-          isShow={copied}
-          style={{width: '100%'}}
-          round
-          positionIndicator="center"
-          textStyle={{textAlign: 'center', fontSize: 16}}
-          fadeInDuration={300}
-          fadeOutDuration={300}
-          color="warning">
-          {intl.formatMessage({id: 'Signup.msg_copied'})}
-        </Toast>
         <Block
           middle
           style={{
@@ -118,10 +122,7 @@ const AccountScreen = (props: Props): JSX.Element => {
                 ? materialTheme.COLORS.ERROR
                 : materialTheme.COLORS.MUTED
             }
-            onPress={() => {
-              setFinalized(true);
-              console.log('finish button, key copied?', keyCopied);
-            }}>
+            onPress={_createAccount}>
             {intl.formatMessage({id: 'Signup.finish_button'})}
           </Button>
         </Block>

@@ -58,14 +58,22 @@ const SignupScreen = (props: Props): JSX.Element => {
     // check username valid
     const valid = _checkUsernameValid(value);
     if (valid) {
-      const available = await props.checkUsernameAvailable(value);
-      console.log('username avail?', available);
-      setAccountAvailable(available);
-      if (available) {
-        setMessage('The username is avaliable.');
-      } else {
-        setMessage('The username is already in use.');
-      }
+      setAccountAvailable(true);
+      setMessage('');
+    } else {
+      setAccountAvailable(false);
+    }
+  };
+
+  const _onCreateAccount = async () => {
+    const available = await props.checkUsernameAvailable(username);
+    console.log('username avail?', available);
+    setAccountAvailable(available);
+    if (available) {
+      setMessage('The username is avaliable.');
+      props.onCreateAccount(username);
+    } else {
+      setMessage('The username is already in use.');
     }
   };
 
@@ -140,10 +148,7 @@ const SignupScreen = (props: Props): JSX.Element => {
                     : materialTheme.COLORS.MUTED
                 }
                 style={styles.button}
-                onPress={() => {
-                  console.log('start signup');
-                  props.onCreateAccount(username);
-                }}>
+                onPress={_onCreateAccount}>
                 {intl.formatMessage({id: 'Signup.button'})}
               </Button>
               <Button

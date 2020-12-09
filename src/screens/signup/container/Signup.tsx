@@ -13,6 +13,7 @@ import firestore from '@react-native-firebase/firestore';
 import {
   checkUsernameAvailable,
   createAccount,
+  generateMasterPassword,
   getDynamicGlobalProperties,
 } from '~/providers/blurt/dblurtApi';
 
@@ -36,6 +37,7 @@ const Signup = (props: Props): JSX.Element => {
   const [showAccountScreen, setShowAccountScreen] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
 
   const [confirmation, setConfirmation] = useState<
     FirebaseAuthTypes.ConfirmationResult
@@ -48,6 +50,9 @@ const Signup = (props: Props): JSX.Element => {
   }, []);
 
   const _onStartSignup = async (username: string) => {
+    // generate masster password
+    const _password = generateMasterPassword();
+    setPassword(_password);
     setShowSignupScreen(false);
   };
 
@@ -62,16 +67,15 @@ const Signup = (props: Props): JSX.Element => {
   const _createAccount = async () => {
     console.log('userState global props', userState.globalProps);
     // now create an account
-    const _password = await createAccount(
+    const success = await createAccount(
       username,
+      password,
       Config.CREATOR_ACCOUNT,
       Config.CREATOR_ACTIVE_WIF,
       userState.globalProps.chainProps.account_creation_fee,
     );
     // check sanity
-    if (_password) {
-      setPassword(password);
-      setShowAccountScreen(true);
+    if (success) {
       // update phone db
       await addPhonenumberToDB(username, phoneNumber);
     }
@@ -95,7 +99,11 @@ const Signup = (props: Props): JSX.Element => {
     });
   };
 
-  const _handleOTPResult = (result: boolean) => {
+  const _handleOTPResult = (result: boolean, _phoneNumber?: string) => {
+    if (_phoneNumber != '') {
+      console.log('phoneNumber', _phoneNumber);
+      setPhoneNumber(_phoneNumber);
+    }
     console.log('opt result', result);
     // TODO: creat account after user clicks the 'finish' since it takes money
     // generated password first, then display the password
@@ -107,7 +115,11 @@ const Signup = (props: Props): JSX.Element => {
   };
 
   return showAccountScreen ? (
-    <AccountScreen account={username} password={password} />
+    <AccountScreen
+      account={username}
+      password={password}
+      createAccount={_createAccount}
+    />
   ) : showSignupScreen ? (
     <SignupScreen
       onCreateAccount={_onStartSignup}

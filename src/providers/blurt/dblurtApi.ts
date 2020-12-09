@@ -96,21 +96,21 @@ const wifIsValid = (privWif: string, pubWif: string) => {
 // check availabled claimed token
 // @return availabivity of the token
 
-// create an account
+//// generate master passwords
+export const generateMasterPassword = () => {
+  // generate random master password wif
+  const array = CryptoJS.lib.WordArray.random(10);
+  return 'P' + PrivateKey.fromSeed(array.toString()).toString();
+};
+
+//// create an account
 export const createAccount = async (
   username: string,
+  password: string,
   creator: string,
   creatorActiveKey: string,
   creationFee: string,
 ) => {
-  // generate random master password wif
-  const array = CryptoJS.lib.WordArray.random(10);
-  const password = 'P' + PrivateKey.fromSeed(array.toString()).toString();
-  console.log('creation fee', creationFee);
-
-  // @test without actual account creation
-  //return { result: "test", password: password };
-
   // private active key of creator account
   const creatorKey = PrivateKey.fromString(creatorActiveKey);
   // create keys
@@ -168,13 +168,13 @@ export const createAccount = async (
     );
     if (result) {
       console.log('creation result', result);
-      return password;
+      return true;
     } else {
-      return null;
+      return false;
     }
   } catch (error) {
     console.log('account creation failed', error);
-    return null;
+    return false;
   }
 };
 
