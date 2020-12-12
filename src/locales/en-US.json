@@ -231,7 +231,8 @@
     "weight_placeholder": "Weight (%)",
     "add_button": "Add",
     "save_button": "Save",
-    "cancel_button": "Cancel"
+    "cancel_button": "Cancel",
+    "error_total": "total percentage must be 100"
   },
   "PostDetails": {
     "edit-button": "Edit Post",

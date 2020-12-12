@@ -17,6 +17,14 @@ import {navigate} from '~/navigation/service';
 import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
 import {Beneficiary} from '~/components';
 
+import {BeneficiaryItem} from '~/components/Beneficiary/BeneficiaryContainer';
+
+// 5%
+const DEFAULT_BENEFICIARY: BeneficiaryItem = {
+  account: 'letsblurt',
+  weight: 500,
+};
+
 interface Props {
   route: any;
 }
@@ -39,12 +47,20 @@ const Posting = (props: Props): JSX.Element => {
   const [followingList, setFollowingList] = useState([]);
   const [filteredFollowings, setFilteredFollowings] = useState([]);
   const [showBeneficiaryModal, setShowBeneficiaryModal] = useState(false);
+  const [beneficiaries, setBeneficiaries] = useState([]);
 
   //// mount event
   useEffect(() => {
     // get following
     if (authState.loggedIn) {
+      // get following list
       _getFollowingList(authState.currentCredentials.username);
+      // add default beneficairy
+      const userWeight = 10000 - DEFAULT_BENEFICIARY.weight;
+      setBeneficiaries([
+        DEFAULT_BENEFICIARY,
+        {account: authState.currentCredentials.username, weight: userWeight},
+      ]);
     }
   }, []);
   //// edit mode event
@@ -170,9 +186,7 @@ const Posting = (props: Props): JSX.Element => {
         permlink = generatePermlink(title, true);
       }
       // add options such as beneficiaries
-      options = addPostingOptions(username, permlink, 'powerup', [
-        {account: 'letsblurt', weight: 500},
-      ]);
+      options = addPostingOptions(username, permlink, 'powerup', beneficiaries);
       console.log('_handlePressPostSumbit. options', options);
     }
     // build posting content
@@ -226,8 +240,9 @@ const Posting = (props: Props): JSX.Element => {
     setShowBeneficiaryModal(!showBeneficiaryModal);
   };
 
-  const _getBeneficiaries = (beneficiaries: any[]) => {
-    console.log('[Posting] Beneficiaries', beneficiaries);
+  const _getBeneficiaries = (_beneficiaries: any[]) => {
+    console.log('[Posting] Beneficiaries', _beneficiaries);
+    setBeneficiaries(_beneficiaries);
   };
 
   return (
@@ -246,6 +261,8 @@ const Posting = (props: Props): JSX.Element => {
       />
       {showBeneficiaryModal ? (
         <Beneficiary
+          username={authState.currentCredentials.username}
+          beneficiaries={beneficiaries}
           sourceList={followingList}
           getBeneficiaries={_getBeneficiaries}
         />

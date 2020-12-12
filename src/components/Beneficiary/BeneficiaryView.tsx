@@ -1,5 +1,5 @@
 //// react
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 //// react native
 import {
   View,
@@ -24,6 +24,8 @@ import Modal from 'react-native-modal';
 import Autocomplete from 'react-native-autocomplete-input';
 import {argonTheme} from '~/constants';
 const {width, height} = Dimensions.get('window');
+import {BeneficiaryItem} from './BeneficiaryContainer';
+import {UIContext} from '~/contexts';
 
 const WEIGHT_OPTIONS = ['100', '75', '50', '25', '10', '0'];
 const BACKGROUND_COLORS = [
@@ -32,33 +34,37 @@ const BACKGROUND_COLORS = [
 ];
 interface Props {
   sourceList: string[];
-  getBeneficiaries: (list: any[]) => void;
+  beneficiaries: BeneficiaryItem[];
+  handlePressRemove: (beneficiary: BeneficiaryItem) => void;
+  addBeneficiary: (beneficiary: BeneficiaryItem) => boolean;
+  handlePressSave: () => boolean;
 }
 const BeneficiaryView = (props: Props): JSX.Element => {
   //// props
+  const {beneficiaries} = props;
   //// language
   const intl = useIntl();
   //// contexts
+  const {setToastMessage} = useContext(UIContext);
   //// states
   const [showModal, setShowModal] = useState(true);
   const [hideResult, setHideResult] = useState(false);
   const [query, setQuery] = useState('');
   const [filteredList, setFilteredList] = useState([]);
-  const [beneficiaryList, setBeneficiaryList] = useState([]);
   const [weight, setWeight] = useState(WEIGHT_OPTIONS[0]);
-  const [weightFocused, setWeightFocused] = useState(false);
-  const [hideWeightResult, setHideWeightResult] = useState(false);
+  const [hideWeightResult, setHideWeightResult] = useState(true);
   const [appended, setAppended] = useState(false);
-  const [refreshList, setRefresList] = useState(false);
+  const [refresh, setRefresh] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
   //// effect
   useEffect(() => {
     if (appended) {
       setAppended(false);
-      setRefresList(true);
+      setRefresh(true);
     }
   }, [appended]);
 
-  const _handleChangeText = (text) => {
+  const _handleChangeAccount = (text) => {
     setQuery(text);
     // filter
     const _filtered = props.sourceList.filter((item) => item.includes(text));
@@ -125,44 +131,61 @@ const BeneficiaryView = (props: Props): JSX.Element => {
 
   ////
   const _handlePressAdd = () => {
+    //
+    if (query === '' || weight === '') return;
     // hide results
     setHideResult(true);
     setHideWeightResult(true);
     // check uniqueness
-    const duplicated = beneficiaryList.some((item) => item[0] === query);
+    const duplicated = beneficiaries.some((item) => item.account === query);
     if (duplicated) return;
-    // check sum of weight
-    let sum = 0;
-    beneficiaryList.forEach((item) => (sum += parseInt(item[1])));
-    sum += parseInt(weight);
-    console.log('sum of weights', sum);
-    // append the item
-    beneficiaryList.push([query, weight]);
-    setAppended(true);
+    // append
+    const _appended = props.addBeneficiary({
+      account: query,
+      weight: parseInt(weight) * 100,
+    });
+    if (_appended) {
+      setAppended(true);
+      // clear inputs
+      setQuery('');
+      setWeight('');
+    } else {
+      setErrorMessage(intl.formatMessage({id: 'Beneficiary.error_total'}));
+    }
   };
 
   ////
   const _handlePressSave = () => {
+    // send back the beneficiary list
+    const valid = props.handlePressSave();
+    if (!valid) {
+      setErrorMessage(intl.formatMessage({id: 'Beneficiary.error_total'}));
+      return;
+    }
     // close modal
     setShowModal(false);
-    // send back the beneficiary list
-    props.getBeneficiaries(beneficiaryList);
+    // clear inputs
+    setQuery('');
+    setWeight('');
   };
 
   ////
   const _renderBeneficiaries = () => {
-    console.log('bene list', beneficiaryList);
-    return beneficiaryList.map((item, index) => {
-      const avatar = `${Config.IMAGE_SERVER}/u/${item[0]}/avatar`;
+    console.log('bene list', beneficiaries);
+    return beneficiaries.map((item, index) => {
+      const {account, weight} = item;
+      console.log('weight', weight);
+      const avatar = `${Config.IMAGE_SERVER}/u/${account}/avatar`;
       return (
         <Block
-          key={item[0]}
+          key={account}
           row
           space="between"
           style={{
             marginBottom: 5,
             marginHorizontal: 10,
             padding: 5,
+            height: 50,
             backgroundColor:
               BACKGROUND_COLORS[index % BACKGROUND_COLORS.length],
           }}>
@@ -174,12 +197,36 @@ const BeneficiaryView = (props: Props): JSX.Element => {
               style={styles.avatar}
             />
             <Text size={14} style={{marginHorizontal: 5}}>
-              {item[0]}
+              {account}
             </Text>
           </Block>
-          <Text size={14} style={{marginHorizontal: 5, marginRight: 5}}>
-            {item[1]}%
-          </Text>
+          <Block row right style={{width: '50%', top: -0}}>
+            <Block center>
+              <Input
+                editable={index === 0 ? false : true}
+                placeholder={intl.formatMessage({
+                  id: 'Beneficiary.weight_placeholder',
+                })}
+                type="number-pad"
+                value={(weight / 100).toString()}
+                onChangeText={() => {}}
+              />
+            </Block>
+            <Block row center style={{marginLeft: 10}}>
+              <Text>%</Text>
+              <Button
+                disabled={index < 2 ? true : false}
+                onPress={() => props.handlePressRemove(item)}
+                onlyIcon
+                icon="trash"
+                iconFamily="font-awesome"
+                iconSize={14}
+                color={
+                  index < 2 ? argonTheme.COLORS.MUTED : argonTheme.COLORS.ERROR
+                }
+              />
+            </Block>
+          </Block>
         </Block>
       );
     });
@@ -187,14 +234,15 @@ const BeneficiaryView = (props: Props): JSX.Element => {
 
   const _renderHeader = () => (
     <Block center>
-      <Text
-        style={{
-          borderBottomColor: 'red',
-          borderBottomWidth: 5,
-          marginBottom: 10,
-        }}>
-        {intl.formatMessage({id: 'Beneficiary.header'})}
-      </Text>
+      <Block>
+        <Button
+          size="small"
+          shadowless
+          color={argonTheme.COLORS.FACEBOOK}
+          onPress={_handlePressAdd}>
+          {intl.formatMessage({id: 'Beneficiary.add_button'})}
+        </Button>
+      </Block>
       <Block card row space="between" style={{marginHorizontal: 10}}>
         <Autocomplete
           placeholder={intl.formatMessage({
@@ -202,8 +250,8 @@ const BeneficiaryView = (props: Props): JSX.Element => {
           })}
           style={{width: width * 0.5}}
           data={hideResult ? [] : filteredList}
-          defaultValue={query}
-          onChangeText={_handleChangeText}
+          value={query}
+          onChangeText={_handleChangeAccount}
           renderItem={({item, index}) => _renderItem(item, index)}
           keyExtractor={(item, index) => String(index)}
         />
@@ -213,9 +261,7 @@ const BeneficiaryView = (props: Props): JSX.Element => {
           })}
           style={{width: width * 0.3}}
           data={hideWeightResult ? [] : WEIGHT_OPTIONS}
-          defaultValue={weight}
-          onFocus={() => setWeightFocused(true)}
-          onBlur={() => setWeightFocused(false)}
+          value={weight}
           onChangeText={_handleChangeWeight}
           renderItem={({item, index}) => (
             <TouchableOpacity
@@ -227,44 +273,32 @@ const BeneficiaryView = (props: Props): JSX.Element => {
           keyExtractor={(item, index) => String(index)}
         />
       </Block>
-      <Block>
-        <Button
-          size="small"
-          shadowless
-          color={argonTheme.COLORS.FACEBOOK}
-          onPress={_handlePressAdd}>
-          {intl.formatMessage({id: 'Beneficiary.add_button'})}
-        </Button>
-      </Block>
-      <Block center>
-        <Text
-          style={{
-            borderBottomColor: 'red',
-            borderBottomWidth: 5,
-            marginBottom: 10,
-          }}>
-          {intl.formatMessage({id: 'Beneficiary.list_header'})}
-        </Text>
-      </Block>
     </Block>
   );
 
   const _renderFooter = () => (
-    <Block row center>
-      <Button
-        size="small"
-        shadowless
-        color={argonTheme.COLORS.ERROR}
-        onPress={_handlePressSave}>
-        {intl.formatMessage({id: 'Beneficiary.save_button'})}
-      </Button>
-      <Button
-        size="small"
-        shadowless
-        color={argonTheme.COLORS.MUTED}
-        onPress={() => setShowModal(false)}>
-        {intl.formatMessage({id: 'Beneficiary.cancel_button'})}
-      </Button>
+    <Block>
+      <Block row center>
+        <Button
+          size="small"
+          shadowless
+          color={argonTheme.COLORS.ERROR}
+          onPress={_handlePressSave}>
+          {intl.formatMessage({id: 'Beneficiary.save_button'})}
+        </Button>
+        <Button
+          size="small"
+          shadowless
+          color={argonTheme.COLORS.MUTED}
+          onPress={() => setShowModal(false)}>
+          {intl.formatMessage({id: 'Beneficiary.cancel_button'})}
+        </Button>
+      </Block>
+      <Block center>
+        <Text size={16} color="red">
+          {errorMessage}
+        </Text>
+      </Block>
     </Block>
   );
 
@@ -275,8 +309,18 @@ const BeneficiaryView = (props: Props): JSX.Element => {
       animationOut="zoomOut"
       onBackdropPress={() => setShowModal(false)}>
       <Block style={styles.listContainer}>
+        <Block center>
+          <Text
+            style={{
+              borderBottomColor: 'red',
+              borderBottomWidth: 5,
+              marginBottom: 10,
+            }}>
+            {intl.formatMessage({id: 'Beneficiary.list_header'})}
+          </Text>
+        </Block>
+        {refresh && _renderBeneficiaries()}
         {_renderHeader()}
-        {refreshList && _renderBeneficiaries()}
         {_renderFooter()}
       </Block>
     </Modal>
@@ -316,84 +360,3 @@ const styles = StyleSheet.create({
     borderRadius: 24 / 2,
   },
 });
-
-/*
-      <Block card center style={styles.modalContainer}>
-        <Text
-          style={{
-            borderBottomColor: 'red',
-            borderBottomWidth: 5,
-            marginBottom: 10,
-          }}>
-          {intl.formatMessage({id: 'Beneficiary.header'})}
-        </Text>
-        <Block card row space="between" style={{marginHorizontal: 10}}>
-          <Autocomplete
-            placeholder={intl.formatMessage({
-              id: 'Beneficiary.account_placeholder',
-            })}
-            style={{width: width * 0.5}}
-            data={hideResult ? [] : filteredList}
-            defaultValue={query}
-            onChangeText={_handleChangeText}
-            renderItem={({item, index}) => _renderItem(item, index)}
-          />
-          <Autocomplete
-            placeholder={intl.formatMessage({
-              id: 'Beneficiary.weight_placeholder',
-            })}
-            style={{width: width * 0.3}}
-            data={weightFocused ? WEIGHT_OPTIONS : []}
-            defaultValue={weight}
-            onFocus={() => setWeightFocused(true)}
-            onBlur={() => setWeightFocused(false)}
-            onChangeText={_handleChangeWeight}
-            renderItem={({item, index}) => (
-              <TouchableOpacity
-                key={item}
-                onPress={() => _handlePressWeightItem(item)}>
-                <Text>{item}</Text>
-              </TouchableOpacity>
-            )}
-          />
-        </Block>
-        <Block>
-          <Button
-            size="small"
-            shadowless
-            color={argonTheme.COLORS.FACEBOOK}
-            onPress={() => console.log('bene saved')}>
-            {intl.formatMessage({id: 'Beneficiary.add_button'})}
-          </Button>
-        </Block>
-        <Block center>
-          <Text
-            style={{
-              borderBottomColor: 'red',
-              borderBottomWidth: 5,
-            }}>
-            {intl.formatMessage({id: 'Beneficiary.list_header'})}
-          </Text>
-          {_renderBeneficiaries()}
-          <Button
-            size="small"
-            shadowless
-            color={argonTheme.COLORS.ERROR}
-            onPress={() => console.log('bene saved')}>
-            {intl.formatMessage({id: 'Beneficiary.save_button'})}
-          </Button>
-        </Block>
-      </Block>
-*/
-
-/*
-      <FlatList
-        data={beneficiaryList}
-        ListHeaderComponent={_renderHeader}
-        ListFooterComponent={_renderFooter}
-        renderItem={({item, index}) => _renderBeneficiaryItem(item, index)}
-        keyExtractor={(item, index) => String(index)}
-        initialNumToRender={5}
-        showsVerticalScrollIndicator={false}
-      />
-*/

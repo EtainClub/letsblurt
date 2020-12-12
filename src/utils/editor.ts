@@ -70,6 +70,14 @@ export const addPostingOptions = (
     return {};
   }
 
+  console.log('[addPostingOptions] beneficiaries', beneficiaries);
+  // need to sort beneficiaries (if not, error: Benficiaries must be specified in sorted order (account ascending))
+  const sortedBeneficiaries = beneficiaries.sort((a, b) =>
+    a.account > b.account ? 1 : a.account < b.account ? -1 : 0,
+  );
+
+  console.log('[addPostingOptions] sorted beneficiaries', sortedBeneficiaries);
+
   // beneficiaries
   // "extensions": [
   //   [
@@ -92,7 +100,7 @@ export const addPostingOptions = (
     allow_votes: true,
     allow_curation_rewards: true,
     //extensions: [[0, {beneficiaries: [{account: 'letsblurt', weight: 500}]}]], // 5%
-    extensions: [[0, {beneficiaries: beneficiaries}]], // 5%
+    extensions: [[0, {beneficiaries: sortedBeneficiaries}]], // 5%
   };
 
   switch (operationType) {
