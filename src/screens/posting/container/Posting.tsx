@@ -14,6 +14,8 @@ import {
   makeJsonMetadata,
 } from '~/utils/editor';
 import {navigate} from '~/navigation/service';
+import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
+import {Beneficiary} from '~/components';
 
 interface Props {
   route: any;
@@ -36,6 +38,7 @@ const Posting = (props: Props): JSX.Element => {
   const [posting, setPosting] = useState(false);
   const [followingList, setFollowingList] = useState([]);
   const [filteredFollowings, setFilteredFollowings] = useState([]);
+  const [showBeneficiaryModal, setShowBeneficiaryModal] = useState(false);
 
   //// mount event
   useEffect(() => {
@@ -219,18 +222,35 @@ const Posting = (props: Props): JSX.Element => {
     }
   };
 
+  const _handlePressBeneficiary = () => {
+    setShowBeneficiaryModal(!showBeneficiaryModal);
+  };
+
+  const _getBeneficiaries = (beneficiaries: any[]) => {
+    console.log('[Posting] Beneficiaries', beneficiaries);
+  };
+
   return (
-    <PostingScreen
-      originalPost={originalPost}
-      uploading={uploading}
-      uploadedImage={uploadedImage}
-      posting={posting}
-      handlePhotoUpload={_handlePhotoUpload}
-      handleCameraUpload={_handleCameraUpload}
-      handlePressPostSumbit={_handlePressPostSumbit}
-      followingList={filteredFollowings}
-      handleMentionAuthor={_showAuthorsModal}
-    />
+    <Block>
+      <PostingScreen
+        originalPost={originalPost}
+        uploading={uploading}
+        uploadedImage={uploadedImage}
+        posting={posting}
+        handlePhotoUpload={_handlePhotoUpload}
+        handleCameraUpload={_handleCameraUpload}
+        handlePressPostSumbit={_handlePressPostSumbit}
+        followingList={filteredFollowings}
+        handleMentionAuthor={_showAuthorsModal}
+        handlePressBeneficiary={_handlePressBeneficiary}
+      />
+      {showBeneficiaryModal ? (
+        <Beneficiary
+          sourceList={followingList}
+          getBeneficiaries={_getBeneficiaries}
+        />
+      ) : null}
+    </Block>
   );
 };
 

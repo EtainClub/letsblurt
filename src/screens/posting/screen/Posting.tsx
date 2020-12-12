@@ -45,6 +45,7 @@ interface Props {
   handlePressPostSumbit: (title: string, body: string, tags: string) => void;
   followingList?: string[];
   handleMentionAuthor: (text: string) => void;
+  handlePressBeneficiary: () => void;
 }
 
 const PostingScreen = (props: Props): JSX.Element => {
@@ -303,6 +304,8 @@ const PostingScreen = (props: Props): JSX.Element => {
     console.log('_handleRewardChange index', index);
     setRewardIndex(index);
   };
+  ////
+  const _handlePressBeneficiary = () => {};
 
   //// render preview of posting
   const _renderPreview = () => (
@@ -375,7 +378,7 @@ const PostingScreen = (props: Props): JSX.Element => {
             />
             {message && <Text color="red">{message}</Text>}
           </Block>
-          {
+          <Block row>
             <DropdownModal
               key={rewardOptions[rewardIndex]}
               defaultText={defaultOptionText || rewardOptions[rewardIndex]}
@@ -388,7 +391,14 @@ const PostingScreen = (props: Props): JSX.Element => {
               options={rewardOptions}
               onSelect={_handleRewardChange}
             />
-          }
+            <Button
+              size="small"
+              onPress={props.handlePressBeneficiary}
+              shadowless
+              color={argonTheme.COLORS.FACEBOOK}>
+              {intl.formatMessage({id: 'Posting.beneficiary_button'})}
+            </Button>
+          </Block>
 
           <Block center row>
             <Button

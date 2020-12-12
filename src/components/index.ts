@@ -16,6 +16,7 @@ import {WalletStatsView, WalletKeyView} from './Wallet';
 import {DraggableList} from './DraggableList';
 import {ParentPost} from './ParentPost';
 import {OTP} from './OTP';
+import {Beneficiary} from './Beneficiary';
 
 //import Switch from "./Switch";
 //import Voting from "./Voting";
@@ -39,4 +40,5 @@ export {
   DraggableList,
   ParentPost,
   OTP,
+  Beneficiary,
 };

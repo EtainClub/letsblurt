@@ -221,7 +221,17 @@
     "limited_lowercase": "Only use lower letters in tag",
     "limited_characters": "Use only allowed characters in tag",
     "limited_firstchar": "Tag must start with a letter",
-    "limited_lastchar": "Tag must end with letter or number"
+    "limited_lastchar": "Tag must end with letter or number",
+    "beneficiary_button": "Beneficiary"
+  },
+  "Beneficiary": {
+    "header": "Beneficiary Setting",
+    "list_header": "Beneficiary List",
+    "account_placeholder": "Account",
+    "weight_placeholder": "Weight (%)",
+    "add_button": "Add",
+    "save_button": "Save",
+    "cancel_button": "Cancel"
   },
   "PostDetails": {
     "edit-button": "Edit Post",
