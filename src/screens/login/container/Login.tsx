@@ -11,8 +11,15 @@ import auth from '@react-native-firebase/auth';
 import {getAccount, verifyPassoword} from '~/providers/blurt/dblurtApi';
 import {navigate} from '~/navigation/service';
 import {LoginScreen} from '../screen/Login';
-import {AuthContext, PostsContext, UIContext, UserContext} from '~/contexts';
+import {
+  AuthContext,
+  PostsContext,
+  UIContext,
+  UserContext,
+  SettingsContext,
+} from '~/contexts';
 import {LOGIN_TOKEN} from '~/screens';
+import {OTP} from '~/components';
 
 import AsyncStorage from '@react-native-community/async-storage';
 
@@ -31,9 +38,13 @@ const Login = (props: Props): JSX.Element => {
   const {authState, processLogin, processLogout} = useContext(AuthContext);
   const {uiState, setToastMessage} = useContext(UIContext);
   const {userState, updateVoteAmount} = useContext(UserContext);
-  // const {} = useContext(PostsContext);
+  const {settingsState} = useContext(SettingsContext);
+  //// states
+  const [showOTP, setShowOTP] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState('');
 
-  const _updateUserDB = async (username: string) => {
+  ////
+  const _updateUserDB = async (_username: string, _phoneNumber?: string) => {
     // sign in firebase anonymously
     await auth()
       .signInAnonymously()
@@ -48,7 +59,7 @@ const Login = (props: Props): JSX.Element => {
         //// save the push token to user db
         // create user document with username
         // check if the user document exists
-        const userRef = firestore().collection('users').doc(username);
+        const userRef = firestore().collection('users').doc(_username);
         userRef
           .get()
           .then((doc) => {
@@ -59,21 +70,22 @@ const Login = (props: Props): JSX.Element => {
               userRef
                 .set({
                   pushToken,
-                  username: username,
+                  username: _username,
                   createdAt: new Date(),
                   lastLoginAt: new Date(),
+                  phone: _phoneNumber,
                 })
                 .then(() => console.log('created user document'))
                 .catch((error) =>
                   console.log('failed to create a user document', error),
                 );
             } else {
-              console.log('user doc exists, username', username);
+              console.log('user doc exists, username', _username);
               // update push token
               userRef.update({pushToken, lastLoginAt: new Date()});
             }
             // save the username to async storage for auto login
-            AsyncStorage.setItem(LOGIN_TOKEN, username);
+            AsyncStorage.setItem(LOGIN_TOKEN, _username);
           })
           .catch((error) => {
             console.log('failed to get user document', error);
@@ -82,7 +94,48 @@ const Login = (props: Props): JSX.Element => {
       .catch((error) => console.log('failed to get push token', error));
   };
 
+  //// process otp
+  // logic
+  // 1. the user never login in firebase (no user doc exists)
+  // then, show otp and get the phone number and save it in update DB
+  // 2. the user has doc which includes phone number, but not setting usingOTP,
+  // then, do not show otp
+  // otherwise, show otp
+  const _processOTP = async (username) => {
+    // @test
+    username = 'ray7272';
+
+    //// check if the user has no phone number
+    // get user doc
+    const userRef = firestore().collection('users').doc(username);
+    userRef
+      .get()
+      .then((doc) => {
+        // check if a doc exists
+        if (!doc.exists) {
+          console.log('user doc does not exist');
+          // open otp modal
+          setShowOTP(true);
+        } else {
+          console.log('[login|processOTP] doc data', doc.data());
+          // check setting if login opt is on
+          if (settingsState.usingOTP) {
+            // set phone number
+            setPhoneNumber(doc.data().phone);
+            setShowOTP(true);
+          }
+        }
+      })
+      .catch((error) => {
+        console.log('failed to get user doc', error);
+      });
+  };
+
   const _processLogin = async (username: string, password: string) => {
+    // @test
+    username = 'etainclub';
+    password = Config.ETAINCLUB_POSTING_WIF;
+
     console.log('[LoginContainer] _processLogin, username', username);
     // verify the private key
     const account = await verifyPassoword(username, password);
@@ -90,26 +143,57 @@ const Login = (props: Props): JSX.Element => {
       setToastMessage(intl.formatMessage({id: 'Login.login_error'}));
       return false;
     }
-    //// process login
     console.log('password is valid');
-
-    // start otp
-
+    //// process login
     // process login action
     processLogin({username, password}, addingAccount);
-    // process firestore login
-    _updateUserDB(username);
+    // otp
+    await _processOTP(username);
 
-    console.log('account info', account);
-    // @test get the credentials
-    console.log('after process login authState', authState);
-    setToastMessage(`logged in as ${username}`);
-    // update user vote amount
-    updateVoteAmount(username);
-    // navigate to feed
-    navigate({name: 'Feed'});
+    // // process firestore login
+    //    _updateUserDB(username);
+
+    // console.log('account info', account);
+    // // @test get the credentials
+    // console.log('after process login authState', authState);
+    // setToastMessage(`logged in as ${username}`);
+    // // update user vote amount
+    // updateVoteAmount(username);
+    // // navigate to feed
+    // navigate({name: 'Feed'});
   };
-  return <LoginScreen processLogin={_processLogin} />;
+
+  const _handleOTPResult = (result: boolean, _phoneNumber?: string) => {
+    // hide otp
+    setShowOTP(false);
+    if (_phoneNumber != '') {
+      console.log('phoneNumber', _phoneNumber);
+      setPhoneNumber(_phoneNumber);
+    }
+    console.log('opt result', result);
+    if (result) {
+      // save phone number to db
+      //      setShowAccountScreen(true);
+      // update db
+      // @test
+      const username = 'ray7272';
+      _updateUserDB(username, _phoneNumber);
+      setToastMessage(`logged in as ${username}`);
+      // update user vote amount
+      updateVoteAmount(username);
+      // navigate to feed
+      navigate({name: 'Feed'});
+    }
+  };
+
+  return showOTP ? (
+    <OTP
+      usePhoneNumber={phoneNumber ? false : true}
+      handleOTPResult={_handleOTPResult}
+    />
+  ) : (
+    <LoginScreen processLogin={_processLogin} />
+  );
 };
 
 export {Login};
