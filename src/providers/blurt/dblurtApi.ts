@@ -406,6 +406,18 @@ export const fetchGlobalProps = async (): Promise<BlockchainGlobalProps> => {
   return globalProps;
 };
 
+//// get latest block
+export const fetchLatestBlock = async () => {
+  try {
+    const block = await client.blockchain.getCurrentBlock();
+    console.log('[fetchLatestBlock] block', block);
+    return block;
+  } catch (error) {
+    console.log('failed to fetch latest block', error);
+    return null;
+  }
+};
+
 ////// user related
 //// account
 // get account

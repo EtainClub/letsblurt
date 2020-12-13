@@ -23,7 +23,6 @@ const OTPContainer = (props: Props): JSX.Element => {
   useEffect(() => {
     // if the phone number is given
     if (props.phoneNumber) {
-      debugger;
       // sign
       _signinPhoneNumber(props.phoneNumber);
     }
@@ -50,7 +49,6 @@ const OTPContainer = (props: Props): JSX.Element => {
 
     const confirmation = await auth().signInWithPhoneNumber(_phoneNumber);
     console.log('[_signinPhoneNumber] confirmation', confirmation);
-    debugger;
     // set confirmation
     setConfirmation(confirmation);
     // set phone number

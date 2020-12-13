@@ -14,6 +14,7 @@ import {
   fetchTagList,
   fetchPostDetails,
   fetchAccountState,
+  fetchLatestBlock,
 } from '~/providers/blurt/dblurtApi';
 import {renderPostBody} from '~/utils/render-helpers';
 import firestore from '@react-native-firebase/firestore';
@@ -198,7 +199,9 @@ const PostsProvider = ({children}: Props) => {
   ////// action creators
   //// fetch tag list
   const getTagList = async (username?: string) => {
-    //// fetch standard tags
+    // @test
+    const blockData = await fetchLatestBlock();
+    //// fetch default tags
     // const _tagList = await fetchTagList();
     // const _tags = _tagList.map((tag) => tag.tag);
 
