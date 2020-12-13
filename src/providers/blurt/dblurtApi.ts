@@ -24,7 +24,7 @@ import {
 
 import {PrivateKey as PrivateKey2} from '@esteemapp/dhive';
 
-import {ProfileData} from '~/contexts/types';
+import {PostsActionTypes, ProfileData} from '~/contexts/types';
 
 import {
   PostingContent,
@@ -447,6 +447,26 @@ export const getVoteAmount = async (
     return voteAmount;
   } catch (error) {
     console.log('failed to get vote amount', error);
+    return null;
+  }
+};
+
+//// fetch account state with extra data
+export const fetchAccountState = async (username: string) => {
+  try {
+    // get state
+    const params = `@${username}`;
+    const accountState = await client.call('condenser_api', `get_state`, [
+      params,
+    ]);
+    console.log('[fetchUserProfile] accountState', accountState);
+    if (!accountState) {
+      console.log('[fetchUserProfile] accountState is null', accountState);
+      return null;
+    }
+    return accountState;
+  } catch (error) {
+    console.log('failed to fetch state', error);
     return null;
   }
 };

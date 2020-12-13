@@ -13,6 +13,7 @@ import {
   fetchCommunityList,
   fetchTagList,
   fetchPostDetails,
+  fetchAccountState,
 } from '~/providers/blurt/dblurtApi';
 import {renderPostBody} from '~/utils/render-helpers';
 import firestore from '@react-native-firebase/firestore';
@@ -197,14 +198,23 @@ const PostsProvider = ({children}: Props) => {
   ////// action creators
   //// fetch tag list
   const getTagList = async (username?: string) => {
-    // fetch tag list
-    const _tagList = await fetchTagList();
-    const _tags = _tagList.map((tag) => tag.tag);
-    let tagList = _tags;
+    //// fetch standard tags
+    // const _tagList = await fetchTagList();
+    // const _tags = _tagList.map((tag) => tag.tag);
+
+    //// fetch trending tags
+    const accountState = await fetchAccountState('letsblurt');
+    if (!accountState) {
+      console.log('[getTagList] account state is null');
+      return null;
+    }
+    const _tags = accountState.tag_idx.trending;
+    console.log('[getTagList] _tags', _tags);
+    let tagList = _tags.slice(1, _tags.length - 1);
     if (username) {
-      tagList = ['Feed', 'All', ..._tags];
+      tagList = ['Feed', 'All', ..._tags.slice(1, _tags.length - 1)];
     } else {
-      tagList = ['All', ..._tags];
+      tagList = ['All', ..._tags.slice(1, _tags.length - 1)];
     }
     // dispatch action
     dispatch({
