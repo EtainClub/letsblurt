@@ -305,27 +305,35 @@ const PostsProvider = ({children}: Props) => {
       username,
     );
 
-    //// now fetch posts
+    // //// now fetch posts
+    // let _posts = null;
+    // for (let i = 0; i < MAX_RETRY; i++) {
+    //   // increase retry count
+    //   dispatch({
+    //     type: PostsActionTypes.RETRY_FETCHING,
+    //   });
+    //   const result = await _fetchPosts(filter, tag, startPostRef, username);
+    //   // check fetching result
+    //   if (result.length != 0) {
+    //     _posts = result;
+    //     break;
+    //   }
+    //   setToastMessage('failed to fetch posts, retry fetching...');
+    // }
+    // console.log('[PostsContext|fetchPosts] fetched post', _posts);
+    // // check result of trying
+    // if (!_posts) {
+    //   setToastMessage('failed to fetch posts, retried 3 times');
+    //   return null;
+    // }
+
     let _posts = null;
-    for (let i = 0; i < MAX_RETRY; i++) {
-      // increase retry count
-      dispatch({
-        type: PostsActionTypes.RETRY_FETCHING,
-      });
-      const result = await _fetchPosts(filter, tag, startPostRef, username);
-      // check fetching result
-      if (result.length != 0) {
-        _posts = result;
-        break;
-      }
-      setToastMessage('failed to fetch posts, retry fetching...');
-    }
-    console.log('[PostsContext|fetchPosts] fetched post', _posts);
-    // check result of trying
-    if (!_posts) {
-      setToastMessage('failed to fetch posts, retried 3 times');
-      return null;
-    }
+    const result = await _fetchPosts(filter, tag, startPostRef, username);
+    // check fetching result
+    if (result.length != 0) {
+      _posts = result;
+    } else return null;
+
     // set start post ref
     const lastPost = _posts[_posts.length - 1];
     const lastPostRef = lastPost.state.post_ref;

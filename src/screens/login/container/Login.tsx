@@ -45,11 +45,11 @@ const Login = (props: Props): JSX.Element => {
 
   ////
   const _updateUserDB = async (_username: string, _phoneNumber?: string) => {
-    // sign in firebase anonymously
-    await auth()
-      .signInAnonymously()
-      .then((result) => console.log('signed in firebase', result))
-      .catch((error) => console.log('failed to sign in firebase', error));
+    // // sign in firebase anonymously
+    // await auth()
+    //   .signInAnonymously()
+    //   .then((result) => console.log('signed in firebase', result))
+    //   .catch((error) => console.log('failed to sign in firebase', error));
 
     //// get device push token
     // request permission
@@ -145,6 +145,13 @@ const Login = (props: Props): JSX.Element => {
     }
     console.log('password is valid');
     //// process login
+
+    // sign in firebase anonymously to use firebase firestore
+    await auth()
+      .signInAnonymously()
+      .then((result) => console.log('signed in firebase', result))
+      .catch((error) => console.log('failed to sign in firebase', error));
+
     // process login action
     processLogin({username, password}, addingAccount);
     // otp
