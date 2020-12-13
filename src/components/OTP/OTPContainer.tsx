@@ -10,6 +10,7 @@ import {OTPView} from './OTPView';
 
 interface Props {
   usePhoneNumber: boolean;
+  phoneNUmber?: string;
   handleOTPResult: (confirm: boolean, phoneNumber?: string) => void;
 }
 const OTPContainer = (props: Props): JSX.Element => {
@@ -19,6 +20,14 @@ const OTPContainer = (props: Props): JSX.Element => {
   const [confirmation, setConfirmation] = useState<
     FirebaseAuthTypes.ConfirmationResult
   >(null);
+  //// effect
+  useEffect(() => {
+    // if use phone number
+    if (props.usePhoneNumber) {
+      // sign
+      _signinPhoneNumber(props.phoneNUmber);
+    }
+  }, []);
 
   const _validatePhoneNumber = (_phoneNumber: string): boolean => {
     let regexp = /^\+[0-9]?()[0-9](\s|\S)(\d[0-9]{8,16})$/;
