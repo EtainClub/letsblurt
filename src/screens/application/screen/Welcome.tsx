@@ -77,7 +77,8 @@ const WelcomeScreen = () => {
             key={index}
             style={{marginHorizontal: 10}}
             size={20}
-            name={id === index ? 'circle' : 'circle-o'}
+            color="white"
+            name={id === index ? 'circle' : 'circle-thin'}
             family="font-awesome"
           />
         ))}

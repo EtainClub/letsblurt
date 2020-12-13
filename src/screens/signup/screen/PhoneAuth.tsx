@@ -147,9 +147,9 @@ const PhoneAuthScreen = (props: Props): JSX.Element => {
   const _onSendSMS = async () => {
     setSMSRequested(true);
     setMessage('');
-    // const phone = '+' + country.callingCode[0] + phoneNumber;
+    const phone = '+' + country.callingCode[0] + phoneNumber;
     // @test test phone number
-    const phone = Config.TEST_PHONE_NUMBER;
+    // const phone = Config.TEST_PHONE_NUMBER;
     // process sign in
     props.signinPhoneNumber(phone);
   };

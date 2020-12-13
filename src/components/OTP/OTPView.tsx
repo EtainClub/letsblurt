@@ -33,7 +33,7 @@ const {width, height} = Dimensions.get('window');
 const countryData = require('react-native-country-picker-modal/lib/assets/data/countries-emoji.json');
 
 interface Props {
-  usePhoneNumber: boolean;
+  usePhoneNumberForm: boolean;
   signinPhoneNumber(phoneNumber: string): Promise<void>;
   confirmOTP(smsCode: string): Promise<boolean>;
 }
@@ -52,11 +52,10 @@ const OTPView = (props: Props): JSX.Element => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [smsRequested, setSMSRequested] = useState(false);
   const [message, setMessage] = useState('');
-  const [authConfirm, setAuthConfirm] = useState(null);
 
   //// events
   useEffect(() => {
-    if (props.usePhoneNumber) {
+    if (props.usePhoneNumberForm) {
       console.log('countryData', countryData);
 
       // get device country based on language setting not based on timezone
@@ -72,6 +71,10 @@ const OTPView = (props: Props): JSX.Element => {
 
       // message
       setMessage(intl.formatMessage({id: 'Signup.phonenumber_guide'}));
+    } else {
+      // login process stated with the given number
+      // so otp code is requested
+      setSMSRequested(true);
     }
   }, []);
 
@@ -140,9 +143,9 @@ const OTPView = (props: Props): JSX.Element => {
   const _onSendSMS = async () => {
     setSMSRequested(true);
     setMessage('');
-    // const phone = '+' + country.callingCode[0] + phoneNumber;
+    const phone = '+' + country.callingCode[0] + phoneNumber;
     // @test test phone number
-    const phone = Config.TEST_PHONE_NUMBER;
+    //    const phone = Config.TEST_PHONE_NUMBER;
     // process sign in
     props.signinPhoneNumber(phone);
   };
@@ -199,7 +202,7 @@ const OTPView = (props: Props): JSX.Element => {
           }}>
           {intl.formatMessage({id: 'OTP.header'})}
         </Text>
-        {props.usePhoneNumber ? _renderPhoneInput() : null}
+        {props.usePhoneNumberForm ? _renderPhoneInput() : null}
         {_renderSMSInput()}
       </Block>
     </Modal>

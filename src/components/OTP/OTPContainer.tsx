@@ -9,8 +9,7 @@ import auth, {FirebaseAuthTypes, firebase} from '@react-native-firebase/auth';
 import {OTPView} from './OTPView';
 
 interface Props {
-  usePhoneNumber: boolean;
-  phoneNUmber?: string;
+  phoneNumber: string;
   handleOTPResult: (confirm: boolean, phoneNumber?: string) => void;
 }
 const OTPContainer = (props: Props): JSX.Element => {
@@ -22,10 +21,11 @@ const OTPContainer = (props: Props): JSX.Element => {
   >(null);
   //// effect
   useEffect(() => {
-    // if use phone number
-    if (props.usePhoneNumber) {
+    // if the phone number is given
+    if (props.phoneNumber) {
+      debugger;
       // sign
-      _signinPhoneNumber(props.phoneNUmber);
+      _signinPhoneNumber(props.phoneNumber);
     }
   }, []);
 
@@ -50,6 +50,7 @@ const OTPContainer = (props: Props): JSX.Element => {
 
     const confirmation = await auth().signInWithPhoneNumber(_phoneNumber);
     console.log('[_signinPhoneNumber] confirmation', confirmation);
+    debugger;
     // set confirmation
     setConfirmation(confirmation);
     // set phone number
@@ -58,7 +59,7 @@ const OTPContainer = (props: Props): JSX.Element => {
 
   const _confirmOTP = async (smsCode: string) => {
     // @test
-    smsCode = Config.SMS_TEST_CODE;
+    //    smsCode = Config.SMS_TEST_CODE;
     console.log('sms code', smsCode);
     let user = null;
     try {
@@ -76,7 +77,7 @@ const OTPContainer = (props: Props): JSX.Element => {
 
   return (
     <OTPView
-      usePhoneNumber={props.usePhoneNumber}
+      usePhoneNumberForm={props.phoneNumber ? false : true}
       signinPhoneNumber={_signinPhoneNumber}
       confirmOTP={_confirmOTP}
     />

@@ -103,7 +103,7 @@ const Login = (props: Props): JSX.Element => {
   // otherwise, show otp
   const _processOTP = async (username) => {
     // @test
-    username = 'ray7272';
+    //    username = 'ray7272';
 
     //// check if the user has no phone number
     // get user doc
@@ -133,8 +133,8 @@ const Login = (props: Props): JSX.Element => {
 
   const _processLogin = async (username: string, password: string) => {
     // @test
-    username = 'etainclub';
-    password = Config.ETAINCLUB_POSTING_WIF;
+    //    username = 'etainclub';
+    //    password = Config.ETAINCLUB_POSTING_WIF;
 
     console.log('[LoginContainer] _processLogin, username', username);
     // verify the private key
@@ -176,7 +176,8 @@ const Login = (props: Props): JSX.Element => {
       //      setShowAccountScreen(true);
       // update db
       // @test
-      const username = 'ray7272';
+      //      const username = 'ray7272';
+      const {username} = authState.currentCredentials;
       _updateUserDB(username, _phoneNumber);
       setToastMessage(`logged in as ${username}`);
       // update user vote amount
@@ -187,10 +188,7 @@ const Login = (props: Props): JSX.Element => {
   };
 
   return showOTP ? (
-    <OTP
-      usePhoneNumber={phoneNumber ? false : true}
-      handleOTPResult={_handleOTPResult}
-    />
+    <OTP phoneNumber={phoneNumber} handleOTPResult={_handleOTPResult} />
   ) : (
     <LoginScreen processLogin={_processLogin} />
   );

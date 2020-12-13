@@ -126,7 +126,7 @@ const Signup = (props: Props): JSX.Element => {
       checkUsernameAvailable={_checkUsernameAvailable}
     />
   ) : (
-    <OTP usePhoneNumber={true} handleOTPResult={_handleOTPResult} />
+    <OTP phoneNumber="" handleOTPResult={_handleOTPResult} />
   );
 
   // return showAccountScreen ? (
