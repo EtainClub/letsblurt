@@ -24,9 +24,37 @@ const OTPContainer = (props: Props): JSX.Element => {
     // if the phone number is given
     if (props.phoneNumber) {
       // sign
-      _signinPhoneNumber(props.phoneNumber);
+      //      _signinPhoneNumber(props.phoneNumber);
+      _verifyPhoneNumber(props.phoneNumber);
     }
   }, []);
+
+  const _verifyPhoneNumber = async (_phoneNumber: string) => {
+    auth()
+      .verifyPhoneNumber(_phoneNumber)
+      .on(
+        'state_changed',
+        (phoneAuthSnapshot) => {
+          switch (phoneAuthSnapshot.state) {
+            case firebase.auth.PhoneAuthState.CODE_SENT:
+              console.log('[_verifyPhoneNumber] code sent');
+              break;
+            case firebase.auth.PhoneAuthState.ERROR: // or 'error'
+              console.log('verification error');
+              console.log(phoneAuthSnapshot.error);
+              break;
+            case firebase.auth.PhoneAuthState.AUTO_VERIFIED: // or 'verified'
+              // auto verified means the code has also been automatically confirmed as correct/received
+              // phoneAuthSnapshot.code will contain the auto verified sms code - no need to ask the user for input.
+              console.log('auto verified on android');
+              console.log(phoneAuthSnapshot);
+          }
+        },
+        (error) => {
+          console.log('failed to verify phone number', error);
+        },
+      );
+  };
 
   const _validatePhoneNumber = (_phoneNumber: string): boolean => {
     let regexp = /^\+[0-9]?()[0-9](\s|\S)(\d[0-9]{8,16})$/;

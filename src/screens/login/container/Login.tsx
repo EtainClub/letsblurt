@@ -178,7 +178,9 @@ const Login = (props: Props): JSX.Element => {
       setPhoneNumber(_phoneNumber);
     }
     console.log('opt result', result);
-    if (result) {
+    // @test
+    if (1) {
+      // if (result) {
       // save phone number to db
       //      setShowAccountScreen(true);
       // update db
