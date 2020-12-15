@@ -1,6 +1,7 @@
 //// react
 import React, {useState, useContext, useEffect} from 'react';
 //// react native
+import {Platform} from 'react-native';
 //// config
 import Config from 'react-native-config';
 //// language
@@ -16,6 +17,7 @@ const OTPContainer = (props: Props): JSX.Element => {
   //// props
   //// states
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [smsCode, setSMSCode] = useState('');
   const [confirmation, setConfirmation] = useState<
     FirebaseAuthTypes.ConfirmationResult
   >(null);
@@ -23,13 +25,17 @@ const OTPContainer = (props: Props): JSX.Element => {
   useEffect(() => {
     // if the phone number is given
     if (props.phoneNumber) {
-      // sign
-      //      _signinPhoneNumber(props.phoneNumber);
+      // phone auth
       _verifyPhoneNumber(props.phoneNumber);
     }
   }, []);
 
   const _verifyPhoneNumber = async (_phoneNumber: string) => {
+    const valid = _validatePhoneNumber(_phoneNumber);
+    if (!valid) return null;
+    // set phone number
+    setPhoneNumber(_phoneNumber);
+    // process phone auth
     auth()
       .verifyPhoneNumber(_phoneNumber)
       .on(
@@ -48,6 +54,8 @@ const OTPContainer = (props: Props): JSX.Element => {
               // phoneAuthSnapshot.code will contain the auto verified sms code - no need to ask the user for input.
               console.log('auto verified on android');
               console.log(phoneAuthSnapshot);
+              // set sms code
+              setSMSCode(phoneAuthSnapshot.code);
           }
         },
         (error) => {
@@ -83,10 +91,15 @@ const OTPContainer = (props: Props): JSX.Element => {
     setPhoneNumber(_phoneNumber);
   };
 
-  const _confirmOTP = async (smsCode: string) => {
+  const _confirmOTP = async (_smsCode: string) => {
     // @test
     //    smsCode = Config.SMS_TEST_CODE;
-    console.log('sms code', smsCode);
+    console.log('sms code', _smsCode);
+    // handle android auto login
+    if (Platform.OS === 'android') {
+      props.handleOTPResult(true, phoneNumber);
+      return true;
+    }
     let user = null;
     try {
       user = await confirmation.confirm(smsCode);
@@ -97,14 +110,16 @@ const OTPContainer = (props: Props): JSX.Element => {
     } catch (error) {
       console.log('invalid code', error);
       // send back the result
-      props.handleOTPResult(false);
+      props.handleOTPResult(false, phoneNumber);
+      return false;
     }
   };
 
   return (
     <OTPView
       usePhoneNumberForm={props.phoneNumber ? false : true}
-      signinPhoneNumber={_signinPhoneNumber}
+      smsCode={smsCode}
+      verifyPhoneNumber={_verifyPhoneNumber}
       confirmOTP={_confirmOTP}
     />
   );

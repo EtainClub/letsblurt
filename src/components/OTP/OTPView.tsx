@@ -34,7 +34,8 @@ const countryData = require('react-native-country-picker-modal/lib/assets/data/c
 
 interface Props {
   usePhoneNumberForm: boolean;
-  signinPhoneNumber(phoneNumber: string): Promise<void>;
+  smsCode?: string;
+  verifyPhoneNumber(phoneNumber: string): Promise<void>;
   confirmOTP(smsCode: string): Promise<boolean>;
 }
 const OTPView = (props: Props): JSX.Element => {
@@ -45,7 +46,7 @@ const OTPView = (props: Props): JSX.Element => {
   //// states
   const [showModal, setShowModal] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [smsCode, setSMSCode] = useState('');
+  const [smsCode, setSMSCode] = useState(props.smsCode);
   const [countryCode, setCountryCode] = useState<CountryCode>('KR');
   const [withFlag, setWithFlag] = useState<boolean>(true);
   const [country, setCountry] = useState<Country>(null);
@@ -77,6 +78,13 @@ const OTPView = (props: Props): JSX.Element => {
       setSMSRequested(true);
     }
   }, []);
+
+  //// event: sms code from props
+  useEffect(() => {
+    if (props.smsCode) {
+      setSMSCode(props.smsCode);
+    }
+  }, [props.smsCode]);
 
   const _handlePhoneNumberChange = (value: string) => {
     setPhoneNumber(value);
@@ -147,7 +155,7 @@ const OTPView = (props: Props): JSX.Element => {
     // @test test phone number
     //    const phone = Config.TEST_PHONE_NUMBER;
     // process sign in
-    props.signinPhoneNumber(phone);
+    props.verifyPhoneNumber(phone);
   };
 
   const _renderSMSInput = () => {
