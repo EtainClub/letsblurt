@@ -170,22 +170,15 @@ const Login = (props: Props): JSX.Element => {
     // navigate({name: 'Feed'});
   };
 
-  const _handleOTPResult = (result: boolean, _phoneNumber?: string) => {
+  const _handleOTPResult = (valid: boolean, _phoneNumber?: string) => {
     // hide otp
     setShowOTP(false);
     if (_phoneNumber != '') {
       console.log('phoneNumber', _phoneNumber);
       setPhoneNumber(_phoneNumber);
     }
-    console.log('opt result', result);
-    // @test
-    if (1) {
-      // if (result) {
-      // save phone number to db
-      //      setShowAccountScreen(true);
-      // update db
-      // @test
-      //      const username = 'ray7272';
+    console.log('opt result', valid);
+    if (valid) {
       const {username} = authState.currentCredentials;
       _updateUserDB(username, _phoneNumber);
       setToastMessage(`logged in as ${username}`);

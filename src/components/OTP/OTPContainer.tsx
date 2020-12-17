@@ -97,7 +97,8 @@ const OTPContainer = (props: Props): JSX.Element => {
     console.log('sms code', _smsCode);
     // handle android auto login
     if (Platform.OS === 'android') {
-      props.handleOTPResult(true, phoneNumber);
+      const valid = smsCode === _smsCode ? true : false;
+      props.handleOTPResult(valid, phoneNumber);
       return true;
     }
     let user = null;
