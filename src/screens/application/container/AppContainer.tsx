@@ -53,8 +53,8 @@ export const AppContainer = (props: Props): JSX.Element => {
       // handle message
       _handleRemoteMessages(message);
     });
-
     return () => {
+      if (__DEV__) console.log('unsubscribe notification listener');
       fgMsgListener();
     };
   }, []);
