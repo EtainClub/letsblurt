@@ -138,7 +138,7 @@ const ActionBarView = (props: Props): JSX.Element => {
         onBackdropPress={() => setShowVotingModal(false)}>
         <Block card center style={styles.votingContainer}>
           <Text color={argonTheme.COLORS.ERROR}>
-            {votingWeight} % ({votingDollar} BLT)
+            {votingWeight} % ({votingDollar} B)
           </Text>
 
           <Slider
@@ -177,7 +177,7 @@ const ActionBarView = (props: Props): JSX.Element => {
             size={actionBarStyle.textSize}
             color={argonTheme.COLORS.ERROR}
             style={{paddingRight: 5}}>
-            {payout} BLT
+            {payout} B
           </Text>
           <Button
             onPress={_onPressVoteIcon}

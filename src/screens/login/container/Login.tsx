@@ -40,6 +40,7 @@ const Login = (props: Props): JSX.Element => {
   const {userState, updateVoteAmount} = useContext(UserContext);
   const {settingsState} = useContext(SettingsContext);
   //// states
+  const [username, setUsername] = useState('');
   const [showOTP, setShowOTP] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
 
@@ -123,6 +124,13 @@ const Login = (props: Props): JSX.Element => {
             // set phone number
             setPhoneNumber(doc.data().phone);
             setShowOTP(true);
+          } else {
+            _updateUserDB(username);
+            setToastMessage(`logged in as ${username}`);
+            // update user vote amount
+            updateVoteAmount(username);
+            // navigate to feed
+            navigate({name: 'Feed'});
           }
         }
       })
@@ -131,14 +139,14 @@ const Login = (props: Props): JSX.Element => {
       });
   };
 
-  const _processLogin = async (username: string, password: string) => {
+  const _processLogin = async (_username: string, _password: string) => {
     // @test
     //    username = 'etainclub';
     //    password = Config.ETAINCLUB_POSTING_WIF;
-
-    console.log('[LoginContainer] _processLogin, username', username);
+    setUsername(_username);
+    console.log('[LoginContainer] _processLogin, username', _username);
     // verify the private key
-    const account = await verifyPassoword(username, password);
+    const account = await verifyPassoword(_username, _password);
     if (!account) {
       setToastMessage(intl.formatMessage({id: 'Login.login_error'}));
       return false;
@@ -153,21 +161,9 @@ const Login = (props: Props): JSX.Element => {
       .catch((error) => console.log('failed to sign in firebase', error));
 
     // process login action
-    processLogin({username, password}, addingAccount);
+    processLogin({username: _username, password: _password}, addingAccount);
     // otp
-    await _processOTP(username);
-
-    // // process firestore login
-    //    _updateUserDB(username);
-
-    // console.log('account info', account);
-    // // @test get the credentials
-    // console.log('after process login authState', authState);
-    // setToastMessage(`logged in as ${username}`);
-    // // update user vote amount
-    // updateVoteAmount(username);
-    // // navigate to feed
-    // navigate({name: 'Feed'});
+    await _processOTP(_username);
   };
 
   const _handleOTPResult = (valid: boolean, _phoneNumber?: string) => {
@@ -179,7 +175,6 @@ const Login = (props: Props): JSX.Element => {
     }
     console.log('opt result', valid);
     if (valid) {
-      const {username} = authState.currentCredentials;
       _updateUserDB(username, _phoneNumber);
       setToastMessage(`logged in as ${username}`);
       // update user vote amount

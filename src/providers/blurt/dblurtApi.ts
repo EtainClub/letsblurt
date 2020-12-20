@@ -856,7 +856,7 @@ export const fetchComments = async (
 export const broadcastPost = async (
   postingData: PostingContent,
   password: string,
-  options: any[],
+  options?: any[],
 ) => {
   // verify the key
   const account = await verifyPassoword(postingData.author, password);

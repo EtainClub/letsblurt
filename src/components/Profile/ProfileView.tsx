@@ -220,7 +220,7 @@ const ProfileView: React.FC<Props> = ({
                 marginBottom: 4,
                 fontFamily: 'open-sans-bold',
               }}>
-              {profile.voteAmount} BLT
+              {profile.voteAmount} B
             </Text>
             <Text
               style={{fontFamily: 'open-sans-regular'}}

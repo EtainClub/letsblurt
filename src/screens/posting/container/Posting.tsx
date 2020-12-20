@@ -53,14 +53,22 @@ const Posting = (props: Props): JSX.Element => {
   useEffect(() => {
     // get following
     if (authState.loggedIn) {
+      const {username} = authState.currentCredentials;
       // get following list
-      _getFollowingList(authState.currentCredentials.username);
+      _getFollowingList(username);
       // add default beneficairy
-      const userWeight = 10000 - DEFAULT_BENEFICIARY.weight;
-      setBeneficiaries([
-        DEFAULT_BENEFICIARY,
-        {account: authState.currentCredentials.username, weight: userWeight},
-      ]);
+      if (username === 'letsblurt') {
+        setBeneficiaries([
+          {account: username, weight: 5000},
+          {account: 'etainclub', weight: 5000},
+        ]);
+      } else {
+        const userWeight = 10000 - DEFAULT_BENEFICIARY.weight;
+        setBeneficiaries([
+          DEFAULT_BENEFICIARY,
+          {account: username, weight: userWeight},
+        ]);
+      }
     }
   }, []);
   //// edit mode event
@@ -217,6 +225,23 @@ const Posting = (props: Props): JSX.Element => {
       //// submit the post
       const result = await submitPost(postingContent, password, false, options);
       if (result) {
+        // TODO: clear the title, body, and tags, beneficiary
+        // initialie beneficiaries
+        if (username === 'letsblurt') {
+          setBeneficiaries([
+            {account: username, weight: 5000},
+            {account: 'etainclub', weight: 5000},
+          ]);
+        } else {
+          setBeneficiaries([
+            DEFAULT_BENEFICIARY,
+            {
+              account: username,
+              weight: 10000 - DEFAULT_BENEFICIARY.weight,
+            },
+          ]);
+        }
+
         // TODO: set tag or feed
         navigate({name: 'Feed'});
       }

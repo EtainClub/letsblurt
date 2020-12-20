@@ -1,4 +1,6 @@
-import React from 'react';
+//// react
+import React, {useState, useContext, useEffect} from 'react';
+//// react native
 import {
   TouchableHighlight,
   StyleSheet,
@@ -8,19 +10,26 @@ import {
   FlatList,
   Platform,
 } from 'react-native';
+//// language
 import {useIntl} from 'react-intl';
+////
 import {navigate} from '~/navigation/service';
+//// UIs
 import {Button, Icon, Block, Input, Text, theme} from 'galio-framework';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 const {height, width} = Dimensions.get('window');
 
+//// props
 interface Props {
   renderItem: (item) => JSX.Element;
 }
-
 const SettingScreen = (props: Props): JSX.Element => {
-  console.log('[ProfileSceeen] props', props);
+  //// props
   //// language
   const intl = useIntl();
+  //// contexts
+  //// states
+  //// effects
   const blockchainItems = [
     {
       title: intl.formatMessage({id: 'Settings.blockchain'}),
@@ -59,13 +68,23 @@ const SettingScreen = (props: Props): JSX.Element => {
       type: 'switch',
     },
     {
-      title: intl.formatMessage({id: 'Settings.notify_comment'}),
-      id: 'notifyComment',
+      title: intl.formatMessage({id: 'Settings.notify_beneficiary'}),
+      id: 'notifyBeneficiary',
+      type: 'switch',
+    },
+    {
+      title: intl.formatMessage({id: 'Settings.notify_reply'}),
+      id: 'notifyReply',
       type: 'switch',
     },
     {
       title: intl.formatMessage({id: 'Settings.notify_mention'}),
       id: 'notifyMention',
+      type: 'switch',
+    },
+    {
+      title: intl.formatMessage({id: 'Settings.notify_follow'}),
+      id: 'notifyFollow',
       type: 'switch',
     },
     {

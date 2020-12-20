@@ -200,7 +200,7 @@ const PostsProvider = ({children}: Props) => {
   //// fetch tag list
   const getTagList = async (username?: string) => {
     // @test
-    const blockData = await fetchLatestBlock();
+    // const blockData = await fetchLatestBlock();
     //// fetch default tags
     // const _tagList = await fetchTagList();
     // const _tags = _tagList.map((tag) => tag.tag);

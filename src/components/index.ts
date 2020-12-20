@@ -17,10 +17,7 @@ import {DraggableList} from './DraggableList';
 import {ParentPost} from './ParentPost';
 import {OTP} from './OTP';
 import {Beneficiary} from './Beneficiary';
-
-//import Switch from "./Switch";
-//import Voting from "./Voting";
-//import Comment from "./Comment";
+import {DNDTimes} from './DNDTimes';
 
 export {
   Button,
@@ -41,4 +38,5 @@ export {
   ParentPost,
   OTP,
   Beneficiary,
+  DNDTimes,
 };

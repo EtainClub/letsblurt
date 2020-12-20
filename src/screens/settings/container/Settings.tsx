@@ -1,4 +1,6 @@
-import React, {useContext} from 'react';
+//// react
+import React, {useState, useEffect, useContext} from 'react';
+//// react native
 import {
   TouchableHighlight,
   TouchableOpacity,
@@ -9,23 +11,70 @@ import {
   FlatList,
   Platform,
 } from 'react-native';
+//// language
+import {useIntl} from 'react-intl';
+//// UIs
 import {Button, Icon, Block, Input, Text, theme} from 'galio-framework';
 import {materialTheme} from '~/constants/materialTheme';
 const {height, width} = Dimensions.get('window');
-import ModalDropdown from 'react-native-modal-dropdown';
-import {AuthContext} from '~/contexts';
-import {SettingScreen} from '../screen/Settings';
 import {argonTheme} from '~/constants';
 import {DropdownModal} from '~/components';
+import ModalDropdown from 'react-native-modal-dropdown';
+//// storage
+import firestore from '@react-native-firebase/firestore';
+import AsyncStorage from '@react-native-community/async-storage';
+//// contexts
+import {AuthContext} from '~/contexts';
+//// screens
+import {SettingScreen} from '../screen/Settings';
+import {DNDTimes} from '~/components';
+//// times
+import moment from 'moment';
+// start date and time: 1AM
+const DATE1 = new Date(2020, 12, 12, 1, 0, 0);
+// end date and time: 8AM
+const DATE2 = new Date(2020, 12, 12, 8, 0, 0);
+// local time offset in hours from UTC+0
+const UTC_OFFSET_IN_MINUTES = DATE1.getTimezoneOffset();
+// get timestamp of the date1
+const START_TIME = DATE1.getTime();
+// get timestamp of the date2
+const END_TIME = DATE2.getTime();
 
 interface Props {
   username: string;
 }
-
 const Settings = (props: Props): JSX.Element => {
+  //// props
   const {username} = props;
+  // firebase user doc ref
+  const userRef = firestore().doc(`users/${username}`);
+  //// language
+  const intl = useIntl();
   //// contexts
   const {authState, processLogout} = useContext(AuthContext);
+  //// states
+  const [switchStates, setSwitchStates] = useState({});
+  const [showDND, setShowDND] = useState(false);
+  const [showStartClock, setShowStartClock] = useState(false);
+  const [showEndClock, setShowEndClock] = useState(false);
+  const [startDNDTime, setStartDNDTime] = useState(START_TIME);
+  const [endDNDTime, setEndDNDTime] = useState(END_TIME);
+
+  //// effects
+  // event: mount
+  useEffect(() => {
+    _getInitialSettings();
+  }, []);
+
+  //// get initial settings
+  const _getInitialSettings = async () => {
+    const _startDND = await AsyncStorage.getItem('dnd_start_time');
+    const _endDND = await AsyncStorage.getItem('dnd_end_time');
+    // set times
+    setStartDNDTime(JSON.parse(_startDND));
+    setEndDNDTime(JSON.parse(_endDND));
+  };
 
   //// process logout
   const _handleLogout = async () => {
@@ -33,10 +82,21 @@ const Settings = (props: Props): JSX.Element => {
     await processLogout();
   };
   ////
-  const _handleToggleSwitch = async (key: string) => {
+  const _handleToggleSwitch = async (key: string, value: boolean) => {
+    setSwitchStates({...switchStates, [key]: value});
+
+    // actions
     switch (key) {
+      case 'dnd':
+        // clear dnd times in db if dnd is not set
+        if (!value) {
+          userRef.update({
+            dndTimes: null,
+          });
+        }
+        break;
       case 'logout':
-        _handleLogout();
+        //        _handleLogout();
         break;
       default:
         break;
@@ -55,28 +115,116 @@ const Settings = (props: Props): JSX.Element => {
 
   const _handleDropdownChange = (index: number, value: string) => {};
 
+  // convert the timestamp to time
+  const _convertTime = (timestamp) => {
+    return moment(timestamp).format('hh:mm A');
+  };
+
+  // convert the timestamp to time in minutes based on UTC+0
+  const _convertTimeToUTC0 = (timestamp) => {
+    // time in 2h hour format
+    const date = moment(timestamp);
+    const hour = date.hour();
+    const minutes = date.minutes();
+    const time = hour * 60 + minutes + UTC_OFFSET_IN_MINUTES;
+    return time;
+  };
+
+  const _handleConfirmDNDTime = async (isStart: boolean, timestamp: number) => {
+    console.log('[_handleConfirmDNDTime] isStart, time', isStart, timestamp);
+    console.log('convert time', _convertTime(timestamp));
+    if (isStart) {
+      setShowStartClock(false);
+      // set time
+      setStartDNDTime(timestamp);
+      // save the time in storage
+      await AsyncStorage.setItem('dnd_start_time', JSON.stringify(timestamp));
+    } else {
+      setShowEndClock(false);
+      // set time
+      setEndDNDTime(timestamp);
+      // save the time in storage
+      await AsyncStorage.setItem('dnd_end_time', JSON.stringify(timestamp));
+    }
+    //// update db
+    // convert the timestamp to minutes based on UTC+0
+    const time1 = _convertTimeToUTC0(startDNDTime);
+    const time2 = _convertTimeToUTC0(endDNDTime);
+    // concatenate the times
+    const times = [time1, time2];
+    // update
+    userRef.update({
+      dndTimes: times,
+    });
+  };
+
+  const _handleCancelDNDTime = (isStart: boolean) => {
+    if (isStart) {
+      setShowStartClock(false);
+    } else {
+      setShowEndClock(false);
+    }
+  };
+
+  const _renderClockButton = (text: string, handlePressButton: () => void) => {
+    return (
+      <Block style={styles.rows}>
+        <TouchableOpacity onPress={handlePressButton}>
+          <Block row middle space="between" style={{paddingTop: 7}}>
+            <Text size={14}>{text}</Text>
+            <Icon
+              name="angle-right"
+              family="font-awesome"
+              style={{paddingRight: 5}}
+            />
+          </Block>
+        </TouchableOpacity>
+      </Block>
+    );
+  };
+
   ////
   const _renderItem = ({item}) => {
-    console.log('[Settings] renderItem. item', item);
+    //    console.log('[Settings] renderItem. item', item);
     switch (item.type) {
       case 'switch':
         return (
-          <Block row middle space="between" style={styles.rows}>
-            <Text size={14}>{item.title}</Text>
-            <Switch
-              onValueChange={() => _handleToggleSwitch(item.id)}
-              ios_backgroundColor={materialTheme.COLORS.SWITCH_OFF}
-              thumbColor={
-                Platform.OS === 'android'
-                  ? materialTheme.COLORS.SWITCH_OFF
-                  : null
-              }
-              trackColor={{
-                false: materialTheme.COLORS.SWITCH_OFF,
-                true: argonTheme.COLORS.ERROR,
-              }}
-              value={true}
-            />
+          <Block>
+            <Block row middle space="between" style={styles.rows}>
+              <Text size={14}>{item.title}</Text>
+              <Switch
+                onValueChange={(value) => _handleToggleSwitch(item.id, value)}
+                ios_backgroundColor={materialTheme.COLORS.SWITCH_OFF}
+                thumbColor={
+                  Platform.OS === 'android'
+                    ? materialTheme.COLORS.SWITCH_OFF
+                    : null
+                }
+                trackColor={{
+                  false: materialTheme.COLORS.SWITCH_OFF,
+                  true: argonTheme.COLORS.ERROR,
+                }}
+                value={switchStates[item.id]}
+              />
+            </Block>
+            {switchStates['dnd'] && (
+              <Block>
+                {item.id === 'dnd' ? (
+                  <Block card>
+                    {_renderClockButton(
+                      intl.formatMessage({id: 'Settings.start_clock_header'}) +
+                        _convertTime(startDNDTime),
+                      () => setShowStartClock(true),
+                    )}
+                    {_renderClockButton(
+                      intl.formatMessage({id: 'Settings.end_clock_header'}) +
+                        _convertTime(endDNDTime),
+                      () => setShowEndClock(true),
+                    )}
+                  </Block>
+                ) : null}
+              </Block>
+            )}
           </Block>
         );
       case 'button':
@@ -120,7 +268,18 @@ const Settings = (props: Props): JSX.Element => {
     }
   };
 
-  return <SettingScreen renderItem={_renderItem} />;
+  return showStartClock || showEndClock ? (
+    <DNDTimes
+      showStartClock={showStartClock}
+      showEndClock={showEndClock}
+      startTime={startDNDTime}
+      endTime={endDNDTime}
+      confirmTime={_handleConfirmDNDTime}
+      cancelTime={_handleCancelDNDTime}
+    />
+  ) : (
+    <SettingScreen renderItem={_renderItem} />
+  );
 };
 
 export {Settings};
