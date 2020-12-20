@@ -78,6 +78,37 @@ const Settings = (props: Props): JSX.Element => {
     }
   };
 
+  //// get notifications state
+  const _buildNotificationsStates = (itemId: string, value: boolean) => {
+    const beneficiary = switchStates['beneficiary'];
+    const reply = switchStates['reply'];
+    const mention = switchStates['mention'];
+    const follow = switchStates['follow'];
+    const transfer = switchStates['transfer'];
+    const vote = switchStates['vote'];
+    // reblog
+    // delegate
+    let notifications = [];
+    if (beneficiary) notifications.push('beneficiary');
+    if (reply) notifications.push('reply');
+    if (mention) notifications.push('mention');
+    if (follow) notifications.push('follow');
+    if (transfer) notifications.push('transfer');
+    if (vote) notifications.push('vote');
+    // handle the event item
+    if (value) {
+      // update the value of the event item
+      notifications = [...notifications, itemId];
+    } else {
+      // remove the event item
+      notifications = notifications.filter(
+        (notification) => notification !== itemId,
+      );
+    }
+    console.log('[_buildNotificationsStates] notifications', notifications);
+    return notifications;
+  };
+
   //// process logout
   const _handleLogout = async () => {
     console.log('[Settings] handle logout');
@@ -96,6 +127,29 @@ const Settings = (props: Props): JSX.Element => {
         if (!value) {
           userRef.update({
             dndTimes: null,
+          });
+        } else {
+          const times = [
+            _convertTimeToUTC0(startDNDTime),
+            _convertTimeToUTC0(endDNDTime),
+          ];
+          // update
+          userRef.update({
+            dndTimes: times,
+          });
+        }
+        break;
+      case 'beneficiary':
+      case 'reply':
+      case 'mention':
+      case 'follow':
+      case 'transfer':
+      case 'vote':
+        const notifications = _buildNotificationsStates(key, value);
+        if (userRef) {
+          // update
+          userRef.update({
+            pushNotifications: notifications,
           });
         }
         break;

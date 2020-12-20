@@ -274,7 +274,7 @@
     "use_tx_otp": "Use TX OTP",
     "logout": "Logout",
     "notification": "Push Notifications",
-    "dnd": "Do Not Disturb",
+    "dnd": "Do Not Disturb Time",
     "start_clock_header": "Start Time: ",
     "end_clock_header": "End Time: ",
     "notify_reply": "Reply",

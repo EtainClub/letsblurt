@@ -69,27 +69,32 @@ const SettingScreen = (props: Props): JSX.Element => {
     },
     {
       title: intl.formatMessage({id: 'Settings.notify_beneficiary'}),
-      id: 'notifyBeneficiary',
+      id: 'beneficiary',
       type: 'switch',
     },
     {
       title: intl.formatMessage({id: 'Settings.notify_reply'}),
-      id: 'notifyReply',
+      id: 'reply',
       type: 'switch',
     },
     {
       title: intl.formatMessage({id: 'Settings.notify_mention'}),
-      id: 'notifyMention',
+      id: 'mention',
       type: 'switch',
     },
     {
       title: intl.formatMessage({id: 'Settings.notify_follow'}),
-      id: 'notifyFollow',
+      id: 'follow',
       type: 'switch',
     },
     {
       title: intl.formatMessage({id: 'Settings.notify_transfer'}),
-      id: 'notifyTransfer',
+      id: 'transfer',
+      type: 'switch',
+    },
+    {
+      title: intl.formatMessage({id: 'Settings.notify_vote'}),
+      id: 'vote',
       type: 'switch',
     },
   ];
