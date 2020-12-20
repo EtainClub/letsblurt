@@ -75,6 +75,12 @@ const Settings = (props: Props): JSX.Element => {
       // set times
       setStartDNDTime(JSON.parse(_startDND));
       setEndDNDTime(JSON.parse(_endDND));
+      // set switch if time is set
+      if (_startDND) {
+        setSwitchStates({...switchStates, ['dnd']: true});
+      }
+      // TODO: get push notification settings from firestore
+      const userRef = firestore().doc(`users/${username}`);
     }
   };
 

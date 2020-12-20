@@ -120,7 +120,7 @@ const Login = (props: Props): JSX.Element => {
         } else {
           console.log('[login|processOTP] doc data', doc.data());
           // check setting if login opt is on
-          if (settingsState.usingOTP) {
+          if (!__DEV__ && settingsState.usingOTP) {
             // set phone number
             setPhoneNumber(doc.data().phone);
             setShowOTP(true);
