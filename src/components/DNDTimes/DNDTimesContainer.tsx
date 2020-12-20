@@ -117,17 +117,6 @@ const DNDTimesContainer = (props: Props): JSX.Element => {
     //// return the resulting times
     console.log('[_onConfirmTime]');
     props.confirmTime(isStart, timestamp);
-
-    // //// update db
-    // // convert the time based on UTC 0 and concatenate the times
-    // const time1 = convertTimeToUTC0(timestamp);
-    // const time2 = convertTimeToUTC0(endDNDTime.time);
-    // // concatenate the times
-    // const times = [time1, time2];
-    // // update
-    // userRef.update({
-    //   dndTimes: times,
-    // });
   };
 
   //// cancel time setting
@@ -140,11 +129,6 @@ const DNDTimesContainer = (props: Props): JSX.Element => {
     }
     // return
     props.cancelTime(isStart);
-  };
-
-  //// handle click the switch
-  const _onPressSwitch = async (value: boolean) => {
-    setShowDND(value);
   };
 
   // // update swith state when a user clicks the DND time switch

@@ -41,19 +41,15 @@ const START_TIME = DATE1.getTime();
 // get timestamp of the date2
 const END_TIME = DATE2.getTime();
 
-interface Props {
-  username: string;
-}
+interface Props {}
 const Settings = (props: Props): JSX.Element => {
   //// props
-  const {username} = props;
-  // firebase user doc ref
-  const userRef = firestore().doc(`users/${username}`);
   //// language
   const intl = useIntl();
   //// contexts
   const {authState, processLogout} = useContext(AuthContext);
   //// states
+  const [username, setUsername] = useState(null);
   const [switchStates, setSwitchStates] = useState({});
   const [showDND, setShowDND] = useState(false);
   const [showStartClock, setShowStartClock] = useState(false);
@@ -69,11 +65,17 @@ const Settings = (props: Props): JSX.Element => {
 
   //// get initial settings
   const _getInitialSettings = async () => {
-    const _startDND = await AsyncStorage.getItem('dnd_start_time');
-    const _endDND = await AsyncStorage.getItem('dnd_end_time');
-    // set times
-    setStartDNDTime(JSON.parse(_startDND));
-    setEndDNDTime(JSON.parse(_endDND));
+    if (authState.loggedIn) {
+      // get username
+      const _username = authState.currentCredentials.username;
+      setUsername(_username);
+      // get dnd times from storage
+      const _startDND = await AsyncStorage.getItem('dnd_start_time');
+      const _endDND = await AsyncStorage.getItem('dnd_end_time');
+      // set times
+      setStartDNDTime(JSON.parse(_startDND));
+      setEndDNDTime(JSON.parse(_endDND));
+    }
   };
 
   //// process logout
@@ -84,6 +86,8 @@ const Settings = (props: Props): JSX.Element => {
   ////
   const _handleToggleSwitch = async (key: string, value: boolean) => {
     setSwitchStates({...switchStates, [key]: value});
+    // firebase user doc ref
+    const userRef = firestore().doc(`users/${username}`);
 
     // actions
     switch (key) {
@@ -133,13 +137,19 @@ const Settings = (props: Props): JSX.Element => {
   const _handleConfirmDNDTime = async (isStart: boolean, timestamp: number) => {
     console.log('[_handleConfirmDNDTime] isStart, time', isStart, timestamp);
     console.log('convert time', _convertTime(timestamp));
+    let time1 = null;
+    let time2 = null;
     if (isStart) {
+      time1 = _convertTimeToUTC0(timestamp);
+      time2 = _convertTimeToUTC0(endDNDTime);
       setShowStartClock(false);
       // set time
       setStartDNDTime(timestamp);
       // save the time in storage
       await AsyncStorage.setItem('dnd_start_time', JSON.stringify(timestamp));
     } else {
+      time1 = _convertTimeToUTC0(startDNDTime);
+      time2 = _convertTimeToUTC0(timestamp);
       setShowEndClock(false);
       // set time
       setEndDNDTime(timestamp);
@@ -147,9 +157,12 @@ const Settings = (props: Props): JSX.Element => {
       await AsyncStorage.setItem('dnd_end_time', JSON.stringify(timestamp));
     }
     //// update db
+    // firebase user doc ref
+    const userRef = firestore().doc(`users/${username}`);
+    console.log('[_handleConfirmDNDTime] usernmae, userRef', username, userRef);
+    // check sanity
+    if (!userRef) return;
     // convert the timestamp to minutes based on UTC+0
-    const time1 = _convertTimeToUTC0(startDNDTime);
-    const time2 = _convertTimeToUTC0(endDNDTime);
     // concatenate the times
     const times = [time1, time2];
     // update
