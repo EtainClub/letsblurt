@@ -56,6 +56,7 @@ const Settings = (props: Props): JSX.Element => {
   const [showEndClock, setShowEndClock] = useState(false);
   const [startDNDTime, setStartDNDTime] = useState(START_TIME);
   const [endDNDTime, setEndDNDTime] = useState(END_TIME);
+  const [language, setLanguage] = useState('en');
 
   //// effects
   // event: mount
@@ -66,6 +67,8 @@ const Settings = (props: Props): JSX.Element => {
   //// get initial settings
   const _getInitialSettings = async () => {
     if (authState.loggedIn) {
+      // switch states
+      let _switchStates = switchStates;
       // get username
       const _username = authState.currentCredentials.username;
       setUsername(_username);
@@ -77,10 +80,32 @@ const Settings = (props: Props): JSX.Element => {
       setEndDNDTime(JSON.parse(_endDND));
       // set switch if time is set
       if (_startDND) {
-        setSwitchStates({...switchStates, ['dnd']: true});
+        //        setSwitchStates({..._switchStates, ['dnd']: true});
+        _switchStates = {..._switchStates, ['dnd']: true};
       }
-      // TODO: get push notification settings from firestore
-      const userRef = firestore().doc(`users/${username}`);
+      // TODO: get push notification and language settings from firestore
+      const userRef = firestore().doc(`users/${_username}`);
+      console.log('[Settings] userRer', userRef);
+      await userRef
+        .get()
+        .then((doc) => {
+          if (doc.exists) {
+            const userDoc = doc.data();
+            // set notifications states
+            userDoc.pushNotifications.forEach((item: string) => {
+              console.log('push item', item);
+              console.log('switches states', _switchStates);
+              //              setSwitchStates({..._switchStates, [item]: true});
+              _switchStates = {..._switchStates, [item]: true};
+            });
+            // set language
+            setLanguage(userDoc.language);
+          }
+        })
+        .catch((error) => console.log('failed to get user doc', error));
+
+      console.log('switch states', _switchStates);
+      setSwitchStates(_switchStates);
     }
   };
 

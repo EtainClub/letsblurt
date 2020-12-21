@@ -13,6 +13,7 @@ const initialState = {
   blockchainType: BlockchainTypes.BLURT,
   savingPassword: true,
   usingOTP: true,
+  language: 'en',
 };
 
 // create settings context
@@ -75,6 +76,7 @@ const SettingsProvider = ({children}: Props) => {
       payload: use,
     });
   };
+
   return (
     <SettingsContext.Provider
       value={{
