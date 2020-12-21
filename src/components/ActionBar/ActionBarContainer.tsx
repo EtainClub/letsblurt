@@ -15,6 +15,7 @@ interface Props {
   handlePressComments?: () => void;
   handlePressEditComment?: () => void;
   handlePressReply?: () => void;
+  handlePressTranslation?: (showOriginal: boolean) => void;
 }
 
 const ActionBarContainer = (props: Props): JSX.Element => {
@@ -125,6 +126,11 @@ const ActionBarContainer = (props: Props): JSX.Element => {
     );
   };
 
+  ////
+  const _handlePressTranslation = (showOriginal: boolean) => {
+    props.handlePressTranslation(showOriginal);
+  };
+
   return (
     <ActionBarView
       actionBarStyle={props.actionBarStyle}
@@ -144,6 +150,7 @@ const ActionBarContainer = (props: Props): JSX.Element => {
       handlePressVoter={_handlePressVoter}
       handlePressBookmark={_handlePressBookmark}
       handlePressReblog={_handlePressReblog}
+      handlePressTranslation={_handlePressTranslation}
     />
   );
 };

@@ -21,6 +21,7 @@ const {height, width} = Dimensions.get('window');
 
 //// props
 interface Props {
+  languages: string[];
   renderItem: (item) => JSX.Element;
 }
 const SettingScreen = (props: Props): JSX.Element => {
@@ -46,13 +47,8 @@ const SettingScreen = (props: Props): JSX.Element => {
       type: 'switch',
     },
     {
-      title: intl.formatMessage({id: 'Settings.use_login_otp'}),
-      id: 'useLoginOTP',
-      type: 'switch',
-    },
-    {
-      title: intl.formatMessage({id: 'Settings.use_tx_otp'}),
-      id: 'useTXOTP',
+      title: intl.formatMessage({id: 'Settings.use_otp'}),
+      id: 'useOTP',
       type: 'switch',
     },
     {
@@ -101,13 +97,14 @@ const SettingScreen = (props: Props): JSX.Element => {
 
   const generalItems = [
     {
-      title: intl.formatMessage({id: 'Settings.notice'}),
-      id: 'notice',
-      type: 'button',
-    },
-    {
       title: intl.formatMessage({id: 'Settings.language'}),
       id: 'language',
+      type: 'dropdown',
+      options: props.languages,
+    },
+    {
+      title: intl.formatMessage({id: 'Settings.notice'}),
+      id: 'notice',
       type: 'button',
     },
     {

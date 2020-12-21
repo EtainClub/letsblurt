@@ -11,6 +11,7 @@ export enum SettingsActionTypes {
   SET_IMAGE_SERVER,
   SAVE_PASSWORD,
   USE_OTP,
+  SET_LOCALE,
 }
 
 // settings state
@@ -21,6 +22,8 @@ export interface SettingsState {
   savingPassword: boolean;
   // flag to use one time password
   usingOTP: boolean;
+  // locale, language
+  locale: string;
 }
 
 //// actions
@@ -39,6 +42,11 @@ interface UseOTPAction {
   type: SettingsActionTypes;
   payload: boolean;
 }
+// set locale
+interface SetLocaleAction {
+  type: SettingsActionTypes;
+  payload: string;
+}
 // settings context type
 export interface SettingsContextType {
   // settings state
@@ -50,9 +58,12 @@ export interface SettingsContextType {
   savePassword: (save: boolean) => void;
   // use otp
   useOTP: (use: boolean) => void;
+  // set locale
+  setLocale: (locale: string) => void;
 }
 
 export type SettingsAction =
   | SetBlockchainTypeAction
   | SavePasswordAction
-  | UseOTPAction;
+  | UseOTPAction
+  | SetLocaleAction;

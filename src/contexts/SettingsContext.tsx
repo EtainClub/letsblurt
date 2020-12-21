@@ -13,7 +13,7 @@ const initialState = {
   blockchainType: BlockchainTypes.BLURT,
   savingPassword: true,
   usingOTP: true,
-  language: 'en',
+  locale: 'en-US',
 };
 
 // create settings context
@@ -30,6 +30,8 @@ const settingsReducer = (state: SettingsState, action: SettingsAction) => {
       return {...state, savingPassword: action.payload};
     case SettingsActionTypes.USE_OTP:
       return {...state, usingOTP: action.payload};
+    case SettingsActionTypes.SET_LOCALE:
+      return {...state, locale: action.payload};
     default:
       return state;
   }
@@ -77,6 +79,16 @@ const SettingsProvider = ({children}: Props) => {
     });
   };
 
+  //// set locale
+  const setLocale = (locale: string) => {
+    console.log('[setLocale] locale', locale);
+    // dispatch action
+    dispatch({
+      type: SettingsActionTypes.SET_LOCALE,
+      payload: locale,
+    });
+  };
+
   return (
     <SettingsContext.Provider
       value={{
@@ -84,6 +96,7 @@ const SettingsProvider = ({children}: Props) => {
         setBlockchainType,
         savePassword,
         useOTP,
+        setLocale,
       }}>
       {children}
     </SettingsContext.Provider>

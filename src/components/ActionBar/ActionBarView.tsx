@@ -46,6 +46,7 @@ interface Props {
   handlePressReply?: () => void;
   handlePressVoter?: (voter: string) => void;
   handlePressReblog?: () => void;
+  handlePressTranslation?: (showOriginal: boolean) => void;
 }
 
 const ActionBarView = (props: Props): JSX.Element => {
@@ -67,6 +68,7 @@ const ActionBarView = (props: Props): JSX.Element => {
   );
   const [showVotingModal, setShowVotingModal] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
+  const [showOriginal, setShowOriginal] = useState(true);
 
   //////// use effects
   // callback when postsState changes only for post
@@ -117,7 +119,12 @@ const ActionBarView = (props: Props): JSX.Element => {
     // @todo open sharing ui
   };
 
-  const _onPressTranslate = () => {};
+  const _onPressTranslate = () => {
+    const _showOriginal = !showOriginal;
+    setShowOriginal(_showOriginal);
+    props.handlePressTranslation(!_showOriginal);
+  };
+
   //// handle slide completion event
   const _onVotingSlidingComplete = (weight: number) => {
     const price = (voteAmount * weight) / 100;
@@ -293,7 +300,11 @@ const ActionBarView = (props: Props): JSX.Element => {
               <Block row style={{top: 0}}>
                 <Icon
                   size={18}
-                  color={argonTheme.COLORS.ERROR}
+                  color={
+                    showOriginal
+                      ? argonTheme.COLORS.ERROR
+                      : argonTheme.COLORS.FACEBOOK
+                  }
                   name="translate"
                   family="material-community"
                   style={{paddingHorizontal: 5}}

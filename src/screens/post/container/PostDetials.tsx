@@ -45,6 +45,9 @@ const PostDetails = (props: Props): JSX.Element => {
   // states
   const [loading, setLoading] = useState(true);
   const [postDetails, setPostDetails] = useState<PostData>(null);
+  const [originalPostDetails, setOriginalPostDetails] = useState<PostData>(
+    null,
+  );
   const [comments, setComments] = useState<CommentData[]>(null);
   const [submitted, setSubmitted] = useState(false);
   const [editMode, setEditMode] = useState(false);
@@ -80,16 +83,16 @@ const PostDetails = (props: Props): JSX.Element => {
       _fetchParentPost(postDetails.state.parent_ref);
     }
   }, [postDetails]);
-  //// event: translate language change
-  useEffect(() => {
-    if (postDetails && uiState.selectedLanguage != '') {
-      _translateLanguage(
-        postDetails.state.title,
-        postDetails.body,
-        uiState.selectedLanguage,
-      );
-    }
-  }, [uiState.selectedLanguage]);
+  // //// event: translate language change
+  // useEffect(() => {
+  //   if (postDetails && uiState.selectedLanguage != '') {
+  //     _translateLanguage(
+  //       postDetails.state.title,
+  //       postDetails.body,
+  //       uiState.selectedLanguage,
+  //     );
+  //   }
+  // }, [uiState.selectedLanguage]);
 
   const _fetchPostDetailsEntry = async () => {
     console.log('_fetchPostDetailsEntry postRef', postsState.postRef);
@@ -113,6 +116,8 @@ const PostDetails = (props: Props): JSX.Element => {
     }
     // set post details
     setPostDetails(details);
+    // set original details
+    setOriginalPostDetails(details);
     // fetch comments
     _fetchComments();
   };
@@ -190,63 +195,74 @@ const PostDetails = (props: Props): JSX.Element => {
     navigate({name: 'Feed'});
   };
 
-  const _translateLanguage = async (
-    title: string,
-    body: string,
-    targetLang: string,
-  ) => {
-    const key = Config.GOOGLE_CLOUD_TRANSLATION_KEY;
-    const url = `https://translation.googleapis.com/language/translate/v2?key=${key}`;
-    console.log('_translateLanguage. original title', title);
-    console.log('_translateLanguage. original body', body);
+  const _translateLanguage = async (showOriginal: boolean) =>
+    // title?: string,
+    // body?: string,
+    // targetLang?: string,
+    {
+      // TODO: when click the icon again, show the original text
+      // keep original post details?
+      if (showOriginal) {
+        // set original post
+        setPostDetails(originalPostDetails);
+        return;
+      }
 
-    // TODO: detect the source language and compare it with the target
-    // if they are the same, disable the translating to save the code.
-    // const html = markdown2html(body);
-    //    const text = body.replace(/<\/?[^>]+>/gi, ' ');
-    // console.log('_translateLanguage. original body html', html);
-    // console.log('_translateLanguage. original body plain text', body);
-    const titleOptions = {
-      target: targetLang,
-      q: title,
-      format: 'text',
-    };
-    const bodyOptions = {
-      q: body,
-      target: targetLang,
-      format: 'html',
-    };
-    try {
-      const titleTranslation = await axios.post(url, titleOptions);
-      const bodyTranslation = await axios.post(url, bodyOptions);
+      const title = postDetails.state.title;
+      const body = postDetails.body;
+      const targetLang = uiState.selectedLanguage;
+      const key = Config.GOOGLE_CLOUD_TRANSLATION_KEY;
+      const url = `https://translation.googleapis.com/language/translate/v2?key=${key}`;
+      console.log('_translateLanguage. original title', title);
+      console.log('_translateLanguage. original body', body);
 
-      console.log(
-        '_translateLanguage. translation',
-        titleTranslation.data.data.translations[0],
-      );
-      console.log(
-        '_translateLanguage. translation',
-        bodyTranslation.data.data.translations[0],
-      );
-
-      const translatedTitle =
-        titleTranslation.data.data.translations[0].translatedText;
-      console.log('_translateLanguage. translatedTitle', translatedTitle);
-
-      const translatedBpdy =
-        bodyTranslation.data.data.translations[0].translatedText;
-      const newPostDetails = {
-        ...postDetails,
-        state: {...postDetails.state, title: translatedTitle},
-        body: translatedBpdy,
+      // TODO: detect the source language and compare it with the target
+      // if they are the same, disable the translating to save the code.
+      // const html = markdown2html(body);
+      //    const text = body.replace(/<\/?[^>]+>/gi, ' ');
+      // console.log('_translateLanguage. original body html', html);
+      // console.log('_translateLanguage. original body plain text', body);
+      const titleOptions = {
+        target: targetLang,
+        q: title,
+        format: 'text',
       };
-      // set translation
-      setPostDetails(newPostDetails);
-      //return translation.data.translations[0].translatedText;
-    } catch (error) {
-      console.log('failed to translate', error);
-    }
-  };
+      const bodyOptions = {
+        q: body,
+        target: targetLang,
+        format: 'html',
+      };
+      try {
+        const titleTranslation = await axios.post(url, titleOptions);
+        const bodyTranslation = await axios.post(url, bodyOptions);
+
+        console.log(
+          '_translateLanguage. translation',
+          titleTranslation.data.data.translations[0],
+        );
+        console.log(
+          '_translateLanguage. translation',
+          bodyTranslation.data.data.translations[0],
+        );
+
+        const translatedTitle =
+          titleTranslation.data.data.translations[0].translatedText;
+        console.log('_translateLanguage. translatedTitle', translatedTitle);
+
+        const translatedBpdy =
+          bodyTranslation.data.data.translations[0].translatedText;
+        const newPostDetails = {
+          ...postDetails,
+          state: {...postDetails.state, title: translatedTitle},
+          body: translatedBpdy,
+        };
+        // set translation
+        setPostDetails(newPostDetails);
+        //return translation.data.translations[0].translatedText;
+      } catch (error) {
+        console.log('failed to translate', error);
+      }
+    };
 
   return postDetails ? (
     <PostDetailsScreen
@@ -259,6 +275,7 @@ const PostDetails = (props: Props): JSX.Element => {
       fetchComments={_fetchComments}
       handleSubmitComment={_onSubmitComment}
       handlePressTag={_handlePressTag}
+      handlePressTranslation={_translateLanguage}
     />
   ) : (
     <View style={{top: 20}}>

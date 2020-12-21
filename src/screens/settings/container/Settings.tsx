@@ -24,12 +24,12 @@ import ModalDropdown from 'react-native-modal-dropdown';
 import firestore from '@react-native-firebase/firestore';
 import AsyncStorage from '@react-native-community/async-storage';
 //// contexts
-import {AuthContext} from '~/contexts';
+import {AuthContext, SettingsContext, UIContext} from '~/contexts';
 //// screens
 import {SettingScreen} from '../screen/Settings';
 import {DNDTimes} from '~/components';
 //// times
-import moment from 'moment';
+import moment, {locale} from 'moment';
 // start date and time: 1AM
 const DATE1 = new Date(2020, 12, 12, 1, 0, 0);
 // end date and time: 8AM
@@ -48,6 +48,8 @@ const Settings = (props: Props): JSX.Element => {
   const intl = useIntl();
   //// contexts
   const {authState, processLogout} = useContext(AuthContext);
+  const {setLocale} = useContext(SettingsContext);
+  const {uiState, setLanguageParam, setToastMessage} = useContext(UIContext);
   //// states
   const [username, setUsername] = useState(null);
   const [switchStates, setSwitchStates] = useState({});
@@ -67,6 +69,9 @@ const Settings = (props: Props): JSX.Element => {
   //// get initial settings
   const _getInitialSettings = async () => {
     if (authState.loggedIn) {
+      // TODO: get auto login, use otp settings
+      // states should be handled in settings Context
+
       // switch states
       let _switchStates = switchStates;
       // get username
@@ -88,24 +93,26 @@ const Settings = (props: Props): JSX.Element => {
       console.log('[Settings] userRer', userRef);
       await userRef
         .get()
-        .then((doc) => {
+        .then(async (doc) => {
           if (doc.exists) {
             const userDoc = doc.data();
             // set notifications states
             userDoc.pushNotifications.forEach((item: string) => {
-              console.log('push item', item);
-              console.log('switches states', _switchStates);
-              //              setSwitchStates({..._switchStates, [item]: true});
               _switchStates = {..._switchStates, [item]: true};
             });
-            // set language
+            // set switch states
+            setSwitchStates(_switchStates);
+            // set language (locale)
             setLanguage(userDoc.language);
+            // store the locale in the storage
+            await AsyncStorage.setItem('locale', userDoc.language);
+            // set locale in the context
+            setLocale(userDoc.language);
           }
         })
         .catch((error) => console.log('failed to get user doc', error));
 
       console.log('switch states', _switchStates);
-      setSwitchStates(_switchStates);
     }
   };
 
@@ -202,7 +209,38 @@ const Settings = (props: Props): JSX.Element => {
     }
   };
 
-  const _handleDropdownChange = (index: number, value: string) => {};
+  const SUPPORTED_LANGUAGES = ['EN', 'KO'];
+
+  const _handleDropdownChange = async (index: number, value: string) => {
+    console.log('[_handleDropdownChange] index, value', index, value);
+    // check supported language
+    // distingush translated language and locale
+    // when a language changed,
+    // first updated ui's language
+    setLanguageParam(value.toLowerCase());
+    // then, check if the language is supported,
+    let _locale = 'en-US';
+    if (SUPPORTED_LANGUAGES.includes(value)) {
+      // check it is the same as the current language
+      if (language.split('-')[0].toUpperCase() !== value) {
+        switch (value) {
+          case 'KO':
+            _locale = 'ko-KR';
+            break;
+          default:
+            break;
+        }
+        setToastMessage(intl.formatMessage({id: 'Settings.msg_restart'}));
+      }
+    } else {
+      setToastMessage(intl.formatMessage({id: 'Settings.lang_not_supported'}));
+    }
+    console.log('[_handleDropdownChange] locale', _locale);
+    // set locale
+    setLocale(_locale);
+    // store the locale
+    await AsyncStorage.setItem('locale', _locale);
+  };
 
   // convert the timestamp to time
   const _convertTime = (timestamp) => {
@@ -348,7 +386,7 @@ const Settings = (props: Props): JSX.Element => {
             </Text>
             <DropdownModal
               key={item.options[0]}
-              defaultText={item.options[0]}
+              defaultText={language.split('-')[0].toUpperCase()}
               dropdownButtonStyle={styles.dropdownButtonStyle}
               selectedOptionIndex={0}
               rowTextStyle={styles.rowTextStyle}
@@ -376,7 +414,10 @@ const Settings = (props: Props): JSX.Element => {
       cancelTime={_handleCancelDNDTime}
     />
   ) : (
-    <SettingScreen renderItem={_renderItem} />
+    <SettingScreen
+      languages={uiState.translateLanguages}
+      renderItem={_renderItem}
+    />
   );
 };
 
