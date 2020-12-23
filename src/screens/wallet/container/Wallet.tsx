@@ -6,7 +6,7 @@ import {WalletScreen} from '../screen/Wallet';
 import {useIntl} from 'react-intl';
 ////
 import {AuthContext, UIContext, UserContext} from '~/contexts';
-import {WalletData} from '~/contexts/types';
+import {WalletData, KeyTypes} from '~/contexts/types';
 //// blockchain
 import {claimRewardBalance} from '~/providers/blurt/dblurtApi';
 
@@ -33,6 +33,7 @@ const Wallet = (props: Props): JSX.Element => {
   //// event: creation
   useEffect(() => {
     if (authState.loggedIn) {
+      console.log('[wallet] crendentials', authState.currentCredentials);
       // fetch user data
       getWalletData(authState.currentCredentials.username);
       // fetch price
@@ -63,8 +64,9 @@ const Wallet = (props: Props): JSX.Element => {
   };
 
   //// show password
-  const _handlePressShowPassword = async () => {
-    console.log('handlePressShowPassword');
+  const _handlePressShowPassword = async (keyType: KeyTypes) => {
+    console.log('handlePressShowPassword', keyType);
+    // check current key type
   };
 
   return (
@@ -74,6 +76,7 @@ const Wallet = (props: Props): JSX.Element => {
       claiming={claiming}
       handlePressShowPassword={_handlePressShowPassword}
       price={price}
+      keyType={authState.currentCredentials.type}
     />
   );
 };

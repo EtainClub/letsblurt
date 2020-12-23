@@ -24,7 +24,7 @@ import {
 
 import {PrivateKey as PrivateKey2} from '@esteemapp/dhive';
 
-import {PostsActionTypes, ProfileData} from '~/contexts/types';
+import {PostsActionTypes, ProfileData, KeyTypes} from '~/contexts/types';
 
 import {
   PostingContent,
@@ -179,6 +179,7 @@ export const createAccount = async (
 };
 
 // verify the password (master password, private keys in wif format)
+// return account and password key type
 export const verifyPassoword = async (username: string, password: string) => {
   // @test master password for playdreams
   // posting key in wif: etainclub
@@ -203,7 +204,9 @@ export const verifyPassoword = async (username: string, password: string) => {
   const postingPublicKey = account.posting.key_auths[0][0];
 
   //// handle master password
-  if (password[0] === 'P') {
+  // TODO: the master password might not start with 'P', then how??
+  if (password[0] !== '5') {
+    // if the password is the master key, then it can deduce the public posting key
     // compute private posting key using username and password, and then get wif
     const postingPrivateKey = PrivateKey.fromLogin(
       username,
@@ -214,7 +217,7 @@ export const verifyPassoword = async (username: string, password: string) => {
     const valid = wifIsValid(postingPrivateKey, postingPublicKey);
     if (valid) {
       console.log('master password is valid');
-      return account;
+      return {account, keyType: KeyTypes.MASTER};
     } else {
       console.log('master password is not valid');
       return null;
@@ -226,7 +229,7 @@ export const verifyPassoword = async (username: string, password: string) => {
     let valid = wifIsValid(password, postingPublicKey);
     if (valid) {
       console.log('input is the posting private key, which is valid');
-      return account;
+      return {account, keyType: KeyTypes.POSTING};
     }
     //// check active key
     // get publich active key
@@ -235,7 +238,7 @@ export const verifyPassoword = async (username: string, password: string) => {
     valid = wifIsValid(password, activePublicKey);
     if (valid) {
       console.log('input is the active private key, which is valid');
-      return account;
+      return {account, keyType: KeyTypes.ACTIVE};
     }
     //// check owner key
     // get public owner key
@@ -244,12 +247,21 @@ export const verifyPassoword = async (username: string, password: string) => {
     valid = wifIsValid(password, ownerPublicKey);
     if (valid) {
       console.log('input is the owner private key, which is valid');
-      return account;
+      return {account, keyType: KeyTypes.OWNER};
     }
     // input password is not valid
     console.log('input password is not valid');
     return null;
   }
+};
+
+// get requested password in Wif
+export const getRequestedPassword = (
+  username: string,
+  password: string,
+  type: string,
+) => {
+  return PrivateKey.fromLogin(username, password, type).toString();
 };
 
 // check sanity of a username to be created

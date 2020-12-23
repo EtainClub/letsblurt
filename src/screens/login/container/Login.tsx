@@ -146,7 +146,7 @@ const Login = (props: Props): JSX.Element => {
     setUsername(_username);
     console.log('[LoginContainer] _processLogin, username', _username);
     // verify the private key
-    const account = await verifyPassoword(_username, _password);
+    const {account, keyType} = await verifyPassoword(_username, _password);
     if (!account) {
       setToastMessage(intl.formatMessage({id: 'Login.login_error'}));
       return false;
@@ -161,7 +161,10 @@ const Login = (props: Props): JSX.Element => {
       .catch((error) => console.log('failed to sign in firebase', error));
 
     // process login action
-    processLogin({username: _username, password: _password}, addingAccount);
+    processLogin(
+      {username: _username, password: _password, type: keyType},
+      addingAccount,
+    );
     // otp
     await _processOTP(_username);
   };

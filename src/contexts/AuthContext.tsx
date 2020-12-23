@@ -195,7 +195,7 @@ const _getCredentials = async (username: string) => {
     const keychain = await Keychain.getInternetCredentials(KEYCHAIN_SERVER);
     // get credentials if exists
     if (keychain) {
-      // parse keys
+      // parse keys (password and type are stored in the passworkd property)
       const keysList = JSON.parse(keychain.password);
       console.log('[_getCredentials] retrieved keys list', keysList);
 
@@ -204,12 +204,13 @@ const _getCredentials = async (username: string) => {
         (key) => Object.keys(key)[0] === username,
       );
       if (credentials) {
-        console.log('[_getCredentials] user exists');
+        console.log('[_getCredentials] user exists. credentials', credentials);
 
         return {
           credentials: {
             username,
-            password: Object.values(credentials)[0] as string,
+            password: credentials[username].password as string,
+            type: credentials[username].type as number,
           },
           keysList: keysList,
         };
@@ -233,14 +234,14 @@ const _getCredentials = async (username: string) => {
 };
 
 //// helpers: store credentials as a string
-const _storeCredentials = async ({username, password}: Credentials) => {
+const _storeCredentials = async ({username, password, type}: Credentials) => {
   try {
     // first retrieve all the stored credentials
     const prevKeychain = await Keychain.getInternetCredentials(KEYCHAIN_SERVER);
     console.log('[storeCredentials] initCrededentials', prevKeychain);
     // set new credentials
     let credentials = {};
-    credentials[username] = password;
+    credentials[username] = {password, type};
     // empty keys list
     let keysList = [];
     // if previous keys exist, append them
@@ -253,12 +254,15 @@ const _storeCredentials = async ({username, password}: Credentials) => {
       const sameKey = prevKeys.find((key) => Object.keys(key)[0] === username);
       if (!sameKey) {
         // append the new key
+        // store password and type in the key property which is username
         keysList.push(credentials);
       }
     } else {
       // append the new one first
       keysList.push(credentials);
     }
+
+    console.log('storeCredentials. keysList', keysList);
 
     // set new keys list
     Keychain.setInternetCredentials(

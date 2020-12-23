@@ -77,6 +77,10 @@ const Settings = (props: Props): JSX.Element => {
       // get username
       const _username = authState.currentCredentials.username;
       setUsername(_username);
+      // login status
+      if (authState.loggedIn) {
+        _switchStates = {..._switchStates, ['logout']: true};
+      }
       // get dnd times from storage
       const _startDND = await AsyncStorage.getItem('dnd_start_time');
       const _endDND = await AsyncStorage.getItem('dnd_end_time');
@@ -85,7 +89,6 @@ const Settings = (props: Props): JSX.Element => {
       setEndDNDTime(JSON.parse(_endDND));
       // set switch if time is set
       if (_startDND) {
-        //        setSwitchStates({..._switchStates, ['dnd']: true});
         _switchStates = {..._switchStates, ['dnd']: true};
       }
       // TODO: get push notification and language settings from firestore

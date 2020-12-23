@@ -31,6 +31,8 @@ const SettingScreen = (props: Props): JSX.Element => {
   //// contexts
   //// states
   //// effects
+
+  // TODO: blockchain servers list
   const blockchainItems = [
     {
       title: intl.formatMessage({id: 'Settings.blockchain'}),

@@ -9,14 +9,16 @@ import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
 import {TabView, SceneMap} from 'react-native-tab-view';
 import {argonTheme} from '~/constants';
 import {WalletStatsView, WalletKeyView} from '~/components';
+import {KeyTypes} from '~/contexts/types';
 import {WalletData} from '~/contexts/types';
 
 interface Props {
   walletData: WalletData;
   price: number;
+  keyType: KeyTypes;
   handlePressClaim: () => void;
   claiming: boolean;
-  handlePressShowPassword: (type: string) => void;
+  handlePressShowPassword: (type: KeyTypes) => void;
   //  tabIndex: number;
   //  handleTabIndexChanged: (index: number) => void;
 }
@@ -26,6 +28,7 @@ const WalletScreen = (props: Props): JSX.Element => {
   //// contexts
   //// states
   const [index, setIndex] = React.useState(0);
+  // TODO: use intl
   const [routes] = React.useState([
     {key: 'stats', title: 'Balances'},
     {key: 'keys', title: 'Keys'},
@@ -44,44 +47,53 @@ const WalletScreen = (props: Props): JSX.Element => {
   const WalletKeys = () => {
     return (
       <ScrollView>
-        <Text h6>{intl.formatMessage({id: 'Wallet.keys_header'})}</Text>
-        <Text>{intl.formatMessage({id: 'Wallet.keys_guide'})}</Text>
+        <Block style={{margin: 5}}>
+          <Text h6>{intl.formatMessage({id: 'Wallet.keys_header'})}</Text>
+          <Text>{intl.formatMessage({id: 'Wallet.keys_guide'})}</Text>
 
-        <WalletKeyView
-          type="posting"
-          handlePressShowPassword={() =>
-            props.handlePressShowPassword('posting')
-          }
-        />
-        <WalletKeyView
-          type="active"
-          handlePressShowPassword={() =>
-            props.handlePressShowPassword('active')
-          }
-        />
-        <WalletKeyView
-          type="owner"
-          handlePressShowPassword={() => props.handlePressShowPassword('owner')}
-        />
-        <WalletKeyView
-          type="memo"
-          handlePressShowPassword={() => props.handlePressShowPassword('memo')}
-        />
-
-        <Block
-          card
-          middle
-          style={{
-            shadowColor: argonTheme.COLORS.FACEBOOK,
-            marginHorizontal: 5,
-            marginVertical: 10,
-            padding: 20,
-          }}>
-          <Text h6 color="red">
-            Danger Zone
-          </Text>
-          <Text>Be careful when changing master password</Text>
-          <Button size="large">Change Master Password</Button>
+          <WalletKeyView
+            type="posting"
+            keyType={props.keyType}
+            handlePressShowPassword={() =>
+              props.handlePressShowPassword(KeyTypes.POSTING)
+            }
+          />
+          <WalletKeyView
+            type="active"
+            keyType={props.keyType}
+            handlePressShowPassword={() =>
+              props.handlePressShowPassword(KeyTypes.ACTIVE)
+            }
+          />
+          <WalletKeyView
+            type="owner"
+            keyType={props.keyType}
+            handlePressShowPassword={() =>
+              props.handlePressShowPassword(KeyTypes.OWNER)
+            }
+          />
+          <WalletKeyView
+            type="memo"
+            keyType={props.keyType}
+            handlePressShowPassword={() =>
+              props.handlePressShowPassword(KeyTypes.MEMO)
+            }
+          />
+          <Block
+            card
+            middle
+            style={{
+              shadowColor: argonTheme.COLORS.FACEBOOK,
+              marginHorizontal: 5,
+              marginVertical: 10,
+              padding: 20,
+            }}>
+            <Text h6 color="red">
+              Danger Zone
+            </Text>
+            <Text>Be careful when changing master password</Text>
+            <Button size="large">Change Master Password</Button>
+          </Block>
         </Block>
       </ScrollView>
     );

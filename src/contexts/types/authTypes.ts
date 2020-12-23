@@ -9,10 +9,19 @@ export enum AuthActionTypes {
   ADD,
 }
 
+export enum KeyTypes {
+  MEMO,
+  POSTING,
+  ACTIVE,
+  OWNER,
+  MASTER,
+}
+
 // keychain credentials, username/password pair
 export type Credentials = {
   username: string;
   password: string;
+  type?: KeyTypes;
 };
 
 // auth state
