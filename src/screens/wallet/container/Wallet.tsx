@@ -76,7 +76,6 @@ const Wallet = (props: Props): JSX.Element => {
       claiming={claiming}
       handlePressShowPassword={_handlePressShowPassword}
       price={price}
-      keyType={authState.currentCredentials.type}
     />
   );
 };

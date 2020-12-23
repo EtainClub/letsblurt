@@ -53,28 +53,24 @@ const WalletScreen = (props: Props): JSX.Element => {
 
           <WalletKeyView
             type="posting"
-            keyType={props.keyType}
             handlePressShowPassword={() =>
               props.handlePressShowPassword(KeyTypes.POSTING)
             }
           />
           <WalletKeyView
             type="active"
-            keyType={props.keyType}
             handlePressShowPassword={() =>
               props.handlePressShowPassword(KeyTypes.ACTIVE)
             }
           />
           <WalletKeyView
             type="owner"
-            keyType={props.keyType}
             handlePressShowPassword={() =>
               props.handlePressShowPassword(KeyTypes.OWNER)
             }
           />
           <WalletKeyView
             type="memo"
-            keyType={props.keyType}
             handlePressShowPassword={() =>
               props.handlePressShowPassword(KeyTypes.MEMO)
             }

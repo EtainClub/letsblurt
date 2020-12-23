@@ -23,7 +23,6 @@ import {KeyTypes} from '~/contexts/types';
 const HIDE_PASSWORD = '****************************************';
 interface Props {
   type: string;
-  keyType: KeyTypes;
   handlePressShowPassword: () => void;
 }
 const WalletKeyView = (props: Props): JSX.Element => {
@@ -41,20 +40,21 @@ const WalletKeyView = (props: Props): JSX.Element => {
   const _handlePressShowPassword = () => {
     const {username, password, type} = authState.currentCredentials;
     const _type = KeyTypes[props.type.toUpperCase()];
-    console.log(
-      '_handlePressShowPassword, props.keyType, _type',
-      props.keyType,
-      _type,
-    );
+    console.log('_handlePressShowPassword, stored type, type', type, _type);
+    //
+    if (type === _type) {
+      setPassword(password);
+      setShowPassword(!showPassword);
+    }
     // only master key can retrieve the lower keys
-    if (props.keyType === KeyTypes.MASTER) {
+    else if (type === KeyTypes.MASTER) {
       console.log('show password');
       const _password = getRequestedPassword(username, password, props.type);
       //      console.log('_handlePressShowPassword. _password', _password);
       setPassword(_password);
       setShowPassword(!showPassword);
     } else {
-      setToastMessage('Please login with a master key.');
+      setToastMessage('Please login with a proper key or master key.');
     }
   };
   ////
