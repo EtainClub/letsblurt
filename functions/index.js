@@ -26,3 +26,30 @@ exports.searchRequest = functions.https.onCall(async (data, res) => {
 
   return result;
 });
+
+// proxy for google translation v3
+exports.translationRequest = functions.https.onCall(async (data, context) => {
+  console.log('input data', data);
+  const {text, targetLang, format} = data;
+
+  const options = {
+    target: targetLang,
+    q: text,
+    format,
+  };
+
+  const key = functions.config().translation.key;
+  const url = `https://translation.googleapis.com/language/translate/v2?key=${key}`;
+  console.log('url', url);
+
+  let result = null;
+  await axios
+    .post(url, options)
+    .then((response) => {
+      result = response.data;
+      console.log('response result', result);
+    })
+    .catch((error) => console.log('failed to translate', error));
+
+  return result;
+});

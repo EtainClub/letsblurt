@@ -5,6 +5,8 @@ import React, {useState, useEffect, useContext} from 'react';
 import {View, ActivityIndicator, Platform} from 'react-native';
 // config
 import Config from 'react-native-config';
+//// firebase
+import {firebase} from '@react-native-firebase/functions';
 // axios
 import axios from 'axios';
 import {PostDetailsScreen} from '../screen/PostDetails';
@@ -211,14 +213,7 @@ const PostDetails = (props: Props): JSX.Element => {
       const title = postDetails.state.title;
       const body = postDetails.body;
       const targetLang = uiState.selectedLanguage;
-      const key =
-        Platform.OS === 'android'
-          ? Config.LETSBLURT_ANDROID_TRANSLATION
-          : Config.LETSBLURT_IOS_TRANSLATION;
-      const url = `https://translation.googleapis.com/language/translate/v2?key=${key}`;
-      console.log('_translateLanguage. original title', title);
-      console.log('_translateLanguage. original body', body);
-
+      console.log('targetLang', targetLang);
       // TODO: detect the source language and compare it with the target
       // if they are the same, disable the translating to save the code.
       // const html = markdown2html(body);
@@ -226,18 +221,25 @@ const PostDetails = (props: Props): JSX.Element => {
       // console.log('_translateLanguage. original body html', html);
       // console.log('_translateLanguage. original body plain text', body);
       const titleOptions = {
-        target: targetLang,
-        q: title,
+        targetLang: targetLang,
+        text: title,
         format: 'text',
       };
       const bodyOptions = {
-        q: body,
-        target: targetLang,
+        targetLang: targetLang,
+        text: body,
         format: 'html',
       };
+
       try {
-        const titleTranslation = await axios.post(url, titleOptions);
-        const bodyTranslation = await axios.post(url, bodyOptions);
+        const titleTranslation = await firebase
+          .functions()
+          .httpsCallable('translationRequest')(titleOptions);
+        console.log('translation. title', titleTranslation);
+        const bodyTranslation = await firebase
+          .functions()
+          .httpsCallable('translationRequest')(bodyOptions);
+        console.log('translation body', bodyTranslation);
 
         console.log(
           '_translateLanguage. translation',
@@ -259,6 +261,8 @@ const PostDetails = (props: Props): JSX.Element => {
           state: {...postDetails.state, title: translatedTitle},
           body: translatedBpdy,
         };
+        // TODO: save the translation for re-translate
+
         // set translation
         setPostDetails(newPostDetails);
         //return translation.data.translations[0].translatedText;
