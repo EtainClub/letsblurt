@@ -261,12 +261,12 @@ const PostDetails = (props: Props): JSX.Element => {
         titleTranslation.data.data.translations[0].translatedText;
       console.log('_translateLanguage. translatedTitle', translatedTitle);
 
-      const translatedBpdy =
+      const translatedBody =
         bodyTranslation.data.data.translations[0].translatedText;
       const newPostDetails = {
         ...postDetails,
         state: {...postDetails.state, title: translatedTitle},
-        body: translatedBpdy,
+        body: translatedBody,
       };
       // TODO: save the translation for re-translate
 
@@ -301,25 +301,3 @@ const PostDetails = (props: Props): JSX.Element => {
 };
 
 export {PostDetails};
-
-/*
-    // fetch post details
-    const postPromise = new Promise((resolve, reject) =>
-      resolve(
-        getPostDetails(
-          postsState.postRef,
-          authState.currentCredentials.username,
-        ),
-      ),
-    );
-    const commentPromise = new Promise((resolve, reject) => {
-      resolve(_fetchComments());
-    });
-
-    Promise.all([postPromise, commentPromise]).then((results) => {
-      // set post details
-      setPostDetails(results[0] as PostData);
-      // set comment
-      setComments(results[1] as CommentData[]);
-    });
-*/

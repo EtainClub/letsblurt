@@ -11,6 +11,7 @@ export interface ActionBarStyle {
   share?: boolean;
   bookmark?: boolean;
   resteem?: boolean;
+  translation?: boolean;
 }
 
 export const ActionBarStyleFeed: ActionBarStyle = {
@@ -36,6 +37,7 @@ export const ActionBarStylePost: ActionBarStyle = {
   bookmark: true,
   resteem: true,
   share: true,
+  translation: true,
 };
 
 export const ActionBarStyleComment: ActionBarStyle = {
@@ -46,6 +48,7 @@ export const ActionBarStyleComment: ActionBarStyle = {
   },
   reply: true,
   edit: false,
+  translation: true,
 };
 
 export const ActionBarStyleCommentEdit: ActionBarStyle = {

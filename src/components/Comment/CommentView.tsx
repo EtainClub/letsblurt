@@ -12,15 +12,17 @@ import {
   TouchableWithoutFeedback,
   ScrollView,
 } from 'react-native';
+//// firebase
+import {firebase} from '@react-native-firebase/functions';
 // ui
 import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
 import HTML from 'react-native-render-html';
-import {argonTheme} from '../../constants/argonTheme';
-import {PostData, CommentData, PostingContent} from '../../contexts/types';
-import {Avatar} from '../../components/Avatar';
+import {argonTheme} from '~/constants/argonTheme';
+import {PostData, CommentData, PostingContent} from '~/contexts/types';
+import {Avatar} from '~/components/Avatar';
 import {ActionBar} from '../ActionBar';
-import {ActionBarStyleComment} from '../../constants/actionBarTypes';
-import {AuthContext, PostsContext} from '../../contexts';
+import {ActionBarStyleComment} from '~/constants/actionBarTypes';
+import {AuthContext, UIContext, PostsContext} from '~/contexts';
 import {getTimeFromNow} from '~/utils/time';
 import {
   extractMetadata,
@@ -40,8 +42,11 @@ interface Props {
   //  updateComment: () => void;
 }
 const Comment = (props: Props): JSX.Element => {
+  //// props
+  const {comment} = props;
   //// contexts
   const {authState} = useContext(AuthContext);
+  const {uiState} = useContext(UIContext);
   const {postsState, submitPost, updatePost} = useContext(PostsContext);
   //// stats
   const [originalPost, setOriginalPost] = useState(null);
@@ -51,7 +56,11 @@ const Comment = (props: Props): JSX.Element => {
   const [text, setText] = useState('');
   const [newHeight, setNewHeight] = useState(40);
 
-  const {comment} = props;
+  const [body, setBody] = useState(comment.body);
+  const [showOriginal, setShowOriginal] = useState(true);
+  const [originalBody, setOriginalBody] = useState(comment.body);
+  const [translatedBody, setTranslatedBody] = useState(null);
+
   const reputation = comment.state.reputation.toFixed(0);
 
   const formatedTime = comment && getTimeFromNow(comment.state.createdAt);
@@ -138,6 +147,51 @@ const Comment = (props: Props): JSX.Element => {
 
   const _handlePressEditComment = () => {
     setEditMode(true);
+  };
+
+  const _handlePressTranslation = async () => {
+    console.log('[_translateLanguage] showOriginal', showOriginal);
+    const _showOriginal = !showOriginal;
+    setShowOriginal(_showOriginal);
+    if (_showOriginal) {
+      console.log('[_translateLanguage] showOriginal', _showOriginal);
+      // set original comment
+      setBody(originalBody);
+      return;
+    }
+    // if translation exists, use it
+    if (translatedBody) {
+      console.log('translation exists');
+      setBody(translatedBody);
+      return;
+    }
+    const targetLang = uiState.selectedLanguage;
+    console.log('targetLang', targetLang);
+    const bodyOptions = {
+      targetLang: targetLang,
+      text: body,
+      format: 'html',
+    };
+
+    try {
+      const bodyTranslation = await firebase
+        .functions()
+        .httpsCallable('translationRequest')(bodyOptions);
+
+      console.log(
+        '_translateLanguage. translation',
+        bodyTranslation.data.data.translations[0],
+      );
+      const translatedBody =
+        bodyTranslation.data.data.translations[0].translatedText;
+
+      // set translation
+      setBody(translatedBody);
+      // store the translation
+      setTranslatedBody(translatedBody);
+    } catch (error) {
+      console.log('failed to translate', error);
+    }
   };
 
   const _renderCommentForm = () => {
@@ -244,7 +298,7 @@ const Comment = (props: Props): JSX.Element => {
           <Text style={{top: 10, marginRight: 20}}>{formatedTime}</Text>
         </Block>
         <Block style={[styles.messageCard, styles.shadow]}>
-          <HTML html={comment.body} />
+          <HTML html={body} />
         </Block>
         <ActionBar
           actionBarStyle={ActionBarStyleComment}
@@ -252,6 +306,7 @@ const Comment = (props: Props): JSX.Element => {
           postState={comment.state}
           handlePressReply={_handlePressReply}
           handlePressEditComment={_handlePressEditComment}
+          handlePressTranslation={_handlePressTranslation}
         />
       </Block>
       {showReply && _renderCommentForm()}

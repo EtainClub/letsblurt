@@ -284,34 +284,34 @@ const ActionBarView = (props: Props): JSX.Element => {
           </TouchableOpacity>
         ) : null}
         {actionBarStyle.share ? (
-          <Block row>
-            <TouchableWithoutFeedback onPress={_onPressShare}>
-              <Block row style={{paddingRight: 10}}>
-                <Icon
-                  size={actionBarStyle.iconSize}
-                  color={argonTheme.COLORS.ERROR}
-                  name="sharealt"
-                  family="antdesign"
-                  style={{paddingHorizontal: 10}}
-                />
-              </Block>
-            </TouchableWithoutFeedback>
-            <TouchableWithoutFeedback onPress={_onPressTranslate}>
-              <Block row style={{top: 0}}>
-                <Icon
-                  size={18}
-                  color={
-                    showOriginal
-                      ? argonTheme.COLORS.ERROR
-                      : argonTheme.COLORS.FACEBOOK
-                  }
-                  name="translate"
-                  family="material-community"
-                  style={{paddingHorizontal: 5}}
-                />
-              </Block>
-            </TouchableWithoutFeedback>
-          </Block>
+          <TouchableWithoutFeedback onPress={_onPressShare}>
+            <Block row style={{paddingRight: 10}}>
+              <Icon
+                size={actionBarStyle.iconSize}
+                color={argonTheme.COLORS.ERROR}
+                name="sharealt"
+                family="antdesign"
+                style={{paddingHorizontal: 10}}
+              />
+            </Block>
+          </TouchableWithoutFeedback>
+        ) : null}
+        {actionBarStyle.translation ? (
+          <TouchableWithoutFeedback onPress={_onPressTranslate}>
+            <Block row style={{top: 0}}>
+              <Icon
+                size={18}
+                color={
+                  showOriginal
+                    ? argonTheme.COLORS.ERROR
+                    : argonTheme.COLORS.FACEBOOK
+                }
+                name="translate"
+                family="material-community"
+                style={{paddingHorizontal: 5}}
+              />
+            </Block>
+          </TouchableWithoutFeedback>
         ) : null}
         {actionBarStyle.bookmark && isUser ? (
           <TouchableWithoutFeedback onPress={props.handlePressEditPost}>
