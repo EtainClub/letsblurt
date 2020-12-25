@@ -13,6 +13,7 @@
   },
   "main": "index.js",
   "dependencies": {
+    "axios": "^0.21.1",
     "dblurt": "gitlab:blurt/openblurt/dblurt",
     "dsteem": "^0.11.3",
     "event-stream": "^4.0.1",

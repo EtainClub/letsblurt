@@ -1,31 +1,28 @@
 const functions = require('firebase-functions');
-let dsteem = require('dsteem');
-var es = require('event-stream');
-var util = require('util');
+const axios = require('axios');
 
-const MAINNET_OFFICIAL = [
-  'https://api.blurt.blog',
-  'https://rpc.blurt.world',
-  'https://blurtd.privex.io',
-  'https://rpc.blurt.buzz',
-];
-const client = new dsteem.Client(MAINNET_OFFICIAL, {
-  timeout: 5000,
-  addressPrefix: 'BLT',
-  chainId: 'cd8d90f29ae273abec3eaa7731e25934c63eb654d55080caff2ebb7f5df6381f',
+// proxy for google custom search
+exports.searchRequest = functions.https.onCall(async (data, res) => {
+  console.log('input data', data);
+  const {query, startAt = 1, num = 10, sort = ''} = data;
+
+  const key = functions.config().search.key;
+  const cx = functions.config().search.cx;
+  const search = `https://www.googleapis.com/customsearch/v1?key=${key}&cx=${cx}&q=${query}&num=${num}&start=${startAt}&sort=${sort}`;
+
+  console.log('key', key);
+  console.log('cx', cx);
+  console.log('search', search);
+
+  //    const response = await axios.get(search);
+  let result = null;
+  await axios
+    .get(search)
+    .then((response) => {
+      result = response.data;
+      console.log('response result', result);
+    })
+    .catch((error) => console.log('failed to search', error));
+
+  return result;
 });
-
-const stream = client.blockchain.getOperationsStream({
-  mode: dsteem.BlockchainMode.Latest,
-});
-
-// const stream = client.blockchain.getOperationsStream({
-//   mode: dsteem.BlockchainMode.Latest,
-// });
-
-exports.blockData = functions.pubsub
-  .schedule('every 1 minutes')
-  .onRun(async (context) => {
-    // const block = await client.blockchain.getCurrentBlock();
-    console.log('block', block);
-  });

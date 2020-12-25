@@ -2,6 +2,7 @@
 import React, {useState, useEffect, useContext, useCallback} from 'react';
 //// react native
 import {
+  Platform,
   View,
   StyleSheet,
   Dimensions,
@@ -12,6 +13,8 @@ import {
 } from 'react-native';
 //// config
 import Config from 'react-native-config';
+//// firebase
+import {firebase} from '@react-native-firebase/functions';
 ////
 import axios, {AxiosResponse} from 'axios';
 //// react navigation
@@ -79,58 +82,32 @@ const SearchFeed = (props: Props): JSX.Element => {
 
   const _handleLoadMore = async (text?: string) => {
     console.log('[search] _handleLoadMore. searchText', searchText);
-    // do not search if all loaded
-    if (!loadedAll) {
-      // fetch more
-      if (text != '') _fetchSearch(text);
-      else _fetchSearch(searchText);
-    }
+    // // do not search if all loaded
+    // if (!loadedAll) {
+    //   // fetch more
+    //   if (text != '') _fetchSearch(text);
+    //   else _fetchSearch(searchText);
+    // }
   };
 
   const _fetchSearch = async (text: string) => {
-    const key = Config.GOOGLE_SEARCH_BLURT_KEY;
-    const cx = Config.GOOGLE_SEARCH_BLURT_cx;
-    //
-    const query = text;
-    // search start index
-    const start = startIndex;
-    // search limit
-    const num = 10;
-    const sort = '';
-    const search = `https://www.googleapis.com/customsearch/v1?key=${key}&cx=${cx}&q=${query}&num=${num}&start=${start}&sort=${sort}`;
-
-    console.log('_fetchSearch. start', start);
-    console.log('_fetchSearch. search', search);
-
-    // search
-    // let response: AxiosResponse;
-    // try {
-    //   response = await axios.get(search);
-    //   console.log('search response', response);
-    // } catch (error) {
-    //   console.error('search error', error);
-    //   return;
-    // }
-
-    // // check response
-    // if (response.status != 200) {
-    //   console.log('response status is 200', response.status);
-    //   return;
-    // }
-    // const {items} = response.data;
-    // console.log('search items link', items);
-
-    const response = await fetch(search);
-    console.log('search results', response);
-    if (response.status != 200) {
-      console.log('response status is 200', response.status);
+    let response = null;
+    try {
+      response = await firebase.functions().httpsCallable('searchRequest')({
+        query: text,
+        startAt: startIndex,
+        num: 10,
+        sort: '',
+      });
+      console.log('search results', response);
+    } catch (error) {
+      console.log('failed to search', error);
       return;
     }
 
     // check response
-    const data = await response.json();
-    console.log('search items', data);
-    const {items} = data;
+    const {items} = response.data;
+    console.log('search items', items);
 
     //
     if (!items) {
@@ -139,6 +116,7 @@ const SearchFeed = (props: Props): JSX.Element => {
       //      setSearchText('');
       return null;
     }
+
     // filtering first
     // map
     let _items = [];
@@ -157,16 +135,12 @@ const SearchFeed = (props: Props): JSX.Element => {
         });
     });
     console.log('filtered items', _items);
-    setSearchItems(searchItems.concat(_items));
-    // update start index: start index + how many searched (not actual items)
-    setStartIndex(startIndex + items.length);
-    //    setSearchText('');
+    setSearchItems(_items);
 
-    // check if the search items are fewer than the numbe intended
-    // if (!loadedAll) {
-    //   //      setLoadedAll(true);
-    //   _handleLoadMore(text);
-    // }
+    //    setSearchItems(searchItems.concat(_items));
+    // update start index: start index + how many searched (not actual items)
+    //    setStartIndex(startIndex + items.length);
+    //    setSearchText('');
   };
 
   const _handleRefresh = async (text: string) => {

@@ -2,7 +2,7 @@
 // react
 import React, {useState, useEffect, useContext} from 'react';
 // react native
-import {View, ActivityIndicator} from 'react-native';
+import {View, ActivityIndicator, Platform} from 'react-native';
 // config
 import Config from 'react-native-config';
 // axios
@@ -211,7 +211,10 @@ const PostDetails = (props: Props): JSX.Element => {
       const title = postDetails.state.title;
       const body = postDetails.body;
       const targetLang = uiState.selectedLanguage;
-      const key = Config.GOOGLE_CLOUD_TRANSLATION_KEY;
+      const key =
+        Platform.OS === 'android'
+          ? Config.LETSBLURT_ANDROID_TRANSLATION
+          : Config.LETSBLURT_IOS_TRANSLATION;
       const url = `https://translation.googleapis.com/language/translate/v2?key=${key}`;
       console.log('_translateLanguage. original title', title);
       console.log('_translateLanguage. original body', body);

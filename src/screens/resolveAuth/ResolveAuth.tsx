@@ -1,4 +1,7 @@
+//// react
 import React, {useEffect, useContext, useState} from 'react';
+//// react native
+import {Platform} from 'react-native';
 // config
 import Config from 'react-native-config';
 //
@@ -71,7 +74,10 @@ export const ResolveAuth = (props) => {
 
   /////
   const _getSupportedLanguages = async () => {
-    const key = Config.GOOGLE_CLOUD_TRANSLATION_KEY;
+    const key =
+      Platform.OS === 'android'
+        ? Config.LETSBLURT_ANDROID_TRANSLATION
+        : Config.LETSBLURT_IOS_TRANSLATION;
 
     let url = `https://translation.googleapis.com/language/translate/v2/languages?key=${key}`;
     try {
