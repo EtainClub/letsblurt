@@ -1,4 +1,5 @@
 import Config from 'react-native-config';
+
 //
 import axios from 'axios';
 //
@@ -53,7 +54,7 @@ const MAINNET_OFFICIAL = [
 ];
 const client = new Client(MAINNET_OFFICIAL, {
   timeout: 5000,
-  addressPrefix: 'BLT',
+  addressPrefix: 'BLURT',
   chainId: 'cd8d90f29ae273abec3eaa7731e25934c63eb654d55080caff2ebb7f5df6381f',
 });
 

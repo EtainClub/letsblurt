@@ -47,7 +47,11 @@ const PostDetails = (props: Props): JSX.Element => {
   // states
   const [loading, setLoading] = useState(true);
   const [postDetails, setPostDetails] = useState<PostData>(null);
+  const [showOriginal, setShowOriginal] = useState(true);
   const [originalPostDetails, setOriginalPostDetails] = useState<PostData>(
+    null,
+  );
+  const [translatedPostDetails, setTranslatedPostDetails] = useState<PostData>(
     null,
   );
   const [comments, setComments] = useState<CommentData[]>(null);
@@ -197,79 +201,84 @@ const PostDetails = (props: Props): JSX.Element => {
     navigate({name: 'Feed'});
   };
 
-  const _translateLanguage = async (showOriginal: boolean) =>
-    // title?: string,
-    // body?: string,
-    // targetLang?: string,
-    {
-      // TODO: when click the icon again, show the original text
-      // keep original post details?
-      if (showOriginal) {
-        // set original post
-        setPostDetails(originalPostDetails);
-        return;
-      }
-
-      const title = postDetails.state.title;
-      const body = postDetails.body;
-      const targetLang = uiState.selectedLanguage;
-      console.log('targetLang', targetLang);
-      // TODO: detect the source language and compare it with the target
-      // if they are the same, disable the translating to save the code.
-      // const html = markdown2html(body);
-      //    const text = body.replace(/<\/?[^>]+>/gi, ' ');
-      // console.log('_translateLanguage. original body html', html);
-      // console.log('_translateLanguage. original body plain text', body);
-      const titleOptions = {
-        targetLang: targetLang,
-        text: title,
-        format: 'text',
-      };
-      const bodyOptions = {
-        targetLang: targetLang,
-        text: body,
-        format: 'html',
-      };
-
-      try {
-        const titleTranslation = await firebase
-          .functions()
-          .httpsCallable('translationRequest')(titleOptions);
-        console.log('translation. title', titleTranslation);
-        const bodyTranslation = await firebase
-          .functions()
-          .httpsCallable('translationRequest')(bodyOptions);
-        console.log('translation body', bodyTranslation);
-
-        console.log(
-          '_translateLanguage. translation',
-          titleTranslation.data.data.translations[0],
-        );
-        console.log(
-          '_translateLanguage. translation',
-          bodyTranslation.data.data.translations[0],
-        );
-
-        const translatedTitle =
-          titleTranslation.data.data.translations[0].translatedText;
-        console.log('_translateLanguage. translatedTitle', translatedTitle);
-
-        const translatedBpdy =
-          bodyTranslation.data.data.translations[0].translatedText;
-        const newPostDetails = {
-          ...postDetails,
-          state: {...postDetails.state, title: translatedTitle},
-          body: translatedBpdy,
-        };
-        // TODO: save the translation for re-translate
-
-        // set translation
-        setPostDetails(newPostDetails);
-        //return translation.data.translations[0].translatedText;
-      } catch (error) {
-        console.log('failed to translate', error);
-      }
+  const _translateLanguage = async () => {
+    console.log('[_translateLanguage] showOriginal', showOriginal);
+    const _showOriginal = !showOriginal;
+    setShowOriginal(_showOriginal);
+    if (_showOriginal) {
+      console.log('[_translateLanguage] showOriginal', _showOriginal);
+      // set original post
+      setPostDetails(originalPostDetails);
+      return;
+    }
+    // if translation exists, use it
+    if (translatedPostDetails) {
+      console.log('translation exists');
+      setPostDetails(translatedPostDetails);
+      return;
+    }
+    const title = postDetails.state.title;
+    const body = postDetails.body;
+    const targetLang = uiState.selectedLanguage;
+    console.log('targetLang', targetLang);
+    // TODO: detect the source language and compare it with the target
+    // if they are the same, disable the translating to save the code.
+    // const html = markdown2html(body);
+    //    const text = body.replace(/<\/?[^>]+>/gi, ' ');
+    // console.log('_translateLanguage. original body html', html);
+    // console.log('_translateLanguage. original body plain text', body);
+    const titleOptions = {
+      targetLang: targetLang,
+      text: title,
+      format: 'text',
     };
+    const bodyOptions = {
+      targetLang: targetLang,
+      text: body,
+      format: 'html',
+    };
+
+    try {
+      const titleTranslation = await firebase
+        .functions()
+        .httpsCallable('translationRequest')(titleOptions);
+      console.log('translation. title', titleTranslation);
+      const bodyTranslation = await firebase
+        .functions()
+        .httpsCallable('translationRequest')(bodyOptions);
+      console.log('translation body', bodyTranslation);
+
+      console.log(
+        '_translateLanguage. translation',
+        titleTranslation.data.data.translations[0],
+      );
+      console.log(
+        '_translateLanguage. translation',
+        bodyTranslation.data.data.translations[0],
+      );
+
+      const translatedTitle =
+        titleTranslation.data.data.translations[0].translatedText;
+      console.log('_translateLanguage. translatedTitle', translatedTitle);
+
+      const translatedBpdy =
+        bodyTranslation.data.data.translations[0].translatedText;
+      const newPostDetails = {
+        ...postDetails,
+        state: {...postDetails.state, title: translatedTitle},
+        body: translatedBpdy,
+      };
+      // TODO: save the translation for re-translate
+
+      // set translation
+      setPostDetails(newPostDetails);
+      // store the translation
+      setTranslatedPostDetails(newPostDetails);
+      //return translation.data.translations[0].translatedText;
+    } catch (error) {
+      console.log('failed to translate', error);
+    }
+  };
 
   return postDetails ? (
     <PostDetailsScreen

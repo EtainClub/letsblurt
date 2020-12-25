@@ -106,16 +106,15 @@ const SearchFeed = (props: Props): JSX.Element => {
     }
 
     // check response
-    const {items} = response.data;
-    console.log('search items', items);
-
-    //
-    if (!items) {
+    if (!response.data) {
       //      setToastMessage('Nothing Found');
       setLoadedAll(true);
       //      setSearchText('');
       return null;
     }
+
+    const {items} = response.data;
+    console.log('search items', items);
 
     // filtering first
     // map

@@ -1,14 +1,15 @@
 import React, {useState, useEffect, useContext} from 'react';
 import Config from 'react-native-config';
+//// firebase
+import {firebase} from '@react-native-firebase/functions';
+import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 import SplashScreen from 'react-native-splash-screen';
 import {SignupScreen} from '../screen/Signup';
 import {PhoneAuthScreen} from '../screen/PhoneAuth';
 import {AccountScreen} from '../screen/Account';
 
 import {OTP} from '~/components';
-
-import auth, {FirebaseAuthTypes, firebase} from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
 
 import {
   checkUsernameAvailable,
@@ -67,15 +68,26 @@ const Signup = (props: Props): JSX.Element => {
   const _createAccount = async () => {
     console.log('userState global props', userState.globalProps);
     // now create an account
-    const success = await createAccount(
+    // const success = await createAccount(
+    //   username,
+    //   password,
+    //   Config.CREATOR_ACCOUNT,
+    //   Config.CREATOR_ACTIVE_WIF,
+    //   userState.globalProps.chainProps.account_creation_fee,
+    // );
+
+    //    const {username, password, creationFee} = data;
+    const options = {
       username,
       password,
-      Config.CREATOR_ACCOUNT,
-      Config.CREATOR_ACTIVE_WIF,
-      userState.globalProps.chainProps.account_creation_fee,
-    );
+      creationFee: userState.globalProps.chainProps.account_creation_fee,
+    };
+    const result = await firebase
+      .functions()
+      .httpsCallable('createAccountRequest')(options);
+
     // check sanity
-    if (success) {
+    if (result) {
       // update phone db
       await addPhonenumberToDB(username, phoneNumber);
     }
@@ -109,7 +121,7 @@ const Signup = (props: Props): JSX.Element => {
     // generated password first, then display the password
     /// then, user clicks confirm or submit
     // then finally create an account
-    if (result) {
+    if (__DEV__ || result) {
       setShowAccountScreen(true);
     }
   };

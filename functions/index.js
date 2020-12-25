@@ -1,6 +1,20 @@
 const functions = require('firebase-functions');
 const axios = require('axios');
 
+const dsteem = require('dsteem');
+
+const MAINNET_OFFICIAL = [
+  'https://api.blurt.blog',
+  'https://rpc.blurt.world',
+  'https://blurtd.privex.io',
+  'https://rpc.blurt.buzz',
+];
+const client = new dsteem.Client(MAINNET_OFFICIAL, {
+  timeout: 5000,
+  addressPrefix: 'BLURT',
+  chainId: 'cd8d90f29ae273abec3eaa7731e25934c63eb654d55080caff2ebb7f5df6381f',
+});
+
 // proxy for google custom search
 exports.searchRequest = functions.https.onCall(async (data, res) => {
   console.log('input data', data);
@@ -52,4 +66,76 @@ exports.translationRequest = functions.https.onCall(async (data, context) => {
     .catch((error) => console.log('failed to translate', error));
 
   return result;
+});
+
+// proxy for creating blurt account
+exports.createAccountRequest = functions.https.onCall(async (data, context) => {
+  console.log('input data', data);
+  const {username, password, creationFee} = data;
+
+  // get creator account
+  const creator = functions.config().createor.account;
+  const creatorWif = functions.config().creator.wif;
+
+  // private active key of creator account
+  const creatorKey = PrivateKey.fromString(creatorWif);
+  // create keys
+  const ownerKey = PrivateKey.fromLogin(username, password, 'owner');
+  const activeKey = PrivateKey.fromLogin(username, password, 'active');
+  const postingKey = PrivateKey.fromLogin(username, password, 'posting');
+  const memoKey = PrivateKey.fromLogin(username, password, 'memo').createPublic(
+    client.addressPrefix,
+  );
+
+  const ownerAuth = {
+    weight_threshold: 1,
+    account_auths: [],
+    key_auths: [[ownerKey.createPublic(client.addressPrefix), 1]],
+  };
+  const activeAuth = {
+    weight_threshold: 1,
+    account_auths: [],
+    key_auths: [[activeKey.createPublic(client.addressPrefix), 1]],
+  };
+  const postingAuth = {
+    weight_threshold: 1,
+    account_auths: [],
+    key_auths: [[postingKey.createPublic(client.addressPrefix), 1]],
+  };
+
+  // get account creation fee
+  //  const fee = await
+  //// send creation operation
+  // operations
+  let operations = [];
+  //create operation to transmit
+  const create_op = [
+    'account_create',
+    {
+      fee: creationFee,
+      creator: creator,
+      new_account_name: username,
+      owner: ownerAuth,
+      active: activeAuth,
+      posting: postingAuth,
+      memo_key: memoKey,
+      json_metadata: '',
+      extensions: [],
+    },
+  ];
+  console.log(create_op);
+  // push the creation operation
+  operations.push(create_op);
+  // broadcast operation to blockchain
+  let result = null;
+  await client.broadcast.sendOperations(
+      operations,
+      creatorKey,
+    ).then(response => {
+      console.log('creation result', result);
+      result = response;
+    })
+    .catch (error) {
+      console.log('account creation failed', error);
+    }
 });

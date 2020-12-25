@@ -38,7 +38,7 @@ interface Props {
   fetchComments: () => void;
   handleSubmitComment: (message: string) => Promise<string>;
   handlePressTag: (tag: string) => void;
-  handlePressTranslation: (showOriginal: boolean) => void;
+  handlePressTranslation: () => void;
 }
 const PostDetailsScreen = (props: Props): JSX.Element => {
   const {uiState, setToastMessage} = useContext(UIContext);
