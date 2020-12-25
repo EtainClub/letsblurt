@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 //// firebase
 import {firebase} from '@react-native-firebase/functions';
-// ui
+//// UIs
 import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
 import HTML from 'react-native-render-html';
 import {argonTheme} from '~/constants/argonTheme';
@@ -23,6 +23,8 @@ import {Avatar} from '~/components/Avatar';
 import {ActionBar} from '../ActionBar';
 import {ActionBarStyleComment} from '~/constants/actionBarTypes';
 import {AuthContext, UIContext, PostsContext} from '~/contexts';
+//// utils
+import {generateCommentPermlink, createPatch} from '~/utils/editor';
 import {getTimeFromNow} from '~/utils/time';
 import {
   extractMetadata,
@@ -53,9 +55,10 @@ const Comment = (props: Props): JSX.Element => {
   const [submitting, setSubmitting] = useState(false);
   const [showReply, setShowReply] = useState(false);
   const [editMode, setEditMode] = useState(false);
-  const [text, setText] = useState('');
+  // reply text
+  const [replyText, setReplyText] = useState('');
   const [newHeight, setNewHeight] = useState(40);
-
+  // comment body
   const [body, setBody] = useState(comment.body);
   const [showOriginal, setShowOriginal] = useState(true);
   const [originalBody, setOriginalBody] = useState(comment.body);
@@ -67,57 +70,41 @@ const Comment = (props: Props): JSX.Element => {
 
   const _handleSubmitComment = async () => {
     // check sanity
-    if (text === '') return;
+    if (replyText === '') return;
 
     // set submitted flag
     setSubmitting(true);
-    const {username, password} = authState.currentCredentials;
+    const {username} = authState.currentCredentials;
     // extract meta
-    const _meta = extractMetadata(text);
+    const _meta = extractMetadata(replyText);
     // split tags by space
     const _tags = [];
     const jsonMeta = makeJsonMetadata(_meta, _tags);
-    let permlink = '';
 
-    // generate permlink for a new post
-    // if (!originalPost) {
-    //   permlink = generatePermlink('');
-    //   //// check duplicate permlink, if so generate a random
-    //   let duplicate: Discussion = await fetchRawPost(username, permlink);
-    //   if (duplicate && duplicate.id) {
-    //     permlink = generatePermlink(title, true);
-    //   }
-    // }
-
-    // build posting content
+    // build posting content for a new comment
     const postingContent: PostingContent = {
       author: username,
       title: '',
-      body: comment.body,
-      parent_author: comment.state.parent_ref.author,
-      parent_permlink: comment.state.parent_ref.permlink,
+      body: replyText,
+      parent_author: comment.state.post_ref.author,
+      parent_permlink: comment.state.post_ref.permlink,
       json_metadata: JSON.stringify(jsonMeta) || '',
-      permlink: comment.state.post_ref.permlink,
+      permlink: generateCommentPermlink(username),
     };
 
+    // update the body with patch if it is edit mode
     if (editMode) {
-      // TODO: use submitPost after patching instead of updatePost
-      // patch = utils editors createPatch
-      // await updatePost(
-      //   props.postIndex,
-      //   comment.body,
-      //   text,
-      //   parentRef,
-      //   postRef,
-      //   authState.currentCredentials.password,
-      // );
-    } else {
-      const {success, message} = await submitPost(
-        postingContent,
-        authState.currentCredentials.password,
-        true,
-      );
+      //      const patch = createPatch(comment.body, replyText);
+      postingContent.parent_author = comment.state.parent_ref.author;
+      postingContent.parent_permlink = comment.state.parent_ref.permlink;
+      postingContent.permlink = comment.state.post_ref.permlink;
     }
+    // submit the comment
+    const {success, message} = await submitPost(
+      postingContent,
+      authState.currentCredentials.password,
+      true,
+    );
     // fetch comments
     props.fetchComments();
     // clear submitted flag
@@ -130,23 +117,19 @@ const Comment = (props: Props): JSX.Element => {
   const _onCancelReply = () => {
     setShowReply(false);
     setEditMode(false);
-    setText('');
-  };
-
-  const _onEditText = () => {
-    setEditMode(true);
-  };
-
-  const _onReplyText = () => {
-    setShowReply(true);
+    setReplyText('');
   };
 
   const _handlePressReply = () => {
+    // clear reply form
     setShowReply(true);
   };
 
   const _handlePressEditComment = () => {
+    console.log('_handlePressEditComment. markdown body', comment.markdownBody);
     setEditMode(true);
+    // set markdown format to body
+    setBody(comment.markdownBody);
   };
 
   const _handlePressTranslation = async () => {
@@ -196,7 +179,7 @@ const Comment = (props: Props): JSX.Element => {
 
   const _renderCommentForm = () => {
     const depth = comment.depth - 1;
-    const body = editMode ? comment.body : text;
+    const _body = editMode ? body : replyText;
 
     const iconSend = (
       <Button
@@ -250,8 +233,8 @@ const Comment = (props: Props): JSX.Element => {
           autoCapitalize="none"
           textContentType="none"
           placeholderTextColor="#9fa5aa"
-          defaultValue={body}
-          onChangeText={(text) => setText(text)}
+          defaultValue={_body}
+          onChangeText={(text) => setReplyText(text)}
           onContentSizeChange={(e) =>
             setNewHeight(e.nativeEvent.contentSize.height)
           }

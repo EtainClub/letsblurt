@@ -221,12 +221,6 @@ const PostDetails = (props: Props): JSX.Element => {
     const body = postDetails.body;
     const targetLang = uiState.selectedLanguage;
     console.log('targetLang', targetLang);
-    // TODO: detect the source language and compare it with the target
-    // if they are the same, disable the translating to save the code.
-    // const html = markdown2html(body);
-    //    const text = body.replace(/<\/?[^>]+>/gi, ' ');
-    // console.log('_translateLanguage. original body html', html);
-    // console.log('_translateLanguage. original body plain text', body);
     const titleOptions = {
       targetLang: targetLang,
       text: title,
