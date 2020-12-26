@@ -18,7 +18,12 @@ import {navigate} from '~/navigation/service';
 // steem api
 import {UIContext, AuthContext, PostsContext, UserContext} from '~/contexts';
 // types
-import {PostRef, PostsState, PostsTypes} from '~/contexts/types';
+import {
+  PostRef,
+  PostsState,
+  PostsTypes,
+  KeyTypeStrings,
+} from '~/contexts/types';
 import {materialTheme} from '~/constants/materialTheme';
 import {DropdownModal} from './DropdownModal';
 import {indexOf} from 'lodash';
@@ -45,7 +50,7 @@ const Header = (props: Props): JSX.Element => {
   //// lanugage
   const intl = useIntl();
   // contexts
-  const {authState, changeAccount} = useContext(AuthContext);
+  const {authState, changeAccount, processLogout} = useContext(AuthContext);
   const {userState} = useContext(UserContext);
   const {uiState, setSearchParam, setLanguageParam} = useContext(UIContext);
   const {postsState, setTagIndex, setFilterIndex, clearPosts} = useContext(
@@ -55,23 +60,29 @@ const Header = (props: Props): JSX.Element => {
   const [username, setUsername] = useState(null);
   const [searchText, setSearchText] = useState('');
   const [accounts, setAccounts] = useState(null);
+  const [keyTypes, setKeyTypes] = useState(null);
   const [searching, setSearching] = useState(false);
   const [community, setCommunity] = useState(0);
   const [category, setTag] = useState(0);
 
   /// auth state change effect
   useEffect(() => {
-    if (authState.loggedIn) {
-      console.log('[Header] authState', authState);
-      setUsername(authState.currentCredentials.username);
-      // set accounts
-      const iterator = authState.credentialsList.values();
-      let _accounts = [];
-      for (const key of iterator) {
-        _accounts.push(Object.keys(key)[0]);
-      }
-      setAccounts(_accounts);
+    //    if (authState.loggedIn) {
+    console.log('[Header] authState', authState);
+    setUsername(authState.currentCredentials.username);
+    // set accounts
+    const iterator = authState.credentialsList.values();
+    let _accounts = [];
+    let _keyTypes = [];
+    for (const key of iterator) {
+      const _username = Object.keys(key)[0];
+      _accounts.push(_username);
+      _keyTypes.push(key[_username].type);
     }
+    // set accounts
+    setAccounts(_accounts);
+    // set key types of accounts
+    setKeyTypes(_keyTypes);
   }, [authState.currentCredentials]);
 
   const _onSubmitSearch = () => {
@@ -80,39 +91,56 @@ const Header = (props: Props): JSX.Element => {
   };
 
   const _renderAccountRow = (option, index, isSelect) => {
-    console.log('_renderAccountRow', option, index, isSelect);
     return (
       <Block row style={{margin: 5}}>
-        <Image
-          source={{
-            uri: `${BLURT_IMAGE_SERVER}/u/${option}/avatar`,
-          }}
-          style={[
-            styles.avatar,
-            {
-              width: 30,
-              height: 30,
-              borderRadius: 30 / 2,
-            },
-          ]}
-        />
         <Block row middle>
+          {index >= accounts.length ? (
+            index === accounts.length ? (
+              <Icon
+                size={30}
+                color={argonTheme.COLORS.SWITCH_ON}
+                name="adduser"
+                family="antdesign"
+              />
+            ) : (
+              <Icon
+                size={30}
+                color={argonTheme.COLORS.ERROR}
+                name="logout"
+                family="antdegisn"
+              />
+            )
+          ) : (
+            <Image
+              source={{
+                uri: `${BLURT_IMAGE_SERVER}/u/${option}/avatar`,
+              }}
+              style={[
+                styles.avatar,
+                {
+                  width: 30,
+                  height: 30,
+                  borderRadius: 30 / 2,
+                },
+              ]}
+            />
+          )}
           <Text
             size={14}
             style={{marginHorizontal: 5, color: argonTheme.COLORS.WHITE}}>
             {option}
           </Text>
-          {isSelect ? (
-            <Block right>
-              <Icon
-                size={16}
-                color={argonTheme.COLORS.ERROR}
-                name="check"
-                family="antdegisn"
-              />
-            </Block>
-          ) : null}
         </Block>
+
+        {keyTypes && (
+          <Block right middle>
+            {index < accounts.length ? (
+              <Text color={argonTheme.COLORS.WARNING}>
+                {KeyTypeStrings[keyTypes[index]][0].toUpperCase()}
+              </Text>
+            ) : null}
+          </Block>
+        )}
       </Block>
     );
   };
@@ -120,13 +148,33 @@ const Header = (props: Props): JSX.Element => {
   const _handleChangeAccount = async (index: number, value: string) => {
     console.log('accounts', accounts);
     console.log('value', value);
-    changeAccount(value);
+    // switch account
+    if (index < accounts.length) {
+      changeAccount(value);
+    }
+    // add account
+    else if (index === accounts.length) {
+      navigate({name: 'Login'});
+    }
+    // log out
+    else {
+      processLogout();
+    }
   };
 
   const Avatar = () => {
+    let options = accounts;
+    if (username) {
+      // append logout at the end
+      options = [
+        ...accounts,
+        intl.formatMessage({id: 'Header.add_account'}),
+        intl.formatMessage({id: 'logout'}),
+      ];
+    }
     return username ? (
       <ModalDropdown
-        options={accounts}
+        options={options}
         renderRow={_renderAccountRow}
         style={styles.dropdown}
         dropdownButtonStyle={styles.avatarButton}
@@ -146,8 +194,8 @@ const Header = (props: Props): JSX.Element => {
       <Block style={styles.dropdown}>
         <Icon
           onPress={() => navigate({name: 'Login'})}
-          name="user-secret"
-          family="font-awesome"
+          name="login"
+          family="antdesign"
           size={40}
         />
       </Block>
@@ -443,6 +491,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
     minWidth: 150,
     width: 200,
+    height: 200,
     backgroundColor: argonTheme.COLORS.DEFAULT,
   },
   dropdownButtonStyle: {

@@ -23,6 +23,7 @@
   "edit": "Edit",
   "followers": "Followers",
   "following": "Following",
+  "logout": "Log out",
   "AppScreen": {
     "title": "Help Wanted",
     "message": "Do you want to see the details?"
@@ -184,7 +185,8 @@
     "translate": "Translate to",
     "language": "Language",
     "search_placeholder": "Search posts",
-    "search": "Search"
+    "search": "Search",
+    "add_account": "Add Account"
   },
   "Search": {
     "search": "Search dreams"
@@ -304,7 +306,8 @@
   "Actionbar": {
     "edit": "edit",
     "vote_wo_login": "You need to login to vote",
-    "vote_again": "You already voted on this post"
+    "vote_again": "You already voted on this post",
+    "voted": "Successfully voted!"
   },
   "Actionsheet": {
     "open": "Open the link",

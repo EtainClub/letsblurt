@@ -1,5 +1,9 @@
+//// react
 import React, {useState, useEffect, useContext} from 'react';
-
+//// react native
+//// config
+//// language
+import {useIntl} from 'react-intl';
 import {navigate} from '~/navigation/service';
 import {PostState} from '~/contexts/types';
 import {AuthContext, PostsContext, UserContext, UIContext} from '~/contexts';
@@ -19,9 +23,11 @@ interface Props {
 }
 
 const ActionBarContainer = (props: Props): JSX.Element => {
-  // props
+  //// props
   const {postState} = props;
-  // contexts
+  //// language
+  const intl = useIntl();
+  //// contexts
   const {postsState, upvote, bookmarkPost, setPostRef} = useContext(
     PostsContext,
   );
@@ -71,7 +77,7 @@ const ActionBarContainer = (props: Props): JSX.Element => {
       setToastMessage,
     );
     console.log('[ActionBarContainer|_processVoting] results', results);
-    setToastMessage(`Voted! block num ${results.block_num}`);
+    setToastMessage(intl.formatMessage({id: 'Actionbar.voted'}));
 
     setVoted(true);
     return true;

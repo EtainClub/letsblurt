@@ -24,7 +24,7 @@ export type DrawerParams = {
   AuthorList: undefined;
   Login: undefined;
   Logout: undefined;
-  Add: undefined;
+  AddAccount: undefined;
   SignUp: undefined;
   Posting: undefined;
   PostDetails: undefined;

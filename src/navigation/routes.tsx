@@ -376,7 +376,7 @@ const DrawerNavigator = (props) => {
       <Drawer.Screen name="Feed" component={TabNavigator} />
       <Drawer.Screen name="Login" component={Login} />
       <Drawer.Screen name="SignUp" component={Signup} />
-      <Drawer.Screen name="Add" component={Login} />
+      <Drawer.Screen name="AddAccount" component={Login} />
       <Drawer.Screen name="AuthorProfile" component={AuthorStack} />
       <Drawer.Screen name="AuthorList" component={AuthorListStack} />
       <Drawer.Screen name="PostDetails" component={PostDetailsStack} />

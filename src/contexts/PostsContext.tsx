@@ -432,8 +432,6 @@ const PostsProvider = ({children}: Props) => {
     console.log('[PostsContext|upvote] postIndex', postIndex, voteAmount);
     console.log('[PostsContext|upvote] post', postsState[postIndex]);
 
-    setToastMessage('submitting upvote...');
-
     // send transaction
     const results = await submitVote(
       username,

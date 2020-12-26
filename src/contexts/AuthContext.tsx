@@ -36,22 +36,17 @@ const authReducer = (state: AuthState, action: AuthAction) => {
     case AuthActionTypes.RESOLVE_AUTH:
       return {...state, authResolved: action.payload};
     case AuthActionTypes.LOGOUT:
-      console.log('logout action payload', action.payload);
-      console.log('before credentials list', state.currentCredentials);
-      return state;
-    // newList = state.credentialsList.filter(
-    //   (credentials: Credentials) => credentials.username !== action.payload,
-    // );
-    //      console.log('after credentials list', newList);
-    // clear the current credentials and set logout
-    // return {
-    //   currentCredentials: {username: '', password: ''},
-    //   credentialsList: newList,
-    //   loggedIn: false,
-    //   authResolved: false,
-    // };
+      const newCredentialsList = state.credentialsList.filter(
+        (credentials: Credentials) => credentials.username !== action.payload,
+      );
+      // clear the current credentials and set logout
+      return {
+        currentCredentials: {username: '', password: ''},
+        credentialsList: newCredentialsList,
+        loggedIn: false,
+        authResolved: false,
+      };
     case AuthActionTypes.SET_CREDENTIALS:
-      console.log('change action payload', action.payload);
       // change credentials
       return {
         currentCredentials: action.payload.currentCredientials,
@@ -133,10 +128,6 @@ const AuthProvider = ({children}: Props) => {
   const processLogout = async () => {
     console.log('[AuthContext] processLogout');
     const {currentCredentials} = authState;
-    console.log(
-      '[AuthContext] processLogout currentCredentails',
-      currentCredentials,
-    );
     // check sanity
     if (!authState.loggedIn) return;
     // remove login token
@@ -158,7 +149,6 @@ const AuthProvider = ({children}: Props) => {
     console.log('[AuthContext] changeAccount account', account);
     // get credentials
     const {credentials} = await _getCredentials(account);
-    console.log('[AuthContext|changeAccount] key credentials', credentials);
     if (!credentials) {
       console.log('[AuthContext|changeAccount] error! no account');
       return;

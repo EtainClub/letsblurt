@@ -280,9 +280,6 @@ const Comment = (props: Props): JSX.Element => {
           />
           <Text style={{top: 10, marginRight: 20}}>{formatedTime}</Text>
         </Block>
-        {/* <Block style={[styles.messageCard, styles.shadow]}>
-          <HTML html={body} />
-        </Block> */}
         <PostBody body={body} />
         <ActionBar
           actionBarStyle={ActionBarStyleComment}

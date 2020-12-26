@@ -17,6 +17,8 @@ export enum KeyTypes {
   MASTER,
 }
 
+export const KeyTypeStrings = ['memo', 'posting', 'active', 'owner', 'master'];
+
 // keychain credentials, username/password pair
 export type Credentials = {
   username: string;

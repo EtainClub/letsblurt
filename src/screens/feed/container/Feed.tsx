@@ -13,18 +13,19 @@ import {
   INIT_MY_TAG,
   INIT_FILTER_LIST,
 } from '~/contexts/types';
-import {PostsContext, AuthContext, UIContext} from '~/contexts';
+import {PostsContext, AuthContext, UIContext, UserContext} from '~/contexts';
 
 import {PostsFeed} from '~/components';
 
 interface Props {}
 
 const Feed = (props: Props): JSX.Element => {
-  // contexts
+  //// contexts
   const {postsState, fetchPosts, clearPosts} = useContext(PostsContext);
   const {authState} = useContext(AuthContext);
   const {uiState, setToastMessage} = useContext(UIContext);
-  // states
+  const {getFollowings} = useContext(UserContext);
+  //// states
   const [username, setUsername] = useState(
     authState.currentCredentials.username,
   );
@@ -55,8 +56,9 @@ const Feed = (props: Props): JSX.Element => {
   // account change event
   useEffect(() => {
     if (!reloading) {
-      // fetch only the user account has been changed
-      if (username != authState.currentCredentials.username) _fetchPosts(false);
+      // // fetch only the user account has been changed
+      // if (username != authState.currentCredentials.username) _fetchPosts(false);
+      _fetchPosts(false);
     }
   }, [authState.currentCredentials]);
   //// focus event with tag param
@@ -108,15 +110,28 @@ const Feed = (props: Props): JSX.Element => {
       await clearPosts(postsType);
       setReloading(true);
     }
+    //
+    const {username} = authState.currentCredentials;
+    // get following
+    const _followings = await getFollowings(username);
+    console.log('feed. following', _followings);
+    let tagIndex = postsState.tagIndex;
+    let filterIndex = postsState.filterIndex;
+    if (_followings.length === 0) {
+      console.log('feed. no following', _followings);
+      // set tag to all
+      tagIndex = 1;
+    }
     const _posts = await fetchPosts(
       postsType,
-      postsState.tagIndex,
-      postsState.filterIndex,
-      authState.currentCredentials.username,
+      tagIndex,
+      filterIndex,
+      username,
       appending,
       uiState.selectedTag,
       setToastMessage,
     );
+
     console.log('postsState', postsState);
     setPosts(_posts);
     if (!appending) {
