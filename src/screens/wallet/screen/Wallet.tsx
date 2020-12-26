@@ -15,12 +15,8 @@ import {WalletData} from '~/contexts/types';
 interface Props {
   walletData: WalletData;
   price: number;
-  keyType: KeyTypes;
   handlePressClaim: () => void;
   claiming: boolean;
-  handlePressShowPassword: (type: KeyTypes) => void;
-  //  tabIndex: number;
-  //  handleTabIndexChanged: (index: number) => void;
 }
 const WalletScreen = (props: Props): JSX.Element => {
   //// language
@@ -51,30 +47,10 @@ const WalletScreen = (props: Props): JSX.Element => {
           <Text h6>{intl.formatMessage({id: 'Wallet.keys_header'})}</Text>
           <Text>{intl.formatMessage({id: 'Wallet.keys_guide'})}</Text>
 
-          <WalletKeyView
-            type="posting"
-            handlePressShowPassword={() =>
-              props.handlePressShowPassword(KeyTypes.POSTING)
-            }
-          />
-          <WalletKeyView
-            type="active"
-            handlePressShowPassword={() =>
-              props.handlePressShowPassword(KeyTypes.ACTIVE)
-            }
-          />
-          <WalletKeyView
-            type="owner"
-            handlePressShowPassword={() =>
-              props.handlePressShowPassword(KeyTypes.OWNER)
-            }
-          />
-          <WalletKeyView
-            type="memo"
-            handlePressShowPassword={() =>
-              props.handlePressShowPassword(KeyTypes.MEMO)
-            }
-          />
+          <WalletKeyView type="posting" />
+          <WalletKeyView type="active" />
+          <WalletKeyView type="owner" />
+          <WalletKeyView type="memo" />
           <Block
             card
             middle

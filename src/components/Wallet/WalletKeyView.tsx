@@ -23,7 +23,6 @@ import {KeyTypes} from '~/contexts/types';
 const HIDE_PASSWORD = '****************************************';
 interface Props {
   type: string;
-  handlePressShowPassword: () => void;
 }
 const WalletKeyView = (props: Props): JSX.Element => {
   //// props

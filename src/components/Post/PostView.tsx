@@ -89,9 +89,11 @@ const PostView = (props: Props): JSX.Element => {
               {/* {runes.substr(post.state.title, 0, 45)} */}
               {sliceByByte(post.state.title, POST_TITLE_LENGTH)}
             </Text>
-            <HTML
-              html={post.summary.replace(/\p{Emoji_Presentation}/gu, ' ')}
-            />
+            {post.summary.length > 0 && (
+              <HTML
+                html={post.summary.replace(/\p{Emoji_Presentation}/gu, ' ')}
+              />
+            )}
           </Block>
           <Block style={{marginBottom: 0}}>
             <ActionBar

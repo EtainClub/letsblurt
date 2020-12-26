@@ -58,15 +58,15 @@ const Wallet = (props: Props): JSX.Element => {
     // claim balance reward
     const {username, password} = authState.currentCredentials;
     const result = await claimRewardBalance(username, password);
-    setClaiming(false);
-    // set toast message
-    setToastMessage(intl.formatMessage({id: 'Wallet.claim_ok'}));
-  };
-
-  //// show password
-  const _handlePressShowPassword = async (keyType: KeyTypes) => {
-    console.log('handlePressShowPassword', keyType);
-    // check current key type
+    if (result) {
+      console.log('[_handlePressClaim] result', result);
+      // update the wallet data
+      getWalletData(username);
+      // stop loading
+      setClaiming(false);
+      // set toast message
+      setToastMessage(intl.formatMessage({id: 'Wallet.claim_ok'}));
+    }
   };
 
   return (
@@ -74,7 +74,6 @@ const Wallet = (props: Props): JSX.Element => {
       walletData={walletData}
       handlePressClaim={_handlePressClaim}
       claiming={claiming}
-      handlePressShowPassword={_handlePressShowPassword}
       price={price}
     />
   );

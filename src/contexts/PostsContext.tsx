@@ -5,16 +5,11 @@ import {useIntl} from 'react-intl';
 //// blockchain api
 import {
   fetchPostsSummary,
-  verifyPassoword,
   submitVote,
   broadcastPost,
   broadcastPostUpdate,
-  fetchComments,
-  fetchCommunityList,
-  fetchTagList,
   fetchPostDetails,
   fetchAccountState,
-  fetchLatestBlock,
 } from '~/providers/blurt/dblurtApi';
 import {renderPostBody} from '~/utils/render-helpers';
 import firestore from '@react-native-firebase/firestore';

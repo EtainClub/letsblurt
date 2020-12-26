@@ -594,7 +594,7 @@ export const updateFollow = async (
   bandwidthKbytesFee: number,
 ) => {
   // verify the key
-  const account = await verifyPassoword(follower, password);
+  const {account} = await verifyPassoword(follower, password);
   if (!account) {
     return {success: false, message: 'the password is invalid'};
   }
@@ -872,7 +872,7 @@ export const broadcastPost = async (
   options?: any[],
 ) => {
   // verify the key
-  const account = await verifyPassoword(postingData.author, password);
+  const {account} = await verifyPassoword(postingData.author, password);
   if (!account) {
     return {success: false, message: 'the password is invalid'};
   }
@@ -915,8 +915,8 @@ export const broadcastPostUpdate = async (
   // check validity of the password
   // verify the key
   // @todo check sanity of argument: exits? (it happend the empty post)
-  const verified = await verifyPassoword(postingContent.author, password);
-  if (!verified) {
+  const {account} = await verifyPassoword(postingContent.author, password);
+  if (!account) {
     return {success: false, message: 'the password is invalid'};
   }
 
@@ -980,7 +980,7 @@ export const signImage = async (photo, username, password) => {
   // verify the user and password
   // @test
   //  password = Config.ETAINCLUB_POSTING_WIF;
-  const account = await verifyPassoword(username, password);
+  const {account} = await verifyPassoword(username, password);
   if (!account) {
     console.log('[signImage] failed to verify password');
     return null;
@@ -1040,7 +1040,7 @@ export const reblog = async (
   bandwidthKbytesFee: number,
 ) => {
   // verify the key
-  const account = await verifyPassoword(username, password);
+  const {account} = await verifyPassoword(username, password);
   if (!account) {
     return {success: false, message: 'the password is invalid'};
   }
@@ -1089,7 +1089,7 @@ export const submitVote = async (
   console.log('[submitVote] vote', vote);
 
   // verify the key
-  const account = await verifyPassoword(voter, password);
+  const {account} = await verifyPassoword(voter, password);
   if (!account) {
     return {success: false, message: 'the password is invalid'};
   }
@@ -1234,7 +1234,7 @@ export const claimRewardBalance = async (
   username: string,
   password: string,
 ) => {
-  const account = await verifyPassoword(username, password);
+  const {account} = await verifyPassoword(username, password);
   if (!account) {
     return {success: false, message: 'the password is invalid'};
   }

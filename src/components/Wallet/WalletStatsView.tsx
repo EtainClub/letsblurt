@@ -37,6 +37,8 @@ const WalletStatsView = (props: Props): JSX.Element => {
     transactions,
     votePower,
   } = props.walletData;
+  console.log('[WalletStatsView] props, walletdata', props.walletData);
+
   blurt = putComma(parseFloat(blurt).toFixed(3));
   power = putComma(parseFloat(power).toFixed(3));
   savings = putComma(savings);

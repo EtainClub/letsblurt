@@ -8,7 +8,7 @@ import messaging from '@react-native-firebase/messaging';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 // blockchain api
-import {getAccount, verifyPassoword} from '~/providers/blurt/dblurtApi';
+import {verifyPassoword} from '~/providers/blurt/dblurtApi';
 import {navigate} from '~/navigation/service';
 import {LoginScreen} from '../screen/Login';
 import {
