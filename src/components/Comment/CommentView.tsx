@@ -19,7 +19,7 @@ import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
 import HTML from 'react-native-render-html';
 import {argonTheme} from '~/constants/argonTheme';
 import {PostData, CommentData, PostingContent} from '~/contexts/types';
-import {Avatar} from '~/components/Avatar';
+import {Avatar, PostBody} from '~/components';
 import {ActionBar} from '../ActionBar';
 import {ActionBarStyleComment} from '~/constants/actionBarTypes';
 import {AuthContext, UIContext, PostsContext} from '~/contexts';
@@ -280,9 +280,10 @@ const Comment = (props: Props): JSX.Element => {
           />
           <Text style={{top: 10, marginRight: 20}}>{formatedTime}</Text>
         </Block>
-        <Block style={[styles.messageCard, styles.shadow]}>
+        {/* <Block style={[styles.messageCard, styles.shadow]}>
           <HTML html={body} />
-        </Block>
+        </Block> */}
+        <PostBody body={body} />
         <ActionBar
           actionBarStyle={ActionBarStyleComment}
           postIndex={props.postIndex}
