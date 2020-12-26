@@ -87,7 +87,7 @@ const TabFeedStack = () => {
           },
         }}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="PostDetails"
         component={PostDetails}
         options={{
@@ -95,7 +95,7 @@ const TabFeedStack = () => {
             return <Header title="Post" navigation={navigation} />;
           },
         }}
-      />
+      /> */}
       <Stack.Screen
         name="SearchFeed"
         component={SearchFeed}
@@ -278,6 +278,20 @@ const profile = {
   username: 'etainclub',
 };
 
+const PostDetailsStack = () => (
+  <Stack.Navigator mode="card" headerMode="screen">
+    <Stack.Screen
+      name="PostDetails"
+      component={PostDetails}
+      options={{
+        header: ({navigation}) => {
+          return <Header title="Post" navigation={navigation} />;
+        },
+      }}
+    />
+  </Stack.Navigator>
+);
+
 const AuthorStack = () => {
   return (
     <Stack.Navigator mode="card" headerMode="screen">
@@ -361,12 +375,11 @@ const DrawerNavigator = (props) => {
       initialRouteName="Feed">
       <Drawer.Screen name="Feed" component={TabNavigator} />
       <Drawer.Screen name="Login" component={Login} />
-
       <Drawer.Screen name="SignUp" component={Signup} />
-
       <Drawer.Screen name="Add" component={Login} />
       <Drawer.Screen name="AuthorProfile" component={AuthorStack} />
       <Drawer.Screen name="AuthorList" component={AuthorListStack} />
+      <Drawer.Screen name="PostDetails" component={PostDetailsStack} />
       {!authState.loggedIn ? (
         <Drawer.Screen name="Logout" component={Login} />
       ) : (

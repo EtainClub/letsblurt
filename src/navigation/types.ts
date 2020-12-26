@@ -27,6 +27,7 @@ export type DrawerParams = {
   Add: undefined;
   SignUp: undefined;
   Posting: undefined;
+  PostDetails: undefined;
   Wallet: undefined;
   Settings: undefined;
 };
