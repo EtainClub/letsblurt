@@ -161,10 +161,12 @@ const Header = (props: Props): JSX.Element => {
     }
     // add account
     else if (index === accounts.length) {
-      navigate({name: 'Login'});
+      //      navigate({name: 'Login'});
+      navigate({name: 'Login', params: {addingAccount: true}});
     }
     // log out
     else {
+      // TODO: show modal to inform that all saved passwords will be removed
       processLogout();
     }
   };

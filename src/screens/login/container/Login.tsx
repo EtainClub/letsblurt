@@ -52,6 +52,9 @@ const Login = (props: Props): JSX.Element => {
     if (loggedIn) {
       // navigate to feed
       console.log('[Feed] logged in event');
+      // reset logged in
+      setLoggedIn(false);
+      // navigate to the Feed screen
       navigate({name: 'Feed'});
     }
   }, [loggedIn]);

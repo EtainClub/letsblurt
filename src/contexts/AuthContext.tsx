@@ -270,9 +270,12 @@ const _storeCredentials = async ({username, password, type}: Credentials) => {
 
 const _removeCredentials = async (username: string) => {
   try {
-    const result = await Keychain.resetGenericPassword({service: username});
-    //    const result = await Keychain.resetInternetCredentials(KEYCHAIN_SERVER);
-    console.log('remove credentials result', result);
+    //const result = await Keychain.resetGenericPassword({service: username});
+    const result = await Keychain.resetInternetCredentials(KEYCHAIN_SERVER);
+    console.log('[_removeCredentials] remove credentials result', result);
+    // @test
+    const _keys = await Keychain.getInternetCredentials(KEYCHAIN_SERVER);
+    console.log('[_removeCredentials] _keys', _keys);
   } catch (error) {
     console.error('failed to remove credentials', error);
   }
