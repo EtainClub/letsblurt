@@ -251,6 +251,7 @@ const PostsProvider = ({children}: Props) => {
     tagIndex: number,
     filterIndex: number,
     username?: string,
+    noFollowings?: boolean,
     appending?: boolean,
     inputTag?: string,
     setToastMessage?: (message: string) => void,
@@ -270,8 +271,21 @@ const PostsProvider = ({children}: Props) => {
       case PostsTypes.HASH_TAG:
       case PostsTypes.FEED:
         if (tagIndex === 0) {
-          tag = username ? username : '';
-          filter = username ? 'feed' : 'trending';
+          // logged in
+          if (username) {
+            // but not followings
+            if (noFollowings) {
+              tag = '';
+              filter = 'trending';
+            } else {
+              tag = username;
+              filter = 'feed';
+            }
+          } // not logged in
+          else {
+            tag = '';
+            filter = 'trending';
+          }
         } else if (postsState.tagList[tagIndex] === 'All') {
           tag = '';
           filter = postsState.filterList[filterIndex];

@@ -368,7 +368,7 @@ const PostBodyView = (props: Props): JSX.Element => {
       <AutoHeightWebView
         source={{html}}
         allowsFullscreenVideo={true}
-        style={{width: width - 25 * props.commentDepth}}
+        style={{width: width - (20 + 25 * props.commentDepth)}}
         customStyle={customStyle}
         onMessage={_handleLinkPress}
         customScript={customBodyScript}

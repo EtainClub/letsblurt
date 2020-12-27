@@ -9,7 +9,7 @@ import {getResizedAvatar, getResizedImage} from './image';
 
 import {PostState, PostData, CommentData, MetaData} from '~/contexts/types';
 
-const POST_SUMMARY_LENGTH = 90;
+const POST_SUMMARY_LENGTH = 80;
 const webp = Platform.OS === 'ios' ? false : true;
 
 export const parsePosts = async (posts: Discussion[], username: string) => {

@@ -51,7 +51,7 @@ const Header = (props: Props): JSX.Element => {
   const intl = useIntl();
   // contexts
   const {authState, changeAccount, processLogout} = useContext(AuthContext);
-  const {userState} = useContext(UserContext);
+  const {userState, getFollowings, updateVoteAmount} = useContext(UserContext);
   const {uiState, setSearchParam, setLanguageParam} = useContext(UIContext);
   const {postsState, setTagIndex, setFilterIndex, clearPosts} = useContext(
     PostsContext,
@@ -150,7 +150,14 @@ const Header = (props: Props): JSX.Element => {
     console.log('value', value);
     // switch account
     if (index < accounts.length) {
-      changeAccount(value);
+      // fetching followings
+      await getFollowings(value);
+      // switch account, auth
+      await changeAccount(value);
+      // update vote amount
+      await updateVoteAmount(value);
+      // set username
+      setUsername(value);
     }
     // add account
     else if (index === accounts.length) {

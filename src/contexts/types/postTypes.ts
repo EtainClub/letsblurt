@@ -342,6 +342,7 @@ export interface PostsContextType {
     tagIndex: number,
     filterIndex: number,
     username?: string,
+    noFollowings?: boolean,
     appending?: boolean,
     inputTag?: string,
     setToastMessage?: (message: string) => void,

@@ -18,7 +18,7 @@ export const ResolveAuth = (props) => {
   //// props
   //// contexts
   const {authState, setAuthResolved, setCredentials} = useContext(AuthContext)!;
-  const {fetchBlockchainGlobalProps} = useContext(UserContext);
+  const {fetchBlockchainGlobalProps, getFollowings} = useContext(UserContext);
   const {postsState, getTagList} = useContext(PostsContext);
   const {setTranslateLanguages} = useContext(UIContext);
   // state
@@ -52,18 +52,17 @@ export const ResolveAuth = (props) => {
     setTranslateLanguages(languages);
     // set category to feed if username exists
     if (username) {
+      // get followings
+      await getFollowings(username);
       // fetch tags
       await getTagList(username);
       // set username
       setUsername(username);
       // retrieve all credentials
       await setCredentials(username);
-      // fetch community list
-      //      await fetchCommunities(username);
       // set fetched flag
       setFetched(true);
     } else {
-      // @todo no communiy list at first, handle this
       // fetch tags
       await getTagList();
       // @test
@@ -82,7 +81,6 @@ export const ResolveAuth = (props) => {
     let url = `https://translation.googleapis.com/language/translate/v2/languages?key=${key}`;
     try {
       const result = await axios.get(url);
-      console.log('_getSupportedLanguages', result.data.data.languages);
       return result.data.data.languages.map((language) =>
         language.language.toUpperCase(),
       );

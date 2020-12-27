@@ -37,12 +37,24 @@ const Login = (props: Props): JSX.Element => {
   //// contexts
   const {authState, processLogin, processLogout} = useContext(AuthContext);
   const {uiState, setToastMessage} = useContext(UIContext);
-  const {userState, updateVoteAmount} = useContext(UserContext);
+  const {userState, updateVoteAmount, getFollowings} = useContext(UserContext);
   const {settingsState} = useContext(SettingsContext);
   //// states
   const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [passwordType, setPasswordType] = useState(null);
   const [showOTP, setShowOTP] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [loggedIn, setLoggedIn] = useState(false);
+  //// effects
+  // event: logged in
+  useEffect(() => {
+    if (loggedIn) {
+      // navigate to feed
+      console.log('[Feed] logged in event');
+      navigate({name: 'Feed'});
+    }
+  }, [loggedIn]);
 
   ////
   const _updateUserDB = async (_username: string, _phoneNumber?: string) => {
@@ -102,16 +114,13 @@ const Login = (props: Props): JSX.Element => {
   // 2. the user has doc which includes phone number, but not setting usingOTP,
   // then, do not show otp
   // otherwise, show otp
-  const _processOTP = async (username) => {
-    // @test
-    //    username = 'ray7272';
-
+  const _processOTP = (username: string, password: string, keyType: number) => {
     //// check if the user has no phone number
     // get user doc
     const userRef = firestore().collection('users').doc(username);
     userRef
       .get()
-      .then((doc) => {
+      .then(async (doc) => {
         // check if a doc exists
         if (!doc.exists) {
           console.log('user doc does not exist');
@@ -125,12 +134,20 @@ const Login = (props: Props): JSX.Element => {
             setPhoneNumber(doc.data().phone);
             setShowOTP(true);
           } else {
+            // update followings which is required in fetching feed
+            await getFollowings(username);
+            console.log('[Feed] got followings');
             _updateUserDB(username);
             setToastMessage(`logged in as ${username}`);
             // update user vote amount
-            updateVoteAmount(username);
-            // navigate to feed
-            navigate({name: 'Feed'});
+            await updateVoteAmount(username);
+            // set logged in to navigate to feed
+            setLoggedIn(true);
+            // process login action
+            processLogin(
+              {username: username, password: password, type: keyType},
+              addingAccount,
+            );
           }
         }
       })
@@ -151,25 +168,24 @@ const Login = (props: Props): JSX.Element => {
       setToastMessage(intl.formatMessage({id: 'Login.login_error'}));
       return false;
     }
+    // set password
+    setPassword(_password);
+    // set password key type
+    setPasswordType(keyType);
     console.log('password is valid');
-    //// process login
 
+    //// process login
     // sign in firebase anonymously to use firebase firestore
     await auth()
       .signInAnonymously()
       .then((result) => console.log('signed in firebase', result))
       .catch((error) => console.log('failed to sign in firebase', error));
 
-    // process login action
-    processLogin(
-      {username: _username, password: _password, type: keyType},
-      addingAccount,
-    );
-    // otp
-    await _processOTP(_username);
+    // otp then process login
+    await _processOTP(_username, _password, keyType);
   };
 
-  const _handleOTPResult = (valid: boolean, _phoneNumber?: string) => {
+  const _handleOTPResult = async (valid: boolean, _phoneNumber?: string) => {
     // hide otp
     setShowOTP(false);
     if (_phoneNumber != '') {
@@ -178,12 +194,19 @@ const Login = (props: Props): JSX.Element => {
     }
     console.log('opt result', valid);
     if (valid) {
+      // update followings which is required in fetching feed
+      await getFollowings(username);
       _updateUserDB(username, _phoneNumber);
       setToastMessage(`logged in as ${username}`);
       // update user vote amount
-      updateVoteAmount(username);
-      // navigate to feed
-      navigate({name: 'Feed'});
+      await updateVoteAmount(username);
+      // set logged in to navigate to feed
+      setLoggedIn(true);
+      // process login action
+      processLogin(
+        {username: username, password: password, type: passwordType},
+        addingAccount,
+      );
     }
   };
 

@@ -188,7 +188,7 @@ export const verifyPassoword = async (username: string, password: string) => {
   // check if the password is wif
   if (!cryptoUtils.isWif(password)) {
     console.log('The password is not wif', password);
-    return null;
+    return {account: null, keyType: null};
   }
   // get accounts by username
   let account = null;
@@ -198,7 +198,7 @@ export const verifyPassoword = async (username: string, password: string) => {
     console.log('failed to get account', error);
   }
   if (!account) {
-    return null;
+    return {account: null, keyType: null};
   }
   console.log('account', account);
   // get public posting key
@@ -221,7 +221,7 @@ export const verifyPassoword = async (username: string, password: string) => {
       return {account, keyType: KeyTypes.MASTER};
     } else {
       console.log('master password is not valid');
-      return null;
+      return {account: null, keyType: null};
     }
   } else {
     ////// handle posting/active/owner private key
@@ -252,7 +252,7 @@ export const verifyPassoword = async (username: string, password: string) => {
     }
     // input password is not valid
     console.log('input password is not valid');
-    return null;
+    return {account: null, keyType: null};
   }
 };
 
