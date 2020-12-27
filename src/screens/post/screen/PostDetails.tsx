@@ -136,21 +136,46 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
     );
   };
 
+  // const _renderComments = () => {
+  //   const {comments} = props;
+  //   return (
+  //     <Block style={{top: -20}}>
+  //       {(comments || []).map((comment, index) => {
+  //         return (
+  //           <Comment
+  //             key={comment.id}
+  //             postIndex={props.index}
+  //             comment={comment}
+  //             index={0}
+  //             fetchComments={props.fetchComments}
+  //           />
+  //         );
+  //       })}
+  //     </Block>
+  //   );
+  // };
+
   const _renderComments = () => {
     const {comments} = props;
     return (
       <Block style={{top: -20}}>
-        {(comments || []).map((comment, index) => {
-          return (
-            <Comment
-              key={comment.id}
-              postIndex={props.index}
-              comment={comment}
-              index={0}
-              fetchComments={props.fetchComments}
-            />
-          );
-        })}
+        {comments ? (
+          comments.map((comment, index) => {
+            return (
+              <Comment
+                key={comment.id}
+                postIndex={props.index}
+                comment={comment}
+                index={0}
+                fetchComments={props.fetchComments}
+              />
+            );
+          })
+        ) : (
+          <View style={{top: 20}}>
+            <ActivityIndicator color={argonTheme.COLORS.ERROR} size="small" />
+          </View>
+        )}
       </Block>
     );
   };
