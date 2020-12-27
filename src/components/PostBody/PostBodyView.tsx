@@ -25,6 +25,7 @@ const {width, height} = Dimensions.get('window');
 
 interface Props {
   body: string;
+  commentDepth: number;
   handlePostPress: (author: string, permlink: string) => void;
   handleAuthorPress: (event) => void;
   handleTagPress: (tag: string) => void;
@@ -178,11 +179,15 @@ const PostBodyView = (props: Props): JSX.Element => {
     width: 100%;
     height: 240px;
   }
-  .pull-right {
-    float: right;
+  .phishy {
+    display: inline;
+    color: red;
   }
-  .pull-left {
-    float: left;
+  .text-justify {
+    text-align: justify;
+  }
+  p {
+    font-size: 16px;
   }
   .pull-left,
   .pull-right {
@@ -191,15 +196,15 @@ const PostBodyView = (props: Props): JSX.Element => {
     margin-bottom: 10px;
     box-sizing: border-box;
   }
-  .phishy {
-    display: inline;
-    color: red;
+  .pull-left {
+    margin-right: 10px;
+    padding-right: 10px;
+    float: left;
   }
-
-  .text-justify {
-    text-align: justify;
-    text-justify: inter-word;
-    letter-spacing: 0px;
+  .pull-right {
+    margin-left: 10px;
+    padding-right: 10px;
+    float: right;
   }
   `;
 
@@ -363,7 +368,7 @@ const PostBodyView = (props: Props): JSX.Element => {
       <AutoHeightWebView
         source={{html}}
         allowsFullscreenVideo={true}
-        style={{width: width - 20}}
+        style={{width: width - 25 * props.commentDepth}}
         customStyle={customStyle}
         onMessage={_handleLinkPress}
         customScript={customBodyScript}

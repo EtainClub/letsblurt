@@ -260,10 +260,12 @@ const Comment = (props: Props): JSX.Element => {
   return !editMode ? (
     <View
       style={
-        props.index === 0 ? {marginTop: 30} : {marginLeft: 25, marginTop: 30}
+        props.index === 0
+          ? {marginTop: 30}
+          : {marginLeft: 25, marginTop: 30, marginRight: 5}
       }>
       <Block
-        style={{padding: 10}}
+        style={{padding: 5}}
         card
         shadow
         shadowColor="black"
@@ -280,7 +282,7 @@ const Comment = (props: Props): JSX.Element => {
           />
           <Text style={{top: 10, marginRight: 20}}>{formatedTime}</Text>
         </Block>
-        <PostBody body={body} />
+        <PostBody body={body} commentDepth={comment.depth} />
         <ActionBar
           actionBarStyle={ActionBarStyleComment}
           postIndex={props.postIndex}
@@ -305,17 +307,5 @@ const styles = StyleSheet.create({
     width: width * 0.8,
     height: theme.SIZES.BASE * 3,
     backgroundColor: theme.COLORS.WHITE,
-  },
-  messageCard: {
-    paddingRight: 50,
-    paddingVertical: 0,
-    borderRadius: 0,
-    backgroundColor: theme.COLORS.WHITE,
-  },
-  shadow: {
-    shadowColor: 'rgba(0, 0, 0, 0.12)',
-    shadowOffset: {width: 0, height: 7},
-    shadowRadius: 20,
-    shadowOpacity: 1,
   },
 });

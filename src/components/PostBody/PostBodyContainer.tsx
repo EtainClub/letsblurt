@@ -7,6 +7,7 @@ import {navigate} from '~/navigation/service';
 
 interface Props {
   body: string;
+  commentDepth?: number;
 }
 const PostBodyContainer = (props: Props): JSX.Element => {
   //// props
@@ -66,6 +67,7 @@ const PostBodyContainer = (props: Props): JSX.Element => {
   return (
     <PostBodyView
       body={props.body}
+      commentDepth={props.commentDepth ? props.commentDepth : 0}
       handlePostPress={_handlePostPress}
       handleAuthorPress={_handleAuthorPress}
       handleTagPress={_handleTagPress}
