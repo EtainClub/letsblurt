@@ -194,8 +194,6 @@ const PostsProvider = ({children}: Props) => {
   ////// action creators
   //// fetch tag list
   const getTagList = async (username?: string) => {
-    // @test
-    // const blockData = await fetchLatestBlock();
     //// fetch default tags
     // const _tagList = await fetchTagList();
     // const _tags = _tagList.map((tag) => tag.tag);
@@ -207,7 +205,6 @@ const PostsProvider = ({children}: Props) => {
       return null;
     }
     const _tags = accountState.tag_idx.trending;
-    console.log('[getTagList] _tags', _tags);
     let tagList = _tags.slice(1, _tags.length - 1);
     if (username) {
       tagList = ['Feed', 'All', ..._tags.slice(1, _tags.length - 1)];
@@ -266,7 +263,6 @@ const PostsProvider = ({children}: Props) => {
     if (appending) {
       startPostRef = postsState[postsState.postsType].startPostRef;
     }
-
     //// setup tag and filter value based on the tagIndex and filterIndex
     let tag = '';
     let filter = '';

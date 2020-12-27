@@ -114,7 +114,6 @@ const Feed = (props: Props): JSX.Element => {
     const {username} = authState.currentCredentials;
     // get following
     const _followings = await getFollowings(username);
-    console.log('feed. following', _followings);
     let tagIndex = postsState.tagIndex;
     let filterIndex = postsState.filterIndex;
     if (_followings.length === 0) {

@@ -53,7 +53,7 @@ export const ResolveAuth = (props) => {
     // set category to feed if username exists
     if (username) {
       // fetch tags
-      getTagList(username);
+      await getTagList(username);
       // set username
       setUsername(username);
       // retrieve all credentials
