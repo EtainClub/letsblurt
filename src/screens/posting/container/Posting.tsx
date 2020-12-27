@@ -16,26 +16,29 @@ import {
 import {navigate} from '~/navigation/service';
 import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
 import {Beneficiary} from '~/components';
-
 import {BeneficiaryItem} from '~/components/Beneficiary/BeneficiaryContainer';
+import {BLURT_BENEFICIARY_WEIGHT} from '~/constants';
 
 // 5%
 const DEFAULT_BENEFICIARY: BeneficiaryItem = {
   account: 'letsblurt',
-  weight: 500,
+  weight: BLURT_BENEFICIARY_WEIGHT,
 };
 
 interface Props {
+  navigation: any;
   route: any;
 }
-
 const Posting = (props: Props): JSX.Element => {
   //// props
+  const {navigation} = props;
   //// language
   const intl = useIntl();
   //// contexts
   const {authState} = useContext(AuthContext);
-  const {uiState, setToastMessage, setTagParam} = useContext(UIContext);
+  const {uiState, setToastMessage, setTagParam, setEditMode} = useContext(
+    UIContext,
+  );
   const {postsState, submitPost, updatePost} = useContext(PostsContext);
   const {getFollowings} = useContext(UserContext);
   // states
@@ -73,6 +76,7 @@ const Posting = (props: Props): JSX.Element => {
   }, []);
   //// edit mode event
   useEffect(() => {
+    console.log('[Posting] uiState', uiState);
     //
     if (uiState.editMode) {
       console.log('[Posting] editMode, postDetails', postsState.postDetails);
@@ -80,6 +84,17 @@ const Posting = (props: Props): JSX.Element => {
       setOriginalPost(postsState.postDetails);
     }
   }, [uiState.editMode]);
+  //// on blur event
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('blur', () => {
+      console.log('[Posting] blur event. uiState', uiState);
+      // reset edit mode before go back
+      if (uiState.editMode) {
+        setEditMode(false);
+      }
+    });
+    return unsubscribe;
+  }, [navigation]);
 
   //// get followings
   const _getFollowingList = async (username: string) => {
@@ -270,6 +285,13 @@ const Posting = (props: Props): JSX.Element => {
     setBeneficiaries(_beneficiaries);
   };
 
+  const _handleCancelEditing = () => {
+    // reset edit mode
+    setEditMode(false);
+    // go back
+    navigation.goBack();
+  };
+
   return (
     <Block>
       <PostingScreen
@@ -283,6 +305,7 @@ const Posting = (props: Props): JSX.Element => {
         followingList={filteredFollowings}
         handleMentionAuthor={_showAuthorsModal}
         handlePressBeneficiary={_handlePressBeneficiary}
+        handleCancelEditing={_handleCancelEditing}
       />
       {showBeneficiaryModal ? (
         <Beneficiary

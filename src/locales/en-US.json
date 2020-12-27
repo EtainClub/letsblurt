@@ -215,6 +215,7 @@
     "post_button": "Post",
     "update_button": "Update",
     "clear_button": "Clear All",
+    "cancel_button": "Cancel",
     "msg-key": "The password is not valid. Please sign in again.",
     "tag_your_story": "Tag (up to 5 tags), the first tag is your main category.",
     "select_a_tag": "Select a tag",

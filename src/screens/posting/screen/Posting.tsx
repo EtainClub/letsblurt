@@ -46,6 +46,7 @@ interface Props {
   followingList?: string[];
   handleMentionAuthor: (text: string) => void;
   handlePressBeneficiary: () => void;
+  handleCancelEditing: () => void;
 }
 
 const PostingScreen = (props: Props): JSX.Element => {
@@ -290,13 +291,25 @@ const PostingScreen = (props: Props): JSX.Element => {
     props.handlePressPostSumbit(title, body, tags);
   };
 
-  ////
-  const _onPressClear = () => {
+  //// clear contents
+  const _clearContents = () => {
     setTitle('');
     setBody('');
     setTags('');
     setPreviewBody('');
     setMessage(null);
+  };
+  const _onPressClear = () => {
+    _clearContents();
+  };
+
+  //// cancel editing
+  const _onPressCancel = () => {
+    console.log('[Posting] _onPressCancel');
+    // clear contents
+    _clearContents();
+    // go back
+    props.handleCancelEditing();
   };
 
   //// handle reward option chnage
@@ -304,8 +317,6 @@ const PostingScreen = (props: Props): JSX.Element => {
     console.log('_handleRewardChange index', index);
     setRewardIndex(index);
   };
-  ////
-  const _handlePressBeneficiary = () => {};
 
   //// render preview of posting
   const _renderPreview = () => (
@@ -411,9 +422,15 @@ const PostingScreen = (props: Props): JSX.Element => {
                 ? intl.formatMessage({id: 'Posting.update_button'})
                 : intl.formatMessage({id: 'Posting.post_button'})}
             </Button>
-            <Button onPress={_onPressClear} shadowless color="gray">
-              {intl.formatMessage({id: 'Posting.clear_button'})}
-            </Button>
+            {props.originalPost ? (
+              <Button onPress={_onPressCancel} shadowless color="gray">
+                {intl.formatMessage({id: 'Posting.cancel_button'})}
+              </Button>
+            ) : (
+              <Button onPress={_onPressClear} shadowless color="gray">
+                {intl.formatMessage({id: 'Posting.clear_button'})}
+              </Button>
+            )}
           </Block>
           {_renderPreview()}
         </Block>
