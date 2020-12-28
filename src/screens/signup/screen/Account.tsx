@@ -5,7 +5,6 @@ import {
   KeyboardAvoidingView,
   Alert,
   Platform,
-  Clipboard,
 } from 'react-native';
 import {
   Block,
@@ -22,6 +21,7 @@ import {materialTheme} from '~/constants/';
 import {HeaderHeight, iPhoneX} from '~/constants/utils';
 
 import {navigate} from '~/navigation/service';
+import Clipboard from '@react-native-community/clipboard';
 
 import {useIntl} from 'react-intl';
 import {UIContext} from '~/contexts';
@@ -132,7 +132,7 @@ const AccountScreen = (props: Props): JSX.Element => {
 
   const _renderWelcome = () => {
     return (
-      <KeyboardAvoidingView behavior="height" enabled>
+      <Block>
         <Block
           middle
           style={{
@@ -154,20 +154,8 @@ const AccountScreen = (props: Props): JSX.Element => {
             onPress={() => navigate({name: 'Login'})}>
             {intl.formatMessage({id: 'Signup.login_button'})}
           </Button>
-          <Button
-            color="transparent"
-            shadowless
-            style={styles.button}
-            onPress={() => navigate({name: 'Home'})}>
-            <Text
-              center
-              color={theme.COLORS.WHITE}
-              size={theme.SIZES.FONT * 0.75}>
-              {intl.formatMessage({id: 'Signup.home_button'})}
-            </Text>
-          </Button>
         </Block>
-      </KeyboardAvoidingView>
+      </Block>
     );
   };
 

@@ -59,14 +59,8 @@ const Login = (props: Props): JSX.Element => {
     }
   }, [loggedIn]);
 
-  ////
+  //// update user data on firestore
   const _updateUserDB = async (_username: string, _phoneNumber?: string) => {
-    // // sign in firebase anonymously
-    // await auth()
-    //   .signInAnonymously()
-    //   .then((result) => console.log('signed in firebase', result))
-    //   .catch((error) => console.log('failed to sign in firebase', error));
-
     //// get device push token
     // request permission
     messaging()
@@ -196,7 +190,7 @@ const Login = (props: Props): JSX.Element => {
       setPhoneNumber(_phoneNumber);
     }
     console.log('opt result', valid);
-    if (valid) {
+    if (__DEV__ || valid) {
       // update followings which is required in fetching feed
       await getFollowings(username);
       _updateUserDB(username, _phoneNumber);
@@ -210,6 +204,9 @@ const Login = (props: Props): JSX.Element => {
         {username: username, password: password, type: passwordType},
         addingAccount,
       );
+    } else {
+      setToastMessage(intl.formatMessage({id: 'Login.otp_error'}));
+      // TODO: then what?
     }
   };
 

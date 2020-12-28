@@ -1,5 +1,10 @@
+//// react
 import React, {useState, useEffect, useContext} from 'react';
+//// react native
+//// config
 import Config from 'react-native-config';
+//// language
+import {useIntl} from 'react-intl';
 //// firebase
 import {firebase} from '@react-native-firebase/functions';
 import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
@@ -18,18 +23,14 @@ import {
   getDynamicGlobalProperties,
 } from '~/providers/blurt/dblurtApi';
 
-import {navigate} from '~/navigation/service';
-
-// clipboard
-import Clipboard from '@react-native-community/clipboard';
-
-import {useIntl} from 'react-intl';
+//// contexts
 import {UIContext, UserContext} from '~/contexts';
 
 interface Props {}
-
 const Signup = (props: Props): JSX.Element => {
   //// props
+  //// language
+  const intl = useIntl();
   //// contexts
   const {userState} = useContext(UserContext);
   const {setToastMessage} = useContext(UIContext);
@@ -43,7 +44,6 @@ const Signup = (props: Props): JSX.Element => {
   const [confirmation, setConfirmation] = useState<
     FirebaseAuthTypes.ConfirmationResult
   >(null);
-  const intl = useIntl();
 
   useEffect(() => {
     SplashScreen.hide();
@@ -86,6 +86,7 @@ const Signup = (props: Props): JSX.Element => {
       .functions()
       .httpsCallable('createAccountRequest')(options);
 
+    console.log('_createAccount. result', result);
     // check sanity
     if (result) {
       // update phone db
@@ -111,18 +112,18 @@ const Signup = (props: Props): JSX.Element => {
     });
   };
 
-  const _handleOTPResult = (result: boolean, _phoneNumber?: string) => {
+  const _handleOTPResult = async (result: boolean, _phoneNumber?: string) => {
     if (_phoneNumber != '') {
       console.log('phoneNumber', _phoneNumber);
       setPhoneNumber(_phoneNumber);
     }
     console.log('opt result', result);
-    // TODO: creat account after user clicks the 'finish' since it takes money
-    // generated password first, then display the password
-    /// then, user clicks confirm or submit
-    // then finally create an account
-    if (__DEV__ || result) {
+    // @test
+    if (__DEV__) {
+      //    if (__DEV__ || result) {
       setShowAccountScreen(true);
+    } else {
+      setToastMessage(intl.formatMessage({id: 'Signup.otp_error'}));
     }
   };
 

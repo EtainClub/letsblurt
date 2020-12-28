@@ -54,7 +54,7 @@ const MAINNET_OFFICIAL = [
 ];
 const client = new Client(MAINNET_OFFICIAL, {
   timeout: 5000,
-  addressPrefix: 'BLURT',
+  addressPrefix: 'BLT',
   chainId: 'cd8d90f29ae273abec3eaa7731e25934c63eb654d55080caff2ebb7f5df6381f',
 });
 
@@ -186,10 +186,12 @@ export const verifyPassoword = async (username: string, password: string) => {
   // posting key in wif: etainclub
   //  password = Config.ETAINCLUB_POSTING_WIF;
   // check if the password is wif
-  if (!cryptoUtils.isWif(password)) {
-    console.log('The password is not wif', password);
-    return {account: null, keyType: null};
-  }
+  // TODO: master password is not wif
+  // if (!cryptoUtils.isWif(password)) {
+  //   console.log('The password is not wif', password);
+  //   return {account: null, keyType: null};
+  // }
+
   // get accounts by username
   let account = null;
   try {

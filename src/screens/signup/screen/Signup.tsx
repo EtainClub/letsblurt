@@ -155,7 +155,9 @@ const SignupScreen = (props: Props): JSX.Element => {
                 color="transparent"
                 shadowless
                 style={styles.button}
-                onPress={() => navigate({name: 'Login'})}>
+                onPress={() => {
+                  navigate({name: 'Login'});
+                }}>
                 <Text
                   center
                   color={theme.COLORS.WHITE}

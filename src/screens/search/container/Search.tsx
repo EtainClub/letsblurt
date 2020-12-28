@@ -44,6 +44,7 @@ const SearchFeed = (props: Props): JSX.Element => {
 
   //// contexts
   const {uiState, setToastMessage} = useContext(UIContext);
+  const {authState} = useContext(AuthContext);
   //// states
   const [searchItems, setSearchItems] = useState([]);
   const [searchText, setSearchText] = useState('');
@@ -91,6 +92,11 @@ const SearchFeed = (props: Props): JSX.Element => {
   };
 
   const _fetchSearch = async (text: string) => {
+    // need to log in to search
+    if (!authState.loggedIn) {
+      console.log('you need to log in to search posts');
+      return;
+    }
     let response = null;
     try {
       response = await firebase.functions().httpsCallable('searchRequest')({

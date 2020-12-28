@@ -12,7 +12,7 @@ import {
 const initialState = {
   blockchainType: BlockchainTypes.BLURT,
   savingPassword: true,
-  usingOTP: true,
+  usingOTP: false,
   locale: 'en-US',
 };
 

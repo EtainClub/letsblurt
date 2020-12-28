@@ -1,9 +1,9 @@
 {
-  "title": "Play Steemit",
+  "title": "Let's Blurt",
   "and": "and",
   "cancel": "Cancel",
   "confirm": "Confirm",
-  "intro-msg": "Play Steemit on Mobile Devices",
+  "intro-msg": "Let's Blurt on Mobile Devices",
   "intro-button": "Get Started",
   "account": "Account",
   "voting-weight": "Voting Weight",
@@ -102,7 +102,6 @@
     "transfer_to_saving": "To Saving",
     "powerUp": "Power Up",
     "withdraw_to_saving": "Withdraw Saving",
-    "steemconnect_title": "Hivesigner Transfer",
     "next": "NEXT",
     "delegate": "Delegate",
     "power_down": "Power Down",
@@ -131,7 +130,7 @@
   },
   "Signup": {
     "header": "Create Account",
-    "header_desc": "Choose your Steem username",
+    "header_desc": "Choose your BLURT username",
     "button": "Continue",
     "username_guide": "must be longer than 3 and shorter than 16 characters.",
     "signin_guide": "Already have an account? Sign In",
@@ -158,18 +157,20 @@
     "copy_confirm": "Copied",
     "finish_button": "Finish",
     "welcome_header": "You're all set!",
-    "welcome_guide": "Now you can use Play Dreams and other Steem Dapps via your username and private key",
+    "welcome_guide": "Now you can use the Let's Blurt app and other BLURT Dapps via your username and private key",
     "login_button": "Let's Blurt!",
-    "home_button": "Go to Home"
+    "home_button": "Go to Home",
+    "otp_error": "code is not correct"
   },
   "Login": {
     "header": "Login",
-    "header_desc": "Enter your Steem username and password (posting key).",
+    "header_desc": "Enter your BLURT username and password (posting key is preferred).",
     "button": "Login",
     "signup_guide": "Create an account",
     "login_error": "username or password is not correct",
     "msg_username": "username does not exist",
-    "msg_password": "password is not valid"
+    "msg_password": "password is not valid",
+    "otp_error": "Code is not correct"
   },
   "OTP": {
     "header": "One Time Password",
@@ -252,14 +253,12 @@
     "unfavorite_button": "Unfavoriate",
     "unfavorite_ok": "Unfavorite successful",
     "unfavorite_error": "Failed to Unfavorite",
-    "steemit_button": "Change",
     "bookmarks": "Bookmarked Dreams",
     "viewall": "View All",
     "postings": "Postings",
     "reputation": "Reputation",
     "power": "Blurt Power",
     "balance": "Blurt",
-    "sp": "Steem Power",
     "vote_amount": "Voting Value",
     "display_name": "Display Name",
     "introduction": "Introduction",

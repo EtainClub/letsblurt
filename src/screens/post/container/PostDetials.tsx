@@ -202,6 +202,10 @@ const PostDetails = (props: Props): JSX.Element => {
   };
 
   const _translateLanguage = async () => {
+    if (!authState.loggedIn) {
+      console.log('you need to log in to translate a post');
+      return;
+    }
     console.log('[_translateLanguage] showOriginal', showOriginal);
     const _showOriginal = !showOriginal;
     setShowOriginal(_showOriginal);

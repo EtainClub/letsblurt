@@ -1,7 +1,6 @@
 const functions = require('firebase-functions');
 const axios = require('axios');
-
-const dsteem = require('dsteem');
+const dblurt = require('./dblurt');
 
 const MAINNET_OFFICIAL = [
   'https://api.blurt.blog',
@@ -9,9 +8,9 @@ const MAINNET_OFFICIAL = [
   'https://blurtd.privex.io',
   'https://rpc.blurt.buzz',
 ];
-const client = new dsteem.Client(MAINNET_OFFICIAL, {
+const client = new dblurt.Client(MAINNET_OFFICIAL, {
   timeout: 5000,
-  addressPrefix: 'BLURT',
+  addressPrefix: 'BLT',
   chainId: 'cd8d90f29ae273abec3eaa7731e25934c63eb654d55080caff2ebb7f5df6381f',
 });
 
@@ -70,22 +69,23 @@ exports.translationRequest = functions.https.onCall(async (data, context) => {
 
 // proxy for creating blurt account
 exports.createAccountRequest = functions.https.onCall(async (data, context) => {
-  console.log('input data', data);
   const {username, password, creationFee} = data;
 
   // get creator account
-  const creator = functions.config().createor.account;
+  const creator = functions.config().creator.account;
   const creatorWif = functions.config().creator.wif;
 
   // private active key of creator account
-  const creatorKey = PrivateKey.fromString(creatorWif);
+  const creatorKey = dblurt.PrivateKey.fromString(creatorWif);
   // create keys
-  const ownerKey = PrivateKey.fromLogin(username, password, 'owner');
-  const activeKey = PrivateKey.fromLogin(username, password, 'active');
-  const postingKey = PrivateKey.fromLogin(username, password, 'posting');
-  const memoKey = PrivateKey.fromLogin(username, password, 'memo').createPublic(
-    client.addressPrefix,
-  );
+  const ownerKey = dblurt.PrivateKey.fromLogin(username, password, 'owner');
+  const activeKey = dblurt.PrivateKey.fromLogin(username, password, 'active');
+  const postingKey = dblurt.PrivateKey.fromLogin(username, password, 'posting');
+  const memoKey = dblurt.PrivateKey.fromLogin(
+    username,
+    password,
+    'memo',
+  ).createPublic(client.addressPrefix);
 
   const ownerAuth = {
     weight_threshold: 1,
@@ -103,8 +103,6 @@ exports.createAccountRequest = functions.https.onCall(async (data, context) => {
     key_auths: [[postingKey.createPublic(client.addressPrefix), 1]],
   };
 
-  // get account creation fee
-  //  const fee = await
   //// send creation operation
   // operations
   let operations = [];
@@ -127,15 +125,25 @@ exports.createAccountRequest = functions.https.onCall(async (data, context) => {
   // push the creation operation
   operations.push(create_op);
   // broadcast operation to blockchain
-  let result = null;
-  await client.broadcast.sendOperations(
+  // let result = null;
+  // client.broadcast
+  //   .sendOperations(operations, creatorKey)
+  //   .then((response) => {
+  //     console.log('creation result', result);
+  //     result = response;
+  //   })
+  //   .catch((error) => console.log('account creation failed', error));
+
+  try {
+    const result = await client.broadcast.sendOperations(
       operations,
       creatorKey,
-    ).then(response => {
-      console.log('creation result', result);
-      result = response;
-    })
-    .catch (error) {
-      console.log('account creation failed', error);
-    }
+    );
+    console.log('create account, result', result);
+    // TODO if successful, transfer 10 blurt to the account
+    return result;
+  } catch (error) {
+    console.log('failed to create account', error);
+    return null;
+  }
 });
