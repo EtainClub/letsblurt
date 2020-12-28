@@ -24,6 +24,7 @@
   "followers": "Followers",
   "following": "Following",
   "logout": "Log out",
+  "not_supported": "It is not supported",
   "AppScreen": {
     "title": "Help Wanted",
     "message": "Do you want to see the details?"
@@ -33,6 +34,14 @@
     "msg2": "Easier and safer on Mobiles",
     "msg3": "Let's Blurt!",
     "button": "Get Started"
+  },
+  "Transaction": {
+    "no_account": "There is no such account",
+    "invalid_password": "Password is invalid",
+    "need_higher_password": "You need the higher password",
+    "error": "Transaction failed",
+    "success": "Transaction succeeded",
+    "something_wrong": "Something went wrong"
   },
   "Wallet": {
     "transaction_header": "Transaction History",
@@ -45,6 +54,12 @@
     "claim_error": "Error on claiming rewards",
     "keys_header": "Keys and Permissions",
     "keys_guide": "Store following keys safely",
+    "dropdown_powerdown": "Power Down",
+    "dropdown_delegate": "Delegate",
+    "dropdown_transfer": "Transfer",
+    "dropdown_transfer2savings": "Transfer to Savings",
+    "dropdown_powerup": "Power Up",
+    "dropdown_withdraw": "Withdraw BLURT",
     "transfer": "Transfer",
     "transfer_to_vesting": "To Vesting",
     "transfer_from_savings": "From Savings",

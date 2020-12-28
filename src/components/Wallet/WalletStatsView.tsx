@@ -7,8 +7,11 @@ import {useIntl} from 'react-intl';
 //// ui
 import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
 import {argonTheme} from '~/constants';
+import {DropdownModal} from '~/components/DropdownModal';
+import ModalDropdown from 'react-native-modal-dropdown';
 import moment from 'moment';
 import {WalletData} from '~/contexts/types';
+
 //// utils
 import {get} from 'lodash';
 import {putComma} from '~/utils/stats';
@@ -26,6 +29,7 @@ interface Props {
   claiming?: boolean;
   showTransactions?: boolean;
   price?: number;
+  handlePressTransfer: (index: number) => void;
 }
 const WalletStatsView = (props: Props): JSX.Element => {
   //// props
@@ -46,6 +50,21 @@ const WalletStatsView = (props: Props): JSX.Element => {
   rewardBlurt = putComma(rewardBlurt);
   //// language
   const intl = useIntl();
+  //// states
+  const [powerIndex, setPowerIndex] = useState(0);
+  const [blurtIndex, setBlurtIndex] = useState(0);
+  const [savingsIndex, setSavingsIndex] = useState(0);
+  //// constants
+  const powerOptions = [
+    intl.formatMessage({id: 'Wallet.dropdown_powerdown'}),
+    intl.formatMessage({id: 'Wallet.dropdown_delegate'}),
+  ];
+  const blurtOptions = [
+    intl.formatMessage({id: 'Wallet.dropdown_transfer'}),
+    intl.formatMessage({id: 'Wallet.dropdown_transfer2savings'}),
+    intl.formatMessage({id: 'Wallet.dropdown_powerup'}),
+  ];
+  const savingsOptions = [intl.formatMessage({id: 'Wallet.dropdown_withdraw'})];
 
   const _renderItem = ({item, index}) => {
     const value = parseFloat(get(item, 'value', '')).toFixed(2);
@@ -85,6 +104,19 @@ const WalletStatsView = (props: Props): JSX.Element => {
     );
   };
 
+  const _renderDropdownRow = (option, index, isSelect) => (
+    <Block style={{backgroundColor: argonTheme.COLORS.DEFAULT}}>
+      <Text color="white" style={{margin: 5}}>
+        {option}
+      </Text>
+    </Block>
+  );
+
+  const _onSelectPowerOption = (index: number, value: string) => {
+    console.log('[_onSelectPowerOption] index, value', index, value);
+    props.handlePressTransfer(index);
+  };
+
   return (
     props.walletData && (
       <Block>
@@ -92,22 +124,72 @@ const WalletStatsView = (props: Props): JSX.Element => {
           card
           style={{
             shadowColor: argonTheme.COLORS.FACEBOOK,
-            marginHorizontal: 70,
+            marginHorizontal: 50,
             marginVertical: 10,
             padding: 20,
           }}>
-          <Block row space="between">
-            <Text>Blurt Power:</Text>
-            <Text> {power} BLURT</Text>
+          <Block row middle space="between">
+            <Text>BLURT</Text>
+            <Block row middle>
+              <Text color={argonTheme.COLORS.ERROR}>{`${blurt} BLURT`}</Text>
+              <DropdownModal
+                key={blurtOptions[blurtIndex]}
+                options={blurtOptions}
+                defaultText=""
+                dropdownButtonStyle={styles.dropdownButtonStyle}
+                selectedOptionIndex={blurtIndex}
+                rowTextStyle={styles.rowTextStyle}
+                style={styles.dropdown}
+                dropdownStyle={styles.dropdownStyle}
+                textStyle={styles.dropdownText}
+                onSelect={_onSelectPowerOption}
+                noHighlight
+                isHasChildIcon
+              />
+            </Block>
           </Block>
-          <Block row space="between">
-            <Text>Blurt:</Text>
-            <Text>{blurt} BLURT</Text>
+
+          <Block row middle space="between">
+            <Text>BLURT POWER</Text>
+            <Block row middle>
+              <Text color={argonTheme.COLORS.ERROR}>{`${power} BLURT`}</Text>
+              <DropdownModal
+                key={powerOptions[powerIndex]}
+                options={powerOptions}
+                defaultText=""
+                dropdownButtonStyle={styles.dropdownButtonStyle}
+                selectedOptionIndex={0}
+                rowTextStyle={styles.rowTextStyle}
+                style={styles.dropdown}
+                dropdownStyle={styles.dropdownStyle}
+                textStyle={styles.dropdownText}
+                onSelect={() => console.log('select')}
+                noHighlight
+                isHasChildIcon
+              />
+            </Block>
           </Block>
-          <Block row space="between">
-            <Text>Savings:</Text>
-            <Text>{savings} BLURT</Text>
+          <Block row middle space="between">
+            <Text>SAVINGS</Text>
+            <Block row middle>
+              <Text color={argonTheme.COLORS.ERROR}>{`${savings} BLURT`}</Text>
+              <DropdownModal
+                key={savingsOptions[savingsIndex]}
+                options={savingsOptions}
+                defaultText=""
+                dropdownButtonStyle={styles.dropdownButtonStyle}
+                selectedOptionIndex={0}
+                rowTextStyle={styles.rowTextStyle}
+                style={styles.dropdown}
+                dropdownStyle={styles.dropdownStyle}
+                textStyle={styles.dropdownText}
+                onSelect={{}}
+                noHighlight
+                isHasChildIcon
+              />
+            </Block>
           </Block>
+
           <Block row space="between">
             <Text>Voting Power:</Text>
             <Text>{parseInt(votePower) / 100}%</Text>
@@ -168,5 +250,38 @@ const styles = StyleSheet.create({
   rows: {
     paddingHorizontal: theme.SIZES.BASE,
     marginBottom: theme.SIZES.BASE * 0.3,
+  },
+
+  // dropdown
+  dropdownText: {
+    fontSize: 14,
+    paddingLeft: 10,
+    paddingHorizontal: 0,
+    color: argonTheme.COLORS.ERROR,
+  },
+  rowTextStyle: {
+    fontSize: 12,
+    color: '#788187',
+  },
+  dropdownStyle: {
+    marginTop: 15,
+    minWidth: 120,
+    width: 160,
+    backgroundColor: argonTheme.COLORS.DEFAULT,
+  },
+  dropdownButtonStyle: {
+    color: argonTheme.COLORS.ERROR,
+    height: 44,
+    width: 40,
+    left: 30,
+  },
+  dropdown: {
+    width: 10,
+  },
+  textStyle: {
+    color: argonTheme.COLORS.DEFAULT,
+  },
+  textButton: {
+    justifyContent: 'center',
   },
 });

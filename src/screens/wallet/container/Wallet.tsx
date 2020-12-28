@@ -8,7 +8,11 @@ import {useIntl} from 'react-intl';
 import {AuthContext, UIContext, UserContext} from '~/contexts';
 import {WalletData, KeyTypes} from '~/contexts/types';
 //// blockchain
-import {claimRewardBalance} from '~/providers/blurt/dblurtApi';
+import {
+  claimRewardBalance,
+  transferToken,
+  TransactionReturnCodes,
+} from '~/providers/blurt/dblurtApi';
 
 //// props
 interface Props {
@@ -69,12 +73,61 @@ const Wallet = (props: Props): JSX.Element => {
     }
   };
 
+  //// transfer token
+  const _transferToken = async (index: number) => {
+    // handle not supported options
+    if (index > 0) {
+      setToastMessage(intl.formatMessage({id: 'not_supported'}));
+      return;
+    }
+    // get username and password
+    const {username, password} = authState.currentCredentials;
+    // build params
+    const params = {
+      to: 'letsblurt',
+      amount: '1 Blurt',
+      memo: "Let's Blurt",
+    };
+    // TODO: check using opt setting
+
+    const returnCode = await transferToken(username, password, params);
+    // handle return code
+    switch (returnCode) {
+      case TransactionReturnCodes.NO_ACCOUNT:
+        setToastMessage(intl.formatMessage({id: 'Transaction.no_account'}));
+        break;
+      case TransactionReturnCodes.INVALID_PASSWORD:
+        setToastMessage(
+          intl.formatMessage({id: 'Transaction.invalid_password'}),
+        );
+        break;
+      case TransactionReturnCodes.NEED_HIGHER_PASSWORD:
+        setToastMessage(
+          intl.formatMessage({id: 'Transaction.need_higher_password'}),
+        );
+        // TODO:show password input modal
+        break;
+      case TransactionReturnCodes.TRANSACTION_ERROR:
+        setToastMessage(intl.formatMessage({id: 'Transaction.error'}));
+        break;
+      case TransactionReturnCodes.TRANSACTION_SUCCESS:
+        setToastMessage(intl.formatMessage({id: 'Transaction.success'}));
+        break;
+      default:
+        setToastMessage(
+          intl.formatMessage({id: 'Transaction.something_wrong'}),
+        );
+        break;
+    }
+  };
+
   return (
     <WalletScreen
       walletData={walletData}
       handlePressClaim={_handlePressClaim}
       claiming={claiming}
       price={price}
+      handlePressTransfer={_transferToken}
     />
   );
 };

@@ -17,6 +17,7 @@ interface Props {
   price: number;
   handlePressClaim: () => void;
   claiming: boolean;
+  handlePressTransfer: (index: number) => void;
 }
 const WalletScreen = (props: Props): JSX.Element => {
   //// language
@@ -37,6 +38,7 @@ const WalletScreen = (props: Props): JSX.Element => {
       handlePressClaim={props.handlePressClaim}
       claiming={props.claiming}
       price={props.price}
+      handlePressTransfer={props.handlePressTransfer}
     />
   );
 

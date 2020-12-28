@@ -1174,7 +1174,19 @@ export const broadcastProfileUpdate = async (
   );
 };
 
-/////// wallet
+/////////// notifications
+//// fetch notifications
+export const fetchNotifications = async (username: string): Promise<any[]> => {
+  return new Promise((resolve, reject) => {
+    const notiClient = new NotiClient('wss://notifications.blurt.world');
+    notiClient.call('get_notifications', [username], (err, result) => {
+      if (err) reject(err);
+      resolve(result);
+    });
+  });
+};
+
+//////////// wallet
 //// fetch wallet data
 export const fetchWalletData = async (username: string) => {
   try {
@@ -1221,16 +1233,6 @@ export const fetchWalletData = async (username: string) => {
   }
 };
 
-export const fetchNotifications = async (username: string): Promise<any[]> => {
-  return new Promise((resolve, reject) => {
-    const notiClient = new NotiClient('wss://notifications.blurt.world');
-    notiClient.call('get_notifications', [username], (err, result) => {
-      if (err) reject(err);
-      resolve(result);
-    });
-  });
-};
-
 //// claim reward balance
 export const claimRewardBalance = async (
   username: string,
@@ -1269,6 +1271,53 @@ export const claimRewardBalance = async (
     new Error('Check private key. Required private posting key or above'),
   );
 };
+
+export enum TransactionReturnCodes {
+  'NO_ACCOUNT',
+  'INVALID_PASSWORD',
+  'NEED_HIGHER_PASSWORD',
+  'TRANSACTION_ERROR',
+  'TRANSACTION_SUCCESS',
+}
+
+//// transfer token
+export const transferToken = async (
+  username: string,
+  password: string,
+  params: {
+    to: string;
+    amount: string;
+    memo: string;
+  },
+): Promise<TransactionReturnCodes> => {
+  // get key type
+  const {account, keyType} = await verifyPassoword(username, password);
+  // check sanity
+  if (!account) {
+    return TransactionReturnCodes.NO_ACCOUNT;
+  }
+  // check key level: active or higher
+  if (keyType < KeyTypes.ACTIVE) {
+    return TransactionReturnCodes.NEED_HIGHER_PASSWORD;
+  }
+  // get privake key from password wif
+  const privateKey = PrivateKey.from(password);
+  // transfer
+  if (privateKey) {
+    const args = {
+      from: username,
+      to: get(params, 'to'),
+      amount: get(params, 'amount'),
+      memo: get(params, 'memo'),
+    };
+    const result = await client.broadcast.transfer(args, privateKey);
+    console.log('[transferToken] result', result);
+    if (result) return TransactionReturnCodes.TRANSACTION_SUCCESS;
+    else return TransactionReturnCodes.TRANSACTION_ERROR;
+  }
+  return TransactionReturnCodes.INVALID_PASSWORD;
+};
+
 //////////////// Utils /////////////////////////////////
 
 export const calculateReputation = (reputation: number) => {
