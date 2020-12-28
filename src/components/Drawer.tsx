@@ -14,11 +14,11 @@ class DrawerItem extends React.Component<Props> {
     const {title, focused} = this.props;
 
     switch (title) {
-      case 'Profile':
+      case 'Feed':
         return (
           <Icon
             size={15}
-            name="user-o"
+            name="feed"
             family="font-awesome"
             color={focused ? 'white' : materialTheme.COLORS.MUTED}
           />
@@ -37,15 +37,6 @@ class DrawerItem extends React.Component<Props> {
           <Icon
             size={15}
             name="ios-log-in"
-            family="ionicon"
-            color={focused ? 'white' : materialTheme.COLORS.MUTED}
-          />
-        );
-      case 'Add':
-        return (
-          <Icon
-            size={15}
-            name="close-circle"
             family="ionicon"
             color={focused ? 'white' : materialTheme.COLORS.MUTED}
           />

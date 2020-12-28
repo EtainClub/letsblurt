@@ -11,7 +11,7 @@ import {
 import {Block, Text, theme, Icon} from 'galio-framework';
 import {useSafeArea} from 'react-native-safe-area-context';
 import {Drawer as DrawerCustomItem} from '../components/';
-import {Images, materialTheme} from '../constants/';
+import {argonTheme, Images, materialTheme} from '../constants/';
 import {navigate} from '../navigation/service';
 
 const {width} = Dimensions.get('screen');
@@ -24,7 +24,7 @@ function CustomDrawerContent({
   ...rest
 }) {
   const insets = useSafeArea();
-  const screens = ['Profile', 'Settings'];
+  const screens = ['Feed', 'Settings'];
   return (
     <Block
       style={styles.container}
@@ -78,10 +78,6 @@ function CustomDrawerContent({
           focused={state.index === 8 ? true : false}
         />
         <DrawerCustomItem
-          title="Add"
-          focused={state.index === 8 ? true : false}
-        />
-        <DrawerCustomItem
           title="SignUp"
           focused={state.index === 9 ? true : false}
         />
@@ -97,7 +93,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    backgroundColor: '#4B1958',
+    backgroundColor: argonTheme.COLORS.FACEBOOK,
     paddingHorizontal: 28,
     paddingBottom: theme.SIZES.BASE,
     paddingTop: theme.SIZES.BASE * 2,
