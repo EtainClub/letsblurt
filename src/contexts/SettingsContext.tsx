@@ -8,6 +8,36 @@ import {
   BlockchainTypes,
 } from './types';
 
+// refer to ecency realm.js
+// export const getSettings = async () => {
+//   try {
+//     const setting = await getItemFromStorage(SETTINGS_SCHEMA);
+
+//     if (setting) {
+//       return setting;
+//     }
+//     const settingData = {
+//       language: '',
+//       isDarkTheme: null,
+//       currency: '',
+//       notification: true,
+//       server: '',
+//       upvotePercent: '1',
+//       nsfw: '0',
+//       followNotification: true,
+//       voteNotification: true,
+//       commentNotification: true,
+//       mentionNotification: true,
+//       reblogNotification: true,
+//       transfersNotification: true,
+//     };
+//     await setItemToStorage(SETTINGS_SCHEMA, settingData);
+//     return settingData;
+//   } catch (error) {
+//     return error;
+//   }
+// };
+
 //// initial settings state
 const initialState = {
   blockchainType: BlockchainTypes.BLURT,

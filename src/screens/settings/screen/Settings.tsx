@@ -18,6 +18,7 @@ import {navigate} from '~/navigation/service';
 import {Button, Icon, Block, Input, Text, theme} from 'galio-framework';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 const {height, width} = Dimensions.get('window');
+import {BLURT_MAINNETS} from '~/constants/blockchain';
 
 //// props
 interface Props {
@@ -35,10 +36,11 @@ const SettingScreen = (props: Props): JSX.Element => {
   // TODO: blockchain servers list
   const blockchainItems = [
     {
-      title: intl.formatMessage({id: 'Settings.blockchain'}),
-      id: 'blockchain',
+      title: intl.formatMessage({id: 'Settings.server'}),
+      id: 'server',
       type: 'dropdown',
-      options: ['Blurt', 'Steemit'],
+      defaultText: BLURT_MAINNETS[0],
+      options: BLURT_MAINNETS,
     },
   ];
 
@@ -102,6 +104,7 @@ const SettingScreen = (props: Props): JSX.Element => {
       title: intl.formatMessage({id: 'Settings.language'}),
       id: 'language',
       type: 'dropdown',
+      defaultText: 'EN',
       options: props.languages,
     },
     {
@@ -133,7 +136,7 @@ const SettingScreen = (props: Props): JSX.Element => {
 
   return (
     <ScrollView>
-      {/* <FlatList
+      <FlatList
         data={blockchainItems}
         keyExtractor={(item, index) => item.id}
         renderItem={props.renderItem}
@@ -144,7 +147,7 @@ const SettingScreen = (props: Props): JSX.Element => {
             </Text>
           </Block>
         }
-      /> */}
+      />
       <FlatList
         data={securityItems}
         keyExtractor={(item, index) => item.id}

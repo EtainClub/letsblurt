@@ -20,7 +20,7 @@ export const ResolveAuth = (props) => {
   const {authState, setAuthResolved, setCredentials} = useContext(AuthContext)!;
   const {fetchBlockchainGlobalProps, getFollowings} = useContext(UserContext);
   const {postsState, getTagList} = useContext(PostsContext);
-  const {setTranslateLanguages} = useContext(UIContext);
+  const {setToastMessage, setTranslateLanguages} = useContext(UIContext);
   // state
   const [fetched, setFetched] = useState(false);
   const [username, setUsername] = useState(null);
@@ -52,14 +52,26 @@ export const ResolveAuth = (props) => {
     setTranslateLanguages(languages);
     // set category to feed if username exists
     if (username) {
-      // get followings
-      await getFollowings(username);
-      // fetch tags
-      await getTagList(username);
+      console.log('[resolveAuth] username', username);
+      try {
+        // get followings
+        const followings = await getFollowings(username);
+        console.log('[resolveAuth] after get followings', followings);
+        if (!followings) navigate({name: 'Drawer'});
+        // fetch tags
+        await getTagList(username);
+      } catch (error) {
+        console.log('failed to fetch initial info (followings, tags)', error);
+        setToastMessage('The server is down, Choose another in the settings');
+        navigate({name: 'Drawer'});
+      }
+      console.log('[resolveAuth] after get tag list');
       // set username
       setUsername(username);
       // retrieve all credentials
       await setCredentials(username);
+      console.log('[resolveAuth] after set credentials');
+
       // set fetched flag
       setFetched(true);
     } else {

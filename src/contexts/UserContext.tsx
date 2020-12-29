@@ -250,16 +250,20 @@ const UserProvider = ({children}: Props) => {
       followingType,
       limit,
     );
-    // get the followings
-    const followings = result.map((item) => {
-      return item.following;
-    });
-    // dispatch action
-    dispatch({
-      type: UserActionTypes.SET_FOLLOWINGS,
-      payload: followings,
-    });
-    return followings;
+    if (result) {
+      // get the followings
+      const followings = result.map((item) => {
+        return item.following;
+      });
+      // dispatch action
+      dispatch({
+        type: UserActionTypes.SET_FOLLOWINGS,
+        payload: followings,
+      });
+      return followings;
+    } else {
+      return null;
+    }
   };
 
   //// get followings

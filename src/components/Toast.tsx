@@ -81,7 +81,7 @@ class Toast extends Component<Props, State> {
       inputRange: [0, 1],
       outputRange,
     });
-    const position = {bottom: 100};
+    const position = {bottom: 150};
 
     return (
       <TouchableOpacity disabled={true}>

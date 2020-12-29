@@ -40,22 +40,18 @@ import {
   TRUNCATE_BODY_LENGTH,
   BLURT_TAG_ENDPOINT,
   BLURT_PRICE_ENDPOINT,
+  BLURT_MAINNETS,
 } from '~/constants/blockchain';
 
 import {jsonStringify} from '~/utils/jsonUtils';
 
-// TODO: check if the voting in release mode is working on steem blockchain
-// blurt
-const MAINNET_OFFICIAL = [
-  'https://api.blurt.blog',
-  'https://rpc.blurt.world',
-  'https://blurtd.privex.io',
-  'https://rpc.blurt.buzz',
-];
-const client = new Client(MAINNET_OFFICIAL, {
+// dblurt handles the server fail situation and choose the next server!
+const client = new Client(BLURT_MAINNETS, {
   timeout: 5000,
   addressPrefix: 'BLT',
   chainId: 'cd8d90f29ae273abec3eaa7731e25934c63eb654d55080caff2ebb7f5df6381f',
+  failoverThreshold: 10,
+  consoleOnFailover: true,
 });
 
 console.log('Blurt Client', client);
@@ -81,7 +77,7 @@ const wifToPublic = (privWif: string) => {
   const privateKey = PrivateKey.fromString(privWif);
 
   // get public key of the private key and then convert it into wif format
-  const pubWif = privateKey.createPublic('BLT').toString();
+  const pubWif = privateKey.createPublic(client.addressPrefix).toString();
   // blurt
   //  const blurtPubWif = pubWif.replace(/^STM/, 'BLT');
   // return the public wif
@@ -644,6 +640,7 @@ export const fetchFollowings = async (
     return result;
   } catch (error) {
     console.log('failed to fetch following', error);
+    throw error;
     return null;
   }
 };

@@ -21,7 +21,13 @@ import {
   PostingContent,
   CommentData,
 } from '~/contexts/types';
-import {PostsContext, AuthContext, UIContext, UserContext} from '~/contexts';
+import {
+  PostsContext,
+  AuthContext,
+  UIContext,
+  UserContext,
+  SettingsContext,
+} from '~/contexts';
 import {generateCommentPermlink, makeJsonMetadataComment} from '~/utils/editor';
 import {TARGET_BLOCKCHAIN} from '~/constants/blockchain';
 
@@ -44,7 +50,8 @@ const PostDetails = (props: Props): JSX.Element => {
     appendTag,
   } = useContext(PostsContext);
   const {uiState} = useContext(UIContext);
-  // states
+  const {settingsState} = useContext(SettingsContext);
+  //// states
   const [loading, setLoading] = useState(true);
   const [postDetails, setPostDetails] = useState<PostData>(null);
   const [showOriginal, setShowOriginal] = useState(true);
@@ -225,7 +232,7 @@ const PostDetails = (props: Props): JSX.Element => {
     }
     const title = postDetails.state.title;
     const body = postDetails.body;
-    const targetLang = uiState.selectedLanguage;
+    const targetLang = settingsState.locale.split('-')[0];
     console.log('targetLang', targetLang);
     const titleOptions = {
       targetLang: targetLang,

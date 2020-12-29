@@ -22,7 +22,12 @@ import {PostData, CommentData, PostingContent} from '~/contexts/types';
 import {Avatar, PostBody} from '~/components';
 import {ActionBar} from '../ActionBar';
 import {ActionBarStyleComment} from '~/constants/actionBarTypes';
-import {AuthContext, UIContext, PostsContext} from '~/contexts';
+import {
+  AuthContext,
+  UIContext,
+  PostsContext,
+  SettingsContext,
+} from '~/contexts';
 //// utils
 import {generateCommentPermlink, createPatch} from '~/utils/editor';
 import {getTimeFromNow} from '~/utils/time';
@@ -50,6 +55,7 @@ const Comment = (props: Props): JSX.Element => {
   const {authState} = useContext(AuthContext);
   const {uiState} = useContext(UIContext);
   const {postsState, submitPost, updatePost} = useContext(PostsContext);
+  const {settingsState} = useContext(SettingsContext);
   //// stats
   const [originalPost, setOriginalPost] = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -152,7 +158,7 @@ const Comment = (props: Props): JSX.Element => {
       setBody(translatedBody);
       return;
     }
-    const targetLang = uiState.selectedLanguage;
+    const targetLang = settingsState.locale.split('-')[0];
     console.log('targetLang', targetLang);
     const bodyOptions = {
       targetLang: targetLang,

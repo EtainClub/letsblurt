@@ -382,6 +382,10 @@ const Settings = (props: Props): JSX.Element => {
           </Block>
         );
       case 'dropdown':
+        let defaultText = item.defaultText;
+        if (item.id === 'language') {
+          defaultText = language.split('-')[0].toUpperCase();
+        }
         return (
           <Block row middle space="between" style={styles.rows}>
             <Text size={14} style={{top: 7}}>
@@ -389,7 +393,7 @@ const Settings = (props: Props): JSX.Element => {
             </Text>
             <DropdownModal
               key={item.options[0]}
-              defaultText={language.split('-')[0].toUpperCase()}
+              defaultText={defaultText}
               dropdownButtonStyle={styles.dropdownButtonStyle}
               selectedOptionIndex={0}
               rowTextStyle={styles.rowTextStyle}
@@ -472,7 +476,7 @@ const styles = StyleSheet.create({
     borderColor: '#f5f5f5',
     borderWidth: 1,
     height: 44,
-    width: 120,
+    width: 200,
     borderRadius: 8,
     marginRight: 20,
   },

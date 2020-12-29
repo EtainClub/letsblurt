@@ -284,7 +284,7 @@
   },
   "Settings": {
     "blockchain_settings": "Blockchain",
-    "blockchain": "Blockchain",
+    "server": "Server",
     "security": "Security",
     "auto_login": "Auto Login",
     "use_otp": "Use OTP",
