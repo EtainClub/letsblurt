@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   ActionSheetIOS,
+  Share,
   //  Slider,
 } from 'react-native';
 import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
@@ -116,7 +117,11 @@ const ActionBarView = (props: Props): JSX.Element => {
   //// handle press share icon of action bar
   const _onPressShare = () => {
     console.log('[ActionBar] onPressShare');
-    // @todo open sharing ui
+    // open sharing ui
+    Share.share({
+      title: "Let's Blurt",
+      message: 'Share this post in social media',
+    });
   };
 
   const _onPressTranslate = () => {
