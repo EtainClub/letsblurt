@@ -124,7 +124,7 @@ const WalletStatsView = (props: Props): JSX.Element => {
           card
           style={{
             shadowColor: argonTheme.COLORS.FACEBOOK,
-            marginHorizontal: 50,
+            marginHorizontal: 20,
             marginVertical: 10,
             padding: 20,
           }}>
@@ -132,20 +132,22 @@ const WalletStatsView = (props: Props): JSX.Element => {
             <Text>BLURT</Text>
             <Block row middle>
               <Text color={argonTheme.COLORS.ERROR}>{`${blurt} BLURT`}</Text>
-              <DropdownModal
-                key={blurtOptions[blurtIndex]}
-                options={blurtOptions}
-                defaultText=""
-                dropdownButtonStyle={styles.dropdownButtonStyle}
-                selectedOptionIndex={blurtIndex}
-                rowTextStyle={styles.rowTextStyle}
-                style={styles.dropdown}
-                dropdownStyle={styles.dropdownStyle}
-                textStyle={styles.dropdownText}
-                onSelect={_onSelectPowerOption}
-                noHighlight
-                isHasChildIcon
-              />
+              {props.isUser && (
+                <DropdownModal
+                  key={blurtOptions[blurtIndex]}
+                  options={blurtOptions}
+                  defaultText=""
+                  dropdownButtonStyle={styles.dropdownButtonStyle}
+                  selectedOptionIndex={blurtIndex}
+                  rowTextStyle={styles.rowTextStyle}
+                  style={styles.dropdown}
+                  dropdownStyle={styles.dropdownStyle}
+                  textStyle={styles.dropdownText}
+                  onSelect={_onSelectPowerOption}
+                  noHighlight
+                  isHasChildIcon
+                />
+              )}
             </Block>
           </Block>
 
@@ -153,40 +155,44 @@ const WalletStatsView = (props: Props): JSX.Element => {
             <Text>BLURT POWER</Text>
             <Block row middle>
               <Text color={argonTheme.COLORS.ERROR}>{`${power} BLURT`}</Text>
-              <DropdownModal
-                key={powerOptions[powerIndex]}
-                options={powerOptions}
-                defaultText=""
-                dropdownButtonStyle={styles.dropdownButtonStyle}
-                selectedOptionIndex={0}
-                rowTextStyle={styles.rowTextStyle}
-                style={styles.dropdown}
-                dropdownStyle={styles.dropdownStyle}
-                textStyle={styles.dropdownText}
-                onSelect={() => console.log('select')}
-                noHighlight
-                isHasChildIcon
-              />
+              {props.isUser && (
+                <DropdownModal
+                  key={powerOptions[powerIndex]}
+                  options={powerOptions}
+                  defaultText=""
+                  dropdownButtonStyle={styles.dropdownButtonStyle}
+                  selectedOptionIndex={0}
+                  rowTextStyle={styles.rowTextStyle}
+                  style={styles.dropdown}
+                  dropdownStyle={styles.dropdownStyle}
+                  textStyle={styles.dropdownText}
+                  onSelect={() => console.log('select')}
+                  noHighlight
+                  isHasChildIcon
+                />
+              )}
             </Block>
           </Block>
           <Block row middle space="between">
             <Text>SAVINGS</Text>
             <Block row middle>
               <Text color={argonTheme.COLORS.ERROR}>{`${savings} BLURT`}</Text>
-              <DropdownModal
-                key={savingsOptions[savingsIndex]}
-                options={savingsOptions}
-                defaultText=""
-                dropdownButtonStyle={styles.dropdownButtonStyle}
-                selectedOptionIndex={0}
-                rowTextStyle={styles.rowTextStyle}
-                style={styles.dropdown}
-                dropdownStyle={styles.dropdownStyle}
-                textStyle={styles.dropdownText}
-                onSelect={{}}
-                noHighlight
-                isHasChildIcon
-              />
+              {props.isUser && (
+                <DropdownModal
+                  key={savingsOptions[savingsIndex]}
+                  options={savingsOptions}
+                  defaultText=""
+                  dropdownButtonStyle={styles.dropdownButtonStyle}
+                  selectedOptionIndex={0}
+                  rowTextStyle={styles.rowTextStyle}
+                  style={styles.dropdown}
+                  dropdownStyle={styles.dropdownStyle}
+                  textStyle={styles.dropdownText}
+                  onSelect={{}}
+                  noHighlight
+                  isHasChildIcon
+                />
+              )}
             </Block>
           </Block>
 
@@ -194,10 +200,12 @@ const WalletStatsView = (props: Props): JSX.Element => {
             <Text>Voting Power:</Text>
             <Text>{parseInt(votePower) / 100}%</Text>
           </Block>
-          <Block row space="between">
-            <Text>Blurt Price:</Text>
-            {props.price ? <Text>${props.price.toFixed(3)}</Text> : null}
-          </Block>
+          {props.isUser && (
+            <Block row space="between">
+              <Text>Blurt Price:</Text>
+              {props.price ? <Text>${props.price.toFixed(3)}</Text> : null}
+            </Block>
+          )}
         </Block>
         {props.isUser && needToClaim ? (
           <Block center>
@@ -213,22 +221,24 @@ const WalletStatsView = (props: Props): JSX.Element => {
             keyExtractor={(item, index) => index.toString()}
             renderItem={_renderItem}
             ListHeaderComponent={
-              <Block style={styles.title}>
-                <Text
-                  style={{fontFamily: 'open-sans-bold', paddingBottom: 5}}
-                  center
-                  size={16}
-                  color={argonTheme.COLORS.TEXT}>
-                  {intl.formatMessage({id: 'Wallet.transaction_header'})}
-                </Text>
-                <Text
-                  style={{fontFamily: 'open-sans-regular'}}
-                  center
-                  size={12}
-                  color={argonTheme.COLORS.TEXT}>
-                  {intl.formatMessage({id: 'Wallet.transaction_desc'})}
-                </Text>
-              </Block>
+              props.isUser && (
+                <Block style={styles.title}>
+                  <Text
+                    style={{fontFamily: 'open-sans-bold', paddingBottom: 5}}
+                    center
+                    size={16}
+                    color={argonTheme.COLORS.TEXT}>
+                    {intl.formatMessage({id: 'Wallet.transaction_header'})}
+                  </Text>
+                  <Text
+                    style={{fontFamily: 'open-sans-regular'}}
+                    center
+                    size={12}
+                    color={argonTheme.COLORS.TEXT}>
+                    {intl.formatMessage({id: 'Wallet.transaction_desc'})}
+                  </Text>
+                </Block>
+              )
             }
           />
         </Block>
