@@ -29,7 +29,7 @@ interface Props {
   claiming?: boolean;
   showTransactions?: boolean;
   price?: number;
-  handlePressTransfer: (index: number) => void;
+  handlePressTransfer?: (index: number) => void;
 }
 const WalletStatsView = (props: Props): JSX.Element => {
   //// props
@@ -209,7 +209,9 @@ const WalletStatsView = (props: Props): JSX.Element => {
         </Block>
         {props.isUser && needToClaim ? (
           <Block center>
-            <Text>Reward: {rewardBlurt}</Text>
+            <Text color={argonTheme.COLORS.ERROR}>
+              Reward: {rewardBlurt} BLURT
+            </Text>
             <Button onPress={props.handlePressClaim} loading={props.claiming}>
               Claim Reward
             </Button>
@@ -270,8 +272,8 @@ const styles = StyleSheet.create({
     color: argonTheme.COLORS.ERROR,
   },
   rowTextStyle: {
-    fontSize: 12,
-    color: '#788187',
+    fontSize: 14,
+    color: 'white',
   },
   dropdownStyle: {
     marginTop: 15,
@@ -283,7 +285,7 @@ const styles = StyleSheet.create({
     color: argonTheme.COLORS.ERROR,
     height: 44,
     width: 40,
-    left: 30,
+    left: 10,
   },
   dropdown: {
     width: 10,

@@ -16,11 +16,13 @@ import {
 
 //// props
 interface Props {
+  navigation: any;
   username: string;
 }
 const Wallet = (props: Props): JSX.Element => {
   //// props
   console.log('[WalletContainer] props', props);
+  const {navigation} = props;
   //// language
   const intl = useIntl();
   //// contexts
@@ -34,7 +36,7 @@ const Wallet = (props: Props): JSX.Element => {
   const [claiming, setClaiming] = useState(false);
   const [price, setPrice] = useState(0);
   //////// events
-  //// event: creation
+  //// event: mount
   useEffect(() => {
     if (authState.loggedIn) {
       console.log('[wallet] crendentials', authState.currentCredentials);
@@ -44,6 +46,19 @@ const Wallet = (props: Props): JSX.Element => {
       getPrice();
     }
   }, []);
+  //// on focus event:
+  //// when the WalletStatView is used before, then author's wallet data show
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      console.log('[Wallet] focus event');
+      if (authState.loggedIn) {
+        // fetch user data
+        getWalletData(authState.currentCredentials.username);
+      }
+    });
+    return unsubscribe;
+  }, [navigation]);
+
   //// event: wallet fetched
   useEffect(() => {
     if (userState.walletData) {

@@ -96,7 +96,6 @@ const PostsFeedView = (props: Props): JSX.Element => {
           width: width,
           height: height,
           paddingVertical: 20,
-          borderTopWidth: 1,
           marginTop: 10,
           marginBottom: 10,
           borderColor: theme.COLORS.PINK,

@@ -102,6 +102,8 @@ const PostDetails = (props: Props): JSX.Element => {
 
   const _fetchPostDetailsEntry = async () => {
     console.log('_fetchPostDetailsEntry postRef', postsState.postRef);
+    // clear the previous post
+    setPostDetails(null);
     // remove the parent post
     setParentPost(null);
     setLoading(true);
