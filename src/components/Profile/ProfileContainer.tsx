@@ -26,10 +26,9 @@ import {
 } from '~/contexts';
 //// dblurt api
 import {isFollowing} from '~/providers/blurt/dblurtApi';
-import {PostData, PostRef, PostsTypes, ProfileData} from '~/contexts/types';
+import {ProfileData} from '~/contexts/types';
 //// etc
 import {ProfileView} from './ProfileView';
-import {AuthorList} from '../AuthorList';
 
 //// props
 interface Props {

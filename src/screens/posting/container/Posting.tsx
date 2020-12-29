@@ -7,17 +7,21 @@ import {signImage, fetchRawPost} from '~/providers/blurt/dblurtApi';
 import {Discussion} from 'dblurt';
 import {PostingContent} from '~/contexts/types';
 import {uploadImage} from '~/providers/blurt/imageApi';
+//// navigation
+import {navigate} from '~/navigation/service';
+//// UIs
+import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
+//// components
+import {Beneficiary, AuthorList} from '~/components';
+import {BeneficiaryItem} from '~/components/Beneficiary/BeneficiaryContainer';
+import {BLURT_BENEFICIARY_WEIGHT} from '~/constants';
+//// utils
 import {
   addPostingOptions,
   extractMetadata,
   generatePermlink,
   makeJsonMetadata,
 } from '~/utils/editor';
-import {navigate} from '~/navigation/service';
-import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
-import {Beneficiary} from '~/components';
-import {BeneficiaryItem} from '~/components/Beneficiary/BeneficiaryContainer';
-import {BLURT_BENEFICIARY_WEIGHT} from '~/constants';
 
 // 5%
 const DEFAULT_BENEFICIARY: BeneficiaryItem = {
@@ -40,7 +44,7 @@ const Posting = (props: Props): JSX.Element => {
     UIContext,
   );
   const {postsState, submitPost, updatePost} = useContext(PostsContext);
-  const {getFollowings} = useContext(UserContext);
+  const {userState, getFollowings} = useContext(UserContext);
   // states
   //  const [editMode, setEditMode] = useState(route.params?.editMode);
   const [originalPost, setOriginalPost] = useState(null);
@@ -51,6 +55,7 @@ const Posting = (props: Props): JSX.Element => {
   const [filteredFollowings, setFilteredFollowings] = useState([]);
   const [showBeneficiaryModal, setShowBeneficiaryModal] = useState(false);
   const [beneficiaries, setBeneficiaries] = useState([]);
+  const [showAuthorsModal, setShowAuthorsModal] = useState(false);
 
   //// mount event
   useEffect(() => {
@@ -106,11 +111,19 @@ const Posting = (props: Props): JSX.Element => {
   //// handle mentioning: filter following list
   const _showAuthorsModal = (text: string) => {
     //    console.log('_showAuthorList. text', text);
-    let _filtered = followingList;
-    if (text != '') {
-      _filtered = followingList.filter((author) => author.includes(text));
-    }
-    setFilteredFollowings(_filtered);
+    // let _filtered = followingList;
+    // if (text != '') {
+    //   _filtered = followingList.filter((author) => author.includes(text));
+    // }
+    // setFilteredFollowings(_filtered);
+
+    // @test
+    setShowAuthorsModal(true);
+  };
+
+  ////
+  const _handlePressAuthor = (author: string) => {
+    console.log('press author', author);
   };
 
   ////

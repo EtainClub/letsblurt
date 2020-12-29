@@ -7,6 +7,7 @@ import {Header} from './Header';
 import {DropdownModal} from './DropdownModal';
 import {Avatar} from './Avatar';
 import {ActionBar} from './ActionBar';
+import {AuthorList} from './AuthorList';
 import {Comment} from './Comment';
 import {PostsFeed} from './PostsFeed';
 import {PostsListView} from './PostsList';
@@ -20,13 +21,14 @@ import {Beneficiary} from './Beneficiary';
 import {DNDTimes} from './DNDTimes';
 
 export {
+  Avatar,
+  ActionBar,
+  AuthorList,
   Button,
   Drawer,
   Header,
   Tabs,
   DropdownModal,
-  Avatar,
-  ActionBar,
   Comment,
   PostsFeed,
   PostsListView,
