@@ -116,11 +116,14 @@ const PostingScreen = (props: Props): JSX.Element => {
     if (body.length > 0) {
       const char = _getTypedCharacter();
       console.log('typed char', char);
-      // handle mentioning
-      if (char === '@') {
+      // handle mentioning.
+      // TODO: handle when removing @ -> no modal
+      if (char === '@' && bodySelection.end >= bodySelection.start) {
         console.log('show authors modal');
         // show authors modal
         setShowAuthorsModal(true);
+      } else {
+        setShowAuthorsModal(false);
       }
     }
   }, [bodySelection]);
@@ -396,12 +399,13 @@ const PostingScreen = (props: Props): JSX.Element => {
         </Block>
       </ActionSheet>
 
-      {showAuthorsModal ? (
+      {showAuthorsModal && (
         <AuthorList
           authors={userState.followings}
+          showModal={showAuthorsModal}
           handlePressAuthor={_insertMentionedAccount}
         />
-      ) : null}
+      )}
     </View>
   );
 };

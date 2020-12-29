@@ -17,8 +17,8 @@ export const STEEM_IMAGE_SERVER = 'https://steemitimages.com';
 export const BLURT_TAG_ENDPOINT = 'https://api.blurt.buzz/tags';
 export const BLURT_PRICE_ENDPOINT = 'https://api.blurt.buzz/price_info';
 export const BLURT_MAINNETS = [
-  'https://rpc.blurt.world',
   'https://rpc.blurt.buzz',
+  'https://rpc.blurt.world',
   'https://api.blurt.blog',
   'https://blurtd.privex.io',
 ];

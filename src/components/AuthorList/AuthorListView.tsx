@@ -44,12 +44,14 @@ const BACKGROUND_COLORS = [
 //// props
 interface Props {
   authors: string[];
+  showModal: boolean;
   handlePressAuthor: (author: string) => void;
 }
 
 const AuthorListView = (props: Props): JSX.Element => {
   //// props
   const {authors} = props;
+  console.log('AuthorListView. props', props);
   //// language
   const intl = useIntl();
   //// contexts
@@ -57,7 +59,7 @@ const AuthorListView = (props: Props): JSX.Element => {
   const {userState} = useContext(UserContext);
   const {setPostRef} = useContext(PostsContext);
   //// states
-  const [showModal, setShowModal] = useState(true);
+  const [showModal, setShowModal] = useState(props.showModal);
   const [searchText, setSearchText] = useState('');
   const [searchedItems, setSearchedItems] = useState(authors);
   const [loading, setLoading] = useState(false);
@@ -148,6 +150,7 @@ const AuthorListView = (props: Props): JSX.Element => {
           placeholder={intl.formatMessage({id: 'Profile.search_author'})}
           placehoderTextColor={argonTheme.COLORS.INPUT}
           onChangeText={_handleTextChange}
+          onSubmitEditing={_onSubmitSearch}
         />
       </Block>
     );
@@ -211,16 +214,18 @@ const AuthorListView = (props: Props): JSX.Element => {
       animationIn="zoomIn"
       animationOut="zoomOut"
       onBackdropPress={() => setShowModal(false)}>
-      <FlatList
-        contentContainerStyle={styles.posts}
-        data={searchedItems}
-        renderItem={({item, index}) => _renderItem(item, index)}
-        keyExtractor={(item, index) => String(index)}
-        initialNumToRender={5}
-        ListHeaderComponent={_renderHeader}
-        ListFooterComponent={_renderFooter}
-        showsVerticalScrollIndicator={false}
-      />
+      <Block card style={styles.container}>
+        <FlatList
+          contentContainerStyle={styles.posts}
+          data={searchedItems}
+          renderItem={({item, index}) => _renderItem(item, index)}
+          keyExtractor={(item, index) => String(index)}
+          initialNumToRender={5}
+          ListHeaderComponent={_renderHeader}
+          ListFooterComponent={_renderFooter}
+          showsVerticalScrollIndicator={false}
+        />
+      </Block>
     </Modal>
   );
 };
@@ -228,6 +233,13 @@ const AuthorListView = (props: Props): JSX.Element => {
 export {AuthorListView};
 
 const styles = StyleSheet.create({
+  container: {
+    width: width * 0.6,
+    height: 'auto',
+    backgroundColor: argonTheme.COLORS.TWITTER,
+    paddingVertical: 10,
+    marginHorizontal: 70,
+  },
   posts: {
     width: '100%',
     paddingHorizontal: theme.SIZES.BASE,
@@ -240,7 +252,7 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     height: 38,
-    width: width * 0.6,
+    width: width * 0.5,
     marginHorizontal: 16,
     borderWidth: 1,
     borderRadius: 3,
