@@ -1,7 +1,9 @@
 import multihash from 'multihashes';
 import querystring from 'querystring';
+import {BLURT_IMAGE_SERVER, STEEM_IMAGE_SERVER} from '~/constants';
 
-let proxyBase = 'https://steemitimages.com';
+//let proxyBase = 'https://steemitimages.com';
+let proxyBase = BLURT_IMAGE_SERVER;
 
 export const setProxyBase = (p) => {
   proxyBase = p;

@@ -91,7 +91,7 @@ const PostingScreen = (props: Props): JSX.Element => {
         '',
       );
       setTags(_tags);
-      // get markdown body
+      // get html from markdown
       const _body = renderPostBody(originalPost.markdownBody, true);
       // set preview
       setPreviewBody(_body);
@@ -146,7 +146,7 @@ const PostingScreen = (props: Props): JSX.Element => {
     // check validity:
     setBody(text);
     // set preview body
-    // update the post body whenver image is uploaded..
+    // update the post body whenever image is uploaded..
     const _body = renderPostBody(text, true);
     setPreviewBody(_body);
   };
@@ -273,7 +273,9 @@ const PostingScreen = (props: Props): JSX.Element => {
   //// render preview of posting
   const _renderPreview = () => (
     <Block>
-      <Text style={{marginLeft: 5, fontWeight: 'bold'}}>Preview</Text>
+      <Text style={{marginLeft: 5, borderTopWidth: 2, fontWeight: 'bold'}}>
+        Preview
+      </Text>
       <Block card style={{margin: 10}}>
         <PostBody body={previewBody} />
       </Block>

@@ -119,7 +119,7 @@ export const parsePost = async (
   }
   postData.state.isPromoted = promoted;
   // TODO: this uploads the first image to the ececy image server
-  // need to modify
+  // thumbnail image
   postData.image = postImage(postData.metadata, post.body);
   postData.state.voters = activeVotes;
   postData.state.voters!.sort((a, b) => b.rshares - a.rshares);
@@ -129,7 +129,7 @@ export const parsePost = async (
 
   postData.state.avatar = getResizedAvatar(post.author);
   postData.state.voters!.sort((a, b) => b.rshares - a.rshares);
-  postData.body = renderPostBody(post.body, true, webp);
+  postData.body = renderPostBody(post.body, true);
   postData.summary = postBodySummary(post, POST_SUMMARY_LENGTH);
   //  extPost.is_declined_payout = Number(parseFloat(post.max_accepted_payout)) === 0;
 

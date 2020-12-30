@@ -30,17 +30,5 @@ export const getResizedAvatar = (
   if (!author) {
     return '';
   }
-
-  // const url =
-  //   OS === 'android'
-  //     ? 'https://steemitimages.com'
-  //     : 'https://steemitimages.com';
-  // return `${url}/u/${author}/avatar/${sizeString}`;
-
-  const url =
-    OS === 'android'
-      ? 'https://steemitimages.com'
-      : 'https://steemitimages.com';
-
   return `${IMAGE_SERVER}/u/${author}/avatar/${sizeString}`;
 };
