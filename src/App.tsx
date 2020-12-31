@@ -7,7 +7,7 @@
  *
  * @format
  */
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useContext} from 'react';
 import {IntlProvider} from 'react-intl';
 // app screen
 import {AppContainer} from './screens/application';
@@ -25,8 +25,10 @@ import {
   UserProvider,
   SettingsProvider,
 } from './contexts';
+import {SettingsContext} from '~/contexts';
 
 export default () => {
+  const {getItemFromStorage} = useContext(SettingsContext);
   // const language = await AsyncStorage.getItem('language');
   const [locale, setLocale] = useState('en-US');
   //
@@ -35,9 +37,10 @@ export default () => {
   }, []);
 
   const _getLocale = async () => {
-    const _locale = await AsyncStorage.getItem('locale');
-    console.log('[App] locale', _locale);
-    if (_locale) setLocale(_locale);
+    const languages = await getItemFromStorage('languages');
+    //const _locale = await AsyncStorage.getItem('locale');
+    console.log('[App] locale', languages.locale);
+    if (languages.locale) setLocale(languages.locale);
   };
 
   return (

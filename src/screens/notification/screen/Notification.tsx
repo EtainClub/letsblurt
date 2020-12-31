@@ -81,6 +81,15 @@ const NotificationScreen = (props: Props): JSX.Element => {
         text = intl.formatMessage({id: 'Notifications.mention'});
         permlink = item.permlink;
         break;
+      case 'tranfer':
+        iconName = 'exchange';
+        iconFamily = 'font-awesome';
+        avatar = `${IMAGE_SERVER}/u/${author}/avatar`;
+        text = intl.formatMessage(
+          {id: 'Notifications.transfer'},
+          {what: item.value},
+        );
+        break;
       default:
         break;
     }

@@ -46,22 +46,22 @@ const SettingsProvider = ({children}: Props) => {
   //// get all settings from storage
   const getAllSettingsFromStorage = async () => {
     const pushPromise = new Promise((resolve, reject) =>
-      resolve(_getItemFromStorage(StorageSchema.PUSH_NOTIFICATIONS)),
+      resolve(getItemFromStorage(StorageSchema.PUSH_NOTIFICATIONS)),
     );
     const dndPromise = new Promise((resolve, reject) => {
-      resolve(_getItemFromStorage(StorageSchema.DND_TIMES));
+      resolve(getItemFromStorage(StorageSchema.DND_TIMES));
     });
     const blockchainPromise = new Promise((resolve, reject) =>
-      resolve(_getItemFromStorage(StorageSchema.BLOCKCHAIN)),
+      resolve(getItemFromStorage(StorageSchema.BLOCKCHAIN)),
     );
     const securityPromise = new Promise((resolve, reject) =>
-      resolve(_getItemFromStorage(StorageSchema.SECURITIES)),
+      resolve(getItemFromStorage(StorageSchema.SECURITIES)),
     );
     const languagePromise = new Promise((resolve, reject) =>
-      resolve(_getItemFromStorage(StorageSchema.LANGUAGE)),
+      resolve(getItemFromStorage(StorageSchema.LANGUAGE)),
     );
     const uiPromise = new Promise((resolve, reject) =>
-      resolve(_getItemFromStorage(StorageSchema.UI)),
+      resolve(getItemFromStorage(StorageSchema.UI)),
     );
 
     const promises = [
@@ -96,7 +96,7 @@ const SettingsProvider = ({children}: Props) => {
   const updateSettingSchema = async (schema: StorageSchema, data: any) => {
     if (data) {
       // get the saved schema data
-      const schemaData = await _getItemFromStorage(schema);
+      const schemaData = await getItemFromStorage(schema);
       // dispatch action
       dispatch({
         type: SettingsActionTypes.SET_SCHEMA,
@@ -109,6 +109,15 @@ const SettingsProvider = ({children}: Props) => {
       return true;
     }
     return false;
+  };
+
+  //// get a single item from storage
+  export const getItemFromStorage = async (key: string) => {
+    const data = await AsyncStorge.getItem(key);
+    if (data) {
+      return JSON.parse(data);
+    }
+    return null;
   };
 
   return (
@@ -124,14 +133,6 @@ const SettingsProvider = ({children}: Props) => {
 };
 
 ////// storage helper functions
-//// get a single item from storage
-const _getItemFromStorage = async (key) => {
-  const data = await AsyncStorge.getItem(key);
-  if (data) {
-    return JSON.parse(data);
-  }
-  return null;
-};
 
 //// set a single item or schema to storage
 const _setItemToStorage = async (key: string, data: any) => {

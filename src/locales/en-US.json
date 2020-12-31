@@ -347,7 +347,8 @@
   "Notifications": {
     "follow": " started following you",
     "reply": " replied to your post",
-    "mention": "mentioned you in this post"
+    "mention": "mentioned you in this post",
+    "transfer": "transferred {what} BLURT to you"
   },
   "ParentPost": {
     "info": "You are seeing the single post of the following:",
