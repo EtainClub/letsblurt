@@ -18,11 +18,11 @@ import {uploadImage} from '~/providers/blurt/imageApi';
 import {
   Images,
   argonTheme,
-  BLURT_IMAGE_SERVER,
+  BLURT_IMAGE_SERVERS,
   STEEM_IMAGE_SERVER,
 } from '~/constants';
 // TODO: generalize this for Steem chain
-const IMAGE_SERVER = BLURT_IMAGE_SERVER;
+const IMAGE_SERVER = BLURT_IMAGE_SERVERS[0];
 
 import ImagePicker, {ImageOrVideo} from 'react-native-image-crop-picker';
 

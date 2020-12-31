@@ -16,14 +16,14 @@ import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
 import {TabView, SceneMap} from 'react-native-tab-view';
 import {useIntl} from 'react-intl';
 import {navigate} from '~/navigation/service';
-import {Images, argonTheme, BLURT_IMAGE_SERVER} from '~/constants';
+import {Images, argonTheme, BLURT_IMAGE_SERVERS} from '~/constants';
 import {HeaderHeight} from '~/constants/utils';
 import {getNumberStat} from '~/utils/stats';
 import {Feed} from '~/screens';
 import {PostsListView, ProfileContainer, DraggableList} from '~/components';
 import {PostsTypes, PostData, ProfileData} from '~/contexts/types';
 import {getTimeFromNow} from '~/utils/time';
-const IMAGE_SERVER = BLURT_IMAGE_SERVER;
+const IMAGE_SERVER = BLURT_IMAGE_SERVERS[0];
 const BACKGROUND_COLORS = [
   argonTheme.COLORS.BORDER,
   argonTheme.COLORS.SECONDARY,

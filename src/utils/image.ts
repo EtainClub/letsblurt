@@ -3,8 +3,8 @@ import {Platform} from 'react-native';
 //import {proxifyImageSrc} from '@esteemapp/esteem-render-helpers';
 import {proxifyImageSrc} from '~/utils/render-helpers';
 
-import {BLURT_IMAGE_SERVER, STEEM_IMAGE_SERVER} from '~/constants';
-const IMAGE_SERVER = BLURT_IMAGE_SERVER;
+import {BLURT_IMAGE_SERVERS, STEEM_IMAGE_SERVER} from '~/constants';
+const IMAGE_SERVER = BLURT_IMAGE_SERVERS[0];
 
 const OS = Platform.OS;
 

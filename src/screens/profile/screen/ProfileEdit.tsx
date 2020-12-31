@@ -32,10 +32,10 @@ import {materialTheme} from '~/constants/';
 import {
   Images,
   argonTheme,
-  BLURT_IMAGE_SERVER,
+  BLURT_IMAGE_SERVERS,
   STEEM_IMAGE_SERVER,
 } from '~/constants';
-const IMAGE_SERVER = BLURT_IMAGE_SERVER;
+const IMAGE_SERVER = BLURT_IMAGE_SERVERS[0];
 const {width, height} = Dimensions.get('screen');
 import {HeaderHeight} from '~/constants/utils';
 //// contexts

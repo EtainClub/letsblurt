@@ -33,8 +33,8 @@ import {Post} from '~/components/Post';
 import {ActionBarStyleFeed} from '~/constants/actionBarTypes';
 import {getTimeFromNow} from '~/utils/time';
 
-import {Images, BLURT_IMAGE_SERVER, STEEM_IMAGE_SERVER} from '~/constants';
-const IMAGE_SERVER = BLURT_IMAGE_SERVER;
+import {Images, BLURT_IMAGE_SERVERS, STEEM_IMAGE_SERVER} from '~/constants';
+const IMAGE_SERVER = BLURT_IMAGE_SERVERS[0];
 
 const BACKGROUND_COLORS = [
   argonTheme.COLORS.BORDER,

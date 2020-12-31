@@ -2,13 +2,13 @@ import {
   BLURT_MAINNETS,
   BLURT_CHAIN_ID,
   BLURT_CHAIN_PREFIX,
-  BLURT_IMAGE_SERVER,
+  BLURT_IMAGE_SERVERS,
 } from '~/constants/blockchain';
 
 //// storage schema
 export enum StorageSchema {
   PUSH_NOTIFICATIONS = 'push', // push notifications
-  DND_TIMES = 'dnd', // start time, end time
+  DND_TIMES = 'dnd', // {start time, end time}
   BLOCKCHAIN = 'blockchain', // rpc server, image server,  blockchain prefix, blockchain id
   SECURITIES = 'security', // otp, auto login,
   LANGUAGE = 'language', // menu language (locale, e.g. en-US), translation language (e.g. EN)
@@ -30,8 +30,6 @@ export enum PushNotificationTypes {
 export type BlockchainTypes = {
   rpc: string;
   image?: string;
-  prefix?: string;
-  chainId?: string;
 };
 
 //// securiteies types
@@ -89,7 +87,7 @@ export const INITIAL_SETTINGS = {
   pushNotifications: ['vote', 'beneficiary'],
   blockchains: {
     rpc: BLURT_MAINNETS[0],
-    image: BLURT_IMAGE_SERVER,
+    image: BLURT_IMAGE_SERVERS[0],
     chainId: BLURT_CHAIN_ID,
     prefix: BLURT_CHAIN_PREFIX,
   },
@@ -113,6 +111,7 @@ export const INITIAL_SETTINGS = {
 //// settings action types
 export enum SettingsActionTypes {
   SET_ALL_SETTINGS,
+  SET_SCHEMA,
   SET_BLOCKCHAINS,
   SET_SECURITIES,
   SET_LANGUAGES,
@@ -121,31 +120,20 @@ export enum SettingsActionTypes {
 }
 
 //// actions
+// set all settings
 interface SetAllSettingsAction {
   type: SettingsActionTypes.SET_ALL_SETTINGS;
   payload: AllSettingsTypes;
 }
+// set schema
+interface SetSchemaAction {
+  type: SettingsActionTypes.SET_SCHEMA;
+  payload: {
+    schema: StorageSchema;
+    data: any;
+  };
+}
 
-// set blockchain type
-interface SetBlockchainsAction {
-  type: SettingsActionTypes.SET_BLOCKCHAINS;
-  payload: BlockchainTypes;
-}
-// save password
-interface SavePasswordAction {
-  type: SettingsActionTypes;
-  payload: boolean;
-}
-// set using opt
-interface UseOTPAction {
-  type: SettingsActionTypes;
-  payload: boolean;
-}
-// set locale
-interface SetLocaleAction {
-  type: SettingsActionTypes;
-  payload: string;
-}
 // settings context type
 export interface SettingsContextType {
   // settings state
@@ -153,14 +141,8 @@ export interface SettingsContextType {
   //// action creators
   // get all settings from storage
   getAllSettingsFromStorage: () => Promise<AllSettingsTypes>;
-  // set blockchain type
-  setBlockchainType: (type: BlockchainTypes) => void;
-  // save password
-  savePassword: (save: boolean) => void;
-  // use otp
-  useOTP: (use: boolean) => void;
-  // set locale
-  setLocale: (locale: string) => void;
+  // update a single item in schema
+  updateSettingSchema: (schema: StorageSchema, key: string, data: any) => void;
 }
 
-export type SettingsAction = SetAllSettingsAction | SetBlockchainsAction;
+export type SettingsAction = SetAllSettingsAction | SetSchemaAction;

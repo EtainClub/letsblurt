@@ -23,8 +23,7 @@ import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
 import {
   Images,
   argonTheme,
-  BLURT_IMAGE_SERVER,
-  STEEM_IMAGE_SERVER,
+  BLURT_IMAGE_SERVERS,
 } from '~/constants';
 const {width, height} = Dimensions.get('screen');
 import {HeaderHeight} from '~/constants/utils';
@@ -65,10 +64,7 @@ const ProfileView: React.FC<Props> = ({
   //// stats
   ////
 
-  const IMAGE_SERVER =
-    blockchain === BlockchainTypes.BLURT
-      ? BLURT_IMAGE_SERVER
-      : STEEM_IMAGE_SERVER;
+  const IMAGE_SERVER = BLURT_IMAGE_SERVERS[0];
 
   const _handlePressWebsite = () => {
     // open link

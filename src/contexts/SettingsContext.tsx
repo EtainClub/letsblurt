@@ -26,14 +26,8 @@ const settingsReducer = (state: SettingsState, action: SettingsAction) => {
   switch (action.type) {
     case SettingsActionTypes.SET_ALL_SETTINGS:
       return action.payload;
-    case SettingsActionTypes.SET_BLOCKCHAIN_TYPE:
-      return {...state, blockchainType: action.payload};
-    case SettingsActionTypes.SAVE_PASSWORD:
-      return {...state, savingPassword: action.payload};
-    case SettingsActionTypes.USE_OTP:
-      return {...state, usingOTP: action.payload};
-    case SettingsActionTypes.SET_LOCALE:
-      return {...state, locale: action.payload};
+    case SettingsActionTypes.SET_SCHEMA:
+      return {...state, [action.payload.schema]: action.payload.data};
     default:
       return state;
   }
@@ -50,17 +44,6 @@ const SettingsProvider = ({children}: Props) => {
   console.log('[ui provider] state', settingsState);
 
   //////// action creators
-
-  //// set blockchain type
-  const setBlockchainType = (type: BlockchainTypes) => {
-    console.log('[setBlockchainType] blockchain', type);
-    // dispatch action
-    dispatch({
-      type: SettingsActionTypes.SET_BLOCKCHAIN_TYPE,
-      payload: type,
-    });
-  };
-
   //// set saving password
   const savePassword = (save: boolean) => {
     console.log('[savePassword] save?', save);
@@ -94,22 +77,22 @@ const SettingsProvider = ({children}: Props) => {
   //// get all settings from storage
   const getAllSettingsFromStorage = async () => {
     const pushPromise = new Promise((resolve, reject) =>
-      resolve(getItemFromStorage(StorageSchema.PUSH_NOTIFICATIONS)),
+      resolve(_getItemFromStorage(StorageSchema.PUSH_NOTIFICATIONS)),
     );
     const dndPromise = new Promise((resolve, reject) => {
-      resolve(getItemFromStorage(StorageSchema.DND_TIMES));
+      resolve(_getItemFromStorage(StorageSchema.DND_TIMES));
     });
     const blockchainPromise = new Promise((resolve, reject) =>
-      resolve(getItemFromStorage(StorageSchema.BLOCKCHAIN)),
+      resolve(_getItemFromStorage(StorageSchema.BLOCKCHAIN)),
     );
     const securityPromise = new Promise((resolve, reject) =>
-      resolve(getItemFromStorage(StorageSchema.SECURITIES)),
+      resolve(_getItemFromStorage(StorageSchema.SECURITIES)),
     );
     const languagePromise = new Promise((resolve, reject) =>
-      resolve(getItemFromStorage(StorageSchema.LANGUAGE)),
+      resolve(_getItemFromStorage(StorageSchema.LANGUAGE)),
     );
     const uiPromise = new Promise((resolve, reject) =>
-      resolve(getItemFromStorage(StorageSchema.UI)),
+      resolve(_getItemFromStorage(StorageSchema.UI)),
     );
 
     const promises = [
@@ -140,20 +123,20 @@ const SettingsProvider = ({children}: Props) => {
     return settings;
   };
 
-  ////
-  const getItemFromStorage = async (key) => {
-    const data = await AsyncStorge.getItem(key);
+  //// update setting schema
+  const updateSettingSchema = async (schema: StorageSchema, data: any) => {
     if (data) {
-      return JSON.parse(data);
-    }
-    return null;
-  };
-
-  ////
-  const setItemToStorage = async (key, data) => {
-    if (data) {
-      const dataString = JSON.stringify(data);
-      await AsyncStorage.setItem(key, dataString);
+      // get the saved schema data
+      const schemaData = await _getItemFromStorage(schema);
+      // dispatch action
+      dispatch({
+        type: SettingsActionTypes.SET_SCHEMA,
+        payload: {
+          shcema: schema,
+          data: schemaData,
+        },
+      });
+      await _setItemToStorage(schema, schemaData);
       return true;
     }
     return false;
@@ -164,14 +147,32 @@ const SettingsProvider = ({children}: Props) => {
       value={{
         settingsState,
         getAllSettingsFromStorage,
-        setBlockchainType,
-        savePassword,
-        useOTP,
-        setLocale,
+        updateSettingSchema,
       }}>
       {children}
     </SettingsContext.Provider>
   );
+};
+
+////// storage helper functions
+//// get a single item from storage
+const _getItemFromStorage = async (key) => {
+  const data = await AsyncStorge.getItem(key);
+  if (data) {
+    return JSON.parse(data);
+  }
+  return null;
+};
+
+//// set a single item or schema to storage
+const _setItemToStorage = async (key: string, data: any) => {
+  if (data) {
+    // stringify the data
+    const dataString = JSON.stringify(data);
+    await AsyncStorage.setItem(key, dataString);
+    return true;
+  }
+  return false;
 };
 
 export {SettingsContext, SettingsProvider};

@@ -28,8 +28,15 @@ import {AuthContext, SettingsContext, UIContext} from '~/contexts';
 //// screens
 import {SettingScreen} from '../screen/Settings';
 import {DNDTimes} from '~/components';
+//// constants
+import {
+  BLURT_MAINNETS,
+  BLURT_IMAGE_SERVERS,
+} from '~/constants/blockchain';
+import {SUPPORTED_TRANSLATION_LANGUAGES} from '~/constants/languague';
 //// times
 import moment, {locale} from 'moment';
+import { StorageSchema } from '~/contexts/types';
 // start date and time: 1AM
 const DATE1 = new Date(2020, 12, 12, 1, 0, 0);
 // end date and time: 8AM
@@ -41,6 +48,36 @@ const START_TIME = DATE1.getTime();
 // get timestamp of the date2
 const END_TIME = DATE2.getTime();
 
+// settings types for UI statues
+export const enum SettingUITypes {
+  // push notifications
+  REPLY = "reply",
+  VOTE = "vote",
+  TRANSFER = "transfer",
+  BENEFICIARY = "beneficiary",
+  MENTION = "mention",
+  FOLLOW = "follow",
+  REBLOG = "reblog",
+  // dnd times
+  DND_TIMES= "dnd_times",
+  // languages
+  LOCALE = "locale",
+  TRANSLATION = "translation",
+  // blockchain
+  RPC_SERVER = "rpc_server",
+  IMAGE_SERVER = "image_server",
+  // securities
+  USE_OTP = "use_otp",
+  USE_AUTO_LOGIN = "use_auto_login",
+  NSFW = "nsfw", 
+  // general
+  NOTICE = "notice",
+  TERMS = 'terms',
+  PRIVACY = "privacy",
+  RATE_APP = "rate_app",
+  APP_VERSION = "app_version",
+}
+
 interface Props {}
 const Settings = (props: Props): JSX.Element => {
   //// props
@@ -48,7 +85,7 @@ const Settings = (props: Props): JSX.Element => {
   const intl = useIntl();
   //// contexts
   const {authState, processLogout} = useContext(AuthContext);
-  const {settingsState, getAllSettingsFromStorage} = useContext(
+  const {settingsState, getAllSettingsFromStorage, updateSettingSchema} = useContext(
     SettingsContext,
   );
   const {uiState, setLanguageParam, setToastMessage} = useContext(UIContext);
@@ -107,11 +144,11 @@ const Settings = (props: Props): JSX.Element => {
       // securities: {useOTP, useAutoLogin}
       _switchStates = {
         ..._switchStates,
-        ['useOTP']: securities.useOTP,
-        ['useAutoLogin']: securities.useAutoLogin,
+        [SettingUITypes.USE_OTP]: securities.useOTP,
+        [SettingUITypes.USE_AUTO_LOGIN]: securities.useAutoLogin,
       };
       // ui
-      _switchStates = {..._switchStates, ['ui']: ui.nsfw};
+      _switchStates = {..._switchStates, [SettingUITypes.NSFW]: ui.nsfw};
       //// dropdown states
       // blockchain rpc server
       setRPCServer(blockchains.rpc);
@@ -126,35 +163,11 @@ const Settings = (props: Props): JSX.Element => {
         setStartDNDTime(dndTimes.start);
         setEndDNDTime(dndTimes.end);
         // switch 
-        _switchStates = {..._switchStates, ['dnd']: true};
+        _switchStates = {..._switchStates, [SettingUITypes.DND_TIMES]: true};
       }
 
       // now set switch states
-      setSwitchStates(_switchStates);
-
-    //   // TODO: get push notification and language settings from firestore
-    //   const userRef = firestore().doc(`users/${_username}`);
-    //   console.log('[Settings] userRer', userRef);
-    //   await userRef
-    //     .get()
-    //     .then(async (doc) => {
-    //       if (doc.exists) {
-    //         const userDoc = doc.data();
-    //         // set notifications states
-    //         userDoc.pushNotifications.forEach((item: string) => {
-    //           _switchStates = {..._switchStates, [item]: true};
-    //         });
-    //         // set switch states
-    //         setSwitchStates(_switchStates);
-    //         // set language (locale)
-    //         setLanguage(userDoc.language);
-    //         // store the locale in the storage
-    //         await AsyncStorage.setItem('locale', userDoc.language);
-    //         // set locale in the context
-    //         setLocale(userDoc.language);
-    //       }
-    //     })
-    //     .catch((error) => console.log('failed to get user doc', error));
+      setSwitchStates(_switchStates);    
 
     //   console.log('switch states', _switchStates);
     // }
@@ -162,21 +175,21 @@ const Settings = (props: Props): JSX.Element => {
 
   //// get notifications state
   const _buildNotificationsStates = (itemId: string, value: boolean) => {
-    const beneficiary = switchStates['beneficiary'];
-    const reply = switchStates['reply'];
-    const mention = switchStates['mention'];
-    const follow = switchStates['follow'];
-    const transfer = switchStates['transfer'];
-    const vote = switchStates['vote'];
+    const beneficiary = switchStates[SettingUITypes.BENEFICIARY];
+    const reply = switchStates[SettingUITypes.REPLY];
+    const mention = switchStates[SettingUITypes.MENTION];
+    const follow = switchStates[SettingUITypes.FOLLOW];
+    const transfer = switchStates[SettingUITypes.TRANSFER];
+    const vote = switchStates[SettingUITypes.VOTE];
     // reblog
     // delegate
     let notifications = [];
-    if (beneficiary) notifications.push('beneficiary');
-    if (reply) notifications.push('reply');
-    if (mention) notifications.push('mention');
-    if (follow) notifications.push('follow');
-    if (transfer) notifications.push('transfer');
-    if (vote) notifications.push('vote');
+    if (beneficiary) notifications.push(SettingUITypes.BENEFICIARY);
+    if (reply) notifications.push(SettingUITypes.REPLY);
+    if (mention) notifications.push(SettingUITypes.MENTION);
+    if (follow) notifications.push(SettingUITypes.MENTION);
+    if (transfer) notifications.push(SettingUITypes.TRANSFER);
+    if (vote) notifications.push(SettingUITypes.VOTE);
     // handle the event item
     if (value) {
       // update the value of the event item
@@ -191,103 +204,132 @@ const Settings = (props: Props): JSX.Element => {
     return notifications;
   };
 
-  //// process logout
-  const _handleLogout = async () => {
-    console.log('[Settings] handle logout');
-    await processLogout();
-  };
-  ////
+  //// handle switch events: push notifications, securities, dnd times, ui
   const _handleToggleSwitch = async (key: string, value: boolean) => {
+    // update the switch state
     setSwitchStates({...switchStates, [key]: value});
     // firebase user doc ref
     const userRef = firestore().doc(`users/${username}`);
-
+    // securities 
+    let _securities = null;
     // actions
     switch (key) {
-      case 'dnd':
+      // securities
+      case SettingUITypes.USE_AUTO_LOGIN:
+        // build structure
+        _securities = {useAutoLogin: value, useOTP: switchStates[SettingUITypes.USE_OTP]};
+        // update context state and storage
+        updateSettingSchema(StorageSchema.SECURITIES, _securities);
+        break;
+      case SettingUITypes.USE_OTP:        
+        // build structure
+        _securities = {useAutoLogin: switchStates[SettingUITypes.USE_AUTO_LOGIN], useOTP: value};
+        // update context state and storage
+        updateSettingSchema(StorageSchema.SECURITIES, _securities);   
+        break;
+      // dnd time
+      case SettingUITypes.DND_TIMES:
         // clear dnd times in db if dnd is not set
-        if (!value) {
-          userRef.update({
-            dndTimes: null,
-          });
-        } else {
-          const times = [
+        let _dndTimes = null;
+        if (value) {
+          // convert the local time to the UTC0 time
+          _dndTimes = [
             _convertTimeToUTC0(startDNDTime),
             _convertTimeToUTC0(endDNDTime),
-          ];
-          // update
+          ];        
+        }
+        // update times in firestore
+        userRef.update({
+          dndTimes: _dndTimes,
+        });        
+        // update time in context state and storage
+        updateSettingSchema(StorageSchema.DND_TIMES, {start: _dndTimes[0], end: _dndTimes[1]});
+        break;
+      // push notifications
+      case SettingUITypes.BENEFICIARY:
+      case SettingUITypes.REPLY:
+      case SettingUITypes.MENTION:
+      case SettingUITypes.FOLLOW:
+      case SettingUITypes.TRANSFER:
+      case SettingUITypes.VOTE:
+      case SettingUITypes.REBLOG:
+        // build push notification structure
+        const _notifications = _buildNotificationsStates(key, value);        
+        // update in firestore
+        if (userRef) {        
           userRef.update({
-            dndTimes: times,
+            pushNotifications: _notifications,
           });
         }
+        // update in context state        
+        updateSettingSchema(StorageSchema.PUSH_NOTIFICATIONS, _notifications);      
         break;
-      case 'beneficiary':
-      case 'reply':
-      case 'mention':
-      case 'follow':
-      case 'transfer':
-      case 'vote':
-        const notifications = _buildNotificationsStates(key, value);        
+      case SettingUITypes.NSFW:
+        // build structure
+        const _ui = {nsfw: value};
+        // update in context state        
+        updateSettingSchema(StorageSchema.UI, _ui);    
+        break;
+      default:
+        break;
+    }
+  };
+
+  //// handle dropdown events: rpc server, locale, translation language
+  const _handleDropdownChange = async (uiType: SettingUITypes, index: number, value: string) => {
+    console.log('[_handleDropdownChange] uiType, index, value', uiType, index, value);
+    // firebase user doc ref
+    const userRef = firestore().doc(`users/${username}`);
+    let _languages = null;
+    switch(uiType) {   
+      case SettingUITypes.RPC_SERVER:
+        // build structure
+        const _blockchains = {rpc: value, image: BLURT_IMAGE_SERVERS[0]};
+        // update in context state        
+        updateSettingSchema(StorageSchema.BLOCKCHAIN, _blockchains);   
+        break;
+      case SettingUITypes.LOCALE:
+        // build structure
+        _languages = {locale: value, translation: translation};        
+        // update in context state        
+        updateSettingSchema(StorageSchema.LANGUAGE, _languages);   
+        break;
+      case SettingUITypes.TRANSLATION:
+        // build structure
+        _languages = {locale: locale, translation: value};
+        // update in firestore
+        // TODO: modify the firebase field: remove locale, add translation
         if (userRef) {
-          // update in firestore
           userRef.update({
-            pushNotifications: notifications,
+            translation: value,
           });
         }
-        // update in storage
-        
-        break;
-      case 'logout':
-        //        _handleLogout();
+        // update in context state        
+        updateSettingSchema(StorageSchema.LANGUAGE, _languages);           
         break;
       default:
         break;
     }
   };
 
-  const _handlePressButton = async (key: string) => {
-    switch (key) {
-      case 'logout':
-        _handleLogout();
+  //// handle button events: terms, privacy, feedback, etc
+  const _handlePressButton = async (uiType: SettingUITypes) => {
+    switch (uiType) {      
+      case SettingUITypes.NOTICE:
+        break;
+      case SettingUITypes.APP_VERSION:
+        break;
+      case SettingUITypes.RATE_APP:
+        break;
+      case SettingUITypes.TERMS:
+        break;
+      case SettingUITypes.PRIVACY:
         break;
       default:
         break;
     }
   };
-
-  const SUPPORTED_LANGUAGES = ['EN', 'KO'];
-
-  const _handleDropdownChange = async (index: number, value: string) => {
-    console.log('[_handleDropdownChange] index, value', index, value);
-    // check supported language
-    // distingush translated language and locale
-    // when a language changed,
-    // first updated ui's language
-    setLanguageParam(value.toLowerCase());
-    // then, check if the language is supported,
-    let _locale = 'en-US';
-    if (SUPPORTED_LANGUAGES.includes(value)) {
-      // check it is the same as the current language
-      if (language.split('-')[0].toUpperCase() !== value) {
-        switch (value) {
-          case 'KO':
-            _locale = 'ko-KR';
-            break;
-          default:
-            break;
-        }
-        setToastMessage(intl.formatMessage({id: 'Settings.msg_restart'}));
-      }
-    } else {
-      setToastMessage(intl.formatMessage({id: 'Settings.lang_not_supported'}));
-    }
-    console.log('[_handleDropdownChange] locale', _locale);
-    // set locale
-    setLocale(_locale);
-    // store the locale
-    await AsyncStorage.setItem('locale', _locale);
-  };
-
+  
   // convert the timestamp to time
   const _convertTime = (timestamp) => {
     return moment(timestamp).format('hh:mm A');
@@ -444,7 +486,7 @@ const Settings = (props: Props): JSX.Element => {
               dropdownStyle={styles.dropdownStyle}
               textStyle={styles.dropdownText}
               options={item.options}
-              onSelect={_handleDropdownChange}
+              onSelect={(index, value) => _handleDropdownChange(item.id, index, value)}
             />
           </Block>
         );
@@ -534,3 +576,28 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
+
+
+//   // TODO: get push notification and language settings from firestore
+    //   const userRef = firestore().doc(`users/${_username}`);
+    //   console.log('[Settings] userRer', userRef);
+    //   await userRef
+    //     .get()
+    //     .then(async (doc) => {
+    //       if (doc.exists) {
+    //         const userDoc = doc.data();
+    //         // set notifications states
+    //         userDoc.pushNotifications.forEach((item: string) => {
+    //           _switchStates = {..._switchStates, [item]: true};
+    //         });
+    //         // set switch states
+    //         setSwitchStates(_switchStates);
+    //         // set language (locale)
+    //         setLanguage(userDoc.language);
+    //         // store the locale in the storage
+    //         await AsyncStorage.setItem('locale', userDoc.language);
+    //         // set locale in the context
+    //         setLocale(userDoc.language);
+    //       }
+    //     })
+    //     .catch((error) => console.log('failed to get user doc', error));

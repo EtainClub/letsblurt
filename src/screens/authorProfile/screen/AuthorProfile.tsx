@@ -18,7 +18,7 @@ import {navigate} from '~/navigation/service';
 import {useIntl} from 'react-intl';
 //// ui, styles
 import {Block, Text, theme} from 'galio-framework';
-import {Images, argonTheme, BLURT_IMAGE_SERVER} from '~/constants';
+import {Images, argonTheme, BLURT_IMAGE_SERVERS} from '~/constants';
 import {TabView, SceneMap} from 'react-native-tab-view';
 //// contexts
 import {

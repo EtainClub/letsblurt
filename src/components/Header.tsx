@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-community/async-storage';
 import {Button, Icon, Block, NavBar, Input, Text, theme} from 'galio-framework';
-import {Images, argonTheme, BLURT_IMAGE_SERVER} from '~/constants';
+import {Images, argonTheme} from '~/constants';
 
 //
 import {useIntl} from 'react-intl';
@@ -30,6 +30,9 @@ import {indexOf} from 'lodash';
 import {useRoute} from '@react-navigation/native';
 
 import ModalDropdown from 'react-native-modal-dropdown';
+
+import {BLURT_IMAGE_SERVERS} from '~/constants';
+const IMAGE_SERVER = BLURT_IMAGE_SERVERS[0];
 
 const {height, width} = Dimensions.get('window');
 const iPhoneX = (): boolean =>
@@ -113,7 +116,7 @@ const Header = (props: Props): JSX.Element => {
           ) : (
             <Image
               source={{
-                uri: `${BLURT_IMAGE_SERVER}/u/${option}/avatar`,
+                uri: `${IMAGE_SERVER}/u/${option}/avatar`,
               }}
               style={[
                 styles.avatar,
@@ -194,7 +197,7 @@ const Header = (props: Props): JSX.Element => {
         onSelect={_handleChangeAccount}>
         <Image
           source={{
-            uri: `${BLURT_IMAGE_SERVER}/u/${username}/avatar`,
+            uri: `${IMAGE_SERVER}/u/${username}/avatar`,
           }}
           style={[styles.avatar]}
         />

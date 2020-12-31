@@ -23,8 +23,8 @@ import {argonTheme} from '~/constants';
 //// utils
 import {get} from 'lodash';
 import {getTimeFromNow} from '~/utils/time';
-import {Images, BLURT_IMAGE_SERVER, STEEM_IMAGE_SERVER} from '~/constants';
-const IMAGE_SERVER = BLURT_IMAGE_SERVER;
+import {Images, BLURT_IMAGE_SERVERS, STEEM_IMAGE_SERVER} from '~/constants';
+const IMAGE_SERVER = BLURT_IMAGE_SERVERS;
 
 const BACKGROUND_COLORS = [
   argonTheme.COLORS.BORDER,

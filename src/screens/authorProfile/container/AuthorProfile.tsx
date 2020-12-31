@@ -26,7 +26,7 @@ import {fetchUserProfile, fetchWalletData} from '~/providers/blurt/dblurtApi';
 import {AuthorProfileScreen} from '../screen/AuthorProfile';
 import {get, has} from 'lodash';
 const {width, height} = Dimensions.get('screen');
-import {argonTheme, BLURT_IMAGE_SERVER, STEEM_IMAGE_SERVER} from '~/constants';
+import {argonTheme, BLURT_IMAGE_SERVERS, STEEM_IMAGE_SERVER} from '~/constants';
 
 //// props
 interface Props {
@@ -62,7 +62,7 @@ const AuthorProfile = (props: Props): JSX.Element => {
 
   //////// functions
   // TODO: generalize this for Steem chain
-  const IMAGE_SERVER = BLURT_IMAGE_SERVER;
+  const IMAGE_SERVER = BLURT_IMAGE_SERVERS;
   ////
   const _getAuthorProfile = async (author: string) => {
     const _profileData = await fetchUserProfile(author);

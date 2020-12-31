@@ -23,8 +23,8 @@ import renderPostBody from '~/utils/render-helpers/markdown-2-html';
 import {PostData} from '~/contexts/types';
 const {width, height} = Dimensions.get('screen');
 
-import {Images, BLURT_IMAGE_SERVER, STEEM_IMAGE_SERVER} from '~/constants';
-const IMAGE_SERVER = BLURT_IMAGE_SERVER;
+import {Images, BLURT_IMAGE_SERVERS, STEEM_IMAGE_SERVER} from '~/constants';
+const IMAGE_SERVER = BLURT_IMAGE_SERVERS[0];
 const MAX_TAGS = 5;
 const BACKGROUND_COLORS = [
   argonTheme.COLORS.BORDER,
