@@ -163,8 +163,15 @@ const postsReducer = (state: PostsState, action: PostsAction) => {
         },
       };
     case PostsActionTypes.UPVOTE:
+      const {postsType, postIndex, payout, votesCount, voters} = action.payload;
       console.log('[postReducer] upvoting action payload', action.payload);
-      return state;
+      return {
+        ...state, 
+        feed.posts[postIndex].voted: true,
+        [postsType].posts[postIndex].payout: payout,
+        [postsType][postIndex].votesCount: votesCount,
+        [postsType][postIndex].voters: voters,
+      };
 
     case PostsActionTypes.VOTING_COMMENT:
       console.log('[postReducer] upvoting action payload', action.payload);
@@ -439,6 +446,9 @@ const PostsProvider = ({children}: Props) => {
     voteAmount: number,
     setToastMessage?: (message: string) => void,
   ) => {
+    // TODO: need postsType in input
+    const postsType = PostsTypes.FEED;
+
     console.log('[PostsContext|upvote] postIndex', postIndex, voteAmount);
     console.log('[PostsContext|upvote] post', postsState[postIndex]);
 
@@ -451,17 +461,28 @@ const PostsProvider = ({children}: Props) => {
       votingWeight,
     );
     console.log('[upvote] results', results);
+    //// calculate 
+    const payout = parseFloat(postsState[postsType].posts[postIndex].postUserState.payout);
+    const newPayout = payout + (voteAmount * votingWeight) / 100;
+    const newVotesCount = postsState[postsType].posts[postIndex].postUserState.votes_count + 1;
+    const voters = postsState[postsType].posts[postIndex].postUserState.active_votes;
+    const newVoters = [`${username} ($${voteAmount})`, ...voters];    
+
     // dispatch action
     if (results.success) {
       // handle voting on comment
       if (isComment) {
+        //// calculation
+        // TODO: find the comment
+        // Update the comment's voters, payout, vote amount
+        const newComments = _updateComments(postsState[postsType].posts[postIndex].comments, {author: postRef.author, permlink: postRef.permlink})
+       
+
         dispatch({
           type: PostsActionTypes.UPVOTE_COMMENT,
           payload: {
             postIndex: postIndex,
-            voteAmount: (voteAmount * votingWeight) / 100,
-            username: username,
-            postRef: postRef,
+            comments: newComments,
           },
         });
       } else {
@@ -469,14 +490,31 @@ const PostsProvider = ({children}: Props) => {
           type: PostsActionTypes.UPVOTE,
           payload: {
             postIndex: postIndex,
-            voteAmount: (voteAmount * votingWeight) / 100,
-            username: username,
+            voteAmount: newPayout,
+            votesCount: newVotesCount,
+            voters: newVoters,
           },
         });
       }
     }
     return results;
   };
+
+  /// helper function to find the comment
+  const _updateComments = (comments, postRef) => {
+    const {author, permlink} = comments[0];
+    if (author === postRef.author && permlink === postRef.permlink) {
+      // found, update the comment
+      // comment.payout = newPayout
+      // comment.voters = newVoters
+      //
+      return comments
+    } else if (comments.children) {
+      for (let i=0; i<comments.children; i++) {
+        const result = _updateComments(comments.children[i], postRef);
+      }
+    }
+  }
 
   // submit post/comment
   const submitPost = async (

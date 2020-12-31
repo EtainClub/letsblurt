@@ -290,7 +290,8 @@ interface UpVoteAction {
   payload: {
     postIndex: number;
     voteAmount: number;
-    username: string;
+    votesCount: number;
+    voters: string[];
   };
 }
 // voting comment
@@ -298,9 +299,7 @@ interface UpVoteCommentAction {
   type: PostsActionTypes.UPVOTE_COMMENT;
   payload: {
     postIndex: number;
-    voteAmount: number;
-    username: string;
-    postRef: PostRef;
+    comments: CommentData[];
   };
 }
 // commenting
