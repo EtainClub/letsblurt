@@ -38,42 +38,11 @@ type Props = {
 };
 
 const SettingsProvider = ({children}: Props) => {
-  // userReducer hook
-  // set auth reducer with initial state of auth state
+  // useReducer hook
   const [settingsState, dispatch] = useReducer(settingsReducer, initialState);
-  console.log('[ui provider] state', settingsState);
+  console.log('[SettingsProvider] state', settingsState);
 
   //////// action creators
-  //// set saving password
-  const savePassword = (save: boolean) => {
-    console.log('[savePassword] save?', save);
-    // dispatch action
-    dispatch({
-      type: SettingsActionTypes.SAVE_PASSWORD,
-      payload: save,
-    });
-  };
-
-  //// use otp
-  const useOTP = (use: boolean) => {
-    console.log('[useOTP] use?', use);
-    // dispatch action
-    dispatch({
-      type: SettingsActionTypes.USE_OTP,
-      payload: use,
-    });
-  };
-
-  //// set locale
-  const setLocale = (locale: string) => {
-    console.log('[setLocale] locale', locale);
-    // dispatch action
-    dispatch({
-      type: SettingsActionTypes.SET_LOCALE,
-      payload: locale,
-    });
-  };
-
   //// get all settings from storage
   const getAllSettingsFromStorage = async () => {
     const pushPromise = new Promise((resolve, reject) =>

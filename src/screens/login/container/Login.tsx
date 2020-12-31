@@ -126,7 +126,7 @@ const Login = (props: Props): JSX.Element => {
         } else {
           console.log('[login|processOTP] doc data', doc.data());
           // check setting if login opt is on
-          if (!__DEV__ && settingsState.usingOTP) {
+          if (!__DEV__ && settingsState.securities.useOTP) {
             // set phone number
             setPhoneNumber(doc.data().phone);
             setShowOTP(true);
@@ -144,6 +144,7 @@ const Login = (props: Props): JSX.Element => {
             processLogin(
               {username: username, password: password, type: keyType},
               addingAccount,
+              settingsState.securities.useAutoLogin,
             );
           }
         }
@@ -203,6 +204,7 @@ const Login = (props: Props): JSX.Element => {
       processLogin(
         {username: username, password: password, type: passwordType},
         addingAccount,
+        settingsState.securities.useAutoLogin,
       );
     } else {
       setToastMessage(intl.formatMessage({id: 'Login.otp_error'}));

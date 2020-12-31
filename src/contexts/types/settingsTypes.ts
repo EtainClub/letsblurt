@@ -74,12 +74,6 @@ export interface SettingsState {
   dndTimes: DNDTimeTypes;
   languages: LanguageTypes;
   ui: UITypes;
-  // // flag to save password
-  // savingPassword: boolean;
-  // // flag to use one time password
-  // usingOTP: boolean;
-  // // locale, language
-  // locale: string;
 }
 
 // initial post data
@@ -96,7 +90,7 @@ export const INITIAL_SETTINGS = {
     useAutoLogin: true,
   },
   languages: {
-    locales: 'en-US',
+    locale: 'en-US',
     translation: 'EN',
   },
   dndTimes: {

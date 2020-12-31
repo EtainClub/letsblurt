@@ -7,7 +7,13 @@ import Config from 'react-native-config';
 //
 import axios from 'axios';
 import AsyncStorage from '@react-native-community/async-storage';
-import {AuthContext, UserContext, PostsContext, UIContext} from '~/contexts';
+import {
+  AuthContext,
+  UserContext,
+  PostsContext,
+  UIContext,
+  SettingsContext,
+} from '~/contexts';
 import {navigate} from '~/navigation/service';
 
 export const LOGIN_TOKEN = 'loginToken';
@@ -17,7 +23,7 @@ import {OTP} from '~/components';
 export const ResolveAuth = (props) => {
   //// props
   //// contexts
-  const {authState, setAuthResolved, setCredentials} = useContext(AuthContext)!;
+  const {authState, setAuthResolved, getCredentials} = useContext(AuthContext)!;
   const {fetchBlockchainGlobalProps, getFollowings} = useContext(UserContext);
   const {postsState, getTagList} = useContext(PostsContext);
   const {setToastMessage, setTranslateLanguages} = useContext(UIContext);
@@ -69,7 +75,7 @@ export const ResolveAuth = (props) => {
       // set username
       setUsername(username);
       // retrieve all credentials
-      await setCredentials(username);
+      await getCredentials(username);
       console.log('[resolveAuth] after set credentials');
 
       // set fetched flag

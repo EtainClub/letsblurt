@@ -83,8 +83,8 @@ const AuthProvider = ({children}: Props) => {
     });
   };
 
-  // set credentials
-  const setCredentials = async (username: string) => {
+  // get all credentials from key chains and update context state
+  const getCredentials = async (username: string) => {
     // check sanity
     if (!username) {
       console.log('no username is given', username);
@@ -92,7 +92,7 @@ const AuthProvider = ({children}: Props) => {
     }
     // get credentials and keys list
     const {credentials, keysList} = await _getCredentials(username);
-    // @todo update user logged in state
+    // TODO: update user logged in state
     if (credentials) {
       dispatch({
         type: AuthActionTypes.SET_CREDENTIALS,
@@ -108,12 +108,16 @@ const AuthProvider = ({children}: Props) => {
   const processLogin = async (
     credentials: Credentials,
     addingAccount?: boolean,
+    storingCredentials?: boolean,
   ) => {
     console.log('[AuthContext] processLogin adding?', addingAccount);
     // add credentails in case of not loggedin or addingAccount
     if (authState.loggedIn && !addingAccount) return;
-    // save the credentials in the keychain
-    const keysList = await _storeCredentials(credentials);
+    // save the credentials in the keychain if the settings is on
+    let keysList = [];
+    if (storingCredentials) {
+      keysList = await _storeCredentials(credentials);
+    }
     // dispatch action: set credentials
     dispatch({
       type: AuthActionTypes.SET_CREDENTIALS,
@@ -167,7 +171,7 @@ const AuthProvider = ({children}: Props) => {
       value={{
         authState,
         setAuthResolved,
-        setCredentials,
+        getCredentials,
         processLogin,
         processLogout,
         changeAccount,

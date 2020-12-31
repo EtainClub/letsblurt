@@ -41,10 +41,9 @@ export interface AuthContextType {
   //// action creators
   ////
   setAuthResolved: (resolved: boolean) => void;
-  // set credentials
-  setCredentials: (username: string) => void;
+  // get credentials from keychain
+  getCredentials: (username: string) => void;
   // login with token. @toto what to do?
-  //  tryLoginWithToken: (username: string) => void;
   // process login
   processLogin: (credentials: Credentials, addingAccount: boolean) => void;
   // process logout

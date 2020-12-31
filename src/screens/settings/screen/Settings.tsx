@@ -18,12 +18,12 @@ import {navigate} from '~/navigation/service';
 import {Button, Icon, Block, Input, Text, theme} from 'galio-framework';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 const {height, width} = Dimensions.get('window');
-import {BLURT_MAINNETS} from '~/constants/blockchain';
+import {BLURT_MAINNETS, BLURT_IMAGE_SERVERS} from '~/constants/blockchain';
+import {SUPPORTED_LOCALES, LOCALE} from '~/locales';
 import {SettingUITypes} from '../container/Settings';
 
 //// props
 interface Props {
-  locales: string[];
   translationLanguages: string[];
   renderItem: (item) => JSX.Element;
 }
@@ -38,11 +38,18 @@ const SettingScreen = (props: Props): JSX.Element => {
   // blockchains
   const blockchainItems = [
     {
-      title: intl.formatMessage({id: 'Settings.server'}),
+      title: intl.formatMessage({id: 'Settings.rpc_server'}),
       id: SettingUITypes.RPC_SERVER,
       type: 'dropdown',
       defaultText: BLURT_MAINNETS[0],
       options: BLURT_MAINNETS,
+    },
+    {
+      title: intl.formatMessage({id: 'Settings.image_server'}),
+      id: SettingUITypes.IMAGE_SERVER,
+      type: 'dropdown',
+      defaultText: BLURT_IMAGE_SERVERS[0],
+      options: BLURT_IMAGE_SERVERS,
     },
   ];
   // securities
@@ -107,11 +114,11 @@ const SettingScreen = (props: Props): JSX.Element => {
       title: intl.formatMessage({id: 'Settings.locale'}),
       id: SettingUITypes.LOCALE,
       type: 'dropdown',
-      defaultText: 'en-US',
-      options: props.locales,
+      defaultText: SUPPORTED_LOCALES[0].locale,
+      options: SUPPORTED_LOCALES.map((item) => item.locale),
     },
     {
-      title: intl.formatMessage({id: 'Settings.locale'}),
+      title: intl.formatMessage({id: 'Settings.translation'}),
       id: SettingUITypes.TRANSLATION,
       type: 'dropdown',
       defaultText: 'EN',

@@ -3,7 +3,12 @@ export default {
   'ko-KR': require('./ko-KR.json'),
 };
 
-export const locales = [
-  {id: 'en-US', name: 'English'},
-  {id: 'ko-KR', name: '한국어'},
+export type LOCALE = {
+  locale: string;
+  name: string;
+};
+
+export const SUPPORTED_LOCALES = [
+  {locale: 'en-US', name: 'English'},
+  {locale: 'ko-KR', name: '한국어'},
 ];

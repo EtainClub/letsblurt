@@ -284,7 +284,8 @@
   },
   "Settings": {
     "blockchain_settings": "Blockchain",
-    "server": "Server",
+    "rpc_server": "RPC Server",
+    "image_server": "Image Server",
     "security": "Security",
     "auto_login": "Auto Login",
     "use_otp": "Use OTP",

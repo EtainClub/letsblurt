@@ -33,7 +33,8 @@ import {
   BLURT_MAINNETS,
   BLURT_IMAGE_SERVERS,
 } from '~/constants/blockchain';
-import {SUPPORTED_TRANSLATION_LANGUAGES} from '~/constants/languague';
+import {SUPPORTED_LOCALES} from '~/locales';
+
 //// times
 import moment, {locale} from 'moment';
 import { StorageSchema } from '~/contexts/types';
@@ -280,14 +281,21 @@ const Settings = (props: Props): JSX.Element => {
     console.log('[_handleDropdownChange] uiType, index, value', uiType, index, value);
     // firebase user doc ref
     const userRef = firestore().doc(`users/${username}`);
+    let _blockchains = null;
     let _languages = null;
     switch(uiType) {   
       case SettingUITypes.RPC_SERVER:
         // build structure
-        const _blockchains = {rpc: value, image: BLURT_IMAGE_SERVERS[0]};
+        _blockchains = {rpc: value, image: imageServer};
         // update in context state        
         updateSettingSchema(StorageSchema.BLOCKCHAIN, _blockchains);   
         break;
+      case SettingUITypes.IMAGE_SERVER:
+        // build structure
+        _blockchains = {rpc: rpcServer, image: value};
+        // update in context state        
+        updateSettingSchema(StorageSchema.BLOCKCHAIN, _blockchains);   
+        break;  
       case SettingUITypes.LOCALE:
         // build structure
         _languages = {locale: value, translation: translation};        
@@ -507,7 +515,7 @@ const Settings = (props: Props): JSX.Element => {
     />
   ) : (
     <SettingScreen
-      languages={uiState.translateLanguages}
+      translationLanguages={uiState.translateLanguages}
       renderItem={_renderItem}
     />
   );
