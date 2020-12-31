@@ -48,17 +48,29 @@ const Settings = (props: Props): JSX.Element => {
   const intl = useIntl();
   //// contexts
   const {authState, processLogout} = useContext(AuthContext);
-  const {setLocale} = useContext(SettingsContext);
+  const {settingsState, getAllSettingsFromStorage} = useContext(
+    SettingsContext,
+  );
   const {uiState, setLanguageParam, setToastMessage} = useContext(UIContext);
   //// states
   const [username, setUsername] = useState(null);
+  // switches
   const [switchStates, setSwitchStates] = useState({});
+  // dnd
   const [showDND, setShowDND] = useState(false);
   const [showStartClock, setShowStartClock] = useState(false);
   const [showEndClock, setShowEndClock] = useState(false);
   const [startDNDTime, setStartDNDTime] = useState(START_TIME);
   const [endDNDTime, setEndDNDTime] = useState(END_TIME);
-  const [language, setLanguage] = useState('en');
+  // dropdowns: rpc server, image server,
+  const [rpcServer, setRPCServer] = useState(settingsState.blockchains.rpc);
+  const [imageServer, setImageServer] = useState(
+    settingsState.blockchains.image,
+  );
+  const [locale, setLocale] = useState(settingsState.languages.locale);
+  const [translation, setTranslation] = useState(
+    settingsState.languages.translation,
+  );
 
   //// effects
   // event: mount
@@ -69,54 +81,83 @@ const Settings = (props: Props): JSX.Element => {
   //// get initial settings
   const _getInitialSettings = async () => {
     if (authState.loggedIn) {
-      // TODO: get auto login, use otp settings
-      // states should be handled in settings Context
-
-      // switch states
-      let _switchStates = switchStates;
       // get username
       const _username = authState.currentCredentials.username;
       setUsername(_username);
-      // login status
-      if (authState.loggedIn) {
-        _switchStates = {..._switchStates, ['logout']: true};
-      }
-      // get dnd times from storage
-      const _startDND = await AsyncStorage.getItem('dnd_start_time');
-      const _endDND = await AsyncStorage.getItem('dnd_end_time');
-      // set times
-      setStartDNDTime(JSON.parse(_startDND));
-      setEndDNDTime(JSON.parse(_endDND));
-      // set switch if time is set
-      if (_startDND) {
+
+      // get all settings from storage
+      const allSettings = await getAllSettingsFromStorage();
+
+      ////// set settings states
+      // destructure the settgins
+      const {
+        pushNotifications,
+        blockchains,
+        dndTimes,
+        languages,
+        securities,
+        ui,
+      } = allSettings;
+      //// switch states
+      let _switchStates = switchStates;
+      // push notifications
+      pushNotifications.forEach((item: string) => {
+        _switchStates = {..._switchStates, [item]: true};
+      });
+      // securities: {useOTP, useAutoLogin}
+      _switchStates = {
+        ..._switchStates,
+        ['useOTP']: securities.useOTP,
+        ['useAutoLogin']: securities.useAutoLogin,
+      };
+      // ui
+      _switchStates = {..._switchStates, ['ui']: ui.nsfw};
+      //// dropdown states
+      // blockchain rpc server
+      setRPCServer(blockchains.rpc);
+      // blockchain image server
+      setImageServer(blockchains.image);
+      // locale
+      setLocale(languages.locale);
+      // translation
+      setTranslation(languages.translation);
+      //// dnd time states
+      if (dndTimes.start) {
+        setStartDNDTime(dndTimes.start);
+        setEndDNDTime(dndTimes.end);
+        // switch 
         _switchStates = {..._switchStates, ['dnd']: true};
       }
-      // TODO: get push notification and language settings from firestore
-      const userRef = firestore().doc(`users/${_username}`);
-      console.log('[Settings] userRer', userRef);
-      await userRef
-        .get()
-        .then(async (doc) => {
-          if (doc.exists) {
-            const userDoc = doc.data();
-            // set notifications states
-            userDoc.pushNotifications.forEach((item: string) => {
-              _switchStates = {..._switchStates, [item]: true};
-            });
-            // set switch states
-            setSwitchStates(_switchStates);
-            // set language (locale)
-            setLanguage(userDoc.language);
-            // store the locale in the storage
-            await AsyncStorage.setItem('locale', userDoc.language);
-            // set locale in the context
-            setLocale(userDoc.language);
-          }
-        })
-        .catch((error) => console.log('failed to get user doc', error));
 
-      console.log('switch states', _switchStates);
-    }
+      // now set switch states
+      setSwitchStates(_switchStates);
+
+    //   // TODO: get push notification and language settings from firestore
+    //   const userRef = firestore().doc(`users/${_username}`);
+    //   console.log('[Settings] userRer', userRef);
+    //   await userRef
+    //     .get()
+    //     .then(async (doc) => {
+    //       if (doc.exists) {
+    //         const userDoc = doc.data();
+    //         // set notifications states
+    //         userDoc.pushNotifications.forEach((item: string) => {
+    //           _switchStates = {..._switchStates, [item]: true};
+    //         });
+    //         // set switch states
+    //         setSwitchStates(_switchStates);
+    //         // set language (locale)
+    //         setLanguage(userDoc.language);
+    //         // store the locale in the storage
+    //         await AsyncStorage.setItem('locale', userDoc.language);
+    //         // set locale in the context
+    //         setLocale(userDoc.language);
+    //       }
+    //     })
+    //     .catch((error) => console.log('failed to get user doc', error));
+
+    //   console.log('switch states', _switchStates);
+    // }
   };
 
   //// get notifications state
@@ -186,13 +227,15 @@ const Settings = (props: Props): JSX.Element => {
       case 'follow':
       case 'transfer':
       case 'vote':
-        const notifications = _buildNotificationsStates(key, value);
+        const notifications = _buildNotificationsStates(key, value);        
         if (userRef) {
-          // update
+          // update in firestore
           userRef.update({
             pushNotifications: notifications,
           });
         }
+        // update in storage
+        
         break;
       case 'logout':
         //        _handleLogout();

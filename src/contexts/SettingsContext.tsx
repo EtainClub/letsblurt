@@ -1,50 +1,20 @@
+//// react
 import React, {useReducer, createContext} from 'react';
+//// storage
+import AsyncStorage from '@react-native-community/async-storage';
 
 import {
   SettingsActionTypes,
+  INITIAL_SETTINGS,
   SettingsState,
   SettingsContextType,
   SettingsAction,
   BlockchainTypes,
+  StorageSchema,
 } from './types';
 
-// refer to ecency realm.js
-// export const getSettings = async () => {
-//   try {
-//     const setting = await getItemFromStorage(SETTINGS_SCHEMA);
-
-//     if (setting) {
-//       return setting;
-//     }
-//     const settingData = {
-//       language: '',
-//       isDarkTheme: null,
-//       currency: '',
-//       notification: true,
-//       server: '',
-//       upvotePercent: '1',
-//       nsfw: '0',
-//       followNotification: true,
-//       voteNotification: true,
-//       commentNotification: true,
-//       mentionNotification: true,
-//       reblogNotification: true,
-//       transfersNotification: true,
-//     };
-//     await setItemToStorage(SETTINGS_SCHEMA, settingData);
-//     return settingData;
-//   } catch (error) {
-//     return error;
-//   }
-// };
-
 //// initial settings state
-const initialState = {
-  blockchainType: BlockchainTypes.BLURT,
-  savingPassword: true,
-  usingOTP: false,
-  locale: 'en-US',
-};
+const initialState = INITIAL_SETTINGS;
 
 // create settings context
 const SettingsContext = createContext<SettingsContextType | undefined>(
@@ -54,6 +24,8 @@ const SettingsContext = createContext<SettingsContextType | undefined>(
 // settings reducer
 const settingsReducer = (state: SettingsState, action: SettingsAction) => {
   switch (action.type) {
+    case SettingsActionTypes.SET_ALL_SETTINGS:
+      return action.payload;
     case SettingsActionTypes.SET_BLOCKCHAIN_TYPE:
       return {...state, blockchainType: action.payload};
     case SettingsActionTypes.SAVE_PASSWORD:
@@ -119,10 +91,79 @@ const SettingsProvider = ({children}: Props) => {
     });
   };
 
+  //// get all settings from storage
+  const getAllSettingsFromStorage = async () => {
+    const pushPromise = new Promise((resolve, reject) =>
+      resolve(getItemFromStorage(StorageSchema.PUSH_NOTIFICATIONS)),
+    );
+    const dndPromise = new Promise((resolve, reject) => {
+      resolve(getItemFromStorage(StorageSchema.DND_TIMES));
+    });
+    const blockchainPromise = new Promise((resolve, reject) =>
+      resolve(getItemFromStorage(StorageSchema.BLOCKCHAIN)),
+    );
+    const securityPromise = new Promise((resolve, reject) =>
+      resolve(getItemFromStorage(StorageSchema.SECURITIES)),
+    );
+    const languagePromise = new Promise((resolve, reject) =>
+      resolve(getItemFromStorage(StorageSchema.LANGUAGE)),
+    );
+    const uiPromise = new Promise((resolve, reject) =>
+      resolve(getItemFromStorage(StorageSchema.UI)),
+    );
+
+    const promises = [
+      pushPromise,
+      dndPromise,
+      blockchainPromise,
+      securityPromise,
+      languagePromise,
+      uiPromise,
+    ];
+    let settings = null;
+    Promise.all(promises)
+      .then((results) => {
+        console.log('all settings result', results);
+        if (!results[0]) return null;
+        // parse the storage values
+        const _settings = results.map((setting) => JSON.parse(setting));
+        // dispatch actions
+        dispatch({
+          type: SettingsActionTypes.SET_ALL_SETTINGS,
+          payload: _settings,
+        });
+        settings = _settings;
+      })
+      .catch((error) =>
+        console.log('failed to get all settings from storage', error),
+      );
+    return settings;
+  };
+
+  ////
+  const getItemFromStorage = async (key) => {
+    const data = await AsyncStorge.getItem(key);
+    if (data) {
+      return JSON.parse(data);
+    }
+    return null;
+  };
+
+  ////
+  const setItemToStorage = async (key, data) => {
+    if (data) {
+      const dataString = JSON.stringify(data);
+      await AsyncStorage.setItem(key, dataString);
+      return true;
+    }
+    return false;
+  };
+
   return (
     <SettingsContext.Provider
       value={{
         settingsState,
+        getAllSettingsFromStorage,
         setBlockchainType,
         savePassword,
         useOTP,

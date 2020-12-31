@@ -11,6 +11,10 @@ export const TARGET_BLOCKCHAIN = 'blurt';
 export const TARGET_APP = 'blurt';
 
 //export const BLURT_IMAGE_SERVER = 'https://images.blurt.blog';
+export const BLURT_CHAIN_ID =
+  'cd8d90f29ae273abec3eaa7731e25934c63eb654d55080caff2ebb7f5df6381f';
+export const BLURT_CHAIN_PREFIX = 'BLT';
+export const CHAIN_TIMEOUT = 5000;
 export const BLURT_IMAGE_SERVER = 'https://images.blurt.buzz';
 export const STEEM_IMAGE_SERVER = 'https://steemitimages.com';
 

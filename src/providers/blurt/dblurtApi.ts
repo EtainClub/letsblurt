@@ -41,15 +41,18 @@ import {
   BLURT_TAG_ENDPOINT,
   BLURT_PRICE_ENDPOINT,
   BLURT_MAINNETS,
+  BLURT_CHAIN_ID,
+  BLURT_CHAIN_PREFIX,
+  CHAIN_TIMEOUT,
 } from '~/constants/blockchain';
 
 import {jsonStringify} from '~/utils/jsonUtils';
 
 // dblurt handles the server fail situation and choose the next server!
 const client = new Client(BLURT_MAINNETS, {
-  timeout: 5000,
-  addressPrefix: 'BLT',
-  chainId: 'cd8d90f29ae273abec3eaa7731e25934c63eb654d55080caff2ebb7f5df6381f',
+  timeout: CHAIN_TIMEOUT,
+  addressPrefix: BLURT_CHAIN_PREFIX,
+  chainId: BLURT_CHAIN_ID,
   failoverThreshold: 10,
   consoleOnFailover: true,
 });
