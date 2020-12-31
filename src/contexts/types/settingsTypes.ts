@@ -17,15 +17,6 @@ export enum StorageSchema {
   UI = 'ui', // dark theme, font size,
 }
 
-export enum PushNotificationTypes {
-  VOTE,
-  MENTION,
-  BENEFICIARY,
-  TRANSFER,
-  REPLY,
-  FOLLOW,
-}
-
 //// blockchain types
 export type BlockchainTypes = {
   rpc: string;
@@ -56,14 +47,14 @@ export type UITypes = {
 };
 
 //// all settings types
-export type AllSettingsTypes = {
-  pushNotifications: PushNotificationTypes;
-  blockchains: BlockchainTypes;
-  securities: SecurityTypes;
-  dndTimes: DNDTimeTypes;
-  languages: LanguageTypes;
-  ui?: UITypes;
-};
+// export type AllSettingsTypes = {
+//   pushNotifications: string[];
+//   blockchains: BlockchainTypes;
+//   securities: SecurityTypes;
+//   dndTimes: DNDTimeTypes;
+//   languages: LanguageTypes;
+//   ui: UITypes;
+// };
 
 // settings state
 export interface SettingsState {
@@ -77,13 +68,11 @@ export interface SettingsState {
 }
 
 // initial post data
-export const INITIAL_SETTINGS = {
+export const INITIAL_SETTINGS: SettingsState = {
   pushNotifications: ['vote', 'beneficiary'],
   blockchains: {
     rpc: BLURT_MAINNETS[0],
     image: BLURT_IMAGE_SERVERS[0],
-    chainId: BLURT_CHAIN_ID,
-    prefix: BLURT_CHAIN_PREFIX,
   },
   securities: {
     useOTP: false,
@@ -104,21 +93,28 @@ export const INITIAL_SETTINGS = {
 
 //// settings action types
 export enum SettingsActionTypes {
-  SET_ALL_SETTINGS,
+  GET_ALL_SETTINGS,
+  FINALIZE_SETTINGS_TO_STORAGE,
   SET_SCHEMA,
   SET_BLOCKCHAINS,
   SET_SECURITIES,
   SET_LANGUAGES,
   SET_DND_TIMES,
   SET_UI,
+  SET_STORAGE,
 }
 
 //// actions
-// set all settings
-interface SetAllSettingsAction {
-  type: SettingsActionTypes.SET_ALL_SETTINGS;
-  payload: AllSettingsTypes;
+// get all settings from storage
+interface GetAllSettingsAction {
+  type: SettingsActionTypes.GET_ALL_SETTINGS;
+  payload: SettingsState;
 }
+// finalize settings to storage
+interface FinalizeSettingsToStorageAction {
+  type: SettingsActionTypes.FINALIZE_SETTINGS_TO_STORAGE;
+}
+
 // set schema
 interface SetSchemaAction {
   type: SettingsActionTypes.SET_SCHEMA;
@@ -134,11 +130,14 @@ export interface SettingsContextType {
   settingsState: SettingsState;
   //// action creators
   // get all settings from storage
-  getAllSettingsFromStorage: () => Promise<AllSettingsTypes>;
+  getAllSettingsFromStorage: () => Promise<SettingsState>;
   //
   getItemFromStorage: (key: string) => Promise<any>;
   // update a single item in schema
-  updateSettingSchema: (schema: StorageSchema, key: string, data: any) => void;  
+  updateSettingSchema: (schema: StorageSchema, data: any) => void;
 }
 
-export type SettingsAction = SetAllSettingsAction | SetSchemaAction;
+export type SettingsAction =
+  | GetAllSettingsAction
+  | FinalizeSettingsToStorageAction
+  | SetSchemaAction;

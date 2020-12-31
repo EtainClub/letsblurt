@@ -27,7 +27,7 @@ interface Props {
   translationLanguages: string[];
   renderItem: (item) => JSX.Element;
 }
-const SettingScreen = (props: Props): JSX.Element => {
+const SettingsScreen = (props: Props): JSX.Element => {
   //// props
   //// language
   const intl = useIntl();
@@ -98,7 +98,7 @@ const SettingScreen = (props: Props): JSX.Element => {
       type: 'switch',
     },
     {
-      title: intl.formatMessage({id: 'Settings.notify_vote'}),
+      title: intl.formatMessage({id: 'Settings.notify_reblog'}),
       id: SettingUITypes.REBLOG,
       type: 'switch',
     },
@@ -114,8 +114,8 @@ const SettingScreen = (props: Props): JSX.Element => {
       title: intl.formatMessage({id: 'Settings.locale'}),
       id: SettingUITypes.LOCALE,
       type: 'dropdown',
-      defaultText: SUPPORTED_LOCALES[0].locale,
-      options: SUPPORTED_LOCALES.map((item) => item.locale),
+      defaultText: SUPPORTED_LOCALES[0].name,
+      options: SUPPORTED_LOCALES.map((item) => item.name),
     },
     {
       title: intl.formatMessage({id: 'Settings.translation'}),
@@ -205,7 +205,7 @@ const SettingScreen = (props: Props): JSX.Element => {
   );
 };
 
-export {SettingScreen};
+export {SettingsScreen};
 
 const styles = StyleSheet.create({
   settings: {

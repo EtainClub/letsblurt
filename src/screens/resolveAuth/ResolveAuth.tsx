@@ -62,7 +62,6 @@ export const ResolveAuth = (props) => {
       try {
         // get followings
         const followings = await getFollowings(username);
-        console.log('[resolveAuth] after get followings', followings);
         if (!followings) navigate({name: 'Drawer'});
         // fetch tags
         await getTagList(username);

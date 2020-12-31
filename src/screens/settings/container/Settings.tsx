@@ -26,18 +26,15 @@ import AsyncStorage from '@react-native-community/async-storage';
 //// contexts
 import {AuthContext, SettingsContext, UIContext} from '~/contexts';
 //// screens
-import {SettingScreen} from '../screen/Settings';
+import {SettingsScreen} from '../screen/Settings';
 import {DNDTimes} from '~/components';
 //// constants
-import {
-  BLURT_MAINNETS,
-  BLURT_IMAGE_SERVERS,
-} from '~/constants/blockchain';
+import {BLURT_MAINNETS, BLURT_IMAGE_SERVERS} from '~/constants/blockchain';
 import {SUPPORTED_LOCALES} from '~/locales';
 
 //// times
 import moment, {locale} from 'moment';
-import { StorageSchema } from '~/contexts/types';
+import {StorageSchema} from '~/contexts/types';
 // start date and time: 1AM
 const DATE1 = new Date(2020, 12, 12, 1, 0, 0);
 // end date and time: 8AM
@@ -50,45 +47,47 @@ const START_TIME = DATE1.getTime();
 const END_TIME = DATE2.getTime();
 
 // settings types for UI statues
-export const enum SettingUITypes {
+export enum SettingUITypes {
   // push notifications
-  REPLY = "reply",
-  VOTE = "vote",
-  TRANSFER = "transfer",
-  BENEFICIARY = "beneficiary",
-  MENTION = "mention",
-  FOLLOW = "follow",
-  REBLOG = "reblog",
+  REPLY = 'reply',
+  VOTE = 'vote',
+  TRANSFER = 'transfer',
+  BENEFICIARY = 'beneficiary',
+  MENTION = 'mention',
+  FOLLOW = 'follow',
+  REBLOG = 'reblog',
   // dnd times
-  DND_TIMES= "dnd_times",
+  DND_TIMES = 'dnd_times',
   // languages
-  LOCALE = "locale",
-  TRANSLATION = "translation",
+  LOCALE = 'locale',
+  TRANSLATION = 'translation',
   // blockchain
-  RPC_SERVER = "rpc_server",
-  IMAGE_SERVER = "image_server",
+  RPC_SERVER = 'rpc_server',
+  IMAGE_SERVER = 'image_server',
   // securities
-  USE_OTP = "use_otp",
-  USE_AUTO_LOGIN = "use_auto_login",
-  NSFW = "nsfw", 
+  USE_OTP = 'use_otp',
+  USE_AUTO_LOGIN = 'use_auto_login',
+  NSFW = 'nsfw',
   // general
-  NOTICE = "notice",
+  NOTICE = 'notice',
   TERMS = 'terms',
-  PRIVACY = "privacy",
-  RATE_APP = "rate_app",
-  APP_VERSION = "app_version",
+  PRIVACY = 'privacy',
+  RATE_APP = 'rate_app',
+  APP_VERSION = 'app_version',
 }
 
 interface Props {}
-const Settings = (props: Props): JSX.Element => {
+const SettingsContainer = (props: Props): JSX.Element => {
   //// props
   //// language
   const intl = useIntl();
   //// contexts
   const {authState, processLogout} = useContext(AuthContext);
-  const {settingsState, getAllSettingsFromStorage, updateSettingSchema} = useContext(
-    SettingsContext,
-  );
+  const {
+    settingsState,
+    getAllSettingsFromStorage,
+    updateSettingSchema,
+  } = useContext(SettingsContext);
   const {uiState, setLanguageParam, setToastMessage} = useContext(UIContext);
   //// states
   const [username, setUsername] = useState(null);
@@ -124,8 +123,9 @@ const Settings = (props: Props): JSX.Element => {
       setUsername(_username);
 
       // get all settings from storage
-      const allSettings = await getAllSettingsFromStorage();
-
+      //      const allSettings = await getAllSettingsFromStorage();
+      // const allSettings = settingsState;
+      // console.log('_getInitialSettings. allSettings', allSettings);
       ////// set settings states
       // destructure the settgins
       const {
@@ -135,7 +135,7 @@ const Settings = (props: Props): JSX.Element => {
         languages,
         securities,
         ui,
-      } = allSettings;
+      } = settingsState;
       //// switch states
       let _switchStates = switchStates;
       // push notifications
@@ -160,18 +160,18 @@ const Settings = (props: Props): JSX.Element => {
       // translation
       setTranslation(languages.translation);
       //// dnd time states
-      if (dndTimes.start) {
-        setStartDNDTime(dndTimes.start);
-        setEndDNDTime(dndTimes.end);
-        // switch 
+      if (dndTimes.startTime) {
+        setStartDNDTime(dndTimes.startTime);
+        setEndDNDTime(dndTimes.endTime);
+        // switch
         _switchStates = {..._switchStates, [SettingUITypes.DND_TIMES]: true};
       }
 
       // now set switch states
-      setSwitchStates(_switchStates);    
+      setSwitchStates(_switchStates);
 
-    //   console.log('switch states', _switchStates);
-    // }
+      //   console.log('switch states', _switchStates);
+    }
   };
 
   //// get notifications state
@@ -211,22 +211,28 @@ const Settings = (props: Props): JSX.Element => {
     setSwitchStates({...switchStates, [key]: value});
     // firebase user doc ref
     const userRef = firestore().doc(`users/${username}`);
-    // securities 
+    // securities
     let _securities = null;
     // actions
     switch (key) {
       // securities
       case SettingUITypes.USE_AUTO_LOGIN:
         // build structure
-        _securities = {useAutoLogin: value, useOTP: switchStates[SettingUITypes.USE_OTP]};
+        _securities = {
+          useAutoLogin: value,
+          useOTP: switchStates[SettingUITypes.USE_OTP],
+        };
         // update context state and storage
         updateSettingSchema(StorageSchema.SECURITIES, _securities);
         break;
-      case SettingUITypes.USE_OTP:        
+      case SettingUITypes.USE_OTP:
         // build structure
-        _securities = {useAutoLogin: switchStates[SettingUITypes.USE_AUTO_LOGIN], useOTP: value};
+        _securities = {
+          useAutoLogin: switchStates[SettingUITypes.USE_AUTO_LOGIN],
+          useOTP: value,
+        };
         // update context state and storage
-        updateSettingSchema(StorageSchema.SECURITIES, _securities);   
+        updateSettingSchema(StorageSchema.SECURITIES, _securities);
         break;
       // dnd time
       case SettingUITypes.DND_TIMES:
@@ -237,14 +243,17 @@ const Settings = (props: Props): JSX.Element => {
           _dndTimes = [
             _convertTimeToUTC0(startDNDTime),
             _convertTimeToUTC0(endDNDTime),
-          ];        
+          ];
         }
         // update times in firestore
         userRef.update({
           dndTimes: _dndTimes,
-        });        
+        });
         // update time in context state and storage
-        updateSettingSchema(StorageSchema.DND_TIMES, {start: _dndTimes[0], end: _dndTimes[1]});
+        updateSettingSchema(StorageSchema.DND_TIMES, {
+          start: _dndTimes[0],
+          end: _dndTimes[1],
+        });
         break;
       // push notifications
       case SettingUITypes.BENEFICIARY:
@@ -255,21 +264,21 @@ const Settings = (props: Props): JSX.Element => {
       case SettingUITypes.VOTE:
       case SettingUITypes.REBLOG:
         // build push notification structure
-        const _notifications = _buildNotificationsStates(key, value);        
+        const _notifications = _buildNotificationsStates(key, value);
         // update in firestore
-        if (userRef) {        
+        if (userRef) {
           userRef.update({
             pushNotifications: _notifications,
           });
         }
-        // update in context state        
-        updateSettingSchema(StorageSchema.PUSH_NOTIFICATIONS, _notifications);      
+        // update in context state
+        updateSettingSchema(StorageSchema.PUSH_NOTIFICATIONS, _notifications);
         break;
       case SettingUITypes.NSFW:
         // build structure
         const _ui = {nsfw: value};
-        // update in context state        
-        updateSettingSchema(StorageSchema.UI, _ui);    
+        // update in context state
+        updateSettingSchema(StorageSchema.UI, _ui);
         break;
       default:
         break;
@@ -277,30 +286,39 @@ const Settings = (props: Props): JSX.Element => {
   };
 
   //// handle dropdown events: rpc server, locale, translation language
-  const _handleDropdownChange = async (uiType: SettingUITypes, index: number, value: string) => {
-    console.log('[_handleDropdownChange] uiType, index, value', uiType, index, value);
+  const _handleDropdownChange = async (
+    uiType: SettingUITypes,
+    index: number,
+    value: string,
+  ) => {
+    console.log(
+      '[_handleDropdownChange] uiType, index, value',
+      uiType,
+      index,
+      value,
+    );
     // firebase user doc ref
     const userRef = firestore().doc(`users/${username}`);
     let _blockchains = null;
     let _languages = null;
-    switch(uiType) {   
+    switch (uiType) {
       case SettingUITypes.RPC_SERVER:
         // build structure
         _blockchains = {rpc: value, image: imageServer};
-        // update in context state        
-        updateSettingSchema(StorageSchema.BLOCKCHAIN, _blockchains);   
+        // update in context state
+        updateSettingSchema(StorageSchema.BLOCKCHAIN, _blockchains);
         break;
       case SettingUITypes.IMAGE_SERVER:
         // build structure
         _blockchains = {rpc: rpcServer, image: value};
-        // update in context state        
-        updateSettingSchema(StorageSchema.BLOCKCHAIN, _blockchains);   
-        break;  
+        // update in context state
+        updateSettingSchema(StorageSchema.BLOCKCHAIN, _blockchains);
+        break;
       case SettingUITypes.LOCALE:
         // build structure
-        _languages = {locale: value, translation: translation};        
-        // update in context state        
-        updateSettingSchema(StorageSchema.LANGUAGE, _languages);   
+        _languages = {locale: value, translation: translation};
+        // update in context state
+        updateSettingSchema(StorageSchema.LANGUAGE, _languages);
         break;
       case SettingUITypes.TRANSLATION:
         // build structure
@@ -312,8 +330,8 @@ const Settings = (props: Props): JSX.Element => {
             translation: value,
           });
         }
-        // update in context state        
-        updateSettingSchema(StorageSchema.LANGUAGE, _languages);           
+        // update in context state
+        updateSettingSchema(StorageSchema.LANGUAGE, _languages);
         break;
       default:
         break;
@@ -322,7 +340,7 @@ const Settings = (props: Props): JSX.Element => {
 
   //// handle button events: terms, privacy, feedback, etc
   const _handlePressButton = async (uiType: SettingUITypes) => {
-    switch (uiType) {      
+    switch (uiType) {
       case SettingUITypes.NOTICE:
         break;
       case SettingUITypes.APP_VERSION:
@@ -337,7 +355,7 @@ const Settings = (props: Props): JSX.Element => {
         break;
     }
   };
-  
+
   // convert the timestamp to time
   const _convertTime = (timestamp) => {
     return moment(timestamp).format('hh:mm A');
@@ -476,9 +494,6 @@ const Settings = (props: Props): JSX.Element => {
         );
       case 'dropdown':
         let defaultText = item.defaultText;
-        if (item.id === 'language') {
-          defaultText = language.split('-')[0].toUpperCase();
-        }
         return (
           <Block row middle space="between" style={styles.rows}>
             <Text size={14} style={{top: 7}}>
@@ -494,7 +509,9 @@ const Settings = (props: Props): JSX.Element => {
               dropdownStyle={styles.dropdownStyle}
               textStyle={styles.dropdownText}
               options={item.options}
-              onSelect={(index, value) => _handleDropdownChange(item.id, index, value)}
+              onSelect={(index, value) =>
+                _handleDropdownChange(item.id, index, value)
+              }
             />
           </Block>
         );
@@ -514,14 +531,14 @@ const Settings = (props: Props): JSX.Element => {
       cancelTime={_handleCancelDNDTime}
     />
   ) : (
-    <SettingScreen
+    <SettingsScreen
       translationLanguages={uiState.translateLanguages}
       renderItem={_renderItem}
     />
   );
 };
 
-export {Settings};
+export {SettingsContainer};
 
 const styles = StyleSheet.create({
   settings: {
@@ -585,27 +602,26 @@ const styles = StyleSheet.create({
   },
 });
 
-
 //   // TODO: get push notification and language settings from firestore
-    //   const userRef = firestore().doc(`users/${_username}`);
-    //   console.log('[Settings] userRer', userRef);
-    //   await userRef
-    //     .get()
-    //     .then(async (doc) => {
-    //       if (doc.exists) {
-    //         const userDoc = doc.data();
-    //         // set notifications states
-    //         userDoc.pushNotifications.forEach((item: string) => {
-    //           _switchStates = {..._switchStates, [item]: true};
-    //         });
-    //         // set switch states
-    //         setSwitchStates(_switchStates);
-    //         // set language (locale)
-    //         setLanguage(userDoc.language);
-    //         // store the locale in the storage
-    //         await AsyncStorage.setItem('locale', userDoc.language);
-    //         // set locale in the context
-    //         setLocale(userDoc.language);
-    //       }
-    //     })
-    //     .catch((error) => console.log('failed to get user doc', error));
+//   const userRef = firestore().doc(`users/${_username}`);
+//   console.log('[Settings] userRer', userRef);
+//   await userRef
+//     .get()
+//     .then(async (doc) => {
+//       if (doc.exists) {
+//         const userDoc = doc.data();
+//         // set notifications states
+//         userDoc.pushNotifications.forEach((item: string) => {
+//           _switchStates = {..._switchStates, [item]: true};
+//         });
+//         // set switch states
+//         setSwitchStates(_switchStates);
+//         // set language (locale)
+//         setLanguage(userDoc.language);
+//         // store the locale in the storage
+//         await AsyncStorage.setItem('locale', userDoc.language);
+//         // set locale in the context
+//         setLocale(userDoc.language);
+//       }
+//     })
+//     .catch((error) => console.log('failed to get user doc', error));

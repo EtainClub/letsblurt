@@ -25,10 +25,8 @@ import {
   UserProvider,
   SettingsProvider,
 } from './contexts';
-import {SettingsContext} from '~/contexts';
 
 export default () => {
-  const {getItemFromStorage} = useContext(SettingsContext);
   // const language = await AsyncStorage.getItem('language');
   const [locale, setLocale] = useState('en-US');
   //
@@ -37,10 +35,14 @@ export default () => {
   }, []);
 
   const _getLocale = async () => {
-    const languages = await getItemFromStorage('languages');
-    //const _locale = await AsyncStorage.getItem('locale');
-    console.log('[App] locale', languages.locale);
-    if (languages.locale) setLocale(languages.locale);
+    const _languages = await AsyncStorage.getItem('languages');
+    let _locale = 'en-US';
+    if (_languages) {
+      const languages = JSON.parse(_languages);
+      _locale = languages.locale;
+    }
+    console.log('[App] locale', _locale);
+    setLocale(_locale);
   };
 
   return (

@@ -1,3 +1,3 @@
-import {Settings} from './container/Settings';
+import {SettingsContainer} from './container/Settings';
 
-export {Settings};
+export {SettingsContainer as Settings};

@@ -163,15 +163,16 @@ const postsReducer = (state: PostsState, action: PostsAction) => {
         },
       };
     case PostsActionTypes.UPVOTE:
+      return state;
       const {postsType, postIndex, payout, votesCount, voters} = action.payload;
       console.log('[postReducer] upvoting action payload', action.payload);
-      return {
-        ...state, 
-        feed.posts[postIndex].voted: true,
-        [postsType].posts[postIndex].payout: payout,
-        [postsType][postIndex].votesCount: votesCount,
-        [postsType][postIndex].voters: voters,
-      };
+    // return {
+    //   ...state,
+    //   feed.posts[postIndex].voted: true,
+    //   [postsType].posts[postIndex].payout: payout,
+    //   [postsType][postIndex].votesCount: votesCount,
+    //   [postsType][postIndex].voters: voters,
+    // };
 
     case PostsActionTypes.VOTING_COMMENT:
       console.log('[postReducer] upvoting action payload', action.payload);
@@ -461,12 +462,16 @@ const PostsProvider = ({children}: Props) => {
       votingWeight,
     );
     console.log('[upvote] results', results);
-    //// calculate 
-    const payout = parseFloat(postsState[postsType].posts[postIndex].postUserState.payout);
+    //// calculate
+    const payout = parseFloat(
+      postsState[postsType].posts[postIndex].postUserState.payout,
+    );
     const newPayout = payout + (voteAmount * votingWeight) / 100;
-    const newVotesCount = postsState[postsType].posts[postIndex].postUserState.votes_count + 1;
-    const voters = postsState[postsType].posts[postIndex].postUserState.active_votes;
-    const newVoters = [`${username} ($${voteAmount})`, ...voters];    
+    const newVotesCount =
+      postsState[postsType].posts[postIndex].postUserState.votes_count + 1;
+    const voters =
+      postsState[postsType].posts[postIndex].postUserState.active_votes;
+    const newVoters = [`${username} ($${voteAmount})`, ...voters];
 
     // dispatch action
     if (results.success) {
@@ -475,8 +480,10 @@ const PostsProvider = ({children}: Props) => {
         //// calculation
         // TODO: find the comment
         // Update the comment's voters, payout, vote amount
-        const newComments = _updateComments(postsState[postsType].posts[postIndex].comments, {author: postRef.author, permlink: postRef.permlink})
-       
+        const newComments = _updateComments(
+          postsState[postsType].posts[postIndex].comments,
+          {author: postRef.author, permlink: postRef.permlink},
+        );
 
         dispatch({
           type: PostsActionTypes.UPVOTE_COMMENT,
@@ -508,13 +515,13 @@ const PostsProvider = ({children}: Props) => {
       // comment.payout = newPayout
       // comment.voters = newVoters
       //
-      return comments
+      return comments;
     } else if (comments.children) {
-      for (let i=0; i<comments.children; i++) {
+      for (let i = 0; i < comments.children; i++) {
         const result = _updateComments(comments.children[i], postRef);
       }
     }
-  }
+  };
 
   // submit post/comment
   const submitPost = async (
