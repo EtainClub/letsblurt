@@ -35,6 +35,7 @@ import {SUPPORTED_LOCALES} from '~/locales';
 //// times
 import moment, {locale} from 'moment';
 import {StorageSchema} from '~/contexts/types';
+import {setBlockchainClient} from '~/providers/blurt/dblurtApi';
 // start date and time: 1AM
 const DATE1 = new Date(2020, 12, 12, 1, 0, 0);
 // end date and time: 8AM
@@ -300,12 +301,22 @@ const SettingsContainer = (props: Props): JSX.Element => {
     let _languages = null;
     switch (uiType) {
       case SettingUITypes.RPC_SERVER:
+        // check if the input value is the same as the current value
+        if (rpcServer === value) return;
+        // update state
+        setRPCServer(value);
         // build structure
         _blockchains = {rpc: value, image: imageServer};
         // update in context state
         updateSettingSchema(StorageSchema.BLOCKCHAINS, _blockchains);
+        // set blockchain client
+        setBlockchainClient(value);
         break;
       case SettingUITypes.IMAGE_SERVER:
+        // check if the input value is the same as the current value
+        if (imageServer === value) return;
+        // update state
+        setImageServer(value);
         // build structure
         _blockchains = {rpc: rpcServer, image: value};
         // update in context state
@@ -319,10 +330,16 @@ const SettingsContainer = (props: Props): JSX.Element => {
           return item.name === value;
         }).locale;
         _languages = {locale: _locale, translation: translation};
+        // update state
+        setLocale(_locale);
         // update in context state
         updateSettingSchema(StorageSchema.LANGUAGES, _languages);
         break;
       case SettingUITypes.TRANSLATION:
+        // check if the input value is the same as the current value
+        if (translation === value) return;
+        // update state
+        setTranslation(value);
         // build structure
         _languages = {locale: locale, translation: value};
         // update in firestore

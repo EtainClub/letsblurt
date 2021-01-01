@@ -7,7 +7,7 @@ import {Client as NotiClient} from '@busyorg/busyjs';
 
 // crypto-js
 import CryptoJS from 'crypto-js';
-import {get, has} from 'lodash';
+import {get, has, cloneDeep} from 'lodash';
 // dblurt api
 import {
   Client,
@@ -48,16 +48,60 @@ import {
 
 import {jsonStringify} from '~/utils/jsonUtils';
 
+// get current server from storage
+// put the server first in the list
+// setup client
+
 // dblurt handles the server fail situation and choose the next server!
-const client = new Client(BLURT_MAINNETS[0], {
+let client = new Client(BLURT_MAINNETS, {
   timeout: CHAIN_TIMEOUT,
   addressPrefix: BLURT_CHAIN_PREFIX,
   chainId: BLURT_CHAIN_ID,
   failoverThreshold: 10,
   consoleOnFailover: true,
 });
-
 console.log('Blurt Client', client);
+
+//// change server orders and setup the client again
+export const setBlockchainClient = async (server?: string) => {
+  // get blockchain servers from storage
+  let rpc = null;
+  if (!server) {
+    const _blockchains = await AsyncStorage.getItem('blockchains');
+    const blockchains = JSON.parse(_blockchains);
+    console.log('[changeServerOrder] blockchains', blockchains);
+    if (!blockchains) return;
+    rpc = blockchains.rpc;
+  } else {
+    // use the argument
+    rpc = server;
+  }
+  // deep copy necessary,
+  // otherwise the constant variable BLURT_MAINNETS changes!!! in other code
+  // (SettingsScreen blockchainItems)!!!
+  let serverList = cloneDeep(BLURT_MAINNETS);
+  // remove the server to add in the list
+  const index = serverList.indexOf(rpc);
+  if (index > -1) {
+    serverList.splice(index, 1);
+  }
+  // put the server first in the list
+  serverList = [rpc, ...serverList];
+
+  console.log('[setupBlockchainClient] serverList', serverList);
+
+  // setup the client again
+  client = new Client(serverList, {
+    timeout: CHAIN_TIMEOUT,
+    addressPrefix: BLURT_CHAIN_PREFIX,
+    chainId: BLURT_CHAIN_ID,
+    failoverThreshold: 10,
+    consoleOnFailover: true,
+  });
+  console.log('Blurt Client reordered', client);
+};
+
+setBlockchainClient();
 
 // patch
 const diff_match_patch = require('diff-match-patch');
@@ -70,6 +114,7 @@ import {
   parseComment,
 } from '~/utils/postParser';
 import {estimateVoteAmount} from '~/utils/estimateVoteAmount';
+import AsyncStorage from '@react-native-community/async-storage';
 
 global.Buffer = global.Buffer || require('buffer').Buffer;
 

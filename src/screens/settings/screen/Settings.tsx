@@ -35,6 +35,8 @@ const SettingsScreen = (props: Props): JSX.Element => {
   //// states
   //// effects
 
+  console.log('blockchainItems. BLURT_MAINNETS', BLURT_MAINNETS);
+
   // blockchains
   const blockchainItems = [
     {
@@ -52,6 +54,8 @@ const SettingsScreen = (props: Props): JSX.Element => {
       options: BLURT_IMAGE_SERVERS,
     },
   ];
+
+  console.log('blockchainItems', blockchainItems);
   // securities
   const securityItems = [
     {
