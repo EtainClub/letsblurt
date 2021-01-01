@@ -313,7 +313,12 @@ const SettingsContainer = (props: Props): JSX.Element => {
         break;
       case SettingUITypes.LOCALE:
         // build structure
-        _languages = {locale: value, translation: translation};
+        let _index = 0;
+        const _locale = SUPPORTED_LOCALES.find((item, index) => {
+          _index = index;
+          return item.name === value;
+        }).locale;
+        _languages = {locale: _locale, translation: translation};
         // update in context state
         updateSettingSchema(StorageSchema.LANGUAGES, _languages);
         break;
@@ -520,8 +525,10 @@ const SettingsContainer = (props: Props): JSX.Element => {
             selectedIndex = item.options.indexOf(imageServer);
             break;
           case SettingUITypes.LOCALE:
-            defaultText = locale;
-            selectedIndex = item.options.indexOf(locale);
+            defaultText = SUPPORTED_LOCALES.find((item, index) => {
+              selectedIndex = index;
+              return item.locale === locale;
+            }).name;
             break;
           case SettingUITypes.TRANSLATION:
             defaultText = translation;
