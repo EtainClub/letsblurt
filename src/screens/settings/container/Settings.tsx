@@ -37,15 +37,9 @@ import moment, {locale} from 'moment';
 import {StorageSchema} from '~/contexts/types';
 import {setBlockchainClient} from '~/providers/blurt/dblurtApi';
 // start date and time: 1AM
-const DATE1 = new Date(2020, 12, 12, 1, 0, 0);
-// end date and time: 8AM
-const DATE2 = new Date(2020, 12, 12, 8, 0, 0);
+const DATE1 = new Date(2021, 12, 12, 1, 0, 0);
 // local time offset in hours from UTC+0
 const UTC_OFFSET_IN_MINUTES = DATE1.getTimezoneOffset();
-// get timestamp of the date1
-const START_TIME = DATE1.getTime();
-// get timestamp of the date2
-const END_TIME = DATE2.getTime();
 
 // settings types for UI statues
 export enum SettingUITypes {
@@ -94,8 +88,12 @@ const SettingsContainer = (props: Props): JSX.Element => {
   const [showDND, setShowDND] = useState(false);
   const [showStartClock, setShowStartClock] = useState(false);
   const [showEndClock, setShowEndClock] = useState(false);
-  const [startDNDTime, setStartDNDTime] = useState(START_TIME);
-  const [endDNDTime, setEndDNDTime] = useState(END_TIME);
+  const [startDNDTime, setStartDNDTime] = useState(
+    settingsState.dndTimes.startTime,
+  );
+  const [endDNDTime, setEndDNDTime] = useState(
+    settingsState.dndTimes.startTime,
+  );
   // dropdowns: rpc server, image server,
   const [rpcServer, setRPCServer] = useState(settingsState.blockchains.rpc);
   const [imageServer, setImageServer] = useState(
@@ -236,21 +234,22 @@ const SettingsContainer = (props: Props): JSX.Element => {
       case SettingUITypes.DND_TIMES:
         // clear dnd times in db if dnd is not set
         let _dndTimes = null;
+        // update only if value is true
         if (value) {
           // convert the local time to the UTC0 time
           _dndTimes = [
             _convertTimeToUTC0(startDNDTime),
             _convertTimeToUTC0(endDNDTime),
           ];
+          // update time in context state and storage
+          updateSettingSchema(StorageSchema.DND_TIMES, {
+            start: _dndTimes[0],
+            end: _dndTimes[1],
+          });
         }
         // update times in firestore
         userRef.update({
           dndTimes: _dndTimes,
-        });
-        // update time in context state and storage
-        updateSettingSchema(StorageSchema.DND_TIMES, {
-          start: _dndTimes[0],
-          end: _dndTimes[1],
         });
         break;
       // push notifications
@@ -374,6 +373,11 @@ const SettingsContainer = (props: Props): JSX.Element => {
       default:
         break;
     }
+  };
+
+  //// handle press text items
+  const _handlePressText = async (uiType: SettingUITypes) => {
+    console.log('_handlePressText. uiType', uiType);
   };
 
   // convert the timestamp to time
@@ -575,7 +579,19 @@ const SettingsContainer = (props: Props): JSX.Element => {
             />
           </Block>
         );
-
+      case 'text':
+        // TODO: get the app version from db
+        defaultText = item.defaultText;
+        return (
+          <Block style={styles.rows}>
+            <TouchableOpacity onPress={() => _handlePressText(item.id)}>
+              <Block row middle space="between" style={{paddingTop: 7}}>
+                <Text size={14}>{item.title}</Text>
+                <Text size={14}>{defaultText}</Text>
+              </Block>
+            </TouchableOpacity>
+          </Block>
+        );
       default:
         break;
     }
@@ -646,7 +662,7 @@ const styles = StyleSheet.create({
     borderColor: '#f5f5f5',
     borderWidth: 1,
     height: 44,
-    width: 200,
+    width: 220,
     borderRadius: 8,
     marginRight: 20,
   },

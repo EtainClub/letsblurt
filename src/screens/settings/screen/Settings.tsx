@@ -35,8 +35,6 @@ const SettingsScreen = (props: Props): JSX.Element => {
   //// states
   //// effects
 
-  console.log('blockchainItems. BLURT_MAINNETS', BLURT_MAINNETS);
-
   // blockchains
   const blockchainItems = [
     {
@@ -55,7 +53,6 @@ const SettingsScreen = (props: Props): JSX.Element => {
     },
   ];
 
-  console.log('blockchainItems', blockchainItems);
   // securities
   const securityItems = [
     {
@@ -141,7 +138,8 @@ const SettingsScreen = (props: Props): JSX.Element => {
     {
       title: intl.formatMessage({id: 'Settings.app_version'}),
       id: SettingUITypes.APP_VERSION,
-      type: 'button',
+      type: 'text',
+      defaultText: '0.2.0',
     },
     {
       title: intl.formatMessage({id: 'Settings.terms'}),
