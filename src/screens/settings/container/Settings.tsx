@@ -457,9 +457,9 @@ const SettingsContainer = (props: Props): JSX.Element => {
                 value={switchStates[item.id]}
               />
             </Block>
-            {switchStates['dnd'] && (
+            {switchStates[SettingUITypes.DND_TIMES] && (
               <Block>
-                {item.id === 'dnd' ? (
+                {item.id === SettingUITypes.DND_TIMES ? (
                   <Block card>
                     {_renderClockButton(
                       intl.formatMessage({id: 'Settings.start_clock_header'}) +

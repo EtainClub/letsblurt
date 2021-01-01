@@ -195,19 +195,6 @@ const SettingsProvider = ({children}: Props) => {
     return settings;
   };
 
-  const _checkLanguageStorage = async () =>
-    await AsyncStorage.getItem(StorageSchema.LANGUAGE);
-
-  // set state to storage if not stored
-  // if (!_checkLanguageStorage()) {
-  //   console.log('SettingsProvider. set state to storage...');
-  //   // set state to storage
-  //   _setAllStatesToStorage();
-  // } else {
-  //   // get all from storage
-  //   getAllSettingsFromStorage();
-  // }
-
   //////// action creators
 
   //// update setting schema

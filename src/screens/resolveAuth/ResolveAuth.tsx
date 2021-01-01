@@ -27,6 +27,7 @@ export const ResolveAuth = (props) => {
   const {fetchBlockchainGlobalProps, getFollowings} = useContext(UserContext);
   const {postsState, getTagList} = useContext(PostsContext);
   const {setToastMessage, setTranslateLanguages} = useContext(UIContext);
+  const {getAllSettingsFromStorage} = useContext(SettingsContext);
   // state
   const [fetched, setFetched] = useState(false);
   const [username, setUsername] = useState(null);
@@ -47,6 +48,8 @@ export const ResolveAuth = (props) => {
 
   //// resolve auth
   const _resolveEntry = async () => {
+    // get settings from storage
+    await getAllSettingsFromStorage();
     // fetch global props
     fetchBlockchainGlobalProps();
 
