@@ -7,14 +7,14 @@ import {
 
 //// storage schema
 export enum StorageSchema {
-  PUSH_NOTIFICATIONS = 'push', // push notifications
-  DND_TIMES = 'dnd', // {start time, end time}
-  BLOCKCHAIN = 'blockchain', // rpc server, image server,  blockchain prefix, blockchain id
-  SECURITIES = 'security', // otp, auto login,
-  LANGUAGE = 'language', // menu language (locale, e.g. en-US), translation language (e.g. EN)
+  PUSH_NOTIFICATIONS = 'pushNotifications', // push notifications
+  DND_TIMES = 'dndTimes', // {start time, end time}
+  BLOCKCHAINS = 'blockchains', // rpc server, image server,  blockchain prefix, blockchain id
+  SECURITIES = 'securities', // otp, auto login,
+  LANGUAGES = 'languages', // menu language (locale, e.g. en-US), translation language (e.g. EN)
+  UI = 'ui', // dark theme, font size,
   DRAFT = 'draft', // title, body, tag, beneficiaries
   TEMPLATE = 'template', // posting template, beneficiaries, powerup, ...
-  UI = 'ui', // dark theme, font size,
 }
 
 //// blockchain types
@@ -59,37 +59,39 @@ export type UITypes = {
 // settings state
 export interface SettingsState {
   // ['vote', 'tranfer', ...]
-  pushNotifications: string[];
-  blockchains: BlockchainTypes;
-  securities: SecurityTypes;
-  dndTimes: DNDTimeTypes;
-  languages: LanguageTypes;
-  ui: UITypes;
+  [StorageSchema.PUSH_NOTIFICATIONS]: string[];
+  [StorageSchema.BLOCKCHAINS]: BlockchainTypes;
+  [StorageSchema.SECURITIES]: SecurityTypes;
+  [StorageSchema.DND_TIMES]: DNDTimeTypes;
+  [StorageSchema.LANGUAGES]: LanguageTypes;
+  [StorageSchema.UI]: UITypes;
 }
 
 // initial post data
 export const INITIAL_SETTINGS: SettingsState = {
-  pushNotifications: ['vote', 'beneficiary'],
-  blockchains: {
+  [StorageSchema.PUSH_NOTIFICATIONS]: ['vote', 'beneficiary'],
+  [StorageSchema.BLOCKCHAINS]: {
     rpc: BLURT_MAINNETS[0],
     image: BLURT_IMAGE_SERVERS[0],
   },
-  securities: {
+  [StorageSchema.SECURITIES]: {
     useOTP: false,
     useAutoLogin: true,
   },
-  languages: {
+  [StorageSchema.LANGUAGES]: {
     locale: 'en-US',
     translation: 'EN',
   },
-  dndTimes: {
-    startTime: -540,
-    endTime: -80,
+  [StorageSchema.DND_TIMES]: {
+    startTime: new Date(2021, 12, 12, 1, 0, 0).getTime(),
+    endTime: new Date(2021, 12, 12, 8, 0, 0).getTime(),
   },
-  ui: {
+  [StorageSchema.UI]: {
     nsfw: false,
   },
 };
+
+console.log('initial settings', INITIAL_SETTINGS);
 
 //// settings action types
 export enum SettingsActionTypes {

@@ -52,6 +52,7 @@ const SettingsProvider = ({children}: Props) => {
   //// set a single item or schema to storage
   const _setItemToStorage = async (key: string, data: any) => {
     if (data) {
+      console.log('_setItemToStorage. key, data', key, data);
       // stringify the data
       const dataString = JSON.stringify(data);
       await AsyncStorage.setItem(key, dataString);
@@ -76,7 +77,7 @@ const SettingsProvider = ({children}: Props) => {
     );
     const blockchainPromise = new Promise((resolve, reject) =>
       resolve(
-        _setItemToStorage(StorageSchema.BLOCKCHAIN, settingsState.blockchains),
+        _setItemToStorage(StorageSchema.BLOCKCHAINS, settingsState.blockchains),
       ),
     );
     const securityPromise = new Promise((resolve, reject) =>
@@ -86,7 +87,7 @@ const SettingsProvider = ({children}: Props) => {
     );
     const languagePromise = new Promise((resolve, reject) =>
       resolve(
-        _setItemToStorage(StorageSchema.LANGUAGE, settingsState.languages),
+        _setItemToStorage(StorageSchema.LANGUAGES, settingsState.languages),
       ),
     );
     const uiPromise = new Promise((resolve, reject) =>
@@ -147,13 +148,13 @@ const SettingsProvider = ({children}: Props) => {
       resolve(getItemFromStorage(StorageSchema.DND_TIMES));
     });
     const blockchainPromise = new Promise((resolve, reject) =>
-      resolve(getItemFromStorage(StorageSchema.BLOCKCHAIN)),
+      resolve(getItemFromStorage(StorageSchema.BLOCKCHAINS)),
     );
     const securityPromise = new Promise((resolve, reject) =>
       resolve(getItemFromStorage(StorageSchema.SECURITIES)),
     );
     const languagePromise = new Promise((resolve, reject) =>
-      resolve(getItemFromStorage(StorageSchema.LANGUAGE)),
+      resolve(getItemFromStorage(StorageSchema.LANGUAGES)),
     );
     const uiPromise = new Promise((resolve, reject) =>
       resolve(getItemFromStorage(StorageSchema.UI)),
@@ -172,22 +173,73 @@ const SettingsProvider = ({children}: Props) => {
     Promise.all(promises)
       .then((results) => {
         console.log('get all settings. results', results);
+
+        //// build structure
+        // use default states
+        const _settings: SettingsState = {
+          pushNotifications: settingsState.pushNotifications,
+          dndTimes: settingsState.dndTimes,
+          blockchains: settingsState.blockchains,
+          securities: settingsState.securities,
+          languages: settingsState.languages,
+          ui: settingsState.ui,
+        };
+        results.forEach((item, index) => {
+          switch (index) {
+            case 0:
+              // use storage value if exists
+              if (item) _settings.pushNotifications = item as string[];
+              // if not exist, store the state to storage
+              else
+                updateSettingSchema(
+                  StorageSchema.PUSH_NOTIFICATIONS,
+                  settingsState.pushNotifications,
+                );
+              break;
+            case 1:
+              if (item) _settings.dndTimes = item as DNDTimeTypes;
+              else
+                updateSettingSchema(
+                  StorageSchema.DND_TIMES,
+                  settingsState.dndTimes,
+                );
+              break;
+            case 2:
+              if (item) _settings.blockchains = item as BlockchainTypes;
+              else
+                updateSettingSchema(
+                  StorageSchema.BLOCKCHAINS,
+                  settingsState.blockchains,
+                );
+              break;
+            case 3:
+              if (item) _settings.securities = item as SecurityTypes;
+              else
+                updateSettingSchema(
+                  StorageSchema.SECURITIES,
+                  settingsState.securities,
+                );
+              break;
+            case 4:
+              if (item) _settings.languages = item as LanguageTypes;
+              else
+                updateSettingSchema(
+                  StorageSchema.LANGUAGES,
+                  settingsState.languages,
+                );
+              break;
+            case 5:
+              if (item) _settings.ui = item as UITypes;
+              else updateSettingSchema(StorageSchema.UI, settingsState.ui);
+              break;
+          }
+        });
         // dispatch actions
-        if (results) {
-          // build structure
-          const _settings: SettingsState = {
-            pushNotifications: results[0] as string[],
-            dndTimes: results[1] as DNDTimeTypes,
-            blockchains: results[2] as BlockchainTypes,
-            securities: results[3] as SecurityTypes,
-            languages: results[4] as LanguageTypes,
-            ui: results[5] as UITypes,
-          };
-          dispatch({
-            type: SettingsActionTypes.GET_ALL_SETTINGS,
-            payload: _settings,
-          });
-        }
+        console.log('[getAllSettingsFromStorage] _settings', _settings);
+        dispatch({
+          type: SettingsActionTypes.GET_ALL_SETTINGS,
+          payload: _settings,
+        });
       })
       .catch((error) =>
         console.log('failed to get all settings from storage', error),
@@ -200,17 +252,16 @@ const SettingsProvider = ({children}: Props) => {
   //// update setting schema
   const updateSettingSchema = async (schema: StorageSchema, data: any) => {
     if (data) {
-      // get the saved schema data
-      const schemaData = await getItemFromStorage(schema);
+      console.log('[updateSettingSchema] schema, data', schema, data);
       // dispatch action
       dispatch({
         type: SettingsActionTypes.SET_SCHEMA,
         payload: {
           schema: schema,
-          data: schemaData,
+          data: data,
         },
       });
-      await _setItemToStorage(schema, schemaData);
+      await _setItemToStorage(schema, data);
       return true;
     }
     return false;

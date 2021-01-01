@@ -83,11 +83,7 @@ const SettingsContainer = (props: Props): JSX.Element => {
   const intl = useIntl();
   //// contexts
   const {authState, processLogout} = useContext(AuthContext);
-  const {
-    settingsState,
-    getAllSettingsFromStorage,
-    updateSettingSchema,
-  } = useContext(SettingsContext);
+  const {settingsState, updateSettingSchema} = useContext(SettingsContext);
   const {uiState, setLanguageParam, setToastMessage} = useContext(UIContext);
   //// states
   const [username, setUsername] = useState(null);
@@ -118,14 +114,11 @@ const SettingsContainer = (props: Props): JSX.Element => {
   //// get initial settings
   const _getInitialSettings = async () => {
     if (authState.loggedIn) {
+      console.log('_getInitialSettings', settingsState);
       // get username
       const _username = authState.currentCredentials.username;
       setUsername(_username);
 
-      // get all settings from storage
-      //      const allSettings = await getAllSettingsFromStorage();
-      // const allSettings = settingsState;
-      // console.log('_getInitialSettings. allSettings', allSettings);
       ////// set settings states
       // destructure the settgins
       const {
@@ -163,14 +156,17 @@ const SettingsContainer = (props: Props): JSX.Element => {
       if (dndTimes.startTime) {
         setStartDNDTime(dndTimes.startTime);
         setEndDNDTime(dndTimes.endTime);
+        console.log(
+          '_getInitialSettings. startTime, endTime',
+          dndTimes.startTime,
+          dndTimes.endTime,
+        );
         // switch
         _switchStates = {..._switchStates, [SettingUITypes.DND_TIMES]: true};
       }
 
       // now set switch states
       setSwitchStates(_switchStates);
-
-      //   console.log('switch states', _switchStates);
     }
   };
 
@@ -206,7 +202,8 @@ const SettingsContainer = (props: Props): JSX.Element => {
   };
 
   //// handle switch events: push notifications, securities, dnd times, ui
-  const _handleToggleSwitch = async (key: string, value: boolean) => {
+  const _handleToggleSwitch = async (key: SettingUITypes, value: boolean) => {
+    console.log('[_handleToggleSwitch] key, value', key, value);
     // update the switch state
     setSwitchStates({...switchStates, [key]: value});
     // firebase user doc ref
@@ -306,19 +303,19 @@ const SettingsContainer = (props: Props): JSX.Element => {
         // build structure
         _blockchains = {rpc: value, image: imageServer};
         // update in context state
-        updateSettingSchema(StorageSchema.BLOCKCHAIN, _blockchains);
+        updateSettingSchema(StorageSchema.BLOCKCHAINS, _blockchains);
         break;
       case SettingUITypes.IMAGE_SERVER:
         // build structure
         _blockchains = {rpc: rpcServer, image: value};
         // update in context state
-        updateSettingSchema(StorageSchema.BLOCKCHAIN, _blockchains);
+        updateSettingSchema(StorageSchema.BLOCKCHAINS, _blockchains);
         break;
       case SettingUITypes.LOCALE:
         // build structure
         _languages = {locale: value, translation: translation};
         // update in context state
-        updateSettingSchema(StorageSchema.LANGUAGE, _languages);
+        updateSettingSchema(StorageSchema.LANGUAGES, _languages);
         break;
       case SettingUITypes.TRANSLATION:
         // build structure
@@ -331,7 +328,7 @@ const SettingsContainer = (props: Props): JSX.Element => {
           });
         }
         // update in context state
-        updateSettingSchema(StorageSchema.LANGUAGE, _languages);
+        updateSettingSchema(StorageSchema.LANGUAGES, _languages);
         break;
       default:
         break;
@@ -340,6 +337,7 @@ const SettingsContainer = (props: Props): JSX.Element => {
 
   //// handle button events: terms, privacy, feedback, etc
   const _handlePressButton = async (uiType: SettingUITypes) => {
+    console.log('_handlePressButton. uiType', uiType);
     switch (uiType) {
       case SettingUITypes.NOTICE:
         break;
@@ -371,27 +369,38 @@ const SettingsContainer = (props: Props): JSX.Element => {
     return time;
   };
 
+  // when confirming the time on the clock
   const _handleConfirmDNDTime = async (isStart: boolean, timestamp: number) => {
     console.log('[_handleConfirmDNDTime] isStart, time', isStart, timestamp);
     console.log('convert time', _convertTime(timestamp));
-    let time1 = null;
-    let time2 = null;
+    let dndTimes = null;
     if (isStart) {
-      time1 = _convertTimeToUTC0(timestamp);
-      time2 = _convertTimeToUTC0(endDNDTime);
+      // close the clock
       setShowStartClock(false);
       // set time
       setStartDNDTime(timestamp);
-      // save the time in storage
-      await AsyncStorage.setItem('dnd_start_time', JSON.stringify(timestamp));
+
+      //// save the time in storage
+      // build structure
+      dndTimes = {
+        startTime: timestamp,
+        endTime: endDNDTime,
+      };
+      // update the data to the storage
+      updateSettingSchema(StorageSchema.DND_TIMES, dndTimes);
     } else {
-      time1 = _convertTimeToUTC0(startDNDTime);
-      time2 = _convertTimeToUTC0(timestamp);
       setShowEndClock(false);
       // set time
       setEndDNDTime(timestamp);
-      // save the time in storage
-      await AsyncStorage.setItem('dnd_end_time', JSON.stringify(timestamp));
+
+      //// save the time in storage
+      // build structure
+      dndTimes = {
+        startTime: startDNDTime,
+        endTime: timestamp,
+      };
+      // update the data to the storage
+      updateSettingSchema(StorageSchema.DND_TIMES, dndTimes);
     }
     //// update db
     // firebase user doc ref
@@ -400,11 +409,11 @@ const SettingsContainer = (props: Props): JSX.Element => {
     // check sanity
     if (!userRef) return;
     // convert the timestamp to minutes based on UTC+0
-    // concatenate the times
-    const times = [time1, time2];
+    const time1 = _convertTimeToUTC0(dndTimes.startTime);
+    const time2 = _convertTimeToUTC0(dndTimes.endTime);
     // update
     userRef.update({
-      dndTimes: times,
+      dndTimes: [time1, time2],
     });
   };
 
@@ -435,7 +444,6 @@ const SettingsContainer = (props: Props): JSX.Element => {
 
   ////
   const _renderItem = ({item}) => {
-    //    console.log('[Settings] renderItem. item', item);
     switch (item.type) {
       case 'switch':
         return (
@@ -443,7 +451,10 @@ const SettingsContainer = (props: Props): JSX.Element => {
             <Block row middle space="between" style={styles.rows}>
               <Text size={14}>{item.title}</Text>
               <Switch
-                onValueChange={(value) => _handleToggleSwitch(item.id, value)}
+                onValueChange={(value) => {
+                  console.log('handle switch');
+                  _handleToggleSwitch(item.id, value);
+                }}
                 ios_backgroundColor={materialTheme.COLORS.SWITCH_OFF}
                 thumbColor={
                   Platform.OS === 'android'
@@ -462,13 +473,17 @@ const SettingsContainer = (props: Props): JSX.Element => {
                 {item.id === SettingUITypes.DND_TIMES ? (
                   <Block card>
                     {_renderClockButton(
-                      intl.formatMessage({id: 'Settings.start_clock_header'}) +
-                        _convertTime(startDNDTime),
+                      intl.formatMessage(
+                        {id: 'Settings.start_clock_header'},
+                        {what: _convertTime(startDNDTime)},
+                      ),
                       () => setShowStartClock(true),
                     )}
                     {_renderClockButton(
-                      intl.formatMessage({id: 'Settings.end_clock_header'}) +
-                        _convertTime(endDNDTime),
+                      intl.formatMessage(
+                        {id: 'Settings.end_clock_header'},
+                        {what: _convertTime(endDNDTime)},
+                      ),
                       () => setShowEndClock(true),
                     )}
                   </Block>
@@ -494,6 +509,27 @@ const SettingsContainer = (props: Props): JSX.Element => {
         );
       case 'dropdown':
         let defaultText = item.defaultText;
+        let selectedIndex = 0;
+        switch (item.id) {
+          case SettingUITypes.RPC_SERVER:
+            defaultText = rpcServer;
+            selectedIndex = item.options.indexOf(rpcServer);
+            break;
+          case SettingUITypes.IMAGE_SERVER:
+            defaultText = imageServer;
+            selectedIndex = item.options.indexOf(imageServer);
+            break;
+          case SettingUITypes.LOCALE:
+            defaultText = locale;
+            selectedIndex = item.options.indexOf(locale);
+            break;
+          case SettingUITypes.TRANSLATION:
+            defaultText = translation;
+            selectedIndex = item.options.indexOf(translation);
+            break;
+          default:
+            break;
+        }
         return (
           <Block row middle space="between" style={styles.rows}>
             <Text size={14} style={{top: 7}}>
@@ -503,7 +539,7 @@ const SettingsContainer = (props: Props): JSX.Element => {
               key={item.options[0]}
               defaultText={defaultText}
               dropdownButtonStyle={styles.dropdownButtonStyle}
-              selectedOptionIndex={0}
+              selectedOptionIndex={selectedIndex}
               rowTextStyle={styles.rowTextStyle}
               style={styles.dropdown}
               dropdownStyle={styles.dropdownStyle}

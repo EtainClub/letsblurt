@@ -49,7 +49,7 @@ import {
 import {jsonStringify} from '~/utils/jsonUtils';
 
 // dblurt handles the server fail situation and choose the next server!
-const client = new Client(BLURT_MAINNETS, {
+const client = new Client(BLURT_MAINNETS[0], {
   timeout: CHAIN_TIMEOUT,
   addressPrefix: BLURT_CHAIN_PREFIX,
   chainId: BLURT_CHAIN_ID,
