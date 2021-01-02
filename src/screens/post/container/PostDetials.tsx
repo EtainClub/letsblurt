@@ -38,6 +38,7 @@ interface Props {
 const PostDetails = (props: Props): JSX.Element => {
   // props
   const {route} = props;
+  // TODO: check if this works, otherwise use context
   const index = route.params?.index;
   // contexts
   const {authState} = useContext(AuthContext);
@@ -232,7 +233,7 @@ const PostDetails = (props: Props): JSX.Element => {
     }
     const title = postDetails.state.title;
     const body = postDetails.body;
-    const targetLang = settingsState.locale.split('-')[0];
+    const targetLang = settingsState.languages.translation;
     console.log('targetLang', targetLang);
     const titleOptions = {
       targetLang: targetLang,
@@ -292,6 +293,7 @@ const PostDetails = (props: Props): JSX.Element => {
       post={postDetails}
       loading={loading}
       parentPost={parentPost}
+      postsType={postsState.postsType}
       index={index}
       comments={comments}
       handleRefresh={_onRefresh}

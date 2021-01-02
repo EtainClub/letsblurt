@@ -5,7 +5,7 @@ import React, {useState, useEffect, useContext} from 'react';
 //// language
 import {useIntl} from 'react-intl';
 import {navigate} from '~/navigation/service';
-import {PostState} from '~/contexts/types';
+import {PostState, PostsTypes} from '~/contexts/types';
 import {AuthContext, PostsContext, UserContext, UIContext} from '~/contexts';
 import {PostRef} from '~/contexts/types';
 import {ActionBarView} from './ActionBarView';
@@ -15,7 +15,8 @@ import {reblog} from '~/providers/blurt/dblurtApi';
 interface Props {
   actionBarStyle: ActionBarStyle;
   postState: PostState;
-  postIndex?: number;
+  postsType: PostsTypes;
+  postIndex: number;
   handlePressComments?: () => void;
   handlePressEditComment?: () => void;
   handlePressReply?: () => void;
@@ -67,6 +68,7 @@ const ActionBarContainer = (props: Props): JSX.Element => {
     }
 
     const results = await upvote(
+      props.postsType,
       props.postIndex,
       postState.isComment,
       postState.post_ref,

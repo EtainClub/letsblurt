@@ -91,8 +91,6 @@ export const INITIAL_SETTINGS: SettingsState = {
   },
 };
 
-console.log('initial settings', INITIAL_SETTINGS);
-
 //// settings action types
 export enum SettingsActionTypes {
   GET_ALL_SETTINGS,

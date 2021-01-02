@@ -1129,23 +1129,17 @@ export const submitVote = async (
     permlink,
     weight: votingWeight * 100,
   };
-
-  // @test: etainclub
-  //password = Config.ETAINCLUB_POSTING_WIF;
-
-  console.log('[submitVote] vote', vote);
-
   // verify the key
   const {account} = await verifyPassoword(voter, password);
   if (!account) {
-    return {success: false, message: 'the password is invalid'};
+    return null;
   }
 
   // get privake key from password
   const privateKey = PrivateKey.from(password);
 
   if (privateKey) {
-    // use dblur library --> has signing problem in release mode
+    // use dblurt library --> has signing problem in release mode
     try {
       const result = await client.broadcast.vote(vote, privateKey);
       return result;

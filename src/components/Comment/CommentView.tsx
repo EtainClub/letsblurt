@@ -158,7 +158,7 @@ const Comment = (props: Props): JSX.Element => {
       setBody(translatedBody);
       return;
     }
-    const targetLang = settingsState.locale.split('-')[0];
+    const targetLang = settingsState.languages.translation;
     console.log('targetLang', targetLang);
     const bodyOptions = {
       targetLang: targetLang,

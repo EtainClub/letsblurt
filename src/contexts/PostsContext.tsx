@@ -136,6 +136,7 @@ const postsReducer = (state: PostsState, action: PostsAction) => {
 
     case PostsActionTypes.SET_TAG_INDEX:
       return {...state, tagIndex: action.payload};
+
     case PostsActionTypes.APPEND_TAG:
       return {
         ...state,
@@ -152,6 +153,7 @@ const postsReducer = (state: PostsState, action: PostsAction) => {
         ...state,
         postDetails: action.payload,
       };
+
     case PostsActionTypes.BOOKMARK_POST:
       // update post details's state
       const postsDetails = state.postDetails;
@@ -162,20 +164,28 @@ const postsReducer = (state: PostsState, action: PostsAction) => {
           ...state.postDetails,
         },
       };
-    case PostsActionTypes.UPVOTE:
-      return state;
-      const {postsType, postIndex, payout, votesCount, voters} = action.payload;
-      console.log('[postReducer] upvoting action payload', action.payload);
-    // return {
-    //   ...state,
-    //   feed.posts[postIndex].voted: true,
-    //   [postsType].posts[postIndex].payout: payout,
-    //   [postsType][postIndex].votesCount: votesCount,
-    //   [postsType][postIndex].voters: voters,
-    // };
 
-    case PostsActionTypes.VOTING_COMMENT:
+    case PostsActionTypes.UPVOTE:
       console.log('[postReducer] upvoting action payload', action.payload);
+      // update the specific post state
+      return {
+        ...state,
+        [action.payload.postsType]: {
+          posts: state[action.payload.postsType].posts.map((post, index) =>
+            index === action.payload.postIndex
+              ? {
+                  state: action.payload.postState,
+                }
+              : post,
+          ),
+        },
+      };
+
+    case PostsActionTypes.UPVOTE_COMMENT:
+      console.log(
+        '[postReducer] upvoting comment action payload',
+        action.payload,
+      );
       return state;
 
     case PostsActionTypes.COMMENT_POST:
@@ -438,6 +448,7 @@ const PostsProvider = ({children}: Props) => {
 
   //// voting action creator
   const upvote = async (
+    postsType: PostsTypes,
     postIndex: number,
     isComment: boolean,
     postRef: PostRef,
@@ -447,10 +458,12 @@ const PostsProvider = ({children}: Props) => {
     voteAmount: number,
     setToastMessage?: (message: string) => void,
   ) => {
-    // TODO: need postsType in input
-    const postsType = PostsTypes.FEED;
-
-    console.log('[PostsContext|upvote] postIndex', postIndex, voteAmount);
+    console.log(
+      '[PostsContext|upvote] postsType, postIndex, voteAmount',
+      postsType,
+      postIndex,
+      voteAmount,
+    );
     console.log('[PostsContext|upvote] post', postsState[postIndex]);
 
     // send transaction
@@ -461,48 +474,48 @@ const PostsProvider = ({children}: Props) => {
       postRef.permlink,
       votingWeight,
     );
+    // check result
     console.log('[upvote] results', results);
-    //// calculate
-    const payout = parseFloat(
-      postsState[postsType].posts[postIndex].postUserState.payout,
-    );
-    const newPayout = payout + (voteAmount * votingWeight) / 100;
-    const newVotesCount =
-      postsState[postsType].posts[postIndex].postUserState.votes_count + 1;
-    const voters =
-      postsState[postsType].posts[postIndex].postUserState.active_votes;
-    const newVoters = [`${username} ($${voteAmount})`, ...voters];
+    if (!results) return null;
 
-    // dispatch action
-    if (results.success) {
-      // handle voting on comment
-      if (isComment) {
-        //// calculation
-        // TODO: find the comment
-        // Update the comment's voters, payout, vote amount
-        const newComments = _updateComments(
-          postsState[postsType].posts[postIndex].comments,
-          {author: postRef.author, permlink: postRef.permlink},
-        );
+    //// update post states
+    // new post state
+    const postState = postsState[postsType].posts[postIndex].state;
+    // update payout
+    postState.payout = postState.payout + (voteAmount * votingWeight) / 100;
+    // update vote count
+    postState.vote_count += 1;
+    // update voters
+    postState.voters = [`${username} ($${voteAmount})`, ...postState.voters];
+    // update voted flag
+    postState.voted = true;
+    //// dispatch action
+    // handle voting on comment
+    if (isComment) {
+      //// calculation
+      // TODO: find the comment
+      // Update the comment's voters, payout, vote amount
+      const newComments = _updateComments(
+        postsState[postsType].posts[postIndex].comments,
+        {author: postRef.author, permlink: postRef.permlink},
+      );
 
-        dispatch({
-          type: PostsActionTypes.UPVOTE_COMMENT,
-          payload: {
-            postIndex: postIndex,
-            comments: newComments,
-          },
-        });
-      } else {
-        dispatch({
-          type: PostsActionTypes.UPVOTE,
-          payload: {
-            postIndex: postIndex,
-            voteAmount: newPayout,
-            votesCount: newVotesCount,
-            voters: newVoters,
-          },
-        });
-      }
+      dispatch({
+        type: PostsActionTypes.UPVOTE_COMMENT,
+        payload: {
+          postIndex: postIndex,
+          comments: newComments,
+        },
+      });
+    } else {
+      dispatch({
+        type: PostsActionTypes.UPVOTE,
+        payload: {
+          postsType: postsType,
+          postIndex: postIndex,
+          postState: postState,
+        },
+      });
     }
     return results;
   };

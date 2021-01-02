@@ -20,7 +20,7 @@ import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
 const {height, width} = Dimensions.get('window');
 import {useIntl} from 'react-intl';
 import {navigate} from '~/navigation/service';
-import {PostData, CommentData} from '~/contexts/types';
+import {PostData, CommentData, PostsTypes} from '~/contexts/types';
 import {ActionBarStylePost} from '~/constants/actionBarTypes';
 import {Avatar, Comment, ParentPost, PostBody, ActionBar} from '~/components';
 import {argonTheme} from '~/constants/argonTheme';
@@ -29,6 +29,7 @@ import {UIContext} from '~/contexts';
 import {getTimeFromNow} from '~/utils/time';
 
 interface Props {
+  postsType: PostsTypes;
   post: PostData;
   loading: boolean;
   parentPost: PostData;
@@ -186,6 +187,7 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
         <ActionBar
           actionBarStyle={ActionBarStylePost}
           postState={state}
+          postsType={props.postsType}
           postIndex={props.index}
           handlePressComments={_handlePressComments}
           handlePressTranslation={props.handlePressTranslation}

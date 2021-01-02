@@ -288,10 +288,9 @@ interface SetPostDetailsAction {
 interface UpVoteAction {
   type: PostsActionTypes.UPVOTE;
   payload: {
+    postsType: PostsTypes;
     postIndex: number;
-    voteAmount: number;
-    votesCount: number;
-    voters: string[];
+    postState: PostState;
   };
 }
 // voting comment
@@ -352,6 +351,7 @@ export interface PostsContextType {
   getPostDetails: (postRef: PostRef, username: string) => Promise<PostData>;
   // upvote
   upvote: (
+    postsType: PostsTypes,
     postIndex: number,
     isComment: boolean,
     postRef: PostRef,
