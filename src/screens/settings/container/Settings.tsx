@@ -667,17 +667,16 @@ const styles = StyleSheet.create({
     width: 200,
     backgroundColor: argonTheme.COLORS.DEFAULT,
   },
+  // dropdown container
   dropdownButtonStyle: {
-    borderColor: '#f5f5f5',
-    borderWidth: 1,
-    height: 44,
-    width: 220,
-    borderRadius: 8,
-    marginRight: 20,
+    width: 180,
+    marginRight: 10,
+    //    borderColor: '#f5f5f5',
   },
+  // modal dropdown's button style
   dropdown: {
-    flexGrow: 1,
-    width: 120,
+    width: 180,
+    marginLeft: 10,
   },
   textStyle: {
     color: '#357ce6',

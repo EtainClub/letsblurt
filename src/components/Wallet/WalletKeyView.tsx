@@ -91,7 +91,6 @@ const WalletKeyView = (props: Props): JSX.Element => {
         padding: 20,
       }}>
       <Text size={20}>{`Private ${props.type.toUpperCase()} Keys`}</Text>
-      <Text>Descriptions</Text>
       <Block center row style={{margin: 0}}>
         <Input
           editable={false}

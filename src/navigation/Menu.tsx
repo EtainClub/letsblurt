@@ -56,7 +56,7 @@ function CustomDrawerContent({
           {screens.map((item, index) => {
             return (
               <DrawerCustomItem
-                title={intl.formatMessage({id: `${item.toLowerCase()}`})}
+                title={item}
                 key={index}
                 focused={state.index === index ? true : false}
               />
@@ -66,11 +66,11 @@ function CustomDrawerContent({
       </Block>
       <Block flex={0.3} style={{paddingLeft: 7, paddingRight: 14}}>
         <DrawerCustomItem
-          title={intl.formatMessage({id: 'login'})}
+          title="Login"
           focused={state.index === 8 ? true : false}
         />
         <DrawerCustomItem
-          title={intl.formatMessage({id: 'signup'})}
+          title="SignUp"
           focused={state.index === 9 ? true : false}
         />
       </Block>

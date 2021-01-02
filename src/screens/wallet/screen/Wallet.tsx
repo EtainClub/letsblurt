@@ -66,7 +66,7 @@ const WalletScreen = (props: Props): JSX.Element => {
               {intl.formatMessage({id: 'Wallet.danger_zone'})}
             </Text>
             <Text> {intl.formatMessage({id: 'Wallet.danger_msg'})}</Text>
-            <Button size="large">
+            <Button disabled size="large" color={argonTheme.COLORS.MUTED}>
               {intl.formatMessage({id: 'Wallet.change_master'})}
             </Button>
           </Block>

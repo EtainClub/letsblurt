@@ -152,7 +152,7 @@ const PostsFeedView = (props: Props): JSX.Element => {
           <ActivityIndicator color={argonTheme.COLORS.ERROR} size="large" />
         </View>
       )}
-      {!props.reloading && (
+      {props.posts && !props.reloading && (
         <FAB
           buttonColor="red"
           iconTextColor="#FFFFFF"
