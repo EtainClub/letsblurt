@@ -5,6 +5,9 @@
   "posting": "포스팅",
   "profile": "프로필",
   "wallet": "지갑",
+  "settings": "설정",
+  "login": "로그인",
+  "signup": "가입",
   "and": "그리고",
   "cancel": "취소",
   "confirm": "확인",
@@ -103,10 +106,10 @@
   },
   "Feed": {},
   "Notifications": {
-    "follow": "가 당신을 팔로잉합니다.",
-    "reply": "가 당신의 글에 답글을 달았습니다.",
-    "mention": "가 이 포스트에서 당신을 멘션했습니다.",
-    "transfer": "가 당신에게 {what} BLURT를 전송했습니다."
+    "follow": "당신을 팔로잉합니다.",
+    "reply": "글에 답글을 달았습니다.",
+    "mention": "포스트에서 당신을 멘션했습니다.",
+    "transfer": "{what}를 전송했습니다."
   },
   "Posting": {
     "title": "제목",

@@ -317,7 +317,7 @@ const Header = (props: Props): JSX.Element => {
     <Block style={headerStyles}>
       <NavBar
         back={back}
-        title={title}
+        title={intl.formatMessage({id: `${title.toLowerCase()}`})}
         style={styles.navbar}
         transparent={transparent}
         right={_renderRight()}

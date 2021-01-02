@@ -5,6 +5,9 @@
   "posting": "Posting",
   "profile": "Profile",
   "wallet": "Wallet",
+  "settings": "Settings",
+  "login": "Log In",
+  "signup": "register",
   "and": "and",
   "cancel": "Cancel",
   "confirm": "Confirm",
@@ -106,7 +109,7 @@
     "follow": " started following you",
     "reply": " replied to your post",
     "mention": "mentioned you in this post",
-    "transfer": "transferred {what} BLURT to you"
+    "transfer": "transferred {what} to you"
   },
   "Posting": {
     "title": "Title",

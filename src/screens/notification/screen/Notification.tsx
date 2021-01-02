@@ -81,13 +81,15 @@ const NotificationScreen = (props: Props): JSX.Element => {
         text = intl.formatMessage({id: 'Notifications.mention'});
         permlink = item.permlink;
         break;
-      case 'tranfer':
+      case 'transfer':
+        console.log('transfer. item', item);
+        author = item.from;
         iconName = 'exchange';
         iconFamily = 'font-awesome';
-        avatar = `${IMAGE_SERVER}/u/${author}/avatar`;
+        avatar = `${IMAGE_SERVER}/u/${item.from}/avatar`;
         text = intl.formatMessage(
           {id: 'Notifications.transfer'},
-          {what: item.value},
+          {what: item.amount},
         );
         break;
       default:
@@ -150,7 +152,16 @@ const NotificationScreen = (props: Props): JSX.Element => {
       showsVerticalScrollIndicator={false}
     />
   ) : (
-    <ActivityIndicator color={argonTheme.COLORS.ERROR} size="large" />
+    <View
+      style={{
+        position: 'relative',
+        paddingVertical: 20,
+        marginTop: 10,
+        marginBottom: 10,
+        borderColor: theme.COLORS.PINK,
+      }}>
+      <ActivityIndicator color={argonTheme.COLORS.ERROR} size="large" />
+    </View>
   );
 };
 

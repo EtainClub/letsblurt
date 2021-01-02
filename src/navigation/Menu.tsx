@@ -6,10 +6,10 @@ import {
   Dimensions,
   Image,
   TouchableOpacity,
-  ListView,
 } from 'react-native';
+//// language
+import {useIntl} from 'react-intl';
 import {Block, Text, theme, Icon} from 'galio-framework';
-import {useSafeArea} from 'react-native-safe-area-context';
 import {Drawer as DrawerCustomItem} from '../components/';
 import {argonTheme, Images, materialTheme} from '../constants/';
 import {navigate} from '../navigation/service';
@@ -23,13 +23,14 @@ function CustomDrawerContent({
   state,
   ...rest
 }) {
-  const insets = useSafeArea();
   const screens = ['Feed', 'Settings'];
+  // language
+  const intl = useIntl();
   return (
     <Block
       style={styles.container}
       forceInset={{top: 'always', horizontal: 'never'}}>
-      <Block flex={0.5} style={styles.header}>
+      <Block flex={0.7} style={styles.header}>
         <TouchableWithoutFeedback onPress={() => navigate({name: 'Profile'})}>
           <Block style={styles.profile}>
             <Image
@@ -41,30 +42,21 @@ function CustomDrawerContent({
             </Text>
           </Block>
         </TouchableWithoutFeedback>
-        <Block row>
-          <Text size={16} muted style={styles.seller}>
-            {profile.type}
-          </Text>
-          <Text size={16} color={materialTheme.COLORS.WARNING}>
-            {profile.rating}
-            <Icon name="star" family="font-awesome" size={14} />
-          </Text>
-        </Block>
       </Block>
       <Block flex style={{paddingLeft: 7, paddingRight: 14}}>
         <ScrollView
           contentContainerStyle={[
             {
-              paddingTop: insets.top * 0.4,
-              paddingLeft: drawerPosition === 'left' ? insets.left : 0,
-              paddingRight: drawerPosition === 'right' ? insets.right : 0,
+              paddingTop: 0,
+              paddingLeft: drawerPosition === 'left' ? 0 : 0,
+              paddingRight: drawerPosition === 'right' ? 0 : 0,
             },
           ]}
           showsVerticalScrollIndicator={false}>
           {screens.map((item, index) => {
             return (
               <DrawerCustomItem
-                title={item}
+                title={intl.formatMessage({id: `${item.toLowerCase()}`})}
                 key={index}
                 focused={state.index === index ? true : false}
               />
@@ -72,13 +64,13 @@ function CustomDrawerContent({
           })}
         </ScrollView>
       </Block>
-      <Block flex={0.5} style={{paddingLeft: 7, paddingRight: 14}}>
+      <Block flex={0.3} style={{paddingLeft: 7, paddingRight: 14}}>
         <DrawerCustomItem
-          title="Login"
+          title={intl.formatMessage({id: 'login'})}
           focused={state.index === 8 ? true : false}
         />
         <DrawerCustomItem
-          title="SignUp"
+          title={intl.formatMessage({id: 'signup'})}
           focused={state.index === 9 ? true : false}
         />
       </Block>
@@ -107,20 +99,7 @@ const styles = StyleSheet.create({
     marginBottom: theme.SIZES.BASE / 2,
   },
   avatar: {
-    height: 40,
-    width: 40,
-    borderRadius: 20,
-    marginBottom: theme.SIZES.BASE,
-  },
-  pro: {
-    backgroundColor: materialTheme.COLORS.LABEL,
-    paddingHorizontal: 6,
-    marginRight: 8,
-    borderRadius: 4,
-    height: 19,
-    width: 42,
-  },
-  seller: {
-    marginRight: 16,
+    height: 120,
+    width: 120,
   },
 });

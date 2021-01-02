@@ -87,15 +87,6 @@ const TabFeedStack = () => {
           },
         }}
       />
-      {/* <Stack.Screen
-        name="PostDetails"
-        component={PostDetails}
-        options={{
-          header: ({navigation}) => {
-            return <Header title="Post" navigation={navigation} />;
-          },
-        }}
-      /> */}
       <Stack.Screen
         name="SearchFeed"
         component={SearchFeed}
@@ -180,6 +171,8 @@ const TabNavigator = (props) => {
   console.log('TabNavigator props', props);
   // get route name
   const {route} = props;
+  //// language
+  const intl = useIntl();
   // check loggedin for profile, wallet, notification, posting
   const {authState} = useContext(AuthContext);
   const {loggedIn} = authState;
@@ -196,7 +189,7 @@ const TabNavigator = (props) => {
         name="Feed"
         component={TabFeedStack}
         options={{
-          tabBarLabel: 'Feed',
+          tabBarLabel: intl.formatMessage({id: 'feed'}),
           tabBarIcon: ({focused}) => (
             <Icon
               name="feed"
@@ -211,6 +204,7 @@ const TabNavigator = (props) => {
         name="Notification"
         component={TabNotificationStack}
         options={{
+          tabBarLabel: intl.formatMessage({id: 'notification'}),
           tabBarIcon: ({focused}) => (
             <Icon
               name="notifications"
@@ -225,6 +219,7 @@ const TabNavigator = (props) => {
         name="Posting"
         component={TabPostingStack}
         options={{
+          tabBarLabel: intl.formatMessage({id: 'posting'}),
           tabBarIcon: ({focused}) => (
             <Icon
               name="pencil"
@@ -246,6 +241,7 @@ const TabNavigator = (props) => {
           },
         })}
         options={{
+          tabBarLabel: intl.formatMessage({id: 'profile'}),
           tabBarIcon: ({focused}) => (
             <Icon
               name="user-alt"
@@ -260,6 +256,7 @@ const TabNavigator = (props) => {
         name="Wallet"
         component={TabWalletStack}
         options={{
+          tabBarLabel: intl.formatMessage({id: 'wallet'}),
           tabBarIcon: ({focused}) => (
             <Icon
               name="wallet"
@@ -343,7 +340,11 @@ const SettingsStack = () => {
 const DrawerNavigator = (props) => {
   console.log('DrawerNavigator props', props);
   const {authState} = useContext(AuthContext);
-
+  const profile = {
+    avatar:
+      'https://cdn.steemitimages.com/DQmeT9tc2mTVcjnf213RF7uBVXWkFiKBo9Y51KYxLWmBUi8/etainclub_profile.png',
+    name: authState.currentCredentials.username,
+  };
   return (
     <Drawer.Navigator
       drawerContent={(props) => (
