@@ -38,7 +38,10 @@
   "reward": "Reward",
   "something_wrong": "Something went wrong",
   "failed": "Failed",
-  "AppScreen": {},
+  "App": {
+    "push_title": "Push Message Arrived",
+    "push_body": "Do you want to see the details?"
+  },
   "Welcome": {
     "msg1": "Welcome To Blurt World",
     "msg2": "Easier and safer on Mobiles",

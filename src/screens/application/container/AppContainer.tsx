@@ -1,6 +1,9 @@
+//// react
 import React, {useContext, useEffect} from 'react';
-
+//// react native
 import {Platform, BackHandler, Alert, Linking, AppState} from 'react-native';
+//// language
+import {useIntl} from 'react-intl';
 // notification
 import messaging, {
   FirebaseMessagingTypes,
@@ -11,7 +14,7 @@ import {navigate} from '~/navigation/service';
 
 //import auth, {FirebaseAuthTypes} from '@react-native-firebase/auth';
 
-import {AuthContext, UIContext, UserContext} from '~/contexts';
+import {AuthContext, PostsContext, UIContext, UserContext} from '~/contexts';
 
 import {ApplicationScreen} from '../screen/Application';
 
@@ -24,12 +27,18 @@ type FBRemoteMsgListner = (message: RemoteMessage) => any;
 //let fbMessageOpenedListener: FBRemoteMsgListner;
 // message open handler in foreground
 
+// push operation types
+import {SettingUITypes} from '~/screens/settings';
+
 interface Props {}
 
 export const AppContainer = (props: Props): JSX.Element => {
-  // get auth
+  //// language
+  const intl = useIntl();
+  //// contexts
   const {authState} = useContext(AuthContext)!;
-  const {uiState, setToastMessage} = useContext(UIContext);
+  const {setPostRef} = useContext(PostsContext);
+  const {uiState, setToastMessage, setAuthorParam} = useContext(UIContext);
 
   useEffect(() => {
     // setup push notification listener
@@ -45,13 +54,13 @@ export const AppContainer = (props: Props): JSX.Element => {
     // set foreground notification listener
     const fgMsgListener = messaging().onMessage((message: RemoteMessage) => {
       console.log('fgMsgListener, message', message);
-      _handleRemoteMessages(message);
+      _handleRemoteMessages(message, false);
     });
     // set notification open listener
     messaging().setBackgroundMessageHandler(async (message: RemoteMessage) => {
       console.log('bgMsgListener, message', message);
       // handle message
-      _handleRemoteMessages(message);
+      _handleRemoteMessages(message, true);
     });
     return () => {
       if (__DEV__) console.log('unsubscribe notification listener');
@@ -60,7 +69,10 @@ export const AppContainer = (props: Props): JSX.Element => {
   }, []);
 
   // handle push notification messages
-  const _handleRemoteMessages = (message: RemoteMessage): void => {
+  const _handleRemoteMessages = (
+    message: RemoteMessage,
+    background: boolean,
+  ): void => {
     console.log('_handleRemoteMessages. message', message);
 
     // get notification data
@@ -73,7 +85,58 @@ export const AppContainer = (props: Props): JSX.Element => {
     // get message tyep
     //    const msgType = msgData.type;
     // @test
+    // TODO: handle the foreground message. show modal
     console.log('remote message data', msgData);
+    const {operation, author, permlink} = msgData.data;
+    let route = null;
+    switch (operation) {
+      // navigate to the post details
+      case SettingUITypes.BENEFICIARY:
+      case SettingUITypes.MENTION:
+      case SettingUITypes.REBLOG:
+      case SettingUITypes.REPLY:
+      case SettingUITypes.VOTE:
+        //// navigate
+        // set route name
+        route = 'PostDetails';
+        // set post ref to the context
+        setPostRef({author, permlink});
+        // navigate if the app is in background
+        if (background) navigate({name: route});
+        break;
+      case SettingUITypes.FOLLOW:
+        //// navigate to the author profile
+        // set route name
+        route = 'AuthorProfile';
+        // set author to the context
+        setAuthorParam(author);
+        // navigate
+        if (background) navigate({name: route});
+        break;
+      case SettingUITypes.TRANSFER:
+        //// navigate to the wallet
+        // set route name
+        route = 'Wallet';
+        if (background) navigate({name: 'Wallet'});
+        break;
+      default:
+        break;
+    }
+    // handle foreground message
+    if (!background) {
+      Alert.alert(
+        intl.formatMessage({id: 'App.push_title'}),
+        intl.formatMessage({id: 'App.push_body'}),
+        [
+          {text: intl.formatMessage({id: 'no'}), style: 'cancel'},
+          {
+            text: intl.formatMessage({id: 'yes'}),
+            onPress: () => navigate({name: route}),
+          },
+        ],
+        {cancelable: true},
+      );
+    }
   };
 
   // clear toast message

@@ -1,3 +1,3 @@
-import {SettingsContainer} from './container/Settings';
+import {SettingsContainer, SettingUITypes} from './container/Settings';
 
-export {SettingsContainer as Settings};
+export {SettingsContainer as Settings, SettingUITypes};
