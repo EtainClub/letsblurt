@@ -27,8 +27,8 @@ const WalletScreen = (props: Props): JSX.Element => {
   const [index, setIndex] = React.useState(0);
   // TODO: use intl
   const [routes] = React.useState([
-    {key: 'stats', title: 'Balances'},
-    {key: 'keys', title: 'Keys'},
+    {key: 'stats', title: intl.formatMessage({id: 'Wallet.balances'})},
+    {key: 'keys', title: intl.formatMessage({id: 'Wallet.keys'})},
   ]);
 
   const WalletStats = () => (
@@ -63,10 +63,12 @@ const WalletScreen = (props: Props): JSX.Element => {
               padding: 20,
             }}>
             <Text h6 color="red">
-              Danger Zone
+              {intl.formatMessage({id: 'Wallet.danger_zone'})}
             </Text>
-            <Text>Be careful when changing master password</Text>
-            <Button size="large">Change Master Password</Button>
+            <Text> {intl.formatMessage({id: 'Wallet.danger_msg'})}</Text>
+            <Button size="large">
+              {intl.formatMessage({id: 'Wallet.change_master'})}
+            </Button>
           </Block>
         </Block>
       </ScrollView>

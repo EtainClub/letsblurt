@@ -129,9 +129,7 @@ const Wallet = (props: Props): JSX.Element => {
         setToastMessage(intl.formatMessage({id: 'Transaction.success'}));
         break;
       default:
-        setToastMessage(
-          intl.formatMessage({id: 'Transaction.something_wrong'}),
-        );
+        setToastMessage(intl.formatMessage({id: 'something_wrong'}));
         break;
     }
   };

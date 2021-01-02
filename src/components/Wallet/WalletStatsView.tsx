@@ -197,12 +197,12 @@ const WalletStatsView = (props: Props): JSX.Element => {
           </Block>
 
           <Block row space="between">
-            <Text>Voting Power:</Text>
+            <Text>{intl.formatMessage({id: 'voting_power'})}</Text>
             <Text>{parseInt(votePower) / 100}%</Text>
           </Block>
           {props.isUser && (
             <Block row space="between">
-              <Text>Blurt Price:</Text>
+              <Text>{intl.formatMessage({id: 'blurt_price'})}</Text>
               {props.price ? <Text>${props.price.toFixed(3)}</Text> : null}
             </Block>
           )}
@@ -210,10 +210,13 @@ const WalletStatsView = (props: Props): JSX.Element => {
         {props.isUser && needToClaim ? (
           <Block center>
             <Text color={argonTheme.COLORS.ERROR}>
-              Reward: {rewardBlurt} BLURT
+              {intl.formatMessage(
+                {id: 'Wallet.reward_blurt'},
+                {what: rewardBlurt},
+              )}
             </Text>
             <Button onPress={props.handlePressClaim} loading={props.claiming}>
-              Claim Reward
+              {intl.formatMessage({id: 'Wallet.claim_reward'})}
             </Button>
           </Block>
         ) : null}

@@ -5,7 +5,7 @@ import {
   DrawerNavigationProp,
 } from '@react-navigation/drawer';
 import {Icon} from 'galio-framework';
-import {injectIntl} from 'react-intl';
+import {injectIntl, useIntl} from 'react-intl';
 
 import {AuthContext} from '~/contexts';
 

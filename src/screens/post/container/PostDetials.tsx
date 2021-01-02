@@ -165,6 +165,7 @@ const PostDetails = (props: Props): JSX.Element => {
     );
     console.log('_fetchComments', _comments);
     setComments(_comments);
+    // TODO need to update context state
   };
 
   const _onRefresh = async () => {

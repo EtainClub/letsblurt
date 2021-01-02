@@ -81,7 +81,7 @@ const SearchScreen = (props: Props): JSX.Element => {
           defaultValue={searchText}
           returnKeyType="search"
           style={[styles.search, active ? styles.shadow : null]}
-          placeholder={intl.formatMessage({id: 'Header.search_placeholder'})}
+          placeholder={intl.formatMessage({id: 'Search.search_placeholder'})}
           onFocus={() => setActive(true)}
           onBlur={() => setActive(false)}
           onChangeText={(text: string) => {

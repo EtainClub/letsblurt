@@ -214,48 +214,6 @@ const Header = (props: Props): JSX.Element => {
     );
   };
 
-  const SearchBar = () => {
-    const iconSearch =
-      searchText === '' ? (
-        <TouchableWithoutFeedback onPress={() => setSearchText('')}>
-          <Icon
-            size={16}
-            color={theme.COLORS.MUTED}
-            name="page-remove"
-            family="foundation"
-          />
-        </TouchableWithoutFeedback>
-      ) : (
-        <TouchableWithoutFeedback onPress={_onSubmitSearch}>
-          <Icon
-            size={16}
-            color={theme.COLORS.MUTED}
-            name="magnifying-glass"
-            family="entypo"
-          />
-        </TouchableWithoutFeedback>
-      );
-
-    return (
-      <Block center>
-        <Input
-          style={styles.searchContainer}
-          right
-          color="black"
-          autoFocus={true}
-          autoCorrect={false}
-          autoCapitalize="none"
-          iconContent={iconSearch}
-          defaultValue={searchText}
-          returnKeyType="search"
-          placeholder={intl.formatMessage({id: 'Header.search_placeholder'})}
-          onChangeText={(text: string) => setSearchText(text)}
-          onSubmitEditing={_onSubmitSearch}
-        />
-      </Block>
-    );
-  };
-
   //// update tag index of uiState
   const _handleOnTagChange = (index: number, value: string) => {
     console.log('header tag index, value', index, value);

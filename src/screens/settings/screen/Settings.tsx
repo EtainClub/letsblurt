@@ -136,6 +136,16 @@ const SettingsScreen = (props: Props): JSX.Element => {
       type: 'button',
     },
     {
+      title: intl.formatMessage({id: 'Settings.share'}),
+      id: SettingUITypes.SHARE,
+      type: 'button',
+    },
+    {
+      title: intl.formatMessage({id: 'Settings.feedback'}),
+      id: SettingUITypes.FEEDBACK,
+      type: 'button',
+    },
+    {
       title: intl.formatMessage({id: 'Settings.app_version'}),
       id: SettingUITypes.APP_VERSION,
       type: 'text',
@@ -149,6 +159,11 @@ const SettingsScreen = (props: Props): JSX.Element => {
     {
       title: intl.formatMessage({id: 'Settings.privacy'}),
       id: SettingUITypes.PRIVACY,
+      type: 'button',
+    },
+    {
+      title: intl.formatMessage({id: 'Settings.about'}),
+      id: SettingUITypes.ABOUT,
       type: 'button',
     },
   ];

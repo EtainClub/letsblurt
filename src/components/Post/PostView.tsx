@@ -20,7 +20,7 @@ import FAB from 'react-native-fab';
 const runes = require('runes');
 import {sliceByByte} from '~/utils/strings';
 
-import {PostData, PostState} from '~/contexts/types';
+import {PostData, PostState, PostsTypes} from '~/contexts/types';
 
 import {materialTheme} from '~/constants/materialTheme';
 
@@ -32,6 +32,7 @@ const POST_TITLE_LENGTH = 45;
 
 interface Props {
   post: PostData;
+  postsType: PostsTypes;
   index: number;
   username?: string;
   actionBarStyle: ActionBarStyle;
@@ -99,6 +100,7 @@ const PostView = (props: Props): JSX.Element => {
             <ActionBar
               actionBarStyle={props.actionBarStyle}
               postState={post.state}
+              postsType={props.postsType}
               postIndex={props.index}
             />
           </Block>

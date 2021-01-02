@@ -295,6 +295,7 @@ const Comment = (props: Props): JSX.Element => {
         <PostBody body={body} commentDepth={comment.depth} />
         <ActionBar
           actionBarStyle={ActionBarStyleComment}
+          postsType={postsState.postsType}
           postIndex={props.postIndex}
           postState={comment.state}
           handlePressReply={_handlePressReply}

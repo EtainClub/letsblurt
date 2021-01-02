@@ -69,6 +69,9 @@ export enum SettingUITypes {
   PRIVACY = 'privacy',
   RATE_APP = 'rate_app',
   APP_VERSION = 'app_version',
+  SHARE = 'share',
+  FEEDBACK = 'feedback',
+  ABOUT = 'about',
 }
 
 interface Props {}
@@ -310,6 +313,8 @@ const SettingsContainer = (props: Props): JSX.Element => {
         updateSettingSchema(StorageSchema.BLOCKCHAINS, _blockchains);
         // set blockchain client
         setBlockchainClient(value);
+        // show guide message
+        setToastMessage(intl.formatMessage({id: 'Settings.msg_restart'}));
         break;
       case SettingUITypes.IMAGE_SERVER:
         // check if the input value is the same as the current value
@@ -320,6 +325,8 @@ const SettingsContainer = (props: Props): JSX.Element => {
         _blockchains = {rpc: rpcServer, image: value};
         // update in context state
         updateSettingSchema(StorageSchema.BLOCKCHAINS, _blockchains);
+        // show guide message
+        setToastMessage(intl.formatMessage({id: 'Settings.msg_restart'}));
         break;
       case SettingUITypes.LOCALE:
         // build structure
@@ -333,6 +340,8 @@ const SettingsContainer = (props: Props): JSX.Element => {
         setLocale(_locale);
         // update in context state
         updateSettingSchema(StorageSchema.LANGUAGES, _languages);
+        // show guide message
+        setToastMessage(intl.formatMessage({id: 'Settings.msg_restart'}));
         break;
       case SettingUITypes.TRANSLATION:
         // check if the input value is the same as the current value

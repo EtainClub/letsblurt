@@ -35,6 +35,7 @@ const Post = (props: Props): JSX.Element => {
   return (
     <PostView
       post={props.post}
+      postsType={postsState.postsType}
       index={props.index}
       username={props.username}
       actionBarStyle={props.actionBarStyle}
