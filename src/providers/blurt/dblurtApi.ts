@@ -846,7 +846,8 @@ export const fetchPostDetails = async (
   try {
     const post = await client.database.call('get_content', [author, permlink]);
     const postData = await parsePost(post, username, isPromoted);
-    return postData;
+    if (postData) return postData;
+    return null;
   } catch (error) {
     console.log('failed to fetch post details', error);
     return null;
@@ -934,7 +935,7 @@ export const broadcastPost = async (
   // verify the key
   const {account} = await verifyPassoword(postingData.author, password);
   if (!account) {
-    return {success: false, message: 'the password is invalid'};
+    return null;
   }
   // build comment
   const opArray = [['comment', postingData]];
@@ -949,16 +950,18 @@ export const broadcastPost = async (
   if (privateKey) {
     try {
       const result = await client.broadcast.sendOperations(opArray, privateKey);
-      return result;
+      if (result) return result;
+      return null;
     } catch (error) {
       console.log('failed to broadcast a post', error);
       return null;
     }
   }
   // wrong private key
-  return Promise.reject(
-    new Error('Check private key. Required private posting key or above'),
+  console.log(
+    '[broadcastPost] Check private key. Required private posting key or above',
   );
+  return null;
 };
 
 export const broadcastPostUpdate = async (
@@ -1155,16 +1158,17 @@ export const submitVote = async (
     // use dblurt library --> has signing problem in release mode
     try {
       const result = await client.broadcast.vote(vote, privateKey);
-      return result;
+      if (result) return result;
+      return null;
     } catch (error) {
       console.log('failed to submit a vote', error);
       return null;
     }
   }
-  // wrong private key
-  return Promise.reject(
-    new Error('Check private key. Required private posting key or above'),
+  console.log(
+    '[submitVote] Check private key. Required private posting key or above',
   );
+  return null;
 };
 
 //////// profile

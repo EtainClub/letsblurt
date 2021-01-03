@@ -1,5 +1,5 @@
 //// react
-import React, {useReducer, createContext} from 'react';
+import React, {useReducer, createContext, useContext} from 'react';
 //// language
 import {useIntl} from 'react-intl';
 //// blockchain api
@@ -32,6 +32,8 @@ import {
   INIT_FILTER_LIST,
 } from '~/contexts/types';
 import {filter} from 'lodash';
+
+import {UIContext} from '~/contexts';
 
 const MAX_RETRY = 3;
 
@@ -202,12 +204,15 @@ type Props = {
 };
 
 const PostsProvider = ({children}: Props) => {
-  //// language
-  const intl = useIntl();
   // userReducer hook
   // set auth reducer with initial state of auth state
   const [postsState, dispatch] = useReducer(postsReducer, initialState);
   console.log('[posts provider] posts', postsState);
+  //// language
+  const intl = useIntl();
+  //// contexts
+  // toast message function from UI contexts
+  const {setToastMessage} = useContext(UIContext);
 
   ////// action creators
   //// fetch tag list
@@ -220,6 +225,7 @@ const PostsProvider = ({children}: Props) => {
     const accountState = await fetchAccountState('letsblurt');
     if (!accountState) {
       console.log('[getTagList] account state is null');
+      setToastMessage(intl.formatMessage({id: 'fetch_error'}));
       return null;
     }
     const _tags = accountState.tag_idx.trending;
@@ -272,7 +278,6 @@ const PostsProvider = ({children}: Props) => {
     noFollowings?: boolean,
     appending?: boolean,
     inputTag?: string,
-    setToastMessage?: (message: string) => void,
   ) => {
     //// set start post ref
     let startPostRef = {
@@ -355,7 +360,10 @@ const PostsProvider = ({children}: Props) => {
     // check fetching result
     if (result.length != 0) {
       _posts = result;
-    } else return null;
+    } else {
+      setToastMessage(intl.formatMessage({id: 'fetch_error'}));
+      return null;
+    }
 
     // set start post ref
     const lastPost = _posts[_posts.length - 1];
@@ -402,12 +410,16 @@ const PostsProvider = ({children}: Props) => {
       username,
     );
     console.log('[getPostDetails] post', post);
-    // dispatch action
-    dispatch({
-      type: PostsActionTypes.SET_POST_DETAILS,
-      payload: post,
-    });
-    return post;
+    if (post) {
+      // dispatch action
+      dispatch({
+        type: PostsActionTypes.SET_POST_DETAILS,
+        payload: post,
+      });
+      return post;
+    }
+    setToastMessage(intl.formatMessage({id: 'fetch_error'}));
+    return null;
   };
 
   //// set tag index
@@ -456,7 +468,6 @@ const PostsProvider = ({children}: Props) => {
     password: string,
     votingWeight: number,
     voteAmount: number,
-    setToastMessage?: (message: string) => void,
   ) => {
     console.log(
       '[PostsContext|upvote] postsType, postIndex, voteAmount',
@@ -476,7 +487,10 @@ const PostsProvider = ({children}: Props) => {
     );
     // check result
     console.log('[upvote] results', results);
-    if (!results) return null;
+    if (!results) {
+      setToastMessage(intl.formatMessage({id: 'transaction_error'}));
+      return null;
+    }
 
     //// update post states
     // new post state
@@ -499,7 +513,6 @@ const PostsProvider = ({children}: Props) => {
         postsState[postsType].posts[postIndex].comments,
         {author: postRef.author, permlink: postRef.permlink},
       );
-
       dispatch({
         type: PostsActionTypes.UPVOTE_COMMENT,
         payload: {
@@ -520,7 +533,7 @@ const PostsProvider = ({children}: Props) => {
     return results;
   };
 
-  /// helper function to find the comment
+  //// helper function to find the comment
   const _updateComments = (comments, postRef) => {
     const {author, permlink} = comments[0];
     if (author === postRef.author && permlink === postRef.permlink) {
@@ -536,7 +549,7 @@ const PostsProvider = ({children}: Props) => {
     }
   };
 
-  // submit post/comment
+  //// submit post/comment
   const submitPost = async (
     postingContent: PostingContent,
     password: string,
@@ -546,9 +559,13 @@ const PostsProvider = ({children}: Props) => {
   ) => {
     // broadcast comment
     const result = await broadcastPost(postingContent, password, options);
-    // dispatch action
-    // TODO; distinguish post and comment
-    return result;
+    if (result) {
+      // dispatch action
+      // TODO; distinguish post and comment
+      return result;
+    }
+    setToastMessage(intl.formatMessage({id: 'transaction_error'}));
+    return null;
   };
 
   // update post
@@ -562,28 +579,31 @@ const PostsProvider = ({children}: Props) => {
     postIndex?: number,
   ) => {
     // submit comment
-    const {success, message} = await broadcastPostUpdate(
+    const result = await broadcastPostUpdate(
       originalBody,
       originalPermlink,
       originalParentPermlink,
       postingContent,
       password,
     );
-    let action = PostsActionTypes.SET_POST_DETAILS;
-    if (isComment) action = PostsActionTypes.SET_POST_DETAILS;
-    if (success) {
-      // update post detail
-      const post = postsState.postDetails;
-      post.body = renderPostBody(postingContent.body, true, true);
-      post.state.title = postingContent.title;
-      post.metadata = JSON.parse(postingContent.json_metadata);
-      dispatch({
-        type: action,
-        payload: post,
-      });
+    console.log('[updatePost] result', result);
+    if (!result) {
+      setToastMessage(intl.formatMessage({id: 'transaction_error'}));
+      return null;
     }
-    console.log('[updatePost] success, message', success, message);
-    return {success, message};
+    let action = PostsActionTypes.SET_POST_DETAILS;
+    // TODO: handle comment. set the parent post detail??
+    if (isComment) action = PostsActionTypes.SET_POST_DETAILS;
+    // update post detail
+    const post = postsState.postDetails;
+    post.body = renderPostBody(postingContent.body, true, true);
+    post.state.title = postingContent.title;
+    post.metadata = JSON.parse(postingContent.json_metadata);
+    dispatch({
+      type: action,
+      payload: post,
+    });
+    return result;
   };
 
   //// bookmark post in firebase
@@ -602,8 +622,15 @@ const PostsProvider = ({children}: Props) => {
       .doc(`users/${username}`)
       .collection('bookmarks')
       .doc(docId);
-    // check saniy if the user already bookmarked this
-    const bookmark = await docRef.get();
+    // check sanity if the user already bookmarked this
+    let bookmark = null;
+    try {
+      bookmark = await docRef.get();
+    } catch (error) {
+      console.log('failed to get bookmarks', error);
+      setToastMessage(intl.formatMessage({id: 'fetch_error'}));
+      return;
+    }
     if (bookmark.exists) {
       console.log('[addBookmark] User bookmarked already');
       setToastMessage(intl.formatMessage({id: 'Bookmark.already'}));
@@ -634,8 +661,14 @@ const PostsProvider = ({children}: Props) => {
       .doc(`users/${username}`)
       .collection('bookmarks')
       .doc(docId);
-    // check saniy if the user already bookmarked this
-    const bookmark = await docRef.get();
+    let bookmark = null;
+    try {
+      bookmark = await docRef.get();
+    } catch (error) {
+      console.log('failed to get bookmarks', error);
+      setToastMessage(intl.formatMessage({id: 'fetch_error'}));
+      return;
+    }
     if (bookmark.exists) {
       return {
         bookmarked: true,
@@ -662,6 +695,7 @@ const PostsProvider = ({children}: Props) => {
         });
       })
       .catch((e) => {
+        setToastMessage(intl.formatMessage({id: 'fetch_error'}));
         console.log('failed to get bookmarks', e);
       });
     return bookmarks;
@@ -672,7 +706,6 @@ const PostsProvider = ({children}: Props) => {
     author: string,
     username: string,
     remove: boolean,
-    setToastMessage?: (message: string) => void,
   ) => {
     console.log('[favoriteAuthor] author', author);
     // create a reference to the doc
@@ -727,6 +760,7 @@ const PostsProvider = ({children}: Props) => {
         });
       })
       .catch((e) => {
+        setToastMessage(intl.formatMessage({id: 'fetch_error'}));
         console.log('failed to get bookmarks', e);
       });
     return favorites;
@@ -757,7 +791,6 @@ const PostsProvider = ({children}: Props) => {
       value={{
         postsState,
         getTagList,
-        //        fetchCommunities,
         fetchPosts,
         setPostRef,
         clearPosts,

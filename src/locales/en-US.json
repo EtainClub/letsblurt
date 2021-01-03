@@ -40,6 +40,7 @@
   "failed": "Failed",
   "fetch_error": "Failed to fetch data",
   "update_error": "Failed to update data",
+  "transaction_error": "Transaction failed",
   "App": {
     "push_title": "Push Message Arrived",
     "push_body": "Do you want to see the details?"

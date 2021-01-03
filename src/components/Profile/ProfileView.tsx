@@ -20,24 +20,18 @@ import {navigate} from '~/navigation/service';
 import {useIntl} from 'react-intl';
 //// ui, styles
 import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
-import {
-  Images,
-  argonTheme,
-  BLURT_IMAGE_SERVERS,
-} from '~/constants';
+import {Images, argonTheme, BLURT_IMAGE_SERVERS} from '~/constants';
 const {width, height} = Dimensions.get('screen');
 import {HeaderHeight} from '~/constants/utils';
 //// contexts
 import {PostData, PostRef, PostsTypes, ProfileData} from '~/contexts/types';
 //// etc
-import {BlockchainTypes} from '~/contexts/types';
 import {getNumberStat} from '~/utils/stats';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 
 //// props
 interface Props {
   profileData: ProfileData;
-  blockchain?: BlockchainTypes;
   isUser?: boolean;
   favoriting: boolean;
   favoriteState: boolean;
@@ -51,7 +45,6 @@ interface Props {
 }
 //// component with default props
 const ProfileView: React.FC<Props> = ({
-  blockchain = BlockchainTypes.BLURT,
   isUser = true,
   ...props
 }): JSX.Element => {

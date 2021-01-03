@@ -124,7 +124,6 @@ const Feed = (props: Props): JSX.Element => {
       noFollowings,
       appending,
       uiState.selectedTag,
-      setToastMessage,
     );
 
     console.log('postsState', postsState);

@@ -343,7 +343,6 @@ export interface PostsContextType {
     noFollowings?: boolean,
     appending?: boolean,
     inputTag?: string,
-    setToastMessage?: (message: string) => void,
   ) => Promise<PostData[]>;
   // clear posts
   clearPosts: (postsType: PostsTypes) => void;
@@ -359,7 +358,6 @@ export interface PostsContextType {
     password: string,
     votingWeight: number,
     voteAmount: number,
-    setToastMessage?: (message: string) => void,
   ) => Promise<any>;
   // submit post
   submitPost: (
@@ -368,10 +366,7 @@ export interface PostsContextType {
     isComment: boolean,
     options?: any[],
     postIndex?: number,
-  ) => Promise<{
-    success: boolean;
-    message: any;
-  }>;
+  ) => Promise<any>;
   // update post
   updatePost: (
     originalBody: string,
@@ -381,17 +376,9 @@ export interface PostsContextType {
     password: string,
     isComment: boolean,
     postIndex?: number,
-  ) => Promise<{
-    success: boolean;
-    message: any;
-  }>;
+  ) => Promise<any>;
   // bookmark
-  bookmarkPost: (
-    postRef: PostRef,
-    username: string,
-    title: string,
-    setToastMessage?: (message: string) => void,
-  ) => void;
+  bookmarkPost: (postRef: PostRef, username: string, title: string) => void;
   // fetch database state
   fetchDatabaseState: (
     postRef: PostRef,
@@ -404,7 +391,6 @@ export interface PostsContextType {
     author: string,
     username: string,
     remove: boolean,
-    setToastMessage?: (message: string) => void,
   ) => Promise<boolean>;
   // fetch all favorite authurs
   fetchFavorites: (username: string) => Promise<any[]>;

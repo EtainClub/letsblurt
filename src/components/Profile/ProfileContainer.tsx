@@ -101,7 +101,6 @@ const ProfileContainer = (props: Props): JSX.Element => {
       props.profileData.profile.name,
       authState.currentCredentials.username,
       favoriteState,
-      setToastMessage,
     );
     setFavoriting(false);
     //// update favorite state
@@ -153,7 +152,6 @@ const ProfileContainer = (props: Props): JSX.Element => {
   return (
     <ProfileView
       profileData={props.profileData}
-      blockchain={settingsState.blockchainType}
       isUser={props.isUser}
       favoriting={favoriting}
       favoriteState={favoriteState}
