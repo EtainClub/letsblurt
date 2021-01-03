@@ -221,6 +221,9 @@
     "error": "Transaction failed",
     "success": "Transaction succeeded"
   },
+  "TokenTransfer": {
+    "next_button": "Next"
+  },
   "Settings": {
     "blockchain_settings": "Blockchain",
     "rpc_server": "RPC Server",

@@ -13,6 +13,8 @@ import {
   transferToken,
   TransactionReturnCodes,
 } from '~/providers/blurt/dblurtApi';
+//// components
+import {TokenTransfer} from '~/components';
 
 //// props
 interface Props {
@@ -27,7 +29,9 @@ const Wallet = (props: Props): JSX.Element => {
   const intl = useIntl();
   //// contexts
   const {authState} = useContext(AuthContext);
-  const {userState, getWalletData, getPrice} = useContext(UserContext);
+  const {userState, getWalletData, getPrice, getFollowings} = useContext(
+    UserContext,
+  );
   const {setToastMessage} = useContext(UIContext);
   //// states
   const [walletData, setWalletData] = useState<WalletData>(
@@ -35,15 +39,19 @@ const Wallet = (props: Props): JSX.Element => {
   );
   const [claiming, setClaiming] = useState(false);
   const [price, setPrice] = useState(0);
+  const [showTransferModal, setShowTransferModal] = useState(false);
+  const [followingList, setFollowingList] = useState([]);
   //////// events
   //// event: mount
   useEffect(() => {
     if (authState.loggedIn) {
-      console.log('[wallet] crendentials', authState.currentCredentials);
+      const {username} = authState.currentCredentials;
       // fetch user data
-      getWalletData(authState.currentCredentials.username);
+      getWalletData(username);
       // fetch price
       getPrice();
+      // get following list
+      _getFollowingList(username);
     }
   }, []);
   //// on focus event:
@@ -71,6 +79,12 @@ const Wallet = (props: Props): JSX.Element => {
     console.log('[Wallet] set price', userState.price);
   }, [userState.price]);
 
+  //// get followings
+  const _getFollowingList = async (username: string) => {
+    const _followings = await getFollowings(username);
+    setFollowingList(_followings);
+  };
+
   //// claim reward balance
   const _handlePressClaim = async () => {
     setClaiming(true);
@@ -86,6 +100,11 @@ const Wallet = (props: Props): JSX.Element => {
       // set toast message
       setToastMessage(intl.formatMessage({id: 'Wallet.claim_ok'}));
     }
+  };
+
+  ////
+  const _handlePressTransfer = () => {
+    setShowTransferModal(true);
   };
 
   //// transfer token
@@ -134,13 +153,19 @@ const Wallet = (props: Props): JSX.Element => {
     }
   };
 
-  return (
+  return showTransferModal ? (
+    <TokenTransfer
+      title="Transfer to Account"
+      username="etainclub"
+      followings={followingList}
+    />
+  ) : (
     <WalletScreen
       walletData={walletData}
       handlePressClaim={_handlePressClaim}
       claiming={claiming}
       price={price}
-      handlePressTransfer={_transferToken}
+      handlePressTransfer={_handlePressTransfer}
     />
   );
 };

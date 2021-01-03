@@ -576,7 +576,7 @@ const SettingsContainer = (props: Props): JSX.Element => {
               {item.title}
             </Text>
             <DropdownModal
-              key={item.options[0]}
+              key={item.id}
               defaultText={defaultText}
               dropdownButtonStyle={styles.dropdownButtonStyle}
               selectedOptionIndex={selectedIndex}

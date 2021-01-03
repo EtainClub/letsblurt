@@ -19,6 +19,7 @@ import {PostBody} from './PostBody';
 import {PostsFeed} from './PostsFeed';
 import {PostsListView} from './PostsList';
 import {ProfileContainer} from './Profile';
+import {TokenTransfer} from './TokenTransfer';
 import {WalletStatsView, WalletKeyView} from './Wallet';
 
 export {
@@ -36,6 +37,7 @@ export {
   PostsListView,
   PostBody,
   ProfileContainer,
+  TokenTransfer,
   WalletStatsView,
   WalletKeyView,
   DraggableList,

@@ -53,8 +53,11 @@ export default () => {
           _locale,
         );
       } else {
-        // store the locale in the storage
-        const _languages = {locale: _locale, translation: 'EN'};
+        // store the locale and translation in the storage
+        const _languages = {
+          locale: _locale,
+          translation: _locale.split('-')[0].toUpperCase(),
+        };
         AsyncStorage.setItem('languages', JSON.stringify(_languages));
       }
     }

@@ -220,6 +220,9 @@
     "error": "거래 실패",
     "success": "거래 성공"
   },
+  "TokenTransfer": {
+    "next_button": "계속 진행"
+  },
   "Settings": {
     "blockchain_settings": "블록체인",
     "rpc_server": "블록체인 서버",
