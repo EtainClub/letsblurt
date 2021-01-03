@@ -135,6 +135,8 @@ export interface SettingsContextType {
   getItemFromStorage: (key: string) => Promise<any>;
   // update a single item in schema
   updateSettingSchema: (schema: StorageSchema, data: any) => void;
+  // set all state to storage
+  setAllStatesToStorage: () => void;
 }
 
 export type SettingsAction =

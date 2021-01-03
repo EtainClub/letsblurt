@@ -27,7 +27,7 @@ export interface UIState {
   // edit mode
   editMode: boolean;
   // supported translated languages;
-  translateLanguages: [];
+  translateLanguages: string[];
   selectedLanguage: string;
 }
 
