@@ -46,11 +46,13 @@ const ImageUploadContainer = (props: Props): JSX.Element => {
 
   ////
   const _handlePhotoUpload = () => {
+    console.log('[_handlePhotoUpload]');
     ImagePicker.openPicker({
       width: 640,
       includeBase64: true,
     })
       .then((photos) => {
+        console.log('[_handlePhotoUpload]. selected photo', photos);
         _uploadPhoto(photos);
       })
       .catch((error) => {
@@ -60,6 +62,7 @@ const ImageUploadContainer = (props: Props): JSX.Element => {
 
   ////
   const _handleCameraUpload = () => {
+    console.log('[_handleCameraUpload]');
     ImagePicker.openCamera({
       includeBase64: true,
     })
@@ -72,14 +75,19 @@ const ImageUploadContainer = (props: Props): JSX.Element => {
   };
 
   //// handle selection failure
-  const _handleSelectionFailure = (error) => {};
+  const _handleSelectionFailure = (error) => {
+    console.log('[_handleSelectionFailure]. error', error);
+  };
 
   //// upload a photo
   const _uploadPhoto = async (photo: ImageOrVideo) => {
     console.log('[ImageUpload] _uploadPhoto. photo', photo);
     setUploading(true);
     // check logged in
-    if (!authState.loggedIn) return;
+    if (!authState.loggedIn) {
+      setUploading(false);
+      //      return;
+    }
     const {username, password} = authState.currentCredentials;
     // sign the photo
     let sign = await signImage(photo, username, password);
@@ -88,7 +96,7 @@ const ImageUploadContainer = (props: Props): JSX.Element => {
     if (!sign) {
       setUploading(false);
       setToastMessage(intl.formatMessage({id: 'ImageUpload.sign_failed'}));
-      return;
+      //      return;
     }
     // upload photo
     uploadImage(photo, username, sign)
@@ -122,12 +130,14 @@ const ImageUploadContainer = (props: Props): JSX.Element => {
   };
 
   return (
-    <ImageUploadView
-      containerStyle={props.containerStyle}
-      uploading={uploading}
-      handlePhotoUpload={_handlePhotoUpload}
-      handleCameraUpload={_handleCameraUpload}
-    />
+    true && (
+      <ImageUploadView
+        containerStyle={props.containerStyle}
+        uploading={uploading}
+        handlePhotoUpload={_handlePhotoUpload}
+        handleCameraUpload={_handleCameraUpload}
+      />
+    )
   );
 };
 

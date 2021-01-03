@@ -41,7 +41,7 @@ const ImageUploadView = (props: Props): JSX.Element => {
 
   //// handle press photo upload
   const _handlePressPhotoUpload = () => {
-    console.log('[_handlePressPhotoUpload');
+    console.log('[_handlePressPhotoUpload]');
     // show the action modal
     photoUploadRef.current?.setModalVisible(true);
   };

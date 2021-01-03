@@ -71,7 +71,7 @@ export interface SettingsState {
 export const INITIAL_SETTINGS: SettingsState = {
   [StorageSchema.PUSH_NOTIFICATIONS]: ['vote', 'beneficiary'],
   [StorageSchema.BLOCKCHAINS]: {
-    rpc: BLURT_MAINNETS[0],
+    rpc: BLURT_MAINNETS[3],
     image: BLURT_IMAGE_SERVERS[0],
   },
   [StorageSchema.SECURITIES]: {
