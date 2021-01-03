@@ -196,6 +196,7 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
 
       <ScrollView
         ref={commentRef}
+        contentContainerStyle={{flex: 1}}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl refreshing={props.loading} onRefresh={_onRefresh} />

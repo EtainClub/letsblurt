@@ -65,15 +65,15 @@ export default () => {
   return (
     <IntlProvider locale={locale} messages={flattenMessages(messages[locale])}>
       <SettingsProvider>
-        <UserProvider>
-          <UIProvider>
+        <UIProvider>
+          <UserProvider>
             <PostsProvider>
               <AuthProvider>
                 <AppContainer />
               </AuthProvider>
             </PostsProvider>
-          </UIProvider>
-        </UserProvider>
+          </UserProvider>
+        </UIProvider>
       </SettingsProvider>
     </IntlProvider>
   );

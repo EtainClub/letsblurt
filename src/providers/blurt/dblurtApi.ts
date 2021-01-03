@@ -553,7 +553,7 @@ export const fetchUserProfile = async (username: string) => {
     console.log('[fetchUserProfile] accountState', accountState);
     if (!accountState) {
       console.log('[fetchUserProfile] accountState is null', accountState);
-      return;
+      return null;
     }
     // get account
     const account = get(accountState.accounts, username, '');
@@ -642,7 +642,7 @@ export const updateFollow = async (
   // verify the key
   const {account} = await verifyPassoword(follower, password);
   if (!account) {
-    return {success: false, message: 'the password is invalid'};
+    return null;
   }
   // get privake key from password
   const privateKey = PrivateKey.from(password);
@@ -661,9 +661,11 @@ export const updateFollow = async (
     let fee = (operationFlatFee + bwFee).toFixed(3);
     try {
       const result = await client.broadcast.json(operation, privateKey);
-      return result;
+      if (result) return result;
+      return null;
     } catch (error) {
       console.log('Failed to broadcast update follow state', error);
+      return null;
     }
   }
 };
@@ -685,26 +687,36 @@ export const fetchFollowings = async (
       followType,
       limit,
     ]);
-    return result;
+    if (result) return result;
+    return null;
   } catch (error) {
     console.log('failed to fetch following', error);
-    throw error;
     return null;
   }
 };
 
-export const fetchFollowers = (
+export const fetchFollowers = async (
   username: string,
   startFollowing: string,
   followType = 'blog',
   limit = 1000,
-) =>
-  client.call('condenser_api', 'get_followers', [
-    username,
-    startFollowing,
-    followType,
-    limit,
-  ]);
+) => {
+  try {
+    const result = await client.call('condenser_api', 'get_followers', [
+      username,
+      startFollowing,
+      followType,
+      limit,
+    ]);
+    if (result) {
+      return result;
+    }
+    return null;
+  } catch (error) {
+    console.log('failed to fetch followers', error);
+    return null;
+  }
+};
 
 export const isFollowing = async (username: string, author: string) => {
   try {
@@ -741,7 +753,8 @@ export const fetchPrice = async () => {
   const {data} = await axios.get(BLURT_PRICE_ENDPOINT, {
     timeout: 5000,
   });
-  return data;
+  if (data) return data;
+  else return null;
 };
 
 // fetch community list of a user
@@ -1216,14 +1229,20 @@ export const broadcastProfileUpdate = async (
 /////////// notifications
 //// fetch notifications
 export const fetchNotifications = async (username: string): Promise<any[]> => {
-  return new Promise((resolve, reject) => {
-    const notiClient = new NotiClient('wss://notifications.blurt.world');
-    notiClient.call('get_notifications', [username], (err, result) => {
-      if (err) reject(err);
-      resolve(result);
-    });
-  });
+  const notiClient = new NotiClient('wss://notifications.blurt.world');
+  const result = await notiClient.call('get_notifications', [username]);
+  if (result) return result;
+  return null;
 };
+// export const fetchNotifications = async (username: string): Promise<any[]> => {
+//   return new Promise((resolve, reject) => {
+//     const notiClient = new NotiClient('wss://notifications.blurt.world');
+//     notiClient.call('get_notifications', [username], (err, result) => {
+//       if (err) reject(err);
+//       resolve(result);
+//     });
+//   });
+// };
 
 //////////// wallet
 //// fetch wallet data
@@ -1267,8 +1286,10 @@ export const fetchWalletData = async (username: string) => {
       };
       return walletData;
     }
+    return null;
   } catch (error) {
     console.log('failed to fetch wallet data', error);
+    return null;
   }
 };
 

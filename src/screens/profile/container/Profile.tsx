@@ -66,6 +66,18 @@ const Profile = ({navigation}): JSX.Element => {
 
   console.log('[ProfileContainer] navigation', navigation);
 
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     if (authState.loggedIn) {
+  //       const {username} = authState.currentCredentials;
+  //       setProfileFetched(false);
+  //       _getUserProfileData(username);
+  //       _fetchBookmarks(username);
+  //       _fetchFavorites(username);
+  //     }
+  //   }, []),
+  // );
+
   //// fetch user state
   useEffect(() => {
     if (authState.loggedIn) {
@@ -76,6 +88,7 @@ const Profile = ({navigation}): JSX.Element => {
       _fetchFavorites(username);
     }
   }, [authState.currentCredentials]);
+
   //// edit event
   useEffect(() => {
     if (!editMode && profileData) {
@@ -88,6 +101,11 @@ const Profile = ({navigation}): JSX.Element => {
     // fetch user profile data
     const _profileData = await getUserProfileData(author);
     console.log('[_getUserProfileData] profile data', _profileData);
+    if (!_profileData) {
+      console.log('[_getUserProfileData] profile data', profileData);
+      setProfileFetched(true);
+      return;
+    }
     // set profile data
     setProfileData(_profileData);
     // build summaries of blogs
@@ -250,9 +268,11 @@ const Profile = ({navigation}): JSX.Element => {
         handlePressEdit={_handlePressEdit}
       />
     ) : (
-      <View style={{top: 20}}>
-        <ActivityIndicator color={argonTheme.COLORS.ERROR} size="large" />
-      </View>
+      !profileFetched && (
+        <View style={{top: 20}}>
+          <ActivityIndicator color={argonTheme.COLORS.ERROR} size="large" />
+        </View>
+      )
     )
   ) : (
     profileData && (

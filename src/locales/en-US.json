@@ -38,6 +38,8 @@
   "reward": "Reward",
   "something_wrong": "Something went wrong",
   "failed": "Failed",
+  "fetch_error": "Failed to fetch data",
+  "update_error": "Failed to update data",
   "App": {
     "push_title": "Push Message Arrived",
     "push_body": "Do you want to see the details?"

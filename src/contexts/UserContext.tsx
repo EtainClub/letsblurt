@@ -1,4 +1,6 @@
-import React, {useReducer, createContext} from 'react';
+import React, {useReducer, createContext, useContext} from 'react';
+//// language
+import {useIntl} from 'react-intl';
 import {
   fetchGlobalProps,
   getAccount,
@@ -23,6 +25,7 @@ import {
   UserActionTypes,
   UserAction,
 } from './types';
+import {UIContext} from './UIContext';
 
 // initial state
 const initialState = {
@@ -105,23 +108,33 @@ const UserProvider = ({children}: Props) => {
   // useReducer hook
   const [userState, dispatch] = useReducer(userReducer, initialState);
   console.log('[user provider] state', userState);
+  //// language
+  const intl = useIntl();
+  //// toast message function from UI contexts
+  const {setToastMessage} = useContext(UIContext);
 
   const testState = userState;
   //////// action creator
   //// set steem global props
   const fetchBlockchainGlobalProps = async (username: string = null) => {
+    //// fetch global properties
     const globalProps = await fetchGlobalProps();
     console.log('[fetchBlockchainGlobalProps]', globalProps);
+    if (globalProps) {
+      // dispatch action
+      dispatch({
+        type: UserActionTypes.SET_GLOBAL_PROPS,
+        payload: globalProps,
+      });
+    } else {
+      setToastMessage(intl.formatMessage({id: 'fetch_error'}));
+      return null;
+    }
 
-    // dispatch action
-    dispatch({
-      type: UserActionTypes.SET_GLOBAL_PROPS,
-      payload: globalProps,
-    });
-
+    //// estimate vote amount
+    // check sanity
     if (!username) return;
-
-    // estimate vote amount
+    // get account
     const account = await getAccount(username);
     if (account) {
       const amount = await estimateVoteAmount(account, globalProps);
@@ -178,6 +191,7 @@ const UserProvider = ({children}: Props) => {
       });
       return walletData;
     } else {
+      setToastMessage(intl.formatMessage({id: 'fetch_error'}));
       console.log('[getWalletData] walletData not fetched', walletData);
       return null;
     }
@@ -194,6 +208,9 @@ const UserProvider = ({children}: Props) => {
         type: UserActionTypes.SET_PROFILE_DATA,
         payload: profileData,
       });
+    } else {
+      setToastMessage(intl.formatMessage({id: 'fetch_error'}));
+      return null;
     }
     return profileData;
   };
@@ -202,17 +219,27 @@ const UserProvider = ({children}: Props) => {
     if (!username) return null;
     const notifications = await fetchNotifications(username);
     console.log('[getNotifications] notifications', notifications);
-    return notifications;
+    if (notifications) {
+      return notifications;
+    } else {
+      setToastMessage(intl.formatMessage({id: 'fetch_error'}));
+      return null;
+    }
   };
 
   const getPrice = async () => {
     const {price_usd} = await fetchPrice();
     console.log('[getPrice] price', price_usd);
-    dispatch({
-      type: UserActionTypes.SET_PRICE,
-      payload: price_usd,
-    });
-    return price_usd;
+    if (price_usd) {
+      dispatch({
+        type: UserActionTypes.SET_PRICE,
+        payload: price_usd,
+      });
+      return price_usd;
+    } else {
+      setToastMessage(intl.formatMessage({id: 'fetch_error'}));
+      return null;
+    }
   };
 
   //////// follow
@@ -236,7 +263,9 @@ const UserProvider = ({children}: Props) => {
       bw_fee,
     );
     console.log('[updateFollowState] transaction result', result);
-    return result;
+    if (result) return result;
+    setToastMessage(intl.formatMessage({id: 'update_error'}));
+    return null;
   };
 
   //// get followings
@@ -262,6 +291,7 @@ const UserProvider = ({children}: Props) => {
       });
       return followings;
     } else {
+      setToastMessage(intl.formatMessage({id: 'fetch_error'}));
       return null;
     }
   };
@@ -277,6 +307,10 @@ const UserProvider = ({children}: Props) => {
       followingType,
       limit,
     );
+    if (!result) {
+      setToastMessage(intl.formatMessage({id: 'fetch_error'}));
+      return null;
+    }
     // get the followers
     const followers = result.map((item) => {
       return item.follower;
