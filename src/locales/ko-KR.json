@@ -41,6 +41,7 @@
   "fetch_error": "데이터를 가져오는데 실패했습니다.",
   "update_error": "데이터를 업데이트하지 못했습니다.",
   "transaction_error": "트랜잭션 실패",
+  "key_error": "계정 또는 키에 오류가 있습니다.",
   "App": {
     "push_title": "푸쉬 메시지 도착",
     "push_body": "상세 내용을 보시겠습니까?"

@@ -1,3 +1,7 @@
+//// react
+import React, {useReducer, createContext, useContext} from 'react';
+//// language
+import {useIntl} from 'react-intl';
 //// firebase
 // firebase phone auth
 //import auth from '@react-native-firebase/auth';
@@ -6,7 +10,6 @@ import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 // keychain
 import * as Keychain from 'react-native-keychain';
-import React, {useReducer, createContext} from 'react';
 //
 import {
   AuthActionTypes,
@@ -17,7 +20,8 @@ import {
 } from './types/authTypes';
 import AsyncStorage from '@react-native-community/async-storage';
 import {LOGIN_TOKEN} from '../screens';
-
+import {UIContext} from '~/contexts';
+import {FlatList} from 'react-native';
 const KEYCHAIN_SERVER = 'users';
 
 const initialState: AuthState = {
@@ -73,6 +77,11 @@ const AuthProvider = ({children}: Props) => {
   // set auth reducer with initial state of auth state
   const [authState, dispatch] = useReducer(authReducer, initialState);
   console.log('[auth provider] authState', authState);
+  //// language
+  const intl = useIntl();
+  //// contexts
+  // toast message function from UI contexts
+  const {setToastMessage} = useContext(UIContext);
 
   //// action creators
   ////
@@ -101,6 +110,10 @@ const AuthProvider = ({children}: Props) => {
           credentialsList: keysList,
         },
       });
+    } else {
+      console.log('[getCredentials] failed to get key');
+      setToastMessage(intl.formatMessage({id: 'key_error'}));
+      return;
     }
   };
 
@@ -116,7 +129,13 @@ const AuthProvider = ({children}: Props) => {
     // save the credentials in the keychain if the settings is on
     let keysList = [];
     if (storingCredentials) {
-      keysList = await _storeCredentials(credentials);
+      const result = await _storeCredentials(credentials);
+      if (!result) {
+        console.log('[processLogin] failed to store key');
+        setToastMessage(intl.formatMessage({id: 'key_error'}));
+        return;
+      }
+      keysList = result;
     }
     // dispatch action: set credentials
     dispatch({
@@ -138,9 +157,19 @@ const AuthProvider = ({children}: Props) => {
     await AsyncStorage.removeItem(LOGIN_TOKEN);
     console.log('removed login token');
     // remove firebase device push token
-    _removePushToken(currentCredentials.username);
+    const result1 = await _removePushToken(currentCredentials.username);
+    if (!result1) {
+      console.log('[processLogout] failed to remove push token');
+      setToastMessage(intl.formatMessage({id: 'key_error'}));
+      return;
+    }
     // remove the current credentials in the keychain
-    _removeCredentials(currentCredentials.username);
+    const result2 = await _removeCredentials(currentCredentials.username);
+    if (!result2) {
+      console.log('[processLogout] failed to remove push token');
+      setToastMessage(intl.formatMessage({id: 'key_error'}));
+      return;
+    }
     // dispatch action: set credentials
     dispatch({
       type: AuthActionTypes.LOGOUT,
@@ -155,7 +184,8 @@ const AuthProvider = ({children}: Props) => {
     const {credentials} = await _getCredentials(account);
     if (!credentials) {
       console.log('[AuthContext|changeAccount] error! no account');
-      return;
+      setToastMessage(intl.formatMessage({id: 'key_error'}));
+      return null;
     }
     // dispatch action
     dispatch({
@@ -277,11 +307,11 @@ const _removeCredentials = async (username: string) => {
     //const result = await Keychain.resetGenericPassword({service: username});
     const result = await Keychain.resetInternetCredentials(KEYCHAIN_SERVER);
     console.log('[_removeCredentials] remove credentials result', result);
-    // @test
-    const _keys = await Keychain.getInternetCredentials(KEYCHAIN_SERVER);
-    console.log('[_removeCredentials] _keys', _keys);
+    if (result) return result;
+    return null;
   } catch (error) {
     console.error('failed to remove credentials', error);
+    return null;
   }
 };
 
@@ -290,6 +320,7 @@ const _removePushToken = async (username: string) => {
   // get user document
   const userRef = firestore().doc(`users/${username}`);
   // remove push token
+  let removed = false;
   userRef
     .get()
     .then((doc) => {
@@ -300,6 +331,7 @@ const _removePushToken = async (username: string) => {
         auth()
           .signOut()
           .then(() => {
+            removed = true;
             console.log('sign out from firebase');
           })
           .catch((error) =>
@@ -310,6 +342,10 @@ const _removePushToken = async (username: string) => {
     .catch((error) =>
       console.log('[remove push token] failed to get user document', error),
     );
+  if (removed) {
+    return true;
+  }
+  return null;
 };
 
 export {AuthContext, AuthProvider};
