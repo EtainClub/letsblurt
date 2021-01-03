@@ -45,7 +45,11 @@ export interface AuthContextType {
   getCredentials: (username: string) => void;
   // login with token. @toto what to do?
   // process login
-  processLogin: (credentials: Credentials, addingAccount: boolean) => void;
+  processLogin: (
+    credentials: Credentials,
+    addingAccount: boolean,
+    storeCredentials?: boolean,
+  ) => void;
   // process logout
   processLogout: () => void;
   // change account

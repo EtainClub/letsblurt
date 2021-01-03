@@ -131,38 +131,6 @@ const DNDTimesContainer = (props: Props): JSX.Element => {
     props.cancelTime(isStart);
   };
 
-  // // update swith state when a user clicks the DND time switch
-  // const _onDNDValueChange = async (value) => {
-  //   console.log('[onDNDValueChange] value', value);
-  //   // update the state
-  //   setShowDND(value);
-  //   // save the flag in async storage
-  //   await AsyncStorage.setItem('DNDSetting', JSON.stringify(value));
-  //   // save the current time in async storage
-  //   if (value) {
-  //     await AsyncStorage.setItem(
-  //       'startDNDTime',
-  //       JSON.stringify(startDNDTime.time),
-  //     );
-  //     await AsyncStorage.setItem('endDNDTime', JSON.stringify(endDNDTime.time));
-  //     //// update db
-  //     // convert the timestamp to minutes based on UTC+0
-  //     const time1 = convertTimeToUTC0(startDNDTime.time);
-  //     const time2 = convertTimeToUTC0(endDNDTime.time);
-  //     // concatenate the times
-  //     const times = [time1, time2];
-  //     // update
-  //     // userRef.update({
-  //     //   dndTimes: times,
-  //     // });
-  //   } else {
-  //     // update db when user unselect dnd time
-  //     // userRef.update({
-  //     //   dndTimes: null,
-  //     // });
-  //   }
-  // };
-
   return (
     <DNDTimesView
       showStartClock={showStartClock}

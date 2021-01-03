@@ -338,6 +338,12 @@ const SettingsContainer = (props: Props): JSX.Element => {
         _languages = {locale: _locale, translation: translation};
         // update state
         setLocale(_locale);
+        // update in firestore
+        if (userRef) {
+          userRef.update({
+            locale: _locale,
+          });
+        }
         // update in context state
         updateSettingSchema(StorageSchema.LANGUAGES, _languages);
         // show guide message
@@ -350,13 +356,6 @@ const SettingsContainer = (props: Props): JSX.Element => {
         setTranslation(value);
         // build structure
         _languages = {locale: locale, translation: value};
-        // update in firestore
-        // TODO: modify the firebase field: remove locale, add translation
-        if (userRef) {
-          userRef.update({
-            translation: value,
-          });
-        }
         // update in context state
         updateSettingSchema(StorageSchema.LANGUAGES, _languages);
         break;

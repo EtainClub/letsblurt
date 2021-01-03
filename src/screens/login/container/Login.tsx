@@ -72,10 +72,13 @@ const Login = (props: Props): JSX.Element => {
         const userRef = firestore().collection('users').doc(_username);
         userRef
           .get()
-          .then((doc) => {
+          .then(async (doc) => {
             // create a new document
             if (!doc.exists) {
               console.log('user doc does not exist');
+              // get perferred language
+              const _languages = await AsyncStorage.getItem('languages');
+              const languages = JSON.parse(_languages);
               // create a user
               userRef
                 .set({
@@ -84,6 +87,9 @@ const Login = (props: Props): JSX.Element => {
                   createdAt: new Date(),
                   lastLoginAt: new Date(),
                   phone: _phoneNumber,
+                  dndTimes: null,
+                  pushNotifications: ['beneficiary'],
+                  locale: languages.locale,
                 })
                 .then(() => console.log('created user document'))
                 .catch((error) =>
