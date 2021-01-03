@@ -43,6 +43,7 @@
   "transaction_error": "트랜잭션 실패",
   "key_error": "계정 또는 키에 오류가 있습니다.",
   "storage_error": "내부 저장소 읽기 또는 쓰기 오류",
+  "blockchain_client_error": "블록체인 클라이언를 설정하지 못했습니다.",
   "App": {
     "push_title": "푸쉬 메시지 도착",
     "push_body": "상세 내용을 보시겠습니까?"
@@ -152,7 +153,9 @@
   },
   "PostDetails": {
     "edit-button": "수정",
-    "wrong_link": "잘못된 링크입니다."
+    "wrong_link": "잘못된 링크입니다.",
+    "need_login": "로그인이 필요한 기능입니다.",
+    "translation_error": "번역 실패"
   },
   "ParentPost": {
     "info": "다음은 본 포스팅의 원글입니다.",

@@ -43,6 +43,7 @@
   "transaction_error": "Transaction failed",
   "key_error": "Something wrong with the account or key",
   "storage_error": "Failed to get or set storage",
+  "blockchain_client_error": "Could not setup blockchain client",
   "App": {
     "push_title": "Push Message Arrived",
     "push_body": "Do you want to see the details?"
@@ -152,7 +153,9 @@
   },
   "PostDetails": {
     "edit-button": "Edit Post",
-    "wrong_link": "The link is broken"
+    "wrong_link": "The link is broken",
+    "need_login": "You need to login to use this",
+    "translation_error": "Failed to translate"
   },
   "ParentPost": {
     "info": "You are seeing the single post of the following:",

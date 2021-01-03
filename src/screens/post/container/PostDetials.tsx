@@ -3,6 +3,8 @@
 import React, {useState, useEffect, useContext} from 'react';
 // react native
 import {View, ActivityIndicator, Platform} from 'react-native';
+//// language
+import {useIntl} from 'react-intl';
 // config
 import Config from 'react-native-config';
 //// firebase
@@ -40,6 +42,8 @@ const PostDetails = (props: Props): JSX.Element => {
   const {route} = props;
   // TODO: check if this works, otherwise use context
   const index = route.params?.index;
+  //// language
+  const intl = useIntl();
   // contexts
   const {authState} = useContext(AuthContext);
   const {userState, updateVoteAmount} = useContext(UserContext);
@@ -50,7 +54,7 @@ const PostDetails = (props: Props): JSX.Element => {
     fetchDatabaseState,
     appendTag,
   } = useContext(PostsContext);
-  const {uiState} = useContext(UIContext);
+  const {setToastMessage} = useContext(UIContext);
   const {settingsState} = useContext(SettingsContext);
   //// states
   const [loading, setLoading] = useState(true);
@@ -215,13 +219,12 @@ const PostDetails = (props: Props): JSX.Element => {
   const _translateLanguage = async () => {
     if (!authState.loggedIn) {
       console.log('you need to log in to translate a post');
+      setToastMessage(intl.formatMessage({id: 'PostDetails.need_login'}));
       return;
     }
-    console.log('[_translateLanguage] showOriginal', showOriginal);
     const _showOriginal = !showOriginal;
     setShowOriginal(_showOriginal);
     if (_showOriginal) {
-      console.log('[_translateLanguage] showOriginal', _showOriginal);
       // set original post
       setPostDetails(originalPostDetails);
       return;
@@ -235,7 +238,6 @@ const PostDetails = (props: Props): JSX.Element => {
     const title = postDetails.state.title;
     const body = postDetails.body;
     const targetLang = settingsState.languages.translation;
-    console.log('targetLang', targetLang);
     const titleOptions = {
       targetLang: targetLang,
       text: title,
@@ -251,20 +253,9 @@ const PostDetails = (props: Props): JSX.Element => {
       const titleTranslation = await firebase
         .functions()
         .httpsCallable('translationRequest')(titleOptions);
-      console.log('translation. title', titleTranslation);
       const bodyTranslation = await firebase
         .functions()
         .httpsCallable('translationRequest')(bodyOptions);
-      console.log('translation body', bodyTranslation);
-
-      console.log(
-        '_translateLanguage. translation',
-        titleTranslation.data.data.translations[0],
-      );
-      console.log(
-        '_translateLanguage. translation',
-        bodyTranslation.data.data.translations[0],
-      );
 
       const translatedTitle =
         titleTranslation.data.data.translations[0].translatedText;
@@ -286,6 +277,9 @@ const PostDetails = (props: Props): JSX.Element => {
       //return translation.data.translations[0].translatedText;
     } catch (error) {
       console.log('failed to translate', error);
+      setToastMessage(
+        intl.formatMessage({id: 'PostDetails.translation_error'}),
+      );
     }
   };
 

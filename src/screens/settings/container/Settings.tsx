@@ -312,7 +312,11 @@ const SettingsContainer = (props: Props): JSX.Element => {
         // update in context state
         updateSettingSchema(StorageSchema.BLOCKCHAINS, _blockchains);
         // set blockchain client
-        setBlockchainClient(value);
+        const clientResult = await setBlockchainClient(value);
+        if (!clientResult) {
+          setToastMessage(intl.formatMessage({id: 'blockchain_client_error'}));
+          return;
+        }
         // show guide message
         setToastMessage(intl.formatMessage({id: 'Settings.msg_restart'}));
         break;

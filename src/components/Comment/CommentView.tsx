@@ -12,6 +12,8 @@ import {
   TouchableWithoutFeedback,
   ScrollView,
 } from 'react-native';
+//// language
+import {useIntl} from 'react-intl';
 //// firebase
 import {firebase} from '@react-native-firebase/functions';
 //// UIs
@@ -51,9 +53,11 @@ interface Props {
 const Comment = (props: Props): JSX.Element => {
   //// props
   const {comment} = props;
+  //// language
+  const intl = useIntl();
   //// contexts
   const {authState} = useContext(AuthContext);
-  const {uiState} = useContext(UIContext);
+  const {setToastMessage} = useContext(UIContext);
   const {postsState, submitPost, updatePost} = useContext(PostsContext);
   const {settingsState} = useContext(SettingsContext);
   //// stats
@@ -141,13 +145,12 @@ const Comment = (props: Props): JSX.Element => {
   const _handlePressTranslation = async () => {
     if (!authState.loggedIn) {
       console.log('you need to log in to translate a post');
+      setToastMessage(intl.formatMessage({id: 'PostDetails.need_login'}));
       return;
     }
-    console.log('[_translateLanguage] showOriginal', showOriginal);
     const _showOriginal = !showOriginal;
     setShowOriginal(_showOriginal);
     if (_showOriginal) {
-      console.log('[_translateLanguage] showOriginal', _showOriginal);
       // set original comment
       setBody(originalBody);
       return;
@@ -159,7 +162,6 @@ const Comment = (props: Props): JSX.Element => {
       return;
     }
     const targetLang = settingsState.languages.translation;
-    console.log('targetLang', targetLang);
     const bodyOptions = {
       targetLang: targetLang,
       text: body,
@@ -171,10 +173,6 @@ const Comment = (props: Props): JSX.Element => {
         .functions()
         .httpsCallable('translationRequest')(bodyOptions);
 
-      console.log(
-        '_translateLanguage. translation',
-        bodyTranslation.data.data.translations[0],
-      );
       const translatedBody =
         bodyTranslation.data.data.translations[0].translatedText;
 
@@ -184,6 +182,9 @@ const Comment = (props: Props): JSX.Element => {
       setTranslatedBody(translatedBody);
     } catch (error) {
       console.log('failed to translate', error);
+      setToastMessage(
+        intl.formatMessage({id: 'PostDetails.translation_error'}),
+      );
     }
   };
 

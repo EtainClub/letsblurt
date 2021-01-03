@@ -70,7 +70,7 @@ export const setBlockchainClient = async (server?: string) => {
     const _blockchains = await AsyncStorage.getItem('blockchains');
     const blockchains = JSON.parse(_blockchains);
     console.log('[changeServerOrder] blockchains', blockchains);
-    if (!blockchains) return;
+    if (!blockchains) return null;
     rpc = blockchains.rpc;
   } else {
     // use the argument
@@ -84,6 +84,8 @@ export const setBlockchainClient = async (server?: string) => {
   const index = serverList.indexOf(rpc);
   if (index > -1) {
     serverList.splice(index, 1);
+  } else {
+    return null;
   }
   // put the server first in the list
   serverList = [rpc, ...serverList];
@@ -99,6 +101,7 @@ export const setBlockchainClient = async (server?: string) => {
     consoleOnFailover: true,
   });
   console.log('Blurt Client reordered', client);
+  return true;
 };
 
 setBlockchainClient();
