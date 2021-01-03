@@ -139,7 +139,8 @@
     "limited_characters": "태그에는 지정된 문자를 사용해 주세요.",
     "limited_firstchar": "태그의 첫자는 문자여야 합니다.",
     "limited_lastchar": "태그의 끝은 문자나 숫자로 끝나야 합니다.",
-    "beneficiary_button": "베네피셔리 설정"
+    "beneficiary_button": "베네피셔리 설정",
+    "preview": "미리보기"
   },
   "Beneficiary": {
     "header": "베네피셔리 설정",
@@ -250,6 +251,10 @@
     "share": "이 앱을 공유하기",
     "feedback": "의견 보내기",
     "about": "앱 정보"
+  },
+  "ImageUpload": {
+    "upload_success": "이미지 업로드 성공",
+    "sign_failed": "이미지 서명 실패"
   },
   "Actionbar": {
     "edit": "수정",

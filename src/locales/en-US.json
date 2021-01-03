@@ -139,7 +139,8 @@
     "limited_characters": "Use only allowed characters in tag",
     "limited_firstchar": "Tag must start with a letter",
     "limited_lastchar": "Tag must end with letter or number",
-    "beneficiary_button": "Beneficiary"
+    "beneficiary_button": "Beneficiary",
+    "preview": "Preview"
   },
   "Beneficiary": {
     "header": "Beneficiary Setting",
@@ -257,6 +258,10 @@
     "vote_wo_login": "You need to login to vote",
     "vote_again": "You already voted on this post",
     "voted": "Successfully voted!"
+  },
+  "ImageUpload": {
+    "upload_success": "Image uploaded successfully",
+    "sign_failed": "Failed to sign the image"
   },
   "Actionsheet": {
     "open": "Open the link",

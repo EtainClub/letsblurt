@@ -2,23 +2,24 @@ import Button from './Button';
 //import Select from "./Select";
 import {Tabs} from './Tabs';
 //import Post from "./Post";
-import Drawer from './Drawer';
 import {Header} from './Header';
-import {DropdownModal} from './DropdownModal';
 import {Avatar} from './Avatar';
 import {ActionBar} from './ActionBar';
 import {AuthorList} from './AuthorList';
+import {Beneficiary} from './Beneficiary';
 import {Comment} from './Comment';
+import {DNDTimes} from './DNDTimes';
+import {DraggableList} from './DraggableList';
+import Drawer from './Drawer';
+import {DropdownModal} from './DropdownModal';
+import {ImageUpload} from './ImageUpload';
+import {OTP} from './OTP';
+import {ParentPost} from './ParentPost';
+import {PostBody} from './PostBody';
 import {PostsFeed} from './PostsFeed';
 import {PostsListView} from './PostsList';
-import {PostBody} from './PostBody';
 import {ProfileContainer} from './Profile';
 import {WalletStatsView, WalletKeyView} from './Wallet';
-import {DraggableList} from './DraggableList';
-import {ParentPost} from './ParentPost';
-import {OTP} from './OTP';
-import {Beneficiary} from './Beneficiary';
-import {DNDTimes} from './DNDTimes';
 
 export {
   Avatar,
@@ -30,6 +31,7 @@ export {
   Tabs,
   DropdownModal,
   Comment,
+  ImageUpload,
   PostsFeed,
   PostsListView,
   PostBody,

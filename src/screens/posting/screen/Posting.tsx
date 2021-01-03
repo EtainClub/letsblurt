@@ -22,8 +22,10 @@ import {UserContext} from '~/contexts';
 import renderPostBody from '~/utils/render-helpers/markdown-2-html';
 import {PostData} from '~/contexts/types';
 const {width, height} = Dimensions.get('screen');
-
 import {Images, BLURT_IMAGE_SERVERS, STEEM_IMAGE_SERVER} from '~/constants';
+
+import {ImageUpload} from '~/components';
+
 const IMAGE_SERVER = BLURT_IMAGE_SERVERS[0];
 const MAX_TAGS = 5;
 const BACKGROUND_COLORS = [
@@ -41,13 +43,12 @@ interface Props {
   uploading: boolean;
   uploadedImage: {};
   posting: boolean;
-  handlePhotoUpload: () => void;
-  handleCameraUpload: () => void;
   handlePressPostSumbit: (title: string, body: string, tags: string) => void;
   followingList?: string[];
   handleMentionAuthor: (text: string) => void;
   handlePressBeneficiary: () => void;
   handleCancelEditing: () => void;
+  getUploadedImageURL: (url: string) => void;
 }
 
 const PostingScreen = (props: Props): JSX.Element => {
@@ -211,32 +212,32 @@ const PostingScreen = (props: Props): JSX.Element => {
     }
   };
 
-  //// handle press photo upload
-  const _handlePressPhotoUpload = () => {
-    console.log('[Posting');
-    // show the action modal
-    photoUploadRef.current?.setModalVisible(true);
-  };
+  // //// handle press photo upload
+  // const _handlePressPhotoUpload = () => {
+  //   console.log('[Posting');
+  //   // show the action modal
+  //   photoUploadRef.current?.setModalVisible(true);
+  // };
 
-  ////
-  const _openImagePicker = () => {
-    props.handlePhotoUpload();
-    // hide the modal
-    photoUploadRef.current?.setModalVisible(false);
-  };
+  // ////
+  // const _openImagePicker = () => {
+  //   props.handlePhotoUpload();
+  //   // hide the modal
+  //   photoUploadRef.current?.setModalVisible(false);
+  // };
 
-  ///
-  const _openCamera = () => {
-    props.handleCameraUpload();
-    // hide the modal
-    photoUploadRef.current?.setModalVisible(false);
-  };
+  // ///
+  // const _openCamera = () => {
+  //   props.handleCameraUpload();
+  //   // hide the modal
+  //   photoUploadRef.current?.setModalVisible(false);
+  // };
 
-  ////
-  const _closeActionSheet = () => {
-    // hide the modal
-    photoUploadRef.current?.setModalVisible(false);
-  };
+  // ////
+  // const _closeActionSheet = () => {
+  //   // hide the modal
+  //   photoUploadRef.current?.setModalVisible(false);
+  // };
 
   ////
   const _onPressPostSubmit = () => {
@@ -274,7 +275,7 @@ const PostingScreen = (props: Props): JSX.Element => {
   const _renderPreview = () => (
     <Block>
       <Text style={{marginLeft: 5, borderTopWidth: 2, fontWeight: 'bold'}}>
-        Preview
+        {intl.formatMessage({id: 'Posting.preview'})}
       </Text>
       <Block card style={{margin: 10}}>
         <PostBody body={previewBody} />
@@ -318,7 +319,7 @@ const PostingScreen = (props: Props): JSX.Element => {
               autoCorrect={false}
             />
           </Block>
-          <Block row>
+          {/* <Block row>
             <Button
               onPress={_handlePressPhotoUpload}
               loading={props.uploading}
@@ -327,6 +328,12 @@ const PostingScreen = (props: Props): JSX.Element => {
               iconFamily="font-awesome"
               iconSize={14}
               color={argonTheme.COLORS.ERROR}
+            />
+          </Block> */}
+          <Block row>
+            <ImageUpload
+              containerStyle={{right: true}}
+              getImageURL={props.getUploadedImageURL}
             />
           </Block>
           <Block style={{paddingHorizontal: theme.SIZES.BASE}}>
@@ -387,7 +394,7 @@ const PostingScreen = (props: Props): JSX.Element => {
           {_renderPreview()}
         </Block>
       </ScrollView>
-      <ActionSheet ref={photoUploadRef}>
+      {/* <ActionSheet ref={photoUploadRef}>
         <Block center>
           <Button color="primary" onPress={_openImagePicker}>
             {intl.formatMessage({id: 'Actionsheet.gallery'})}
@@ -399,7 +406,7 @@ const PostingScreen = (props: Props): JSX.Element => {
             {intl.formatMessage({id: 'Actionsheet.close'})}
           </Button>
         </Block>
-      </ActionSheet>
+      </ActionSheet> */}
 
       {showAuthorsModal && (
         <AuthorList

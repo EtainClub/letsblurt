@@ -126,74 +126,79 @@ const Posting = (props: Props): JSX.Element => {
     console.log('press author', author);
   };
 
-  ////
-  const _handlePhotoUpload = () => {
-    ImagePicker.openPicker({
-      width: 640,
-      includeBase64: true,
-    })
-      .then((photos) => {
-        _uploadPhoto(photos);
-      })
-      .catch((error) => {
-        _handleSelectionFailure(error);
-      });
-  };
+  // ////
+  // const _handlePhotoUpload = () => {
+  //   ImagePicker.openPicker({
+  //     width: 640,
+  //     includeBase64: true,
+  //   })
+  //     .then((photos) => {
+  //       _uploadPhoto(photos);
+  //     })
+  //     .catch((error) => {
+  //       _handleSelectionFailure(error);
+  //     });
+  // };
+
+  // ////
+  // const _handleCameraUpload = () => {
+  //   ImagePicker.openCamera({
+  //     includeBase64: true,
+  //   })
+  //     .then((image) => {
+  //       _uploadPhoto(image);
+  //     })
+  //     .catch((error) => {
+  //       _handleSelectionFailure(error);
+  //     });
+  // };
+
+  // //// upload a photo
+  // const _uploadPhoto = async (photo: ImageOrVideo) => {
+  //   console.log('[PostingContainer] _uploadPhoto. photo', photo);
+  //   setUploading(true);
+  //   // check logged in
+  //   if (!authState.loggedIn) return;
+  //   const {username, password} = authState.currentCredentials;
+  //   // sign the photo
+  //   let sign = await signImage(photo, username, password);
+  //   console.log('[_uploadPhoto] sign', sign);
+  //   // check sanity
+  //   if (!sign) return;
+  //   // upload photo
+  //   uploadImage(photo, username, sign)
+  //     .then((res) => {
+  //       console.log('[PostingContainer] uploadImage, res', res);
+  //       if (res.data && res.data.url) {
+  //         res.data.hash = res.data.url.split('/').pop();
+  //         setUploading(false);
+  //         setToastMessage('Upload Successful!');
+  //         setUploadedImage(res.data);
+  //       }
+  //     })
+  //     .catch((error) => {
+  //       console.log('Failed to upload image', error, error.message);
+  //       if (error.toString().includes('code 413')) {
+  //         setToastMessage(intl.formatMessage({id: 'Alert.payload_too_large'}));
+  //       } else if (error.toString().includes('code 429')) {
+  //         setToastMessage(intl.formatMessage({id: 'Alert.quota_exceeded'}));
+  //       } else if (error.toString().includes('code 400')) {
+  //         setToastMessage(intl.formatMessage({id: 'Alert.invalid_image'}));
+  //       } else {
+  //         setToastMessage(intl.formatMessage({id: 'Alert.failed'}));
+  //       }
+  //       // clear uploading
+  //       setUploading(false);
+  //     });
+  // };
+
+  // //// handle selection failure
+  // const _handleSelectionFailure = (error) => {};
 
   ////
-  const _handleCameraUpload = () => {
-    ImagePicker.openCamera({
-      includeBase64: true,
-    })
-      .then((image) => {
-        _uploadPhoto(image);
-      })
-      .catch((error) => {
-        _handleSelectionFailure(error);
-      });
+  const _getUploadedImageUrl = (url: string) => {
+    console.log('_getUploadedImageUrl', url);
   };
-
-  //// upload a photo
-  const _uploadPhoto = async (photo: ImageOrVideo) => {
-    console.log('[PostingContainer] _uploadPhoto. photo', photo);
-    setUploading(true);
-    // check logged in
-    if (!authState.loggedIn) return;
-    const {username, password} = authState.currentCredentials;
-    // sign the photo
-    let sign = await signImage(photo, username, password);
-    console.log('[_uploadPhoto] sign', sign);
-    // check sanity
-    if (!sign) return;
-    // upload photo
-    uploadImage(photo, username, sign)
-      .then((res) => {
-        console.log('[PostingContainer] uploadImage, res', res);
-        if (res.data && res.data.url) {
-          res.data.hash = res.data.url.split('/').pop();
-          setUploading(false);
-          setToastMessage('Upload Successful!');
-          setUploadedImage(res.data);
-        }
-      })
-      .catch((error) => {
-        console.log('Failed to upload image', error, error.message);
-        if (error.toString().includes('code 413')) {
-          setToastMessage(intl.formatMessage({id: 'Alert.payload_too_large'}));
-        } else if (error.toString().includes('code 429')) {
-          setToastMessage(intl.formatMessage({id: 'Alert.quota_exceeded'}));
-        } else if (error.toString().includes('code 400')) {
-          setToastMessage(intl.formatMessage({id: 'Alert.invalid_image'}));
-        } else {
-          setToastMessage(intl.formatMessage({id: 'Alert.failed'}));
-        }
-        // clear uploading
-        setUploading(false);
-      });
-  };
-
-  //// handle selection failure
-  const _handleSelectionFailure = (error) => {};
 
   //// handle press post
   const _handlePressPostSumbit = async (
@@ -312,13 +317,12 @@ const Posting = (props: Props): JSX.Element => {
         uploading={uploading}
         uploadedImage={uploadedImage}
         posting={posting}
-        handlePhotoUpload={_handlePhotoUpload}
-        handleCameraUpload={_handleCameraUpload}
         handlePressPostSumbit={_handlePressPostSumbit}
         followingList={filteredFollowings}
         handleMentionAuthor={_showAuthorsModal}
         handlePressBeneficiary={_handlePressBeneficiary}
         handleCancelEditing={_handleCancelEditing}
+        getUploadedImageURL={_getUploadedImageUrl}
       />
       {showBeneficiaryModal ? (
         <Beneficiary

@@ -1,5 +1,6 @@
-// react native
+//// react
 import React, {useState, useEffect, useContext} from 'react';
+//// react native
 import {
   View,
   StyleSheet,
@@ -18,11 +19,9 @@ import {useIntl} from 'react-intl';
 import {firebase} from '@react-native-firebase/functions';
 //// UIs
 import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
-import HTML from 'react-native-render-html';
 import {argonTheme} from '~/constants/argonTheme';
 import {PostData, CommentData, PostingContent} from '~/contexts/types';
-import {Avatar, PostBody} from '~/components';
-import {ActionBar} from '../ActionBar';
+import {Avatar, PostBody, ImageUpload, ActionBar} from '~/components';
 import {ActionBarStyleComment} from '~/constants/actionBarTypes';
 import {
   AuthContext,
@@ -188,6 +187,8 @@ const Comment = (props: Props): JSX.Element => {
     }
   };
 
+  const _getUploadedImageURL = (url: string) => {};
+
   const _renderCommentForm = () => {
     const depth = comment.depth - 1;
     const _body = editMode ? body : replyText;
@@ -223,6 +224,10 @@ const Comment = (props: Props): JSX.Element => {
             onPress={_onCancelReply}
           />
         )}
+        <ImageUpload
+          containerStyle={{right: true}}
+          getImageURL={_getUploadedImageURL}
+        />
         <Input
           color="#9fa5aa"
           multiline

@@ -110,7 +110,6 @@ const ActionBarContainer = (props: Props): JSX.Element => {
       postState.post_ref,
       authState.currentCredentials.username,
       postState.title,
-      setToastMessage,
     );
   };
 
