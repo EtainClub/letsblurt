@@ -95,6 +95,8 @@ const userReducer = (state: UserState, action: UserAction) => {
       return {...state, followings: action.payload};
     case UserActionTypes.SET_FOLLOWERS:
       return {...state, followers: action.payload};
+    case UserActionTypes.SET_PHONE_NUMBER:
+      return {...state, phoneNumber: action.payload};
     default:
       return state;
   }
@@ -327,7 +329,7 @@ const UserProvider = ({children}: Props) => {
   const setPhoneNumberState = (phoneNumber: string) => {
     // dispatch action
     dispatch({
-      type: SET_PHONE_NUMBER,
+      type: UserActionTypes.SET_PHONE_NUMBER,
       payload: phoneNumber,
     });
   };

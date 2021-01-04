@@ -1,6 +1,7 @@
 {
   "title": "렛츠 블러트",
   "feed": "피드",
+  "post": "포스트",
   "notification": "알림",
   "posting": "포스팅",
   "profile": "프로필",
@@ -194,6 +195,7 @@
     "curation_reward": "큐레이션 보상",
     "author_reward": "저자 보상",
     "claim_reward": "보상 청구",
+    "reward_blurt": "보상: {what} Blurt",
     "claim_ok": "보상 청구 성공",
     "claim_error": "보상 청구 에러",
     "keys_header": "키(암호)와 권한",
