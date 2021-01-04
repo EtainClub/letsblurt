@@ -222,7 +222,10 @@
     "success": "Transaction succeeded"
   },
   "TokenTransfer": {
-    "next_button": "Next"
+    "next_button": "Next",
+    "transfer_button": "Transfer",
+    "confirm_title": "Confirm Transfer",
+    "empty_recipient": "You need to insert a recipient"
   },
   "Settings": {
     "blockchain_settings": "Blockchain",

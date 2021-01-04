@@ -61,7 +61,7 @@ const AuthorListView = (props: Props): JSX.Element => {
   //// states
   const [showModal, setShowModal] = useState(props.showModal);
   const [searchText, setSearchText] = useState('');
-  const [searchedItems, setSearchedItems] = useState(authors);
+  const [searchedItems, setSearchedItems] = useState(authors || []);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -105,6 +105,7 @@ const AuthorListView = (props: Props): JSX.Element => {
     if (text === '') {
       setSearchedItems(authors);
     } else {
+      console.log('authors', authors);
       const _filterdItems = authors.filter(
         (author) => text && author.includes(text),
       );

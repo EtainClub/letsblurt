@@ -24,7 +24,9 @@ import Modal from 'react-native-modal';
 import Autocomplete from 'react-native-autocomplete-input';
 import {argonTheme} from '~/constants';
 const {width, height} = Dimensions.get('window');
-import {UIContext} from '~/contexts';
+import {SettingsContext, UIContext} from '~/contexts';
+//// coponents
+import {AuthorList} from '~/components';
 
 const WEIGHT_OPTIONS = ['100', '75', '50', '25', '10', '0'];
 const BACKGROUND_COLORS = [
@@ -35,6 +37,8 @@ interface Props {
   title: string;
   username: string;
   followings: string[];
+  balance: string;
+  transferToken: (recipient: string, amount: string, memo?: string) => void;
 }
 const TokenTransferView = (props: Props): JSX.Element => {
   //// props
@@ -43,25 +47,25 @@ const TokenTransferView = (props: Props): JSX.Element => {
   const intl = useIntl();
   //// contexts
   const {setToastMessage} = useContext(UIContext);
+  const {settingsState} = useContext(SettingsContext);
   //// states
+  const [title, setTitle] = useState(props.title);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [showModal, setShowModal] = useState(true);
   const [query, setQuery] = useState('');
   const [filteredList, setFilteredList] = useState([]);
   const [hideResult, setHideResult] = useState(false);
-  const [amount, setAmount] = useState(0);
+  const [amount, setAmount] = useState('0');
   const [refresh, setRefresh] = useState(true);
+  const [showAuthorsModal, setShowAuthorsModal] = useState(false);
+  const [recipient, setRecipient] = useState('');
+  const [recipientAvatar, setRecipientAvatar] = useState('');
+  const [recipientMessage, setRecipientMessage] = useState('');
+  const [amountMessage, setAmountMessage] = useState('');
+  const [memo, setMemo] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   //// effect
   useEffect(() => {}, []);
-
-  const _handleChangeAccount = (text) => {
-    setQuery(text);
-    // filter
-    //    const _filtered = props.sourceList.filter((item) => item.includes(text));
-    //    setFilteredList(_filtered);
-    // clear hide
-    setHideResult(false);
-  };
 
   ////
   const _renderItem = (item: string, index: number) => {
@@ -106,59 +110,214 @@ const TokenTransferView = (props: Props): JSX.Element => {
   };
 
   ///
-  const _handleChangeAmount = (text) => {
-    setAmount(text);
+  const _handleChangeRecipient = (_recipient: string) => {
+    console.log('[_handleChangeRecipient]. recipient', _recipient);
   };
 
   ////
-  const _handlePressNext = () => {};
+  const _handleChangeAmount = (_amount: string) => {
+    ////
+    if (!showConfirm) {
+      console.log('_handleChangeAmount', _amount);
+      setAmount(_amount);
+    }
+  };
 
-  const _renderHeader = () => (
-    <Block center card>
-      <Block center style={{margin: 10}}>
-        <Block row center space="between">
-          <Text style={{marginRight: 10}}>From</Text>
-          <Input
-            disabled
-            left
-            icon="at"
-            family="font-awesome"
-            placeholder="regular"
-          />
-        </Block>
-        <Block row center space="between">
-          <Text style={{marginRight: 10}}>To</Text>
-          <Input left icon="at" family="font-awesome" placeholder="regular" />
-        </Block>
-        <Block>
+  ////
+  const _handleRecipientFocused = () => {
+    setRecipientMessage(null);
+    setErrorMessage(null);
+    setShowAuthorsModal(true);
+  };
+  //// check recipient account
+  const _checkRecipientValid = (_account: string) => {
+    console.log('_checkRecipientValid', _account);
+    if (!_account) {
+      setRecipientMessage(
+        intl.formatMessage({id: 'TokenTransfer.empty_recipient'}),
+      );
+      return false;
+    }
+    if (_account.length < 3) {
+      console.log('username must be longer than 3.', _account);
+      setRecipientMessage(intl.formatMessage({id: 'Signup.msg_too_short'}));
+      return false;
+    }
+    // long length
+    if (_account.length > 16) {
+      console.log('username must be shorter than 16.', _account);
+      setRecipientMessage(intl.formatMessage({id: 'Signup.msg_too_long'}));
+      return false;
+    }
+    // start with number
+    if (_account.match(/^\d/)) {
+      console.log('username must not start with a number.', _account);
+      setRecipientMessage(intl.formatMessage({id: 'Signup.msg_number'}));
+      return false;
+    }
+    return true;
+  };
+
+  //// check amount
+  const _checkAmountValid = (_amount: number) => {
+    // check amount
+    if (
+      parseFloat(props.balance) <= 0 ||
+      _amount <= 0 ||
+      _amount >= parseFloat(props.balance)
+    ) {
+      setAmountMessage('Check the amount');
+      return false;
+    }
+    console.log(
+      '_checkSanity. balance, amount',
+      parseFloat(props.balance),
+      _amount,
+    );
+    return true;
+  };
+
+  //// check sanity
+  const _checkSanity = () => {
+    // check recipient
+    if (!_checkRecipientValid(recipient)) return false;
+    //    if (!_checkAmountValid(parseFloat(amount))) return false;
+    return true;
+  };
+
+  ////
+  const _handlePressNext = () => {
+    if (!showConfirm) {
+      // check saity
+      const valid = _checkSanity();
+      if (valid) {
+        console.log('everything is valid. showConfirm', showConfirm);
+        setTitle(intl.formatMessage({id: 'TokenTransfer.confirm_title'}));
+        setShowConfirm(true);
+      } else {
+        setErrorMessage('Something is wrong. Check messages');
+      }
+    } else {
+      props.transferToken(recipient, amount, memo);
+    }
+  };
+
+  const _renderForms = () => {
+    //    const avatar = `${settingsState.blockchains.image}/u/${recipient}}/avatar`;
+    const userAvatar = `https://steemitimages.com/u/${props.username}/avatar`;
+    console.log('recipient avatar', recipientAvatar);
+    //   const recipientAvatar = 'https://steemitimages.com/u/rayheyna/avatar';
+    return (
+      <Block center card>
+        <Block center style={{margin: 10}}>
           <Block row center space="between">
-            <Text style={{marginRight: 10}}>Amount</Text>
-            <Input right placeholder="regular" />
+            <Text style={styles.text}>From</Text>
+            <Input
+              style={styles.input}
+              editable={false}
+              defaultValue={props.username}
+              autoCapitalize="none"
+              left
+              icon="at"
+              family="font-awesome"
+              placeholder="regular"
+            />
+            <Image
+              source={{
+                uri: userAvatar || null,
+              }}
+              style={styles.avatar}
+            />
           </Block>
-          <TouchableWithoutFeedback onPress={() => {}}>
-            <Text>Balance: 1.23 BLURT</Text>
-          </TouchableWithoutFeedback>
-        </Block>
-        <Block>
-          <Text size={10}>This memo is public</Text>
-          <Block row center>
-            <Text style={{marginRight: 10}}>Memo</Text>
-            <Input left icon="at" family="font-awesome" placeholder="regular" />
+          <Block row center space="between">
+            <Text style={styles.text}>To</Text>
+            <Input
+              style={styles.input}
+              editable={!showConfirm}
+              left
+              onFocus={_handleRecipientFocused}
+              onBlur={() => setShowAuthorsModal(false)}
+              defaultValue={recipient}
+              autoCapitalize="none"
+              icon="at"
+              family="font-awesome"
+              placeholder="regular"
+              onChangeText={_handleChangeRecipient}
+            />
+            <Image
+              source={{
+                uri: recipientAvatar || null,
+              }}
+              style={styles.avatar}
+            />
+          </Block>
+          <Text color="red">{recipientMessage}</Text>
+          <Block>
+            <Block row center space="between">
+              <Text style={styles.text}>Amount</Text>
+              <Block>
+                <Input
+                  editable={!showConfirm}
+                  right
+                  type="number-pad"
+                  style={[styles.input, {marginRight: 30}]}
+                  defaultValue={amount.toString()}
+                  placeholder="regular"
+                  onFocus={() => setAmountMessage(null)}
+                  onChangeText={_handleChangeAmount}
+                />
+              </Block>
+            </Block>
+            <TouchableOpacity
+              onPress={() => _handleChangeAmount(props.balance)}>
+              <Text color={argonTheme.COLORS.FACEBOOK} style={{left: 60}}>
+                Balance: {props.balance} BLURT
+              </Text>
+            </TouchableOpacity>
+            <Text color="red">{amountMessage}</Text>
+          </Block>
+          <Block>
+            <Block row center>
+              <Text style={styles.text}>Memo</Text>
+              <Input
+                style={[styles.input, {marginRight: 30}]}
+                editable={!showConfirm}
+                onChangeText={(text: string) => setMemo(text)}
+                placeholder="regular"
+              />
+            </Block>
+            <Text style={{left: 50}} size={14}>
+              This memo is public
+            </Text>
           </Block>
         </Block>
       </Block>
-    </Block>
-  );
+    );
+  };
 
   const _renderFooter = () => (
     <Block>
+      {showAuthorsModal && (
+        <AuthorList
+          authors={props.followings}
+          showModal={showAuthorsModal}
+          handlePressAuthor={(_recipient) => {
+            setRecipient(_recipient);
+            setRecipientAvatar(
+              `https://steemitimages.com/u/${_recipient}/avatar`,
+            );
+          }}
+        />
+      )}
       <Block row center>
         <Button
           size="small"
           shadowless
-          color={argonTheme.COLORS.MUTED}
-          onPress={() => setShowModal(false)}>
-          {intl.formatMessage({id: 'TokenTransfer.next_button'})}
+          color={argonTheme.COLORS.ERROR}
+          onPress={_handlePressNext}>
+          {showConfirm
+            ? intl.formatMessage({id: 'TokenTransfer.transfer_button'})
+            : intl.formatMessage({id: 'TokenTransfer.next_button'})}
         </Button>
       </Block>
       <Block center>
@@ -184,10 +343,10 @@ const TokenTransferView = (props: Props): JSX.Element => {
               borderBottomWidth: 5,
               marginBottom: 10,
             }}>
-            {props.title}
+            {title}
           </Text>
         </Block>
-        {_renderHeader()}
+        {_renderForms()}
         {_renderFooter()}
       </Block>
     </Modal>
@@ -207,6 +366,15 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     backgroundColor: theme.COLORS.WHITE,
     paddingVertical: 10,
+  },
+  text: {
+    width: 50,
+    textAlign: 'left',
+    marginRight: 10,
+  },
+  input: {
+    width: width * 0.6,
+    marginRight: 10,
   },
   autocompleteContainer: {
     flex: 1,

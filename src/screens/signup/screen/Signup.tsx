@@ -40,7 +40,7 @@ const SignupScreen = (props: Props): JSX.Element => {
     // long length
     if (username.length > 16) {
       console.log('username must be shorter than 16.', username);
-      setMessage(intl.formatMessage({id: 'Singup.msg_too_long'}));
+      setMessage(intl.formatMessage({id: 'Signup.msg_too_long'}));
       return false;
     }
     // start with number

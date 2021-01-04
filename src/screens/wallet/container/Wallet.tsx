@@ -60,7 +60,7 @@ const Wallet = (props: Props): JSX.Element => {
     const unsubscribe = navigation.addListener('focus', () => {
       console.log('[Wallet] focus event');
       if (authState.loggedIn) {
-        // fetch user data
+        // fetch user's wallet data
         getWalletData(authState.currentCredentials.username);
       }
     });
@@ -158,6 +158,7 @@ const Wallet = (props: Props): JSX.Element => {
       title="Transfer to Account"
       username="etainclub"
       followings={followingList}
+      balance={walletData.blurt}
     />
   ) : (
     <WalletScreen

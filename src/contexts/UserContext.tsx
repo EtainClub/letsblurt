@@ -216,14 +216,14 @@ const UserProvider = ({children}: Props) => {
   };
 
   const getNotifications = async (username: string) => {
-    if (!username) return null;
+    if (!username) return [];
     const notifications = await fetchNotifications(username);
     console.log('[getNotifications] notifications', notifications);
     if (notifications) {
       return notifications;
     } else {
       setToastMessage(intl.formatMessage({id: 'fetch_error'}));
-      return null;
+      return [];
     }
   };
 
@@ -292,7 +292,7 @@ const UserProvider = ({children}: Props) => {
       return followings;
     } else {
       setToastMessage(intl.formatMessage({id: 'fetch_error'}));
-      return null;
+      return [];
     }
   };
 
@@ -309,7 +309,7 @@ const UserProvider = ({children}: Props) => {
     );
     if (!result) {
       setToastMessage(intl.formatMessage({id: 'fetch_error'}));
-      return null;
+      return [];
     }
     // get the followers
     const followers = result.map((item) => {
