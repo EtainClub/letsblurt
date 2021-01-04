@@ -37,7 +37,12 @@ const Login = (props: Props): JSX.Element => {
   //// contexts
   const {authState, processLogin, processLogout} = useContext(AuthContext);
   const {uiState, setToastMessage} = useContext(UIContext);
-  const {userState, updateVoteAmount, getFollowings} = useContext(UserContext);
+  const {
+    userState,
+    updateVoteAmount,
+    getFollowings,
+    setPhoneNumberState,
+  } = useContext(UserContext);
   const {settingsState} = useContext(SettingsContext);
   //// states
   const [username, setUsername] = useState('');
@@ -131,6 +136,8 @@ const Login = (props: Props): JSX.Element => {
           setShowOTP(true);
         } else {
           console.log('[login|processOTP] doc data', doc.data());
+          // set the phone number to user context
+          setPhoneNumberState(doc.data().phone);
           // check setting if login opt is on
           if (!__DEV__ && settingsState.securities.useOTP) {
             // set phone number

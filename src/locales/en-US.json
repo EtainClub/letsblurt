@@ -222,10 +222,25 @@
     "success": "Transaction succeeded"
   },
   "TokenTransfer": {
+    "recipient_placeholder": "Recipient",
+    "amount_placeholder": "Amount to transfer",
+    "memo_placeholder": "Memo",
     "next_button": "Next",
     "transfer_button": "Transfer",
     "confirm_title": "Confirm Transfer",
-    "empty_recipient": "You need to insert a recipient"
+    "empty_recipient": "You need to insert a recipient",
+    "amount_message": "Check the amount",
+    "error": "Something is wrong. Check messages",
+    "balance": "Balance {what} Blurt",
+    "amount": "Amount",
+    "memo": "Memo",
+    "memo_message": "This memo is public"
+  },
+  "SecureKey": {
+    "title": "Proper Password Required",
+    "password_placeholder": "Password (Wallet Import Format or Master Password)",
+    "password_guide": "This operation requires your Active or Owner key or Master password.",
+    "confirm_button": "Confirm"
   },
   "Settings": {
     "blockchain_settings": "Blockchain",

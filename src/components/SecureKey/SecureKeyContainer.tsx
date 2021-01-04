@@ -24,7 +24,17 @@ const SecureKeyContainer = (props: Props): JSX.Element => {
   //// states
   //// effect
 
-  return <SecureKeyView username={props.username} useOTP={true} />;
+  ////
+  const _handleOTPResult = (result: boolean) => {
+    console.log('_handleOTPResult. result', result);
+  };
+  return (
+    <SecureKeyView
+      username={props.username}
+      useOTP={true}
+      handleOTPResult={_handleOTPResult}
+    />
+  );
 };
 
 export {SecureKeyContainer};

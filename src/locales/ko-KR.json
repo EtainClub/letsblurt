@@ -210,8 +210,8 @@
     "danger_zone": "위험 존",
     "danger_msg": "마스터 암호를 변경할 때 주의하세요",
     "change_master": "마스터 암호 변경하기 (비활성화)",
-    "from": "From",
-    "to": "To"
+    "from": "송신자",
+    "to": "수신자"
   },
   "Transaction": {
     "no_account": "존재하지 않는 계정이름입니다.",
@@ -224,7 +224,19 @@
     "next_button": "계속 진행",
     "transfer_button": "송금하기",
     "confirm_title": "송금 내용 확인",
-    "empty_recipient": "수신자를 입력해야 합니다."
+    "empty_recipient": "수신자를 입력해야 합니다.",
+    "amount_message": "금액을 확인하세요.",
+    "error": "오류가 발생했습니다. 메시지를 확인하세요.",
+    "balance": "잔고 {what} Blurt",
+    "amount": "금액",
+    "memo": "메모",
+    "memo_message": "이 메모는 누구나 볼 수 있습니다."
+  },
+  "SecureKey": {
+    "title": "암호 요구",
+    "password_placeholder": "패스워드 (Wallet Import Format 또는 마스터 암호)",
+    "password_guide": "액티트 키 이상의 키 또는 마스터 암호가 필요합니다.",
+    "confirm_button": "확인"
   },
   "Settings": {
     "blockchain_settings": "블록체인",

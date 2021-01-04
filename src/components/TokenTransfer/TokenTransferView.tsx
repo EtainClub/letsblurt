@@ -27,6 +27,7 @@ const {width, height} = Dimensions.get('window');
 import {SettingsContext, UIContext} from '~/contexts';
 //// coponents
 import {AuthorList} from '~/components';
+import {TokenTransfer} from '.';
 
 const WEIGHT_OPTIONS = ['100', '75', '50', '25', '10', '0'];
 const BACKGROUND_COLORS = [
@@ -111,7 +112,8 @@ const TokenTransferView = (props: Props): JSX.Element => {
 
   ///
   const _handleChangeRecipient = (_recipient: string) => {
-    console.log('[_handleChangeRecipient]. recipient', _recipient);
+    setRecipient('');
+    setShowAuthorsModal(true);
   };
 
   ////
@@ -166,7 +168,9 @@ const TokenTransferView = (props: Props): JSX.Element => {
       _amount <= 0 ||
       _amount >= parseFloat(props.balance)
     ) {
-      setAmountMessage('Check the amount');
+      setAmountMessage(
+        intl.formatMessage({id: 'TokenTransfer.amount_message'}),
+      );
       return false;
     }
     console.log(
@@ -181,37 +185,40 @@ const TokenTransferView = (props: Props): JSX.Element => {
   const _checkSanity = () => {
     // check recipient
     if (!_checkRecipientValid(recipient)) return false;
-    //    if (!_checkAmountValid(parseFloat(amount))) return false;
+    // check validty of amount
+    if (!_checkAmountValid(parseFloat(amount))) return false;
     return true;
   };
 
-  ////
+  //// handle press next button, transfer button
   const _handlePressNext = () => {
     if (!showConfirm) {
-      // check saity
+      // check saity of recipient and amount
       const valid = _checkSanity();
       if (valid) {
         console.log('everything is valid. showConfirm', showConfirm);
         setTitle(intl.formatMessage({id: 'TokenTransfer.confirm_title'}));
         setShowConfirm(true);
       } else {
-        setErrorMessage('Something is wrong. Check messages');
+        setErrorMessage(intl.formatMessage({id: 'TokenTransfer.error'}));
       }
     } else {
+      console.log('move to transfer view', showConfirm);
       props.transferToken(recipient, amount, memo);
     }
   };
 
   const _renderForms = () => {
-    //    const avatar = `${settingsState.blockchains.image}/u/${recipient}}/avatar`;
-    const userAvatar = `https://steemitimages.com/u/${props.username}/avatar`;
+    const userAvatar = `${settingsState.blockchains.image}/u/${props.username}/avatar`;
+    //const avatar = `${settingsState.blockchains.image}/u/${recipient}}/avatar`;
+    //const userAvatar = `https://steemitimages.com/u/${props.username}/avatar`;
     console.log('recipient avatar', recipientAvatar);
-    //   const recipientAvatar = 'https://steemitimages.com/u/rayheyna/avatar';
+    //       const recipientAvatar = 'https://steemitimages.com/u/rayheyna/avatar';
     return (
       <Block center card>
         <Block center style={{margin: 10}}>
           <Block row center space="between">
-            <Text style={styles.text}>From</Text>
+            <Text style={styles.text}>{intl.formatMessage({id: 'from'})}</Text>
             <Input
               style={styles.input}
               editable={false}
@@ -220,7 +227,6 @@ const TokenTransferView = (props: Props): JSX.Element => {
               left
               icon="at"
               family="font-awesome"
-              placeholder="regular"
             />
             <Image
               source={{
@@ -230,7 +236,7 @@ const TokenTransferView = (props: Props): JSX.Element => {
             />
           </Block>
           <Block row center space="between">
-            <Text style={styles.text}>To</Text>
+            <Text style={styles.text}>{intl.formatMessage({id: 'to'})}</Text>
             <Input
               style={styles.input}
               editable={!showConfirm}
@@ -241,7 +247,9 @@ const TokenTransferView = (props: Props): JSX.Element => {
               autoCapitalize="none"
               icon="at"
               family="font-awesome"
-              placeholder="regular"
+              placeholder={intl.formatMessage({
+                id: 'TokenTransfer.recipient_placeholder',
+              })}
               onChangeText={_handleChangeRecipient}
             />
             <Image
@@ -254,7 +262,9 @@ const TokenTransferView = (props: Props): JSX.Element => {
           <Text color="red">{recipientMessage}</Text>
           <Block>
             <Block row center space="between">
-              <Text style={styles.text}>Amount</Text>
+              <Text style={styles.text}>
+                {intl.formatMessage({id: 'TokenTransfer.amount'})}
+              </Text>
               <Block>
                 <Input
                   editable={!showConfirm}
@@ -262,7 +272,9 @@ const TokenTransferView = (props: Props): JSX.Element => {
                   type="number-pad"
                   style={[styles.input, {marginRight: 30}]}
                   defaultValue={amount.toString()}
-                  placeholder="regular"
+                  placeholder={intl.formatMessage({
+                    id: 'TokenTransfer.amount_placeholder',
+                  })}
                   onFocus={() => setAmountMessage(null)}
                   onChangeText={_handleChangeAmount}
                 />
@@ -271,23 +283,30 @@ const TokenTransferView = (props: Props): JSX.Element => {
             <TouchableOpacity
               onPress={() => _handleChangeAmount(props.balance)}>
               <Text color={argonTheme.COLORS.FACEBOOK} style={{left: 60}}>
-                Balance: {props.balance} BLURT
+                {intl.formatMessage(
+                  {id: 'TokenTransfer.balance'},
+                  {what: props.balance},
+                )}
               </Text>
             </TouchableOpacity>
             <Text color="red">{amountMessage}</Text>
           </Block>
           <Block>
             <Block row center>
-              <Text style={styles.text}>Memo</Text>
+              <Text style={styles.text}>
+                {intl.formatMessage({id: 'TokenTransfer.memo'})}
+              </Text>
               <Input
                 style={[styles.input, {marginRight: 30}]}
                 editable={!showConfirm}
                 onChangeText={(text: string) => setMemo(text)}
-                placeholder="regular"
+                placeholder={intl.formatMessage({
+                  id: 'TokenTransfer.memo_placeholder',
+                })}
               />
             </Block>
             <Text style={{left: 50}} size={14}>
-              This memo is public
+              {intl.formatMessage({id: 'TokenTransfer.memo_message'})}
             </Text>
           </Block>
         </Block>
@@ -304,7 +323,7 @@ const TokenTransferView = (props: Props): JSX.Element => {
           handlePressAuthor={(_recipient) => {
             setRecipient(_recipient);
             setRecipientAvatar(
-              `https://steemitimages.com/u/${_recipient}/avatar`,
+              `${settingsState.blockchains.image}/u/${_recipient}/avatar`,
             );
           }}
         />

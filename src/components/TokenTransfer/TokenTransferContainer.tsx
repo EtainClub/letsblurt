@@ -35,14 +35,16 @@ const TokenTransferContainer = (props: Props): JSX.Element => {
     amount: string,
     memo?: string,
   ) => {
+    // return if not logged in
+    if (!authState.loggedIn) return;
     const {username, password, type} = authState.currentCredentials;
-    // TODO: handle otp
     // check the key level
     if (type < KeyTypes.ACTIVE) {
-      // show input modal
+      // show key input modal
       setShowSecureKey(true);
       return;
     }
+    //// good to go
     // build params
     const _params = {
       to: recipient,
@@ -50,10 +52,10 @@ const TokenTransferContainer = (props: Props): JSX.Element => {
       memo: memo,
     };
     // transfer
-    const returnCode = await transferToken(username, password, _params);
+    const resultCode = await transferToken(username, password, _params);
+    console.log('_hanldeTokenTransfer. resultCode', resultCode);
+    // TODO: handle the result
   };
-
-  const _renderPasswordModal = () => {};
 
   return showSecureKey ? (
     <SecureKey username={props.username} />
