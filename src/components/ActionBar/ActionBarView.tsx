@@ -64,9 +64,7 @@ const ActionBarView = (props: Props): JSX.Element => {
   const [voted, setVoted] = useState(postState.voted);
   const [bookmarking, setBookmarking] = useState(false);
   const [votingWeight, setVotingWeight] = useState(100);
-  const [votingDollar, setVotingDollar] = useState<string>(
-    props.voteAmount.toFixed(2),
-  );
+  const [votingDollar, setVotingDollar] = useState<string>(postState.payout);
   const [showVotingModal, setShowVotingModal] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const [showOriginal, setShowOriginal] = useState(true);
@@ -76,7 +74,10 @@ const ActionBarView = (props: Props): JSX.Element => {
   useEffect(() => {
     // only for post
     if (!postState.isComment) {
+      // update voted flag
       setVoted(postState.voted);
+      // update payout
+      setVotingDollar(postState.payout);
     }
   }, [postState]);
 

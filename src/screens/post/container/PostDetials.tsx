@@ -34,14 +34,13 @@ import {generateCommentPermlink, makeJsonMetadataComment} from '~/utils/editor';
 import {TARGET_BLOCKCHAIN} from '~/constants/blockchain';
 
 interface Props {
-  route: any;
+  navigation: any;
 }
 
 const PostDetails = (props: Props): JSX.Element => {
   // props
-  const {route} = props;
-  // TODO: check if this works, otherwise use context
-  const index = route.params?.index;
+  console.log('[PostDetails] props', props);
+
   //// language
   const intl = useIntl();
   // contexts
@@ -54,6 +53,7 @@ const PostDetails = (props: Props): JSX.Element => {
     fetchDatabaseState,
     appendTag,
   } = useContext(PostsContext);
+  const postIndex = postsState[postsState.postsType].index;
   const {setToastMessage} = useContext(UIContext);
   const {settingsState} = useContext(SettingsContext);
   //// states
@@ -197,7 +197,7 @@ const PostDetails = (props: Props): JSX.Element => {
       permlink: permlink,
     };
 
-    const result = await submitPost(postingContent, password, index);
+    const result = await submitPost(postingContent, password, postIndex);
     // set submitted flag
     setSubmitted(true);
   };
@@ -285,7 +285,7 @@ const PostDetails = (props: Props): JSX.Element => {
       loading={loading}
       parentPost={parentPost}
       postsType={postsState.postsType}
-      index={index}
+      index={postIndex}
       comments={comments}
       handleRefresh={_onRefresh}
       fetchComments={_fetchComments}

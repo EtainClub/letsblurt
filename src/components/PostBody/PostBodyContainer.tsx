@@ -14,7 +14,7 @@ const PostBodyContainer = (props: Props): JSX.Element => {
   //// language
   const intl = useIntl();
   //// contexts
-  const {uiState, setAuthorParam, setToastMessage} = useContext(UIContext);
+  const {setAuthorParam, setToastMessage} = useContext(UIContext);
   const {authState} = useContext(AuthContext);
   const {setPostRef, appendTag} = useContext(PostsContext);
   //// states
@@ -24,13 +24,9 @@ const PostBodyContainer = (props: Props): JSX.Element => {
     if (permlink) {
       // set post ref
       setPostRef({author, permlink});
-      navigate({
-        name: 'PostDetails',
-        params: {
-          author,
-          permlink,
-        },
-      });
+      // TODO: set post index. can we set? no
+      //
+      navigate({name: 'PostDetails'});
     }
   };
 

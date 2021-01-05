@@ -25,7 +25,6 @@ interface Props {
 
 const ActionBarContainer = (props: Props): JSX.Element => {
   //// props
-  const {postState} = props;
   //// language
   const intl = useIntl();
   //// contexts
@@ -38,7 +37,7 @@ const ActionBarContainer = (props: Props): JSX.Element => {
     UIContext,
   );
   // states
-  //  const [postState, setPostState] = useState<PostState>(props.postState);
+  const [postState, setPostState] = useState<PostState>(props.postState);
   const [voted, setVoted] = useState(false);
 
   //////// use effect
@@ -82,8 +81,11 @@ const ActionBarContainer = (props: Props): JSX.Element => {
     console.log('[ActionBarContainer|_processVoting] results', results);
     if (results) {
       setToastMessage(intl.formatMessage({id: 'Actionbar.voted'}));
-
       setVoted(true);
+      // update the post state
+      setPostState(
+        postsState[postsState.postsType].posts[props.postIndex].state,
+      );
       return true;
     }
     return false;
@@ -151,7 +153,6 @@ const ActionBarContainer = (props: Props): JSX.Element => {
       isUser={
         authState.currentCredentials.username === postState.post_ref.author
       }
-      //      voteAmount={parseFloat(userState.profileData.profile.voteAmount)}
       voteAmount={parseFloat(userState.profileData.profile.voteAmount)}
       handlePressVoting={_processVoting}
       handlePressEditPost={_handlePressEditPost}

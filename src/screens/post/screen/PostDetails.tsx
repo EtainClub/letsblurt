@@ -42,7 +42,6 @@ interface Props {
   handlePressTranslation: () => void;
 }
 const PostDetailsScreen = (props: Props): JSX.Element => {
-  console.log('[PostDetailsScreen] props', props);
   const {uiState, setToastMessage} = useContext(UIContext);
   const intl = useIntl();
   const commentRef = useRef(null);

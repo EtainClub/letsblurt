@@ -3,6 +3,7 @@ export enum PostsActionTypes {
   UPVOTE,
   UPVOTE_COMMENT,
   SET_POSTS,
+  SET_POST_INDEX,
   SET_FETCHED,
   CLEAR_POSTS,
   APPEND_POSTS,
@@ -236,6 +237,13 @@ interface SetPostsAction {
     metaposts: MetaPosts;
   };
 }
+interface SetPostIndexAction {
+  type: PostsActionTypes.SET_POST_INDEX;
+  payload: {
+    postsType: PostsTypes;
+    postIndex: number;
+  };
+}
 // set fetched flag
 interface SetFetchedAction {
   type: PostsActionTypes.SET_FETCHED;
@@ -397,6 +405,8 @@ export interface PostsContextType {
   isFavoriteAuthor: (username: string, author: string) => Promise<boolean>;
   // set post ref
   setPostRef: (postRef: PostRef) => void;
+  // set post index
+  setPostIndex: (postsType: PostsTypes, postIndex: number) => void;
   // fetch tag list
   getTagList: (username?: string) => void;
   // set communities
@@ -415,6 +425,7 @@ export interface PostsContextType {
 
 export type PostsAction =
   | SetPostsAction
+  | SetPostIndexAction
   | SetFetchedAction
   | SetPostRefAction
   | ClearPostsAction

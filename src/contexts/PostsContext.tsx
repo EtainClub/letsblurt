@@ -95,7 +95,14 @@ const postsReducer = (state: PostsState, action: PostsAction) => {
         fetched: true,
         retryCount: 0,
       };
-
+    case PostsActionTypes.SET_POST_INDEX:
+      return {
+        ...state,
+        [action.payload.postsType]: {
+          ...state[action.payload.postsType],
+          index: action.payload.postIndex,
+        },
+      };
     case PostsActionTypes.APPEND_POSTS:
       console.log('[postsReducer appending aciton payload', action.payload);
       // append
@@ -172,10 +179,18 @@ const postsReducer = (state: PostsState, action: PostsAction) => {
       // update the specific post state
       return {
         ...state,
+        // feed or hash (MetaPosts)
         [action.payload.postsType]: {
+          // set the previous values to the object
+          ...state[action.payload.postsType],
+          // update posts
           posts: state[action.payload.postsType].posts.map((post, index) =>
+            // post: PostData
             index === action.payload.postIndex
               ? {
+                  // set the previous values to the object, PostData
+                  ...state[action.payload.postsType].posts[index],
+                  // update the state
                   state: action.payload.postState,
                 }
               : post,
@@ -395,6 +410,17 @@ const PostsProvider = ({children}: Props) => {
     return posts;
   };
 
+  //// set post index
+  const setPostIndex = (postsType: PostsTypes, postIndex: number) => {
+    // dispatch action
+    dispatch({
+      type: PostsActionTypes.SET_POST_INDEX,
+      payload: {
+        postsType,
+        postIndex,
+      },
+    });
+  };
   //// clear posts
   const clearPosts = async (postsType: PostsTypes) => {
     dispatch({
@@ -477,7 +503,6 @@ const PostsProvider = ({children}: Props) => {
       postIndex,
       voteAmount,
     );
-    console.log('[PostsContext|upvote] post', postsState[postIndex]);
 
     // send transaction
     const results = await submitVote(
@@ -506,7 +531,7 @@ const PostsProvider = ({children}: Props) => {
     // update vote count
     postState.vote_count += 1;
     // update voters
-    postState.voters = [`${username} ($${voteAmount})`, ...postState.voters];
+    postState.voters = [`${username} (${voteAmount})`, ...postState.voters];
     // update voted flag
     postState.voted = true;
     //// dispatch action
@@ -799,6 +824,7 @@ const PostsProvider = ({children}: Props) => {
         getTagList,
         fetchPosts,
         setPostRef,
+        setPostIndex,
         clearPosts,
         getPostDetails,
         setTagIndex,

@@ -13,14 +13,9 @@ interface Props {
   username?: string;
   actionBarStyle: ActionBarStyle;
 }
-
-//
-//category: DiscussionQueryCategory,
-// query: DisqussionQuery,
 const Post = (props: Props): JSX.Element => {
   // contexts
-  const {authState, processLogin, processLogout} = useContext(AuthContext);
-  const {postsState, setPostRef} = useContext(PostsContext);
+  const {postsState, setPostRef, setPostIndex} = useContext(PostsContext);
   const {post} = props;
 
   const _handleOnPressAuthor = () => {
@@ -30,7 +25,10 @@ const Post = (props: Props): JSX.Element => {
     console.log('[Post] handle press post', post);
     // set post ref
     setPostRef(post.state.post_ref);
-    navigate({name: 'PostDetails', params: {index: props.index}});
+    // set post index
+    setPostIndex(postsState.postsType, props.index);
+    // navigate
+    navigate({name: 'PostDetails'});
   };
   return (
     <PostView
