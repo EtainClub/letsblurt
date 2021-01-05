@@ -101,8 +101,6 @@ export const AppContainer = (props: Props): JSX.Element => {
         route = 'PostDetails';
         // set post ref to the context
         setPostRef({author, permlink});
-        // navigate if the app is in background
-        if (background) navigate({name: route});
         break;
       case SettingUITypes.FOLLOW:
         //// navigate to the author profile
@@ -111,19 +109,20 @@ export const AppContainer = (props: Props): JSX.Element => {
         // set author to the context
         setAuthorParam(author);
         // navigate
-        if (background) navigate({name: route});
         break;
       case SettingUITypes.TRANSFER:
         //// navigate to the wallet
         // set route name
         route = 'Wallet';
-        if (background) navigate({name: 'Wallet'});
         break;
       default:
         break;
     }
-    // handle foreground message
-    if (!background) {
+    // navigate if the app is in background
+    if (background) {
+      navigate({name: route});
+    } else {
+      // handle foreground message
       Alert.alert(
         intl.formatMessage({id: 'App.push_title'}),
         intl.formatMessage({id: 'App.push_body'}),

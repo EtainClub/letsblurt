@@ -72,7 +72,7 @@ const Comment = (props: Props): JSX.Element => {
   const [showOriginal, setShowOriginal] = useState(true);
   const [originalBody, setOriginalBody] = useState(comment.body);
   const [translatedBody, setTranslatedBody] = useState(null);
-
+  const [uploadedImageUrl, setUploadedImageUrl] = useState('');
   const reputation = comment.state.reputation.toFixed(0);
 
   const formatedTime = comment && getTimeFromNow(comment.state.createdAt);
@@ -187,7 +187,9 @@ const Comment = (props: Props): JSX.Element => {
     }
   };
 
-  const _getUploadedImageURL = (url: string) => {};
+  const _getUploadedImageURL = (url: string) => {
+    setUploadedImageUrl(url);
+  };
 
   const _renderCommentForm = () => {
     const depth = comment.depth - 1;

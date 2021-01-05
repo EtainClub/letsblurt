@@ -22,7 +22,14 @@ import {useIntl} from 'react-intl';
 import {navigate} from '~/navigation/service';
 import {PostData, CommentData, PostsTypes} from '~/contexts/types';
 import {ActionBarStylePost} from '~/constants/actionBarTypes';
-import {Avatar, Comment, ParentPost, PostBody, ActionBar} from '~/components';
+import {
+  Avatar,
+  Comment,
+  ParentPost,
+  PostBody,
+  ActionBar,
+  ImageUpload,
+} from '~/components';
 import {argonTheme} from '~/constants/argonTheme';
 import {UIContext} from '~/contexts';
 
@@ -57,6 +64,7 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
   const reputation = state.reputation.toFixed(0);
 
   const [commentY, setCommentY] = useState(0);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState('');
 
   const formatedTime = post && getTimeFromNow(state.createdAt);
 
@@ -77,6 +85,11 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
 
   const _handlePressHashTag = (tag: string) => {
     props.handlePressTag(tag);
+  };
+
+  const _getUploadedImageURL = (url: string) => {
+    setUploadedImageUrl(url);
+    setMessage(message + ' ' + url);
   };
 
   const _renderCommentForm = () => {
@@ -104,6 +117,10 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
         center
         style={{marginTop: 20}}
         onLayout={(event) => setCommentY(event.nativeEvent.layout.y)}>
+        <ImageUpload
+          containerStyle={{right: true}}
+          getImageURL={_getUploadedImageURL}
+        />
         <Input
           color="#9fa5aa"
           multiline
