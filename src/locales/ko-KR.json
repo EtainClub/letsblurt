@@ -100,7 +100,8 @@
     "msg_username": "존재하지 않는 계정이름입니다.",
     "msg_password": "유효하지 않는 암호(키)입니다",
     "otp_error": "인증코드 입력 에러",
-    "logged_in": "{what}로 로그인 되었습니다."
+    "logged_in": "{what}로 로그인 되었습니다.",
+    "not_loggedin": "둘러보기 모드 입니다."
   },
   "OTP": {
     "header": "일회용 인증",

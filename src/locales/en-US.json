@@ -56,6 +56,7 @@
     "msg2": "Easier and safer on Mobiles",
     "msg3": "Let's Blurt!",
     "button": "Get Started",
+    "logged_in": "{what}로 로그인 되었습니다.",
     "not_loggedin": "You are not logged in."
   },
   "Signup": {
