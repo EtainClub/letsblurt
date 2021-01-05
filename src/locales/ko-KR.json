@@ -45,6 +45,8 @@
   "key_error": "계정 또는 키에 오류가 있습니다.",
   "storage_error": "내부 저장소 읽기 또는 쓰기 오류",
   "blockchain_client_error": "블록체인 클라이언를 설정하지 못했습니다.",
+  "yes": "예",
+  "no": "아니오",
   "App": {
     "push_title": "푸쉬 메시지 도착",
     "push_body": "상세 내용을 보시겠습니까?"

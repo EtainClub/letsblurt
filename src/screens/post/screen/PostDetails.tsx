@@ -37,11 +37,12 @@ interface Props {
   comments: CommentData[];
   handleRefresh: () => void;
   fetchComments: () => void;
-  handleSubmitComment: (message: string) => Promise<string>;
+  handleSubmitComment: (message: string) => void;
   handlePressTag: (tag: string) => void;
   handlePressTranslation: () => void;
 }
 const PostDetailsScreen = (props: Props): JSX.Element => {
+  console.log('[PostDetailsScreen] props', props);
   const {uiState, setToastMessage} = useContext(UIContext);
   const intl = useIntl();
   const commentRef = useRef(null);
@@ -68,13 +69,11 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
     console.log('[PostDetails] onPressSendComment');
     // set submitting
     setSubmitting(true);
-    const result = await props.handleSubmitComment(message);
+    await props.handleSubmitComment(message);
     // clear submitting
     setSubmitting(false);
     // clear message
     setMessage('');
-    // show toast message
-    setToastMessage(result);
   };
 
   const _handlePressHashTag = (tag: string) => {

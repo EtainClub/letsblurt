@@ -197,14 +197,9 @@ const PostDetails = (props: Props): JSX.Element => {
       permlink: permlink,
     };
 
-    const {success, message} = await submitPost(
-      postingContent,
-      password,
-      index,
-    );
+    const result = await submitPost(postingContent, password, index);
     // set submitted flag
     setSubmitted(true);
-    return message;
   };
 
   //// handle press hash tag

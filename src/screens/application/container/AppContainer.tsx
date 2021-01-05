@@ -76,7 +76,7 @@ export const AppContainer = (props: Props): JSX.Element => {
     console.log('_handleRemoteMessages. message', message);
 
     // get notification data
-    const msgData = message.notification;
+    const msgData = message.data;
     // sanity check
     if (!msgData) {
       console.log('remote messgage data is undefined');
@@ -87,7 +87,7 @@ export const AppContainer = (props: Props): JSX.Element => {
     // @test
     // TODO: handle the foreground message. show modal
     console.log('remote message data', msgData);
-    const {operation, author, permlink} = msgData.data;
+    const {operation, author, permlink} = msgData;
     let route = null;
     switch (operation) {
       // navigate to the post details

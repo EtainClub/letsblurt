@@ -45,6 +45,8 @@
   "key_error": "Something wrong with the account or key",
   "storage_error": "Failed to get or set storage",
   "blockchain_client_error": "Could not setup blockchain client",
+  "yes": "Yes",
+  "no": "No",
   "App": {
     "push_title": "Push Message Arrived",
     "push_body": "Do you want to see the details?"
