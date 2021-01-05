@@ -27,6 +27,7 @@ import {PostsFeedView} from './PostsFeedView';
 interface Props {
   posts: PostData[];
   reloading: boolean;
+  noFetchMore: boolean;
   fetchPosts: (appending?: boolean) => void;
 }
 //// component
@@ -60,6 +61,7 @@ const PostsFeed = (props: Props): JSX.Element => {
 
   const _fetchMorePosts = async () => {
     console.log('[Feed] fetchMorePosts');
+    if (props.noFetchMore) return;
     setLoadingMore(true);
     // fetch posts with appending
     await fetchPosts(true);

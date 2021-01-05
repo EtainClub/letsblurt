@@ -43,11 +43,13 @@ interface Props {
 }
 //// component
 const AuthorProfileScreen = (props: Props): JSX.Element => {
+  const intl = useIntl();
+
   //// states
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
-    {key: 'blogs', title: 'Blogs'},
-    {key: 'wallet', title: 'Wallet'},
+    {key: 'blogs', title: intl.formatMessage({id: 'Profile.blog_tab'})},
+    {key: 'wallet', title: intl.formatMessage({id: 'Profile.wallet_tab'})},
   ]);
   const BlogList = () => <PostsListView posts={props.blogs} isUser={false} />;
 

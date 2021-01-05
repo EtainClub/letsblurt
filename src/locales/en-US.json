@@ -184,7 +184,11 @@
     "location": "Location",
     "website": "website",
     "update_button": "Update",
-    "search_author": "Search account"
+    "search_author": "Search account",
+    "blog_tab": "Blogs",
+    "bookmark_tab": "Bookmarks",
+    "favorite_tab": "Favorites",
+    "wallet_tab": "Wallet Info"
   },
   "Bookmark": {
     "already": "You already bookmarked this post"
@@ -199,6 +203,23 @@
     "curation_reward": "Curation Reward",
     "author_reward": "Author Reward",
     "claim_reward": "Claim Reward",
+
+    "comment_benefactor_reward": "Benefactor Reward",
+    "claim_reward_balance": "Claim Reward ",
+    "transfer_to_vesting": "To Vesting",
+    "transfer_from_savings": "From Savings",
+    "withdraw_vesting": "Power Down",
+    "fill_order": "Fill Order",
+    "escrow_transfer": "Escrow Transfer",
+    "escrow_dispute": "Escrow Dispute",
+    "escrow_release": "Escrow Release",
+    "escrow_approve": "Escrow Approve",
+    "cancel_transfer_from_savings": "Cancel From Savings",
+    "delegate_vesting_shares": "Delegation",
+    "fill_convert_request": "Convert Executed",
+    "fill_transfer_from_savings": "Savings Executed",
+    "fill_vesting_withdraw": "PowerDown executed",
+
     "reward_blurt": "Reward: {what} Blurt",
     "claim_ok": "Claimed Successfully",
     "claim_error": "Error on claiming rewards",

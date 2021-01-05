@@ -48,9 +48,9 @@ const ProfileScreen = (props: Props): JSX.Element => {
 
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
-    {key: 'blogs', title: 'Blogs'},
-    {key: 'bookmarks', title: 'Bookmarks'},
-    {key: 'favorites', title: 'Favorites'},
+    {key: 'blogs', title: intl.formatMessage({id: 'Profile.blog_tab'})},
+    {key: 'bookmarks', title: intl.formatMessage({id: 'Profile.bookmark_tab'})},
+    {key: 'favorites', title: intl.formatMessage({id: 'Profile.favorite_tab'})},
   ]);
 
   const BlogList = () =>

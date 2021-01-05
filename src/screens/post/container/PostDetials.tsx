@@ -197,7 +197,7 @@ const PostDetails = (props: Props): JSX.Element => {
       permlink: permlink,
     };
 
-    const result = await submitPost(postingContent, password, postIndex);
+    const result = await submitPost(postingContent, password, true);
     // set submitted flag
     setSubmitted(true);
   };
@@ -205,11 +205,10 @@ const PostDetails = (props: Props): JSX.Element => {
   //// handle press hash tag
   const _handlePressTag = (tag: string) => {
     console.log('[PostDetailsContainer] handlePressTag, tag', tag);
-    debugger;
     // append a new tag to tag list
     appendTag(tag);
-    // navigate to feed
-    navigate({name: 'Feed'});
+    // navigate to feed by specifying the feed screen
+    props.navigation.navigate('Feed', {screen: 'Feed'});
   };
 
   const _translateLanguage = async () => {

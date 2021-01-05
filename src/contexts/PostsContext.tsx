@@ -89,8 +89,11 @@ const postsReducer = (state: PostsState, action: PostsAction) => {
       console.log('[postsReducer] set posts aciton. payload', action.payload);
       //// set posts to the posts type array
       return {
+        // previous state
         ...state,
+        // update the meta posts
         [action.payload.postsType]: action.payload.metaposts,
+        // update the posts type
         postsType: action.payload.postsType,
         fetched: true,
         retryCount: 0,
@@ -334,7 +337,7 @@ const PostsProvider = ({children}: Props) => {
             '[PostsContext|fetchPosts] tagIndex is wrong',
             tagIndex,
           );
-          return;
+          return null;
         }
         break;
     }
@@ -379,18 +382,18 @@ const PostsProvider = ({children}: Props) => {
       return null;
     }
 
+    // return if nothing fetched
+    if (_posts.length < 1) return null;
+
     // set start post ref
-    let lastPost = _posts[_posts.length - 1];
-    let lastPostRef = {author: null, permlink: null};
+    const lastPost = _posts[_posts.length - 1];
+    const lastPostRef = lastPost.state.post_ref;
     let posts;
     if (_posts.length < NUM_FETCH_POSTS) {
       posts = _posts;
     } else {
       posts = _posts.slice(0, _posts.length - 1);
-      lastPost = _posts[_posts.length - 1];
-      lastPostRef = lastPost.state.post_ref;
     }
-    //    }
     if (appending) {
       // append only if it exists
       if (posts) posts = postsState[postsType].posts.concat(posts);

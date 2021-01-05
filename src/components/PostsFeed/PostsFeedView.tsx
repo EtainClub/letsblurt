@@ -122,7 +122,7 @@ const PostsFeedView = (props: Props): JSX.Element => {
     if (!props.posts) return;
 
     // the last post is hidden for the next fetch
-    const posts = props.posts.slice(0, props.posts.length - 1);
+    const posts = props.posts;
     const username = props.username;
 
     return (

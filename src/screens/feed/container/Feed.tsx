@@ -16,6 +16,7 @@ import {
 import {PostsContext, AuthContext, UIContext, UserContext} from '~/contexts';
 
 import {PostsFeed} from '~/components';
+import {NUM_FETCH_POSTS} from '~/constants';
 
 interface Props {}
 
@@ -36,6 +37,7 @@ const Feed = (props: Props): JSX.Element => {
     author: null,
     permlink: null,
   });
+  const [fetchedAll, setFetchedAll] = useState(false);
 
   //////// effects
   //// hide splash screen
@@ -124,8 +126,14 @@ const Feed = (props: Props): JSX.Element => {
       noFollowings,
       appending,
     );
-
-    console.log('postsState', postsState);
+    //
+    console.log('[Feed] after fetching, posts', _posts);
+    // if nothing fetched,
+    if (!_posts || _posts.length < NUM_FETCH_POSTS - 1) {
+      setFetchedAll(true);
+    } else {
+      setFetchedAll(false);
+    }
     setPosts(_posts);
     if (!appending) {
       setReloading(false);
@@ -133,14 +141,13 @@ const Feed = (props: Props): JSX.Element => {
     console.log('[Feed]_fetchPosts, posts', _posts);
   };
 
-  ////
-  const _clearPosts = async () => {
-    console.log('[FeedContainer] clear posts');
-    clearPosts(PostsTypes.FEED);
-  };
-
   return (
-    <PostsFeed posts={posts} reloading={reloading} fetchPosts={_fetchPosts} />
+    <PostsFeed
+      posts={posts}
+      reloading={reloading}
+      fetchPosts={_fetchPosts}
+      noFetchMore={fetchedAll}
+    />
   );
 };
 

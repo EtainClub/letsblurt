@@ -184,7 +184,11 @@
     "location": "위치",
     "website": "웹사이트",
     "update_button": "업데이트 하기",
-    "search_author": "계정 찾기"
+    "search_author": "계정 찾기",
+    "blog_tab": "게시글",
+    "bookmark_tab": "북마크",
+    "favorite_tab": "관심작가",
+    "wallet_tab": "지갑 정보"
   },
   "Bookmark": {
     "already": "이미 북마크된 포스트입니다."
@@ -199,6 +203,23 @@
     "curation_reward": "큐레이션 보상",
     "author_reward": "저자 보상",
     "claim_reward": "보상 청구",
+
+    "comment_benefactor_reward": "Benefactor Reward",
+    "claim_reward_balance": "Claim Reward ",
+    "transfer_to_vesting": "To Vesting",
+    "transfer_from_savings": "From Savings",
+    "withdraw_vesting": "Power Down",
+    "fill_order": "Fill Order",
+    "escrow_transfer": "Escrow Transfer",
+    "escrow_dispute": "Escrow Dispute",
+    "escrow_release": "Escrow Release",
+    "escrow_approve": "Escrow Approve",
+    "cancel_transfer_from_savings": "Cancel From Savings",
+    "delegate_vesting_shares": "Delegation",
+    "fill_convert_request": "Convert Executed",
+    "fill_transfer_from_savings": "Savings Executed",
+    "fill_vesting_withdraw": "PowerDown executed",
+
     "reward_blurt": "보상: {what} Blurt",
     "claim_ok": "보상 청구 성공",
     "claim_error": "보상 청구 에러",
