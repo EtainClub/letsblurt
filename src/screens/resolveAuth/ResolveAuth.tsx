@@ -24,7 +24,11 @@ export const ResolveAuth = (props) => {
   //// props
   //// contexts
   const {authState, setAuthResolved, getCredentials} = useContext(AuthContext)!;
-  const {fetchBlockchainGlobalProps, getFollowings} = useContext(UserContext);
+  const {
+    fetchBlockchainGlobalProps,
+    getFollowings,
+    getUserProfileData,
+  } = useContext(UserContext);
   const {postsState, getTagList} = useContext(PostsContext);
   const {setToastMessage, setTranslateLanguages} = useContext(UIContext);
   const {getAllSettingsFromStorage} = useContext(SettingsContext);
@@ -63,8 +67,12 @@ export const ResolveAuth = (props) => {
     if (username) {
       console.log('[resolveAuth] username', username);
       try {
+        // get user profile
+        const profileData = await getUserProfileData(username);
+        console.log('[resolveAuth] profile data', profileData);
         // get followings
         const followings = await getFollowings(username);
+        // why this???
         if (!followings) navigate({name: 'Drawer'});
         // fetch tags
         await getTagList(username);

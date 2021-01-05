@@ -342,7 +342,6 @@ export interface PostsContextType {
     username?: string,
     noFollowings?: boolean,
     appending?: boolean,
-    inputTag?: string,
   ) => Promise<PostData[]>;
   // clear posts
   clearPosts: (postsType: PostsTypes) => void;

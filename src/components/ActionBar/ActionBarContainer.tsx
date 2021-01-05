@@ -67,6 +67,8 @@ const ActionBarContainer = (props: Props): JSX.Element => {
       return false;
     }
 
+    console.log('_processVoting. props, userState', props, userState);
+
     const results = await upvote(
       props.postsType,
       props.postIndex,
@@ -78,10 +80,13 @@ const ActionBarContainer = (props: Props): JSX.Element => {
       parseFloat(userState.profileData.profile.voteAmount),
     );
     console.log('[ActionBarContainer|_processVoting] results', results);
-    setToastMessage(intl.formatMessage({id: 'Actionbar.voted'}));
+    if (results) {
+      setToastMessage(intl.formatMessage({id: 'Actionbar.voted'}));
 
-    setVoted(true);
-    return true;
+      setVoted(true);
+      return true;
+    }
+    return false;
   };
 
   const _handlePressVoter = (voter: string) => {
@@ -147,7 +152,7 @@ const ActionBarContainer = (props: Props): JSX.Element => {
         authState.currentCredentials.username === postState.post_ref.author
       }
       //      voteAmount={parseFloat(userState.profileData.profile.voteAmount)}
-      voteAmount={parseFloat(userState.voteAmount)}
+      voteAmount={parseFloat(userState.profileData.profile.voteAmount)}
       handlePressVoting={_processVoting}
       handlePressEditPost={_handlePressEditPost}
       handlePressReply={props.handlePressReply}

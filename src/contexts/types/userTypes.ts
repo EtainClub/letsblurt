@@ -60,7 +60,7 @@ export interface UserState {
   walletData: WalletData;
   // price in usd
   price?: number;
-  voteAmount: string;
+  //  voteAmount: string;
   followings: string[];
   followers: string[];
   phoneNumber: string;

@@ -97,8 +97,8 @@ const Feed = (props: Props): JSX.Element => {
     //   postsType = PostsTypes.HASH_TAG;
     // }
     // TODO: how to handle different types of posts
-    //    const {postsType} = postsState;
-    let postsType = PostsTypes.FEED;
+    const {postsType} = postsState;
+    //    let postsType = PostsTypes.FEED;
     console.log(
       'fetching posts, postsState, posts type',
       postsState,
@@ -123,7 +123,6 @@ const Feed = (props: Props): JSX.Element => {
       username,
       noFollowings,
       appending,
-      uiState.selectedTag,
     );
 
     console.log('postsState', postsState);

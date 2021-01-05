@@ -210,6 +210,7 @@ const PostDetails = (props: Props): JSX.Element => {
   //// handle press hash tag
   const _handlePressTag = (tag: string) => {
     console.log('[PostDetailsContainer] handlePressTag, tag', tag);
+    debugger;
     // append a new tag to tag list
     appendTag(tag);
     // navigate to feed

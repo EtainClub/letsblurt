@@ -54,7 +54,7 @@ const WelcomeScreen = () => {
   ];
 
   const _onGetStarted = async () => {
-    setToastMessage('You are not logged in');
+    setToastMessage(intl.formatMessage({id: 'Welcome.not_loggedin'}));
     // set toast message
     navigate({name: 'Drawer'});
   };

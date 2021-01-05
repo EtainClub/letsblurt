@@ -277,7 +277,6 @@ const PostsProvider = ({children}: Props) => {
     username?: string,
     noFollowings?: boolean,
     appending?: boolean,
-    inputTag?: string,
   ) => {
     //// set start post ref
     let startPostRef = {
@@ -366,17 +365,20 @@ const PostsProvider = ({children}: Props) => {
     }
 
     // set start post ref
-    const lastPost = _posts[_posts.length - 1];
-    const lastPostRef = lastPost.state.post_ref;
+    let lastPost = _posts[_posts.length - 1];
+    let lastPostRef = {author: null, permlink: null};
     let posts;
     if (_posts.length < NUM_FETCH_POSTS) {
       posts = _posts;
     } else {
       posts = _posts.slice(0, _posts.length - 1);
+      lastPost = _posts[_posts.length - 1];
+      lastPostRef = lastPost.state.post_ref;
     }
     //    }
     if (appending) {
-      posts = postsState[postsType].posts.concat(posts);
+      // append only if it exists
+      if (posts) posts = postsState[postsType].posts.concat(posts);
     }
     // dispatch set posts action
     dispatch({
@@ -494,9 +496,13 @@ const PostsProvider = ({children}: Props) => {
 
     //// update post states
     // new post state
+    console.log('posts state, posttype', postsState[postsType]);
     const postState = postsState[postsType].posts[postIndex].state;
     // update payout
-    postState.payout = postState.payout + (voteAmount * votingWeight) / 100;
+    postState.payout = (
+      parseFloat(postState.payout) +
+      (voteAmount * votingWeight) / 100
+    ).toFixed(2);
     // update vote count
     postState.vote_count += 1;
     // update voters

@@ -53,7 +53,8 @@
     "msg1": "Welcome To Blurt World",
     "msg2": "Easier and safer on Mobiles",
     "msg3": "Let's Blurt!",
-    "button": "Get Started"
+    "button": "Get Started",
+    "not_loggedin": "You are not logged in."
   },
   "Signup": {
     "header": "Create Account",
@@ -96,7 +97,8 @@
     "login_error": "username or password is not correct",
     "msg_username": "username does not exist",
     "msg_password": "password is not valid",
-    "otp_error": "Code is not correct"
+    "otp_error": "Code is not correct",
+    "logged_in": "logged in as {what}"
   },
   "OTP": {
     "header": "One Time Password",

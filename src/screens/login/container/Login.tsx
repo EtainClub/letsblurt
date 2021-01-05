@@ -208,7 +208,9 @@ const Login = (props: Props): JSX.Element => {
       // update followings which is required in fetching feed
       await getFollowings(username);
       _updateUserDB(username, _phoneNumber);
-      setToastMessage(`logged in as ${username}`);
+      setToastMessage(
+        intl.formatMessage({id: 'Login.loggedin'}, {what: username}),
+      );
       // update user vote amount
       await updateVoteAmount(username);
       // set logged in to navigate to feed

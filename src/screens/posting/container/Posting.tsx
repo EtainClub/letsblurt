@@ -43,7 +43,9 @@ const Posting = (props: Props): JSX.Element => {
   const {uiState, setToastMessage, setTagParam, setEditMode} = useContext(
     UIContext,
   );
-  const {postsState, submitPost, updatePost} = useContext(PostsContext);
+  const {postsState, appendTag, submitPost, updatePost} = useContext(
+    PostsContext,
+  );
   const {userState, getFollowings} = useContext(UserContext);
   // states
   //  const [editMode, setEditMode] = useState(route.params?.editMode);
@@ -287,8 +289,10 @@ const Posting = (props: Props): JSX.Element => {
 
     //// navigate
     if (success) {
+      // append tag
+      appendTag(_tags[0]);
       // set tag param
-      setTagParam(_tags[0]);
+      //      setTagParam(_tags[0]);
       // navigate to the feed with the first tag
       navigate({name: 'Feed'});
     }

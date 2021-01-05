@@ -109,7 +109,7 @@ const Comment = (props: Props): JSX.Element => {
       postingContent.permlink = comment.state.post_ref.permlink;
     }
     // submit the comment
-    const {success, message} = await submitPost(
+    const result = await submitPost(
       postingContent,
       authState.currentCredentials.password,
       true,

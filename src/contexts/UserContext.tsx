@@ -97,6 +97,8 @@ const userReducer = (state: UserState, action: UserAction) => {
       return {...state, followers: action.payload};
     case UserActionTypes.SET_PHONE_NUMBER:
       return {...state, phoneNumber: action.payload};
+    case UserActionTypes.SET_PROFILE_DATA:
+      return {...state, profileData: action.payload};
     default:
       return state;
   }
