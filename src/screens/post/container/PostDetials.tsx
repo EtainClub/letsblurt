@@ -132,7 +132,7 @@ const PostDetails = (props: Props): JSX.Element => {
         postsState.postRef,
         authState.currentCredentials.username,
       );
-      details.state.bookmarked = bookmarked;
+      if (bookmarked) details.state.bookmarked = bookmarked;
     }
     // set post details
     setPostDetails(details);
