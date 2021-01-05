@@ -48,12 +48,11 @@ interface Props {
   handleMentionAuthor: (text: string) => void;
   handlePressBeneficiary: () => void;
   handleCancelEditing: () => void;
-  getUploadedImageURL: (url: string) => void;
 }
 
 const PostingScreen = (props: Props): JSX.Element => {
   //// props
-  const {uploadedImage, originalPost} = props;
+  const {originalPost} = props;
   //// language
   const intl = useIntl();
   //// references
@@ -68,6 +67,7 @@ const PostingScreen = (props: Props): JSX.Element => {
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [rewardIndex, setRewardIndex] = useState(0);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState('');
   const [bodySelection, setBodySelection] = useState<Position>({
     start: 0,
     end: 0,
@@ -103,14 +103,14 @@ const PostingScreen = (props: Props): JSX.Element => {
 
   //// handle uploaded image event
   useEffect(() => {
-    if (uploadedImage && uploadedImage.url) {
+    if (uploadedImageUrl) {
       const _body =
         body.substring(0, bodySelection.start) +
-        uploadedImage.url +
+        uploadedImageUrl +
         body.substring(bodySelection.end);
       _handleBodyChange(_body);
     }
-  }, [uploadedImage]);
+  }, [uploadedImageUrl]);
 
   //// handle newly typed character
   useEffect(() => {
@@ -271,6 +271,11 @@ const PostingScreen = (props: Props): JSX.Element => {
     setRewardIndex(index);
   };
 
+  ////
+  const _handleUploadedImageURL = (url: string) => {
+    setUploadedImageUrl(url);
+  };
+
   //// render preview of posting
   const _renderPreview = () => (
     <Block>
@@ -333,7 +338,7 @@ const PostingScreen = (props: Props): JSX.Element => {
           <Block row>
             <ImageUpload
               containerStyle={{right: true}}
-              getImageURL={props.getUploadedImageURL}
+              getImageURL={_handleUploadedImageURL}
             />
           </Block>
           <Block style={{paddingHorizontal: theme.SIZES.BASE}}>

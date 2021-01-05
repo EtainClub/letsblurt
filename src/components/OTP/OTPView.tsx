@@ -126,7 +126,7 @@ const OTPView = (props: Props): JSX.Element => {
               placeholder={intl.formatMessage({id: 'OTP.phone_number'})}
               value={phoneNumber.replace(/\-/g, '')}
               autoCapitalize="none"
-              help={message}
+              help={<Text>{message}</Text>}
               bottomHelp
               style={styles.input}
               type="number-pad"

@@ -326,7 +326,6 @@ const Posting = (props: Props): JSX.Element => {
         handleMentionAuthor={_showAuthorsModal}
         handlePressBeneficiary={_handlePressBeneficiary}
         handleCancelEditing={_handleCancelEditing}
-        getUploadedImageURL={_getUploadedImageUrl}
       />
       {showBeneficiaryModal ? (
         <Beneficiary
