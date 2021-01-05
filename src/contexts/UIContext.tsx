@@ -9,7 +9,7 @@ import {PostsTypes} from './types';
 const initialState = {
   toastMessage: '',
   selectedAuthor: null,
-  selectedTag: null,
+  //  selectedTag: null,
   editMode: false,
   searchText: '',
   authorList: [],
@@ -29,8 +29,8 @@ const uiReducer = (state: UIState, action: UIAction) => {
       return {...state, selectedAuthor: action.payload};
     case UIActionTypes.SET_AUTHORS_PARAM:
       return {...state, authorList: action.payload};
-    case UIActionTypes.SET_TAG_PARAM:
-      return {...state, selectedTag: action.payload};
+    // case UIActionTypes.SET_TAG_PARAM:
+    //   return {...state, selectedTag: action.payload};
     case UIActionTypes.SET_EDIT_MODE:
       return {...state, editMode: action.payload};
     case UIActionTypes.SET_SEARCH_PARAM:
@@ -63,16 +63,6 @@ const UIProvider = ({children}: Props) => {
     dispatch({
       type: UIActionTypes.SET_TOAST,
       payload: message,
-    });
-  };
-
-  //// set tag param
-  const setTagParam = (tag: string) => {
-    console.log('[setTagParam] tag', tag);
-    // dispatch action
-    dispatch({
-      type: UIActionTypes.SET_TAG_PARAM,
-      payload: tag,
     });
   };
 
@@ -133,7 +123,6 @@ const UIProvider = ({children}: Props) => {
       value={{
         uiState,
         setToastMessage,
-        setTagParam,
         setAuthorParam,
         setAuthorListParam,
         setEditMode,

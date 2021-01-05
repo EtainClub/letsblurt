@@ -3,7 +3,6 @@ import {PostsTypes} from './postTypes';
 //// action types
 export enum UIActionTypes {
   SET_TOAST,
-  SET_TAG_PARAM,
   SET_AUTHOR_PARAM,
   SET_AUTHORS_PARAM,
   SET_EDIT_MODE,
@@ -20,8 +19,6 @@ export interface UIState {
   // authorParam: string;
   selectedAuthor: string;
   authorList: string[];
-  // selected tag
-  selectedTag: string;
   // search text param
   searchText: string;
   // edit mode
@@ -35,11 +32,6 @@ export interface UIState {
 // set toast message
 interface SetToastAction {
   type: UIActionTypes.SET_TOAST;
-  payload: string;
-}
-// set tag to use it as a navigation param
-interface SetTagParamAction {
-  type: UIActionTypes.SET_TAG_PARAM;
   payload: string;
 }
 // set author to use it as a navigation param
@@ -79,8 +71,6 @@ export interface UIContextType {
   //// action creators
   // set toast message
   setToastMessage: (message: string) => void;
-  // set tag to use it as a param between navigation
-  setTagParam: (tag: string) => void;
   // set author to use it as a param betwen navigation
   setAuthorParam: (author: string) => void;
   // set author list
