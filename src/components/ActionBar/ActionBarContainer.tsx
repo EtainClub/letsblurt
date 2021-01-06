@@ -1,6 +1,7 @@
 //// react
 import React, {useState, useEffect, useContext} from 'react';
 //// react native
+import {Share} from 'react-native';
 //// config
 //// language
 import {useIntl} from 'react-intl';
@@ -11,10 +12,11 @@ import {PostRef} from '~/contexts/types';
 import {ActionBarView} from './ActionBarView';
 import {ActionBarStyle} from '~/constants/actionBarTypes';
 import {reblog} from '~/providers/blurt/dblurtApi';
-
+import {BLURT_BASE_URL} from '~/constants';
 interface Props {
   actionBarStyle: ActionBarStyle;
   postState: PostState;
+  postUrl?: string;
   postsType: PostsTypes;
   postIndex: number;
   handlePressComments?: () => void;
@@ -142,6 +144,17 @@ const ActionBarContainer = (props: Props): JSX.Element => {
     props.handlePressTranslation(showOriginal);
   };
 
+  ////
+  const _handlePressShare = () => {
+    // open sharing ui
+    const message = `${BLURT_BASE_URL}${props.postUrl}`;
+    console.log('_handlePressShare. message', message);
+    Share.share({
+      title: "Let's Blurt",
+      message: message,
+    });
+  };
+
   return (
     <ActionBarView
       actionBarStyle={props.actionBarStyle}
@@ -161,6 +174,7 @@ const ActionBarContainer = (props: Props): JSX.Element => {
       handlePressBookmark={_handlePressBookmark}
       handlePressReblog={_handlePressReblog}
       handlePressTranslation={_handlePressTranslation}
+      handlePressShare={_handlePressShare}
     />
   );
 };

@@ -24,6 +24,7 @@ export const BLURT_IMAGE_SERVERS = [
   'https://images.blurt.buzz',
   'https://images.blurt.blog',
 ];
+export const BLURT_BASE_URL = 'https://blurt.world';
 export const BLURT_TAG_ENDPOINT = 'https://api.blurt.buzz/tags';
 export const BLURT_PRICE_ENDPOINT = 'https://api.blurt.buzz/price_info';
 

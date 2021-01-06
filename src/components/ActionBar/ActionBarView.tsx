@@ -51,7 +51,6 @@ interface Props {
 }
 
 const ActionBarView = (props: Props): JSX.Element => {
-  console.log('ActionBarView. props', props);
   // props
   const {actionBarStyle, postState, handlePressVoting} = props;
   const {voteAmount, isUser} = props;
@@ -134,11 +133,7 @@ const ActionBarView = (props: Props): JSX.Element => {
   //// handle press share icon of action bar
   const _onPressShare = () => {
     console.log('[ActionBar] onPressShare');
-    // open sharing ui
-    Share.share({
-      title: "Let's Blurt",
-      message: 'Share this post in social media',
-    });
+    props.handlePressShare();
   };
 
   const _onPressTranslate = () => {

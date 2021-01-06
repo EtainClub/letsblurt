@@ -86,6 +86,7 @@ export interface PostData {
   markdownBody: string;
   summary: string;
   image: string;
+  url: string;
 
   // meta
   json_metadata: string;

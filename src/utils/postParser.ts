@@ -33,11 +33,12 @@ export const parsePost = async (
   // create a post data object
   const postData: PostData = {
     // post
-    id: post.id ? post.id : post.post_id,
+    id: post.id,
     body: post.body,
     markdownBody: '',
     summary: '',
     image: '',
+    url: post.url,
 
     // meta
     json_metadata: '',
