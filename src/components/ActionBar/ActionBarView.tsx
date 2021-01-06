@@ -34,7 +34,7 @@ interface Props {
   postState: PostState;
   postIndex?: number;
   actionBarStyle: ActionBarStyle;
-  loggedIn: boolean;
+  username: string;
   isUser: boolean;
   voteAmount: number;
   handlePressVoting: (votingWeight: number) => Promise<boolean>;
@@ -51,9 +51,9 @@ interface Props {
 }
 
 const ActionBarView = (props: Props): JSX.Element => {
+  console.log('ActionBarView. props', props);
   // props
   const {actionBarStyle, postState, handlePressVoting} = props;
-  const {vote_count, voters, payout, comment_count, bookmarked} = postState;
   const {voteAmount, isUser} = props;
   // language
   const intl = useIntl();
@@ -62,6 +62,10 @@ const ActionBarView = (props: Props): JSX.Element => {
   // states
   const [voting, setVoting] = useState(false);
   const [voted, setVoted] = useState(postState.voted);
+  const [voters, setVoters] = useState(postState.voters);
+  const [payout, setPayout] = useState(postState.payout);
+  const [commentCount, setCommentCount] = useState(postState.comment_count);
+  const [bookmarked, setBookmarked] = useState(postState.bookmarked);
   const [bookmarking, setBookmarking] = useState(false);
   const [votingWeight, setVotingWeight] = useState(100);
   const [votingDollar, setVotingDollar] = useState<string>(postState.payout);
@@ -86,11 +90,12 @@ const ActionBarView = (props: Props): JSX.Element => {
   const _onPressVoteIcon = () => {
     console.log('[Action] _onPressVoteIcon');
     setVotingDollar(voteAmount.toFixed(2));
-    if (!props.loggedIn) {
+    if (!props.username) {
       console.log('You need to login to vote');
       setToastMessage(intl.formatMessage({id: 'Actionbar.vote_wo_login'}));
       return;
     }
+    console.log('[_onPressVoteIcon] voted', voted);
     if (voted) {
       //      console.log('You already voted on this post');
       setToastMessage(intl.formatMessage({id: 'Actionbar.vote_again'}));
@@ -111,8 +116,19 @@ const ActionBarView = (props: Props): JSX.Element => {
     setVoting(true);
     setShowVotingModal(false);
     const _voted = await handlePressVoting(votingWeight);
-    setVoted(_voted);
     setVoting(false);
+    if (_voted) {
+      setVoted(_voted);
+      // update payout
+      const _payout = (
+        parseFloat(payout) +
+        (voteAmount * votingWeight) / 100
+      ).toFixed(2);
+      setPayout(_payout);
+      // update the voters and the count
+      const _voters = [`${props.username} (${voteAmount})`, ...voters];
+      setVoters(_voters);
+    }
   };
 
   //// handle press share icon of action bar
@@ -226,7 +242,7 @@ const ActionBarView = (props: Props): JSX.Element => {
               name="chevron-up"
               family="material-community"
             />
-            <Text size={actionBarStyle.textSize}>{vote_count}</Text>
+            <Text size={actionBarStyle.textSize}>{voters.length}</Text>
           </Block>
         </ModalDropdown>
 
@@ -259,7 +275,7 @@ const ActionBarView = (props: Props): JSX.Element => {
                 family="font-awesome"
                 style={{paddingRight: 2}}
               />
-              <Text size={actionBarStyle.textSize}>{comment_count}</Text>
+              <Text size={actionBarStyle.textSize}>{commentCount}</Text>
             </Block>
           </TouchableWithoutFeedback>
         )}

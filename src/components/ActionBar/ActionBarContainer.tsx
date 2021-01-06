@@ -38,7 +38,6 @@ const ActionBarContainer = (props: Props): JSX.Element => {
   );
   // states
   const [postState, setPostState] = useState<PostState>(props.postState);
-  const [voted, setVoted] = useState(false);
 
   //////// use effect
   // set new post state
@@ -81,7 +80,6 @@ const ActionBarContainer = (props: Props): JSX.Element => {
     console.log('[ActionBarContainer|_processVoting] results', results);
     if (results) {
       setToastMessage(intl.formatMessage({id: 'Actionbar.voted'}));
-      setVoted(true);
       // update the post state
       setPostState(
         postsState[postsState.postsType].posts[props.postIndex].state,
@@ -149,7 +147,7 @@ const ActionBarContainer = (props: Props): JSX.Element => {
       actionBarStyle={props.actionBarStyle}
       postState={postState}
       postIndex={props.postIndex}
-      loggedIn={authState.loggedIn}
+      username={authState.currentCredentials.username}
       isUser={
         authState.currentCredentials.username === postState.post_ref.author
       }

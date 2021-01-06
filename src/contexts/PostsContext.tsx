@@ -543,17 +543,17 @@ const PostsProvider = ({children}: Props) => {
       //// calculation
       // TODO: find the comment
       // Update the comment's voters, payout, vote amount
-      const newComments = _updateComments(
-        postsState[postsType].posts[postIndex].comments,
-        {author: postRef.author, permlink: postRef.permlink},
-      );
-      dispatch({
-        type: PostsActionTypes.UPVOTE_COMMENT,
-        payload: {
-          postIndex: postIndex,
-          comments: newComments,
-        },
-      });
+      // const newComments = _updateComments(
+      //   postsState[postsType].posts[postIndex].comments,
+      //   {author: postRef.author, permlink: postRef.permlink},
+      // );
+      // dispatch({
+      //   type: PostsActionTypes.UPVOTE_COMMENT,
+      //   payload: {
+      //     postIndex: postIndex,
+      //     comments: newComments,
+      //   },
+      // });
     } else {
       dispatch({
         type: PostsActionTypes.UPVOTE,
