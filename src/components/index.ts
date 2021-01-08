@@ -11,6 +11,7 @@ import {Comment} from './Comment';
 import {DNDTimes} from './DNDTimes';
 import {DraggableList} from './DraggableList';
 import Drawer from './Drawer';
+import {Editor} from './PostingEditor';
 import {DropdownModal} from './DropdownModal';
 import {ImageUpload} from './ImageUpload';
 import {OTP} from './OTP';
@@ -29,6 +30,7 @@ export {
   AuthorList,
   Button,
   Drawer,
+  Editor,
   Header,
   Tabs,
   DropdownModal,

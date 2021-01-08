@@ -23,12 +23,15 @@ import {argonTheme} from '~/constants/argonTheme';
 import {PostData, CommentData, PostingContent} from '~/contexts/types';
 import {Avatar, PostBody, ImageUpload, ActionBar} from '~/components';
 import {ActionBarStyleComment} from '~/constants/actionBarTypes';
+//// contexts
 import {
   AuthContext,
   UIContext,
   PostsContext,
   SettingsContext,
 } from '~/contexts';
+//// componetns
+import {Editor} from '~/components';
 //// utils
 import {generateCommentPermlink, createPatch} from '~/utils/editor';
 import {getTimeFromNow} from '~/utils/time';
@@ -227,6 +230,7 @@ const Comment = (props: Props): JSX.Element => {
           />
         )}
         <ImageUpload
+          isComment={true}
           containerStyle={{right: true}}
           getImageURL={_getUploadedImageURL}
         />
@@ -243,7 +247,7 @@ const Comment = (props: Props): JSX.Element => {
               borderColor: 'red',
               borderWidth: 2,
               paddingVertical: 0,
-              maringVertical: 0,
+              marginVertical: 0,
             },
           ]}
           placeholder="Comment"

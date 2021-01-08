@@ -40,9 +40,7 @@ const Posting = (props: Props): JSX.Element => {
   const intl = useIntl();
   //// contexts
   const {authState} = useContext(AuthContext);
-  const {uiState, setToastMessage, setTagParam, setEditMode} = useContext(
-    UIContext,
-  );
+  const {uiState, setToastMessage, setEditMode} = useContext(UIContext);
   const {postsState, appendTag, submitPost, updatePost} = useContext(
     PostsContext,
   );

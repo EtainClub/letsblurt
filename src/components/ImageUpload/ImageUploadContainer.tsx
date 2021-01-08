@@ -28,6 +28,7 @@ import {AuthContext, UIContext} from '~/contexts';
 import {ImageUploadView} from './ImageUploadView';
 
 interface Props {
+  isComment: boolean;
   containerStyle: any;
   getImageURL: (url: string) => void;
 }
@@ -132,6 +133,7 @@ const ImageUploadContainer = (props: Props): JSX.Element => {
   return (
     true && (
       <ImageUploadView
+        isComment={props.isComment}
         containerStyle={props.containerStyle}
         uploading={uploading}
         handlePhotoUpload={_handlePhotoUpload}

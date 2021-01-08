@@ -24,6 +24,7 @@ const {width, height} = Dimensions.get('window');
 import {UIContext} from '~/contexts';
 
 interface Props {
+  isComment: boolean;
   uploading: boolean;
   containerStyle: any;
   handlePhotoUpload: () => void;
@@ -75,7 +76,7 @@ const ImageUploadView = (props: Props): JSX.Element => {
           onlyIcon
           icon="picture-o"
           iconFamily="font-awesome"
-          iconSize={14}
+          iconSize={props.isComment ? 10 : 14}
           color={argonTheme.COLORS.ERROR}
         />
       </Block>

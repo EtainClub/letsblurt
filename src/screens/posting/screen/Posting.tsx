@@ -1,4 +1,6 @@
+//// react
 import React, {useState, useEffect, useRef, useContext} from 'react';
+//// react native
 import {
   View,
   StyleSheet,
@@ -12,19 +14,22 @@ import {
   Animated,
   Alert,
 } from 'react-native';
-import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
+//// language
 import {useIntl} from 'react-intl';
+//// UIs
+import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
 import ActionSheet from 'react-native-actions-sheet';
 import {DropdownModal} from '~/components/DropdownModal';
 import {argonTheme} from '~/constants/argonTheme';
-import {PostBody, AuthorList} from '~/components';
-import {UserContext} from '~/contexts';
 import renderPostBody from '~/utils/render-helpers/markdown-2-html';
-import {PostData} from '~/contexts/types';
 const {width, height} = Dimensions.get('screen');
+//// contexts
+import {UserContext} from '~/contexts';
+import {PostData} from '~/contexts/types';
+//// components
+import {PostBody, AuthorList, ImageUpload, Editor} from '~/components';
+//// constants
 import {Images, BLURT_IMAGE_SERVERS, STEEM_IMAGE_SERVER} from '~/constants';
-
-import {ImageUpload} from '~/components';
 
 const IMAGE_SERVER = BLURT_IMAGE_SERVERS[0];
 const MAX_TAGS = 5;
@@ -212,33 +217,6 @@ const PostingScreen = (props: Props): JSX.Element => {
     }
   };
 
-  // //// handle press photo upload
-  // const _handlePressPhotoUpload = () => {
-  //   console.log('[Posting');
-  //   // show the action modal
-  //   photoUploadRef.current?.setModalVisible(true);
-  // };
-
-  // ////
-  // const _openImagePicker = () => {
-  //   props.handlePhotoUpload();
-  //   // hide the modal
-  //   photoUploadRef.current?.setModalVisible(false);
-  // };
-
-  // ///
-  // const _openCamera = () => {
-  //   props.handleCameraUpload();
-  //   // hide the modal
-  //   photoUploadRef.current?.setModalVisible(false);
-  // };
-
-  // ////
-  // const _closeActionSheet = () => {
-  //   // hide the modal
-  //   photoUploadRef.current?.setModalVisible(false);
-  // };
-
   ////
   const _onPressPostSubmit = () => {
     props.handlePressPostSumbit(title, body, tags);
@@ -309,7 +287,9 @@ const PostingScreen = (props: Props): JSX.Element => {
               style={[styles.input, styles.inputDefault]}
             />
           </Block>
-          <Block style={{paddingHorizontal: theme.SIZES.BASE}}>
+          <Editor isComment={false} />
+
+          {/* <Block style={{paddingHorizontal: theme.SIZES.BASE}}>
             <Input
               innerRef={inputRef}
               value={body}
@@ -323,7 +303,7 @@ const PostingScreen = (props: Props): JSX.Element => {
               textAlignVertical="top"
               autoCorrect={false}
             />
-          </Block>
+          </Block> */}
           {/* <Block row>
             <Button
               onPress={_handlePressPhotoUpload}
@@ -335,12 +315,12 @@ const PostingScreen = (props: Props): JSX.Element => {
               color={argonTheme.COLORS.ERROR}
             />
           </Block> */}
-          <Block row>
+          {/* <Block row>
             <ImageUpload
               containerStyle={{right: true}}
               getImageURL={_handleUploadedImageURL}
             />
-          </Block>
+          </Block> */}
           <Block style={{paddingHorizontal: theme.SIZES.BASE}}>
             <Input
               color="black"

@@ -23,12 +23,13 @@ import {navigate} from '~/navigation/service';
 import {PostData, CommentData, PostsTypes} from '~/contexts/types';
 import {ActionBarStylePost} from '~/constants/actionBarTypes';
 import {
+  ActionBar,
   Avatar,
   Comment,
+  Editor,
+  ImageUpload,
   ParentPost,
   PostBody,
-  ActionBar,
-  ImageUpload,
 } from '~/components';
 import {argonTheme} from '~/constants/argonTheme';
 import {UIContext} from '~/contexts';
@@ -118,6 +119,7 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
         style={{marginTop: 20}}
         onLayout={(event) => setCommentY(event.nativeEvent.layout.y)}>
         <ImageUpload
+          isComment={true}
           containerStyle={{right: true}}
           getImageURL={_getUploadedImageURL}
         />
@@ -242,7 +244,8 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
               );
             })}
           </Block>
-          {_renderCommentForm()}
+          {/* {_renderCommentForm()} */}
+          <Editor isComment={true} />
           {_renderComments()}
         </Block>
       </ScrollView>
