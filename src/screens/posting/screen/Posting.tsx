@@ -1,19 +1,7 @@
 //// react
 import React, {useState, useEffect, useRef, useContext} from 'react';
 //// react native
-import {
-  View,
-  StyleSheet,
-  Dimensions,
-  ScrollView,
-  Image,
-  Platform,
-  FlatList,
-  TouchableWithoutFeedback,
-  ActivityIndicator,
-  Animated,
-  Alert,
-} from 'react-native';
+import {View, StyleSheet, Dimensions, ScrollView, Image} from 'react-native';
 //// language
 import {useIntl} from 'react-intl';
 //// UIs
@@ -27,11 +15,8 @@ const {width, height} = Dimensions.get('screen');
 import {UserContext} from '~/contexts';
 import {PostData} from '~/contexts/types';
 //// components
-import {PostBody, AuthorList, ImageUpload, Editor} from '~/components';
+import {PostBody, Editor} from '~/components';
 //// constants
-import {Images, BLURT_IMAGE_SERVERS, STEEM_IMAGE_SERVER} from '~/constants';
-
-const IMAGE_SERVER = BLURT_IMAGE_SERVERS[0];
 const MAX_TAGS = 5;
 const BACKGROUND_COLORS = [
   argonTheme.COLORS.BORDER,

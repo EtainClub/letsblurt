@@ -6,7 +6,13 @@ import {useIntl} from 'react-intl';
 import {get, has} from 'lodash';
 import {ProfileScreen} from '../screen/Profile';
 import {ProfileEditForm} from '../screen/ProfileEdit';
-import {AuthContext, UserContext, UIContext, PostsContext} from '~/contexts';
+import {
+  AuthContext,
+  UserContext,
+  UIContext,
+  PostsContext,
+  SettingsContext,
+} from '~/contexts';
 import {PostsTypes, PostData, ProfileData} from '~/contexts/types';
 import {
   signImage,
@@ -15,14 +21,7 @@ import {
 } from '~/providers/blurt/dblurtApi';
 import {uploadImage} from '~/providers/blurt/imageApi';
 
-import {
-  Images,
-  argonTheme,
-  BLURT_IMAGE_SERVERS,
-  STEEM_IMAGE_SERVER,
-} from '~/constants';
-// TODO: generalize this for Steem chain
-const IMAGE_SERVER = BLURT_IMAGE_SERVERS[0];
+import {argonTheme} from '~/constants';
 
 import ImagePicker, {ImageOrVideo} from 'react-native-image-crop-picker';
 
@@ -50,6 +49,7 @@ const Profile = ({navigation}): JSX.Element => {
     fetchFavorites,
     clearPosts,
   } = useContext(PostsContext);
+  const {settingsState} = useContext(SettingsContext);
   // states
   const [profileData, setProfileData] = useState<ProfileData>(null);
   const [profileFetched, setProfileFetched] = useState(false);
@@ -115,7 +115,7 @@ const Profile = ({navigation}): JSX.Element => {
         // get content
         const blog = get(_profileData.blogs, blogRef, {});
         // get avatar
-        const avatar = `${IMAGE_SERVER}/u/${author}/avatar`;
+        const avatar = `${settingsState.blockchains.image}/u/${author}/avatar`;
         // update avatar url state
         setAvatarUrl(avatar);
         return {
@@ -263,6 +263,7 @@ const Profile = ({navigation}): JSX.Element => {
         blogs={blogs}
         bookmarks={bookmarks}
         favorites={favorites}
+        imageServer={settingsState.blockchains.image}
         handlePressFavoriteItem={_handlePressFavoriteItem}
         clearPosts={_clearPosts}
         handlePressEdit={_handlePressEdit}

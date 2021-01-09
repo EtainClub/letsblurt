@@ -68,48 +68,6 @@ const TokenTransferView = (props: Props): JSX.Element => {
   //// effect
   useEffect(() => {}, []);
 
-  ////
-  const _renderItem = (item: string, index: number) => {
-    const avatar = `${Config.IMAGE_SERVER}/u/${item}/avatar`;
-    return (
-      <TouchableWithoutFeedback
-        key={item}
-        onPress={() => _handlePressItem(item)}>
-        <Block
-          flex
-          card
-          row
-          space="between"
-          style={{
-            marginBottom: 5,
-            padding: 5,
-            backgroundColor:
-              BACKGROUND_COLORS[index % BACKGROUND_COLORS.length],
-          }}>
-          <Block row middle>
-            <Image
-              source={{
-                uri: avatar || null,
-              }}
-              style={styles.avatar}
-            />
-            <Text size={14} style={{marginHorizontal: 5}}>
-              {item}
-            </Text>
-          </Block>
-        </Block>
-      </TouchableWithoutFeedback>
-    );
-  };
-
-  ////
-  const _handlePressItem = (item) => {
-    // set query
-    setQuery(item);
-    // hide result
-    setHideResult(true);
-  };
-
   ///
   const _handleChangeRecipient = (_recipient: string) => {
     setRecipient('');

@@ -23,8 +23,6 @@ import {argonTheme} from '~/constants';
 //// utils
 import {get} from 'lodash';
 import {getTimeFromNow} from '~/utils/time';
-import {Images, BLURT_IMAGE_SERVERS, STEEM_IMAGE_SERVER} from '~/constants';
-const IMAGE_SERVER = BLURT_IMAGE_SERVERS;
 
 const BACKGROUND_COLORS = [
   argonTheme.COLORS.BORDER,
@@ -35,6 +33,7 @@ interface Props {
   notifications: any[];
   fetching: boolean;
   username: string;
+  imageServer: string;
   handlePressItem: (
     author: string,
     parent_permlink: string,
@@ -44,6 +43,7 @@ interface Props {
 }
 const NotificationScreen = (props: Props): JSX.Element => {
   console.log('[NotificationScreen] props', props);
+  const {imageServer} = props;
   //// lanugage
   const intl = useIntl();
 
@@ -64,20 +64,20 @@ const NotificationScreen = (props: Props): JSX.Element => {
         iconName = 'adduser';
         iconFamily = 'antdesign';
         author = item.follower;
-        avatar = `${IMAGE_SERVER}/u/${author}/avatar`;
+        avatar = `${imageServer}/u/${author}/avatar`;
         text = intl.formatMessage({id: 'Notifications.follow'});
         break;
       case 'reply':
         iconName = 'message-reply-text';
         iconFamily = 'material-community';
-        avatar = `${IMAGE_SERVER}/u/${author}/avatar`;
+        avatar = `${imageServer}/u/${author}/avatar`;
         text = intl.formatMessage({id: 'Notifications.reply'});
         permlink = item.permlink;
         break;
       case 'mention':
         iconName = 'at';
         iconFamily = 'font-awesome';
-        avatar = `${IMAGE_SERVER}/u/${author}/avatar`;
+        avatar = `${imageServer}/u/${author}/avatar`;
         text = intl.formatMessage({id: 'Notifications.mention'});
         permlink = item.permlink;
         break;
@@ -86,7 +86,7 @@ const NotificationScreen = (props: Props): JSX.Element => {
         author = item.from;
         iconName = 'exchange';
         iconFamily = 'font-awesome';
-        avatar = `${IMAGE_SERVER}/u/${item.from}/avatar`;
+        avatar = `${imageServer}/u/${item.from}/avatar`;
         text = intl.formatMessage(
           {id: 'Notifications.transfer'},
           {what: item.amount},

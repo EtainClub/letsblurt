@@ -157,6 +157,7 @@ const ProfileContainer = (props: Props): JSX.Element => {
       favoriteState={favoriteState}
       following={following}
       followingState={followingState}
+      imageServer={settingsState.blockchains.image}
       handlePressFavorite={_handlePressFavorite}
       handlePressEdit={props.handlePressEdit}
       handlePressFollow={_handlePressFollow}

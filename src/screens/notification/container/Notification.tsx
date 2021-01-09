@@ -18,7 +18,13 @@ import {useIntl} from 'react-intl';
 //// ui, styles
 import {Block} from 'galio-framework';
 //// contexts
-import {PostsContext, AuthContext, UIContext, UserContext} from '~/contexts';
+import {
+  PostsContext,
+  AuthContext,
+  UIContext,
+  UserContext,
+  SettingsContext,
+} from '~/contexts';
 import {PostData, PostRef, PostsTypes} from '~/contexts/types';
 //// blockchain
 import {fetchUserProfile, fetchWalletData} from '~/providers/blurt/dblurtApi';
@@ -35,6 +41,7 @@ const Notification = (props: Props): JSX.Element => {
   const {getNotifications} = useContext(UserContext);
   const {authState} = useContext(AuthContext);
   const {setAuthorParam} = useContext(UIContext);
+  const {settingsState} = useContext(SettingsContext);
   //// states
   const [username, setUsername] = useState('');
   const [fetching, setFetching] = useState(false);
@@ -93,6 +100,7 @@ const Notification = (props: Props): JSX.Element => {
       notifications={notifications}
       fetching={fetching}
       username={authState.currentCredentials.username}
+      imageServer={settingsState.blockchains.image}
       handlePressItem={_handlePressItem}
       handleRefresh={_handleRefresh}
     />

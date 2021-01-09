@@ -223,6 +223,7 @@ const UserProvider = ({children}: Props) => {
   const getNotifications = async (username: string) => {
     if (!username) return [];
     const notifications = await fetchNotifications(username);
+
     console.log('[getNotifications] notifications', notifications);
     if (notifications) {
       return notifications;

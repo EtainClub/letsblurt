@@ -20,7 +20,7 @@ import {navigate} from '~/navigation/service';
 import {useIntl} from 'react-intl';
 //// ui, styles
 import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
-import {Images, argonTheme, BLURT_IMAGE_SERVERS} from '~/constants';
+import {Images, argonTheme} from '~/constants';
 const {width, height} = Dimensions.get('screen');
 import {HeaderHeight} from '~/constants/utils';
 //// contexts
@@ -37,6 +37,7 @@ interface Props {
   favoriteState: boolean;
   following: boolean;
   followingState: boolean;
+  imageServer: string;
   handlePressFavorite: () => void;
   handlePressEdit: () => void;
   handlePressFollow: () => void;
@@ -56,8 +57,6 @@ const ProfileView: React.FC<Props> = ({
   //// contexts
   //// stats
   ////
-
-  const IMAGE_SERVER = BLURT_IMAGE_SERVERS[0];
 
   const _handlePressWebsite = () => {
     // open link
@@ -105,7 +104,7 @@ const ProfileView: React.FC<Props> = ({
               <Block row>
                 <Image
                   source={{
-                    uri: `${IMAGE_SERVER}/u/${profile.name}/avatar`,
+                    uri: `${props.imageServer}/u/${profile.name}/avatar`,
                   }}
                   style={[styles.avatar, {left: 10}]}
                 />

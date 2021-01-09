@@ -12,9 +12,15 @@ import {PostState, PostData, CommentData, MetaData} from '~/contexts/types';
 const POST_SUMMARY_LENGTH = 80;
 const webp = Platform.OS === 'ios' ? false : true;
 
-export const parsePosts = async (posts: Discussion[], username: string) => {
+export const parsePosts = async (
+  posts: Discussion[],
+  username: string,
+  imageServer: string,
+) => {
   if (posts) {
-    const promises = posts.map((post) => parsePost(post, username));
+    const promises = posts.map((post) =>
+      parsePost(post, username, imageServer),
+    );
     const formattedPosts = await Promise.all(promises);
     return formattedPosts;
   }
@@ -24,6 +30,7 @@ export const parsePosts = async (posts: Discussion[], username: string) => {
 export const parsePost = async (
   post: Discussion,
   username: string,
+  imageServer: string,
   promoted: boolean = false,
 ): Promise<PostData | null> => {
   if (!post) {
@@ -128,7 +135,7 @@ export const parsePost = async (
   postData.state.vote_count = activeVotes.length;
   postData.state.reputation = get(profile, 'reputation');
 
-  postData.state.avatar = getResizedAvatar(post.author);
+  postData.state.avatar = getResizedAvatar(post.author, imageServer);
   postData.state.voters!.sort((a, b) => b.rshares - a.rshares);
   postData.body = renderPostBody(post.body, true);
   postData.summary = postBodySummary(post, POST_SUMMARY_LENGTH);

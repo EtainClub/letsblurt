@@ -44,6 +44,7 @@ import {
   BLURT_CHAIN_ID,
   BLURT_CHAIN_PREFIX,
   CHAIN_TIMEOUT,
+  BLURT_NOTIFICATIONS_ENDPOINT,
 } from '~/constants/blockchain';
 
 import {jsonStringify} from '~/utils/jsonUtils';
@@ -62,6 +63,8 @@ let client = new Client(BLURT_MAINNETS, {
 });
 console.log('Blurt Client', client);
 
+// app settings of blockchain
+let blockchainSettings = null;
 //// change server orders and setup the client again
 export const setBlockchainClient = async (server?: string) => {
   // get blockchain servers from storage
@@ -69,6 +72,7 @@ export const setBlockchainClient = async (server?: string) => {
   if (!server) {
     const _blockchains = await AsyncStorage.getItem('blockchains');
     const blockchains = JSON.parse(_blockchains);
+    blockchainSettings = blockchains;
     console.log('[changeServerOrder] blockchains', blockchains);
     if (!blockchains) return null;
     rpc = blockchains.rpc;
@@ -825,7 +829,7 @@ export const fetchPostsSummary = async (
     );
 
     let postDataList: PostData[];
-    postDataList = await parsePosts(posts, username);
+    postDataList = await parsePosts(posts, username, blockchainSettings.image);
 
     // TODO: implement later
     // if (filterNsfw) {
@@ -1235,21 +1239,32 @@ export const broadcastProfileUpdate = async (
 
 /////////// notifications
 //// fetch notifications
-export const fetchNotifications = async (username: string): Promise<any[]> => {
-  const notiClient = new NotiClient('wss://notifications.blurt.world');
-  const result = await notiClient.call('get_notifications', [username]);
-  if (result) return result;
-  return null;
-};
 // export const fetchNotifications = async (username: string): Promise<any[]> => {
-//   return new Promise((resolve, reject) => {
-//     const notiClient = new NotiClient('wss://notifications.blurt.world');
-//     notiClient.call('get_notifications', [username], (err, result) => {
-//       if (err) reject(err);
-//       resolve(result);
-//     });
-//   });
+//   //  const notiClient = new NotiClient('wss://notifications.blurt.world');
+//   //  const result = await notiClient.call('get_notifications', [username]);
+//   const params = `@${username}/notifications`;
+//   console.log('fetchNotifications. params', params);
+//   try {
+//     //    const result = await client.call('condenser_api', 'get_state', [params]);
+//     const notiClient = new NotiClient(BLURT_NOTIFICATIONS_ENDPOINT);
+//     const result = await notiClient.call('get_notifications', [username]);
+//     console.log('fetchNotifications. client, result', notiClient, result);
+//     if (result) return result;
+//     return null;
+//   } catch (error) {
+//     console.log('failed to fetch notifications', error);
+//     return null;
+//   }
 // };
+export const fetchNotifications = async (username: string): Promise<any[]> => {
+  return new Promise((resolve, reject) => {
+    const notiClient = new NotiClient('wss://notifications.blurt.world');
+    notiClient.call('get_notifications', [username], (err, result) => {
+      if (err) reject(err);
+      resolve(result);
+    });
+  });
+};
 
 //////////// wallet
 //// fetch wallet data

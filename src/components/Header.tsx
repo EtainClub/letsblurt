@@ -16,7 +16,13 @@ import {Images, argonTheme} from '~/constants';
 import {useIntl} from 'react-intl';
 import {navigate} from '~/navigation/service';
 // steem api
-import {UIContext, AuthContext, PostsContext, UserContext} from '~/contexts';
+import {
+  UIContext,
+  AuthContext,
+  PostsContext,
+  UserContext,
+  SettingsContext,
+} from '~/contexts';
 // types
 import {
   PostRef,
@@ -30,9 +36,6 @@ import {indexOf} from 'lodash';
 import {useRoute} from '@react-navigation/native';
 
 import ModalDropdown from 'react-native-modal-dropdown';
-
-import {BLURT_IMAGE_SERVERS} from '~/constants';
-const IMAGE_SERVER = BLURT_IMAGE_SERVERS[0];
 
 const {height, width} = Dimensions.get('window');
 const iPhoneX = (): boolean =>
@@ -59,6 +62,7 @@ const Header = (props: Props): JSX.Element => {
   const {postsState, setTagIndex, setFilterIndex, clearPosts} = useContext(
     PostsContext,
   );
+  const {settingsState} = useContext(SettingsContext);
   // states
   const [username, setUsername] = useState(null);
   const [searchText, setSearchText] = useState('');
@@ -116,7 +120,7 @@ const Header = (props: Props): JSX.Element => {
           ) : (
             <Image
               source={{
-                uri: `${IMAGE_SERVER}/u/${option}/avatar`,
+                uri: `${settingsState.blockchains.image}/u/${option}/avatar`,
               }}
               style={[
                 styles.avatar,
@@ -197,7 +201,7 @@ const Header = (props: Props): JSX.Element => {
         onSelect={_handleChangeAccount}>
         <Image
           source={{
-            uri: `${IMAGE_SERVER}/u/${username}/avatar`,
+            uri: `${settingsState.blockchains.image}/u/${username}/avatar`,
           }}
           style={[styles.avatar]}
         />

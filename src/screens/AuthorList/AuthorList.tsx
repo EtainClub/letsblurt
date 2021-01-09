@@ -24,15 +24,17 @@ import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
 import {argonTheme} from '~/constants/argonTheme';
 const {width, height} = Dimensions.get('screen');
 //// contexts
-import {PostsContext, AuthContext, UIContext, UserContext} from '~/contexts';
+import {
+  PostsContext,
+  UIContext,
+  UserContext,
+  SettingsContext,
+} from '~/contexts';
 import {PostData, PostRef, PostsTypes} from '~/contexts/types';
 //// etc
 import {Post} from '~/components/Post';
 import {ActionBarStyleFeed} from '~/constants/actionBarTypes';
 import {getTimeFromNow} from '~/utils/time';
-
-import {Images, BLURT_IMAGE_SERVERS, STEEM_IMAGE_SERVER} from '~/constants';
-const IMAGE_SERVER = BLURT_IMAGE_SERVERS[0];
 
 const BACKGROUND_COLORS = [
   argonTheme.COLORS.BORDER,
@@ -50,6 +52,7 @@ const AuthorListScreen = (props: Props): JSX.Element => {
   const {uiState, setAuthorParam} = useContext(UIContext);
   const {userState} = useContext(UserContext);
   const {setPostRef} = useContext(PostsContext);
+  const {settingsState} = useContext(SettingsContext);
   //// states
   const [searchText, setSearchText] = useState('');
   const [searchedItems, setSearchedItems] = useState(uiState.authorList);
@@ -166,7 +169,7 @@ const AuthorListScreen = (props: Props): JSX.Element => {
 
   //// render an item
   const _renderItem = (author: string, index: number) => {
-    const avatar = `${IMAGE_SERVER}/u/${author}/avatar`;
+    const avatar = `${settingsState.blockchains.image}/u/${author}/avatar`;
     return (
       <TouchableWithoutFeedback onPress={() => _onPressAuthor(author)}>
         <Block

@@ -4,7 +4,8 @@ import React, {useState, useContext, useEffect} from 'react';
 //// config
 import Config from 'react-native-config';
 //// language
-
+//// contexts
+import {SettingsContext} from '~/contexts';
 import {BeneficiaryView} from './BeneficiaryView';
 
 export interface BeneficiaryItem {
@@ -19,6 +20,8 @@ interface Props {
   getBeneficiaries: (beneficiaries: any[]) => void;
 }
 const BeneficiaryContainer = (props: Props): JSX.Element => {
+  //// contexts
+  const {settingsState} = useContext(SettingsContext);
   //// states
   const [beneficiaries, setBeneficiaries] = useState<BeneficiaryItem[]>(
     props.beneficiaries,
@@ -85,6 +88,7 @@ const BeneficiaryContainer = (props: Props): JSX.Element => {
     <BeneficiaryView
       sourceList={props.sourceList}
       beneficiaries={beneficiaries}
+      imageServer={settingsState.blockchains.image}
       handlePressRemove={_removeBeneficiary}
       addBeneficiary={_addBeneficiary}
       handlePressSave={_handlePressSave}

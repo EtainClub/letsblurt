@@ -35,6 +35,7 @@ const BACKGROUND_COLORS = [
 interface Props {
   sourceList: string[];
   beneficiaries: BeneficiaryItem[];
+  imageServer: string;
   handlePressRemove: (beneficiary: BeneficiaryItem) => void;
   addBeneficiary: (beneficiary: BeneficiaryItem) => boolean;
   handlePressSave: () => boolean;
@@ -75,7 +76,7 @@ const BeneficiaryView = (props: Props): JSX.Element => {
 
   ////
   const _renderItem = (item: string, index: number) => {
-    const avatar = `${Config.IMAGE_SERVER}/u/${item}/avatar`;
+    const avatar = `${props.imageServer}/u/${item}/avatar`;
     return (
       <TouchableWithoutFeedback
         key={item}
@@ -175,7 +176,7 @@ const BeneficiaryView = (props: Props): JSX.Element => {
     return beneficiaries.map((item, index) => {
       const {account, weight} = item;
       console.log('weight', weight);
-      const avatar = `${Config.IMAGE_SERVER}/u/${account}/avatar`;
+      const avatar = `${props.imageServer}/u/${account}/avatar`;
       return (
         <Block
           key={account}

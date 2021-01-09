@@ -18,7 +18,13 @@ import {useIntl} from 'react-intl';
 //// ui, styles
 import {Block} from 'galio-framework';
 //// contexts
-import {PostsContext, AuthContext, UIContext, UserContext} from '~/contexts';
+import {
+  PostsContext,
+  AuthContext,
+  UIContext,
+  UserContext,
+  SettingsContext,
+} from '~/contexts';
 import {PostData, PostRef, PostsTypes} from '~/contexts/types';
 //// blockchain
 import {fetchUserProfile, fetchWalletData} from '~/providers/blurt/dblurtApi';
@@ -26,7 +32,7 @@ import {fetchUserProfile, fetchWalletData} from '~/providers/blurt/dblurtApi';
 import {AuthorProfileScreen} from '../screen/AuthorProfile';
 import {get, has} from 'lodash';
 const {width, height} = Dimensions.get('screen');
-import {argonTheme, BLURT_IMAGE_SERVERS, STEEM_IMAGE_SERVER} from '~/constants';
+import {argonTheme} from '~/constants';
 
 //// props
 interface Props {
@@ -37,6 +43,7 @@ const AuthorProfile = (props: Props): JSX.Element => {
   //// contexts
   const {uiState} = useContext(UIContext);
   const {getWalletData} = useContext(UserContext);
+  const {settingsState} = useContext(SettingsContext);
   //// states
   const [profileFetched, setProfileFetched] = useState(false);
   const [profileData, setProfileData] = useState(null);
@@ -61,8 +68,6 @@ const AuthorProfile = (props: Props): JSX.Element => {
   }, [profileFetched]);
 
   //////// functions
-  // TODO: generalize this for Steem chain
-  const IMAGE_SERVER = BLURT_IMAGE_SERVERS;
   ////
   const _getAuthorProfile = async (author: string) => {
     const _profileData = await fetchUserProfile(author);
@@ -76,7 +81,7 @@ const AuthorProfile = (props: Props): JSX.Element => {
         // get content
         const blog = get(_profileData.blogs, blogRef, {});
         // get avatar
-        const avatar = `${IMAGE_SERVER}/u/${author}/avatar`;
+        const avatar = `${settingsState.blockchains.image}/u/${author}/avatar`;
         return {
           author,
           //          avatar,

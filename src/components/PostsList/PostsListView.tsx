@@ -24,15 +24,9 @@ import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
 import {argonTheme} from '~/constants/argonTheme';
 const {width, height} = Dimensions.get('screen');
 //// contexts
-import {PostsContext, AuthContext, UIContext} from '~/contexts';
-import {PostData, PostRef, PostsTypes} from '~/contexts/types';
+import {PostsContext, SettingsContext} from '~/contexts';
 //// etc
-import {Post} from '~/components/Post';
-import {ActionBarStyleFeed} from '~/constants/actionBarTypes';
 import {getTimeFromNow} from '~/utils/time';
-
-import {BLURT_IMAGE_SERVERS} from '~/constants';
-const IMAGE_SERVER = BLURT_IMAGE_SERVERS[0];
 
 const BACKGROUND_COLORS = [
   argonTheme.COLORS.BORDER,
@@ -60,6 +54,7 @@ const PostsListView = (props: Props): JSX.Element => {
   const intl = useIntl();
   //// contexts
   const {setPostRef} = useContext(PostsContext);
+  const {settingsState} = useContext(SettingsContext);
   //// states
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -110,7 +105,7 @@ const PostsListView = (props: Props): JSX.Element => {
 
   //// render a post
   const _renderPost = (item: any, index: number) => {
-    const avatar = `${IMAGE_SERVER}/u/${item.author}/avatar`;
+    const avatar = `${settingsState.blockchains.image}/u/${item.author}/avatar`;
     return (
       <TouchableWithoutFeedback onPress={() => _onPressPost(index)}>
         <Block

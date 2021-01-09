@@ -16,14 +16,13 @@ import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
 import {TabView, SceneMap} from 'react-native-tab-view';
 import {useIntl} from 'react-intl';
 import {navigate} from '~/navigation/service';
-import {Images, argonTheme, BLURT_IMAGE_SERVERS} from '~/constants';
+import {Images, argonTheme} from '~/constants';
 import {HeaderHeight} from '~/constants/utils';
 import {getNumberStat} from '~/utils/stats';
 import {Feed} from '~/screens';
 import {PostsListView, ProfileContainer, DraggableList} from '~/components';
 import {PostsTypes, PostData, ProfileData} from '~/contexts/types';
 import {getTimeFromNow} from '~/utils/time';
-const IMAGE_SERVER = BLURT_IMAGE_SERVERS[0];
 const BACKGROUND_COLORS = [
   argonTheme.COLORS.BORDER,
   argonTheme.COLORS.SECONDARY,
@@ -38,6 +37,7 @@ interface Props {
   blogs: any[];
   bookmarks: any[];
   favorites: any[];
+  imageServer: string;
   handlePressFavoriteItem: (author: string) => void;
   handlePressEdit: () => void;
   clearPosts: () => void;
@@ -72,7 +72,7 @@ const ProfileScreen = (props: Props): JSX.Element => {
 
   ////
   const _renderFavoriteItem = ({item, index, drag, isActive}) => {
-    const avatar = `${IMAGE_SERVER}/u/${item.author}/avatar`;
+    const avatar = `${props.imageServer}/u/${item.author}/avatar`;
     return (
       <TouchableWithoutFeedback
         onPress={() => props.handlePressFavoriteItem(item.author)}>

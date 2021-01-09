@@ -26,15 +26,13 @@ const {width, height} = Dimensions.get('screen');
 import Modal from 'react-native-modal';
 
 //// contexts
-import {PostsContext, AuthContext, UIContext, UserContext} from '~/contexts';
+import {
+  PostsContext,
+  UIContext,
+  UserContext,
+  SettingsContext,
+} from '~/contexts';
 import {PostData, PostRef, PostsTypes} from '~/contexts/types';
-//// etc
-import {Post} from '~/components/Post';
-import {ActionBarStyleFeed} from '~/constants/actionBarTypes';
-import {getTimeFromNow} from '~/utils/time';
-
-import {Images, BLURT_IMAGE_SERVERS, STEEM_IMAGE_SERVER} from '~/constants';
-const IMAGE_SERVER = BLURT_IMAGE_SERVERS[0];
 
 const BACKGROUND_COLORS = [
   argonTheme.COLORS.BORDER,
@@ -58,6 +56,7 @@ const AuthorListView = (props: Props): JSX.Element => {
   const {uiState, setAuthorParam} = useContext(UIContext);
   const {userState} = useContext(UserContext);
   const {setPostRef} = useContext(PostsContext);
+  const {settingsState} = useContext(SettingsContext);
   //// states
   const [showModal, setShowModal] = useState(props.showModal);
   const [searchText, setSearchText] = useState('');
@@ -178,7 +177,7 @@ const AuthorListView = (props: Props): JSX.Element => {
 
   //// render an item
   const _renderItem = (author: string, index: number) => {
-    const avatar = `${IMAGE_SERVER}/u/${author}/avatar`;
+    const avatar = `${settingsState.blockchains.image}/u/${author}/avatar`;
     return (
       <TouchableWithoutFeedback onPress={() => _onPressAuthor(author)}>
         <Block
