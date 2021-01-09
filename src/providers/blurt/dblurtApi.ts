@@ -73,7 +73,12 @@ export const setBlockchainClient = async (server?: string) => {
     const _blockchains = await AsyncStorage.getItem('blockchains');
     const blockchains = JSON.parse(_blockchains);
     blockchainSettings = blockchains;
-    console.log('[changeServerOrder] blockchains', blockchains);
+    console.log(
+      '[changeServerOrder] blockchains',
+      blockchains,
+      blockchainSettings,
+    );
+
     if (!blockchains) return null;
     rpc = blockchains.rpc;
   } else {

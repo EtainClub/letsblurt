@@ -12,6 +12,7 @@ import {
   TouchableWithoutFeedback,
   ScrollView,
   RefreshControl,
+  KeyboardAvoidingView,
 } from 'react-native';
 // SafeAreaView
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -89,67 +90,6 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
     setMessage(message + ' ' + url);
   };
 
-  // const _renderCommentForm = () => {
-  //   const iconSend = (
-  //     <Button
-  //       onPress={_onPressSendComment}
-  //       loading={submitting}
-  //       onlyIcon
-  //       icon="ios-send"
-  //       iconFamily="ionicon"
-  //       iconSize={24}
-  //       color={argonTheme.COLORS.ERROR}
-  //       style={{
-  //         margin: 0,
-  //         padding: 0,
-  //         right: -10,
-  //         width: 24 + 3,
-  //         height: 24 + 3,
-  //       }}
-  //     />
-  //   );
-
-  //   return (
-  //     <Block
-  //       center
-  //       style={{marginTop: 20}}
-  //       onLayout={(event) => setCommentY(event.nativeEvent.layout.y)}>
-  //       <ImageUpload
-  //         isComment={true}
-  //         containerStyle={{right: true}}
-  //         getImageURL={_getUploadedImageURL}
-  //       />
-  //       <Input
-  //         color="#9fa5aa"
-  //         multiline
-  //         rounded
-  //         right
-  //         blurOnSubmit
-  //         iconContent={iconSend}
-  //         style={[
-  //           styles.commentInput,
-  //           {
-  //             height: commentNewHeight,
-  //             borderColor: 'red',
-  //             borderWidth: 2,
-  //             marginVertical: 0,
-  //             paddingVertical: 0,
-  //           },
-  //         ]}
-  //         placeholder="Comment"
-  //         autoCapitalize="none"
-  //         textContentType="none"
-  //         placeholderTextColor="#9fa5aa"
-  //         defaultValue={message}
-  //         onChangeText={(text: string) => setMessage(text)}
-  //         onContentSizeChange={(evt) =>
-  //           setCommentNeeHeight(evt.nativeEvent.contentSize.height)
-  //         }
-  //       />
-  //     </Block>
-  //   );
-  // };
-
   const _renderComments = () => {
     const {comments} = props;
     return (
@@ -176,81 +116,83 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
   };
 
   const _onRefresh = async () => {
-    console.log('[PostDetailsView] onRefresh');
     await props.handleRefresh();
   };
 
   return !props.loading ? (
-    <Block style={{marginHorizontal: 5, marginBottom: 170}}>
-      {props.parentPost && <ParentPost post={props.parentPost} />}
-      <Text size={24}>{post.state.title}</Text>
-      <Block row space="between">
-        <Avatar
-          avatar={post.state.avatar}
-          avatarSize={40}
-          account={post.state.post_ref.author}
-          nickname={nickname ? nickname : post.state.post_ref.author}
-          reputation={reputation}
-          textSize={14}
-          truncate={false}
-        />
-        <Text style={{top: 10, marginRight: 20}}>{formatedTime}</Text>
-      </Block>
-      <Block style={{}}>
-        <ActionBar
-          actionBarStyle={ActionBarStylePost}
-          postState={state}
-          postUrl={post.url}
-          postsType={props.postsType}
-          postIndex={props.index}
-          handlePressComments={_handlePressComments}
-          handlePressTranslation={props.handlePressTranslation}
-        />
-      </Block>
-
-      <ScrollView
-        ref={commentRef}
-        contentContainerStyle={{flex: 1}}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={props.loading} onRefresh={_onRefresh} />
-        }>
-        <Block>
-          <Block style={{padding: theme.SIZES.BASE / 3}}>
-            <PostBody body={post.body} />
-          </Block>
-          <Block row style={{flexWrap: 'wrap'}}>
-            {(tags || []).map((tag, id) => {
-              return (
-                <TouchableWithoutFeedback
-                  key={id}
-                  onPress={() => _handlePressHashTag(tag)}>
-                  <Block
-                    card
-                    key={id}
-                    style={{
-                      backgroundColor: argonTheme.COLORS.INPUT_SUCCESS,
-                      paddingHorizontal: 5,
-                      marginHorizontal: 2,
-                      marginVertical: 3,
-                    }}>
-                    <Text>{tag}</Text>
-                  </Block>
-                </TouchableWithoutFeedback>
-              );
-            })}
-          </Block>
-          {/* {_renderCommentForm()} */}
-          <Editor
-            isComment={true}
-            depth={0}
-            close={false}
-            handleSubmitComment={props.handleSubmitComment}
+    <KeyboardAvoidingView behavior="position" keyboardVerticalOffset={20}>
+      <Block style={{marginHorizontal: 5, marginBottom: 170}}>
+        {props.parentPost && <ParentPost post={props.parentPost} />}
+        <Text size={24}>{post.state.title}</Text>
+        <Block row space="between">
+          <Avatar
+            avatar={post.state.avatar}
+            avatarSize={40}
+            account={post.state.post_ref.author}
+            nickname={nickname ? nickname : post.state.post_ref.author}
+            reputation={reputation}
+            textSize={14}
+            truncate={false}
           />
-          {_renderComments()}
+          <Text style={{top: 10, marginRight: 20}}>{formatedTime}</Text>
         </Block>
-      </ScrollView>
-    </Block>
+        <Block style={{}}>
+          <ActionBar
+            actionBarStyle={ActionBarStylePost}
+            postState={state}
+            postUrl={post.url}
+            postsType={props.postsType}
+            postIndex={props.index}
+            handlePressComments={_handlePressComments}
+            handlePressTranslation={props.handlePressTranslation}
+          />
+        </Block>
+
+        <ScrollView
+          ref={commentRef}
+          contentContainerStyle={{flex: 1}}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={props.loading} onRefresh={_onRefresh} />
+          }>
+          <Block>
+            <Block style={{padding: theme.SIZES.BASE / 3}}>
+              <PostBody body={post.body} />
+            </Block>
+            {!props.parentPost && (
+              <Block row style={{flexWrap: 'wrap'}}>
+                {(tags || []).map((tag, id) => {
+                  return (
+                    <TouchableWithoutFeedback
+                      key={id}
+                      onPress={() => _handlePressHashTag(tag)}>
+                      <Block
+                        card
+                        key={id}
+                        style={{
+                          backgroundColor: argonTheme.COLORS.INPUT_SUCCESS,
+                          paddingHorizontal: 5,
+                          marginHorizontal: 2,
+                          marginVertical: 3,
+                        }}>
+                        <Text>{tag}</Text>
+                      </Block>
+                    </TouchableWithoutFeedback>
+                  );
+                })}
+              </Block>
+            )}
+            <Editor
+              isComment={true}
+              depth={0}
+              close={false}
+              handleSubmitComment={props.handleSubmitComment}
+            />
+            {_renderComments()}
+          </Block>
+        </ScrollView>
+      </Block>
+    </KeyboardAvoidingView>
   ) : (
     <View style={{top: 20}}>
       <ActivityIndicator color={argonTheme.COLORS.ERROR} size="large" />

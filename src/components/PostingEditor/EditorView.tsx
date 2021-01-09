@@ -117,8 +117,10 @@ const EditorView = (props: Props): JSX.Element => {
     // update the post body whenever image is uploaded..
     const _body = renderPostBody(text, true);
     setPreviewBody(_body);
-    // send the change to the parent
-    props.handleBodyChange(_body);
+    // for main posting, send the change to the parent
+    if (!isComment) {
+      props.handleBodyChange(_body);
+    }
   };
 
   const _insertMentionedAccount = (text: string) => {

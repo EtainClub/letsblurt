@@ -47,7 +47,6 @@ interface Props {
 
 const PostsListView = (props: Props): JSX.Element => {
   //// props
-  console.log('props posts', props.posts);
   // const posts = props.posts.slice(0, props.posts.length - 1);
   const posts = props.posts;
   //// language

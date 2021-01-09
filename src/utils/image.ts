@@ -2,7 +2,7 @@ import {Platform} from 'react-native';
 // @todo need to implement this for steemit
 //import {proxifyImageSrc} from '@esteemapp/esteem-render-helpers';
 import {proxifyImageSrc} from '~/utils/render-helpers';
-
+import {BLURT_IMAGE_SERVERS} from '~/constants';
 const OS = Platform.OS;
 
 // @todo need to setup image service
@@ -28,5 +28,7 @@ export const getResizedAvatar = (
   if (!author) {
     return '';
   }
-  return `${imageServer}/u/${author}/avatar/${sizeString}`;
+
+  const IMAGE_SERVER = imageServer ? imageServer : BLURT_IMAGE_SERVERS[0];
+  return `${IMAGE_SERVER}/u/${author}/avatar/${sizeString}`;
 };

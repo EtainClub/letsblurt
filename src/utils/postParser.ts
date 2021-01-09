@@ -6,20 +6,25 @@ import {getActiveVotes, calculateReputation} from '~/providers/blurt/dblurtApi';
 import {Discussion} from 'dblurt';
 import {renderPostBody, postBodySummary} from './render-helpers';
 import {getResizedAvatar, getResizedImage} from './image';
-
+import {BLURT_IMAGE_SERVERS} from '~/constants';
 import {PostState, PostData, CommentData, MetaData} from '~/contexts/types';
 
 const POST_SUMMARY_LENGTH = 80;
 const webp = Platform.OS === 'ios' ? false : true;
+let IMAGE_SERVER = BLURT_IMAGE_SERVERS[0];
 
 export const parsePosts = async (
   posts: Discussion[],
   username: string,
-  imageServer: string,
+  imageServer?: string,
 ) => {
+  // set image server
+  if (imageServer) {
+    IMAGE_SERVER = imageServer;
+  }
   if (posts) {
     const promises = posts.map((post) =>
-      parsePost(post, username, imageServer),
+      parsePost(post, username, IMAGE_SERVER),
     );
     const formattedPosts = await Promise.all(promises);
     return formattedPosts;
