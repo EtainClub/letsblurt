@@ -128,12 +128,6 @@ const Comment = (props: Props): JSX.Element => {
     return false;
   };
 
-  const _onCancelReply = () => {
-    setShowReply(false);
-    setEditMode(false);
-    setReplyText('');
-  };
-
   const _handlePressReply = () => {
     // clear reply form
     setShowReply(!showReply);
@@ -192,81 +186,6 @@ const Comment = (props: Props): JSX.Element => {
     }
   };
 
-  const _getUploadedImageURL = (url: string) => {
-    setUploadedImageUrl(url);
-  };
-
-  const _renderCommentForm = () => {
-    const depth = comment.depth - 1;
-    const _body = editMode ? body : replyText;
-
-    const iconSend = (
-      <Button
-        onPress={_handleSubmitComment}
-        loading={submitting}
-        onlyIcon
-        icon="ios-send"
-        iconFamily="ionicon"
-        iconSize={24}
-        color={argonTheme.COLORS.ERROR}
-        style={{
-          margin: 0,
-          padding: 0,
-          right: -10,
-          width: 24 + 3,
-          height: 24 + 3,
-        }}
-      />
-    );
-
-    return (
-      <Block row center style={{right: depth * 15}}>
-        {(showReply || editMode) && (
-          <Icon
-            size={30}
-            color={theme.COLORS.WARNING}
-            name="ios-close-circle-outline"
-            family="ionicon"
-            style={{marginRight: 5}}
-            onPress={_onCancelReply}
-          />
-        )}
-        <ImageUpload
-          isComment={true}
-          containerStyle={{right: true}}
-          getImageURL={_getUploadedImageURL}
-        />
-        <Input
-          color="#9fa5aa"
-          multiline
-          rounded
-          right
-          iconContent={iconSend}
-          style={[
-            styles.commentInput,
-            {
-              height: newHeight,
-              borderColor: 'red',
-              borderWidth: 2,
-              paddingVertical: 0,
-              marginVertical: 0,
-            },
-          ]}
-          placeholder="Comment"
-          autoFocus={true}
-          autoCapitalize="none"
-          textContentType="none"
-          placeholderTextColor="#9fa5aa"
-          defaultValue={_body}
-          onChangeText={(text) => setReplyText(text)}
-          onContentSizeChange={(e) =>
-            setNewHeight(e.nativeEvent.contentSize.height)
-          }
-        />
-      </Block>
-    );
-  };
-
   // netsting the comments
   const nestedComments = (comment.comments || []).map((comment) => {
     return (
@@ -317,20 +236,25 @@ const Comment = (props: Props): JSX.Element => {
           handlePressTranslation={_handlePressTranslation}
         />
       </Block>
-      {/* {showReply && _renderCommentForm()} */}
       {showReply && (
         <Editor
           isComment={true}
           depth={comment.depth}
           close={false}
-          handleSumbitComment={_handleSubmitComment}
+          handleSubmitComment={_handleSubmitComment}
         />
       )}
       {nestedComments}
     </View>
   ) : (
     <View>
-      <Editor isComment={true} />
+      <Editor
+        isComment={true}
+        originalPost={body}
+        depth={comment.depth}
+        close={false}
+        handleSubmitComment={_handleSubmitComment}
+      />
     </View>
   );
 };

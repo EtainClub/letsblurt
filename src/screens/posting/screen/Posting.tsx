@@ -50,7 +50,6 @@ interface Props {
   posting: boolean;
   handlePressPostSumbit: (title: string, body: string, tags: string) => void;
   followingList?: string[];
-  handleMentionAuthor: (text: string) => void;
   handlePressBeneficiary: () => void;
   handleCancelEditing: () => void;
 }
@@ -58,6 +57,8 @@ interface Props {
 const PostingScreen = (props: Props): JSX.Element => {
   //// props
   const {originalPost} = props;
+  let markdownBody = '';
+  if (originalPost) markdownBody = originalPost.markdownBody;
   //// language
   const intl = useIntl();
   //// references
@@ -66,31 +67,23 @@ const PostingScreen = (props: Props): JSX.Element => {
   const {userState, getFollowings} = useContext(UserContext);
   // states
   const [title, setTitle] = useState('');
+  const [titleEditable, setTitleEditable] = useState(false);
   const [body, setBody] = useState('');
   const [previewBody, setPreviewBody] = useState('');
   const [tags, setTags] = useState('');
   const [message, setMessage] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [rewardIndex, setRewardIndex] = useState(0);
-  const [uploadedImageUrl, setUploadedImageUrl] = useState('');
-  const [bodySelection, setBodySelection] = useState<Position>({
-    start: 0,
-    end: 0,
-  });
-  const [mentioning, setMentioning] = useState(false);
-  const [searchAuthor, setSearchAuthor] = useState('');
-  const [showAuthorsModal, setShowAuthorsModal] = useState(false);
-  //// refs
-  // photo
-  const photoUploadRef = useRef(null);
-  // mention
-  const mentionRef = useRef(null);
 
+  //////// events
+  //// mount
+  useEffect(() => {
+    setTimeout(() => setTitleEditable(true), 100);
+  }, []);
   //// set original post event
   useEffect(() => {
     if (originalPost) {
       setTitle(originalPost.state.title);
-      setBody(originalPost.markdownBody);
+      setBody(markdownBody);
       // tags
       const _tags = originalPost.metadata.tags.reduce(
         (tagString, tag) => tagString + tag + ' ',
@@ -98,91 +91,15 @@ const PostingScreen = (props: Props): JSX.Element => {
       );
       setTags(_tags);
       // get html from markdown
-      const _body = renderPostBody(originalPost.markdownBody, true);
+      const _body = renderPostBody(markdownBody, true);
       // set preview
       setPreviewBody(_body);
-      // go top
-      setBodySelection({start: 0, end: 0});
     }
   }, [originalPost]);
-
-  //// handle uploaded image event
-  useEffect(() => {
-    if (uploadedImageUrl) {
-      const _body =
-        body.substring(0, bodySelection.start) +
-        uploadedImageUrl +
-        body.substring(bodySelection.end);
-      _handleBodyChange(_body);
-    }
-  }, [uploadedImageUrl]);
-
-  //// handle newly typed character
-  useEffect(() => {
-    if (body.length > 0) {
-      const char = _getTypedCharacter();
-      console.log('typed char', char);
-      // handle mentioning.
-      // TODO: handle when removing @ -> no modal
-      if (char === '@' && bodySelection.end >= bodySelection.start) {
-        console.log('show authors modal');
-        // show authors modal
-        setShowAuthorsModal(true);
-      } else {
-        setShowAuthorsModal(false);
-      }
-    }
-  }, [bodySelection]);
-
-  // //// handle mentioning
-  // useEffect(() => {
-  //   if (mentioning) {
-  //     mentionRef.current?.setModalVisible(true);
-  //   } else {
-  //     mentionRef.current?.setModalVisible(false);
-  //   }
-  // }, [mentioning]);
 
   const _handleTitleChange = (text: string) => {
     // check validity: max-length
     setTitle(text);
-  };
-
-  const _handleBodyChange = (text: string) => {
-    // check validity:
-    setBody(text);
-    // set preview body
-    // update the post body whenever image is uploaded..
-    const _body = renderPostBody(text, true);
-    setPreviewBody(_body);
-  };
-
-  const _getTypedCharacter = () => {
-    /// get newly typed character
-    const {start, end} = bodySelection;
-    const char = start === end ? body[start - 1] : body[body.length - 1];
-    return char;
-  };
-
-  const _insertMentionedAccount = (text: string) => {
-    console.log('_finalizeMention. author', text);
-    // hide the modal
-    setShowAuthorsModal(false);
-    //
-    setSearchAuthor('');
-
-    // append the author int the body
-    const _body =
-      body.substring(0, bodySelection.start) +
-      text +
-      body.substring(bodySelection.end, body.length);
-    console.log('_finalizeMention. body', _body);
-    setBody(_body);
-  };
-
-  //// update input selection
-  const _handleOnSelectionChange = async (event) => {
-    setBodySelection(event.nativeEvent.selection);
   };
 
   const _handleTagsChange = (text: string) => {
@@ -250,8 +167,12 @@ const PostingScreen = (props: Props): JSX.Element => {
   };
 
   ////
-  const _handleUploadedImageURL = (url: string) => {
-    setUploadedImageUrl(url);
+  const _handleBodyChange = (_body: string) => {
+    // set body
+    setBody(_body);
+    // set preview
+    const _preview = renderPostBody(_body, true);
+    setPreviewBody(_preview);
   };
 
   //// render preview of posting
@@ -275,6 +196,7 @@ const PostingScreen = (props: Props): JSX.Element => {
           <Block style={{paddingHorizontal: theme.SIZES.BASE}}>
             <Input
               value={title}
+              editable={titleEditable}
               onChangeText={_handleTitleChange}
               maxLength={100}
               borderless
@@ -287,40 +209,12 @@ const PostingScreen = (props: Props): JSX.Element => {
               style={[styles.input, styles.inputDefault]}
             />
           </Block>
-          <Editor isComment={false} />
+          <Editor
+            isComment={false}
+            originalPost={markdownBody}
+            handleBodyChange={_handleBodyChange}
+          />
 
-          {/* <Block style={{paddingHorizontal: theme.SIZES.BASE}}>
-            <Input
-              innerRef={inputRef}
-              value={body}
-              onChangeText={_handleBodyChange}
-              onSelectionChange={_handleOnSelectionChange}
-              style={[styles.input, styles.bodyContainer]}
-              placeholder={intl.formatMessage({id: 'Posting.body_placeholder'})}
-              placeholderTextColor={argonTheme.COLORS.FACEBOOK}
-              color="black"
-              multiline
-              textAlignVertical="top"
-              autoCorrect={false}
-            />
-          </Block> */}
-          {/* <Block row>
-            <Button
-              onPress={_handlePressPhotoUpload}
-              loading={props.uploading}
-              onlyIcon
-              icon="picture-o"
-              iconFamily="font-awesome"
-              iconSize={14}
-              color={argonTheme.COLORS.ERROR}
-            />
-          </Block> */}
-          {/* <Block row>
-            <ImageUpload
-              containerStyle={{right: true}}
-              getImageURL={_handleUploadedImageURL}
-            />
-          </Block> */}
           <Block style={{paddingHorizontal: theme.SIZES.BASE}}>
             <Input
               color="black"
@@ -379,27 +273,6 @@ const PostingScreen = (props: Props): JSX.Element => {
           {_renderPreview()}
         </Block>
       </ScrollView>
-      {/* <ActionSheet ref={photoUploadRef}>
-        <Block center>
-          <Button color="primary" onPress={_openImagePicker}>
-            {intl.formatMessage({id: 'Actionsheet.gallery'})}
-          </Button>
-          <Button color="warning" onPress={_openCamera}>
-            {intl.formatMessage({id: 'Actionsheet.camera'})}
-          </Button>
-          <Button color="gray" onPress={_closeActionSheet}>
-            {intl.formatMessage({id: 'Actionsheet.close'})}
-          </Button>
-        </Block>
-      </ActionSheet> */}
-
-      {showAuthorsModal && (
-        <AuthorList
-          authors={userState.followings}
-          showModal={showAuthorsModal}
-          handlePressAuthor={_insertMentionedAccount}
-        />
-      )}
     </View>
   );
 };

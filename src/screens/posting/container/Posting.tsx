@@ -3,10 +3,9 @@ import {useIntl} from 'react-intl';
 import ImagePicker, {ImageOrVideo} from 'react-native-image-crop-picker';
 import {AuthContext, PostsContext, UIContext, UserContext} from '~/contexts';
 import {PostingScreen} from '../screen/Posting';
-import {signImage, fetchRawPost} from '~/providers/blurt/dblurtApi';
+import {fetchRawPost} from '~/providers/blurt/dblurtApi';
 import {Discussion} from 'dblurt';
 import {PostingContent} from '~/contexts/types';
-import {uploadImage} from '~/providers/blurt/imageApi';
 //// navigation
 import {navigate} from '~/navigation/service';
 //// UIs
@@ -15,6 +14,8 @@ import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
 import {Beneficiary, AuthorList} from '~/components';
 import {BeneficiaryItem} from '~/components/Beneficiary/BeneficiaryContainer';
 import {BLURT_BENEFICIARY_WEIGHT} from '~/constants';
+// types
+import {PostRef, PostsState, PostsTypes} from '~/contexts/types';
 //// utils
 import {
   addPostingOptions,
@@ -41,9 +42,14 @@ const Posting = (props: Props): JSX.Element => {
   //// contexts
   const {authState} = useContext(AuthContext);
   const {uiState, setToastMessage, setEditMode} = useContext(UIContext);
-  const {postsState, appendTag, submitPost, updatePost} = useContext(
-    PostsContext,
-  );
+  const {
+    postsState,
+    appendTag,
+    submitPost,
+    setTagIndex,
+    setFilterIndex,
+    updatePost,
+  } = useContext(PostsContext);
   const {userState, getFollowings} = useContext(UserContext);
   // states
   //  const [editMode, setEditMode] = useState(route.params?.editMode);
@@ -108,98 +114,6 @@ const Posting = (props: Props): JSX.Element => {
     setFilteredFollowings(_followings);
   };
 
-  //// handle mentioning: filter following list
-  const _showAuthorsModal = (text: string) => {
-    //    console.log('_showAuthorList. text', text);
-    // let _filtered = followingList;
-    // if (text != '') {
-    //   _filtered = followingList.filter((author) => author.includes(text));
-    // }
-    // setFilteredFollowings(_filtered);
-
-    // @test
-    setShowAuthorsModal(true);
-  };
-
-  ////
-  const _handlePressAuthor = (author: string) => {
-    console.log('press author', author);
-  };
-
-  // ////
-  // const _handlePhotoUpload = () => {
-  //   ImagePicker.openPicker({
-  //     width: 640,
-  //     includeBase64: true,
-  //   })
-  //     .then((photos) => {
-  //       _uploadPhoto(photos);
-  //     })
-  //     .catch((error) => {
-  //       _handleSelectionFailure(error);
-  //     });
-  // };
-
-  // ////
-  // const _handleCameraUpload = () => {
-  //   ImagePicker.openCamera({
-  //     includeBase64: true,
-  //   })
-  //     .then((image) => {
-  //       _uploadPhoto(image);
-  //     })
-  //     .catch((error) => {
-  //       _handleSelectionFailure(error);
-  //     });
-  // };
-
-  // //// upload a photo
-  // const _uploadPhoto = async (photo: ImageOrVideo) => {
-  //   console.log('[PostingContainer] _uploadPhoto. photo', photo);
-  //   setUploading(true);
-  //   // check logged in
-  //   if (!authState.loggedIn) return;
-  //   const {username, password} = authState.currentCredentials;
-  //   // sign the photo
-  //   let sign = await signImage(photo, username, password);
-  //   console.log('[_uploadPhoto] sign', sign);
-  //   // check sanity
-  //   if (!sign) return;
-  //   // upload photo
-  //   uploadImage(photo, username, sign)
-  //     .then((res) => {
-  //       console.log('[PostingContainer] uploadImage, res', res);
-  //       if (res.data && res.data.url) {
-  //         res.data.hash = res.data.url.split('/').pop();
-  //         setUploading(false);
-  //         setToastMessage('Upload Successful!');
-  //         setUploadedImage(res.data);
-  //       }
-  //     })
-  //     .catch((error) => {
-  //       console.log('Failed to upload image', error, error.message);
-  //       if (error.toString().includes('code 413')) {
-  //         setToastMessage(intl.formatMessage({id: 'Alert.payload_too_large'}));
-  //       } else if (error.toString().includes('code 429')) {
-  //         setToastMessage(intl.formatMessage({id: 'Alert.quota_exceeded'}));
-  //       } else if (error.toString().includes('code 400')) {
-  //         setToastMessage(intl.formatMessage({id: 'Alert.invalid_image'}));
-  //       } else {
-  //         setToastMessage(intl.formatMessage({id: 'Alert.failed'}));
-  //       }
-  //       // clear uploading
-  //       setUploading(false);
-  //     });
-  // };
-
-  // //// handle selection failure
-  // const _handleSelectionFailure = (error) => {};
-
-  ////
-  const _getUploadedImageUrl = (url: string) => {
-    console.log('_getUploadedImageUrl', url);
-  };
-
   //// handle press post
   const _handlePressPostSumbit = async (
     title: string,
@@ -244,42 +158,52 @@ const Posting = (props: Props): JSX.Element => {
     let success = false;
     let message = '';
     if (originalPost) {
+      console.log('[updatePost] originalPost', originalPost);
       // TODO: use submitPost after patching instead of updatePost
       // patch = utils editors createPatch
-      ({success, message} = await updatePost(
-        originalPost.body,
-        originalPost.state.post_ref.permlink,
-        originalPost.state.parent_ref.permlink,
-        postingContent,
-        password,
-        false,
-      ));
-    } else {
-      //// submit the post
-      const result = await submitPost(postingContent, password, false, options);
-      if (result) {
-        // TODO: clear the title, body, and tags, beneficiary
-        // initialie beneficiaries
-        if (username === 'letsblurt') {
-          setBeneficiaries([
-            {account: username, weight: 5000},
-            {account: 'etainclub', weight: 5000},
-          ]);
-        } else {
-          setBeneficiaries([
-            DEFAULT_BENEFICIARY,
-            {
-              account: username,
-              weight: 10000 - DEFAULT_BENEFICIARY.weight,
-            },
-          ]);
-        }
-
-        // TODO: set tag or feed
-        navigate({name: 'Feed'});
-      }
-      //// TODO: update post details.. here or in postsContext
+      // ({success, message} = await updatePost(
+      //   originalPost.body,
+      //   originalPost.state.post_ref.permlink,
+      //   originalPost.state.parent_ref.permlink,
+      //   postingContent,
+      //   password,
+      //   false,
+      // ));
+      postingContent.permlink = originalPost.state.post_ref.permlink;
+      postingContent.parent_permlink = originalPost.state.parent_ref.permlink;
+      console.log('[updatePost] postingContent', postingContent);
     }
+    //// submit the post
+    const result = await submitPost(postingContent, password, false, options);
+    if (result) {
+      console.log('[posting] result', result);
+      // TODO: clear the title, body, and tags, beneficiary
+      // initialie beneficiaries
+      if (username === 'letsblurt') {
+        setBeneficiaries([
+          {account: username, weight: 5000},
+          {account: 'etainclub', weight: 5000},
+        ]);
+      } else {
+        setBeneficiaries([
+          DEFAULT_BENEFICIARY,
+          {
+            account: username,
+            weight: 10000 - DEFAULT_BENEFICIARY.weight,
+          },
+        ]);
+      }
+
+      ////
+      // set tag to all
+      setTagIndex(1, PostsTypes.FEED, authState.currentCredentials.username);
+      // set filter to created
+      setFilterIndex(1, authState.currentCredentials.username);
+      // navigate feed
+      navigate({name: 'Feed'});
+    }
+    //// TODO: update post details.. here or in postsContext
+
     // toast message
     setToastMessage(message);
     // clear posting flag
@@ -321,7 +245,6 @@ const Posting = (props: Props): JSX.Element => {
         posting={posting}
         handlePressPostSumbit={_handlePressPostSumbit}
         followingList={filteredFollowings}
-        handleMentionAuthor={_showAuthorsModal}
         handlePressBeneficiary={_handlePressBeneficiary}
         handleCancelEditing={_handleCancelEditing}
       />

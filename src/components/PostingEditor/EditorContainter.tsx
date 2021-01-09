@@ -15,26 +15,13 @@ import {Beneficiary, AuthorList} from '~/components';
 import {BeneficiaryItem} from '~/components/Beneficiary/BeneficiaryContainer';
 import {BLURT_BENEFICIARY_WEIGHT, TARGET_BLOCKCHAIN} from '~/constants';
 import {EditorView} from './EditorView';
-//// utils
-import {
-  generateCommentPermlink,
-  makeJsonMetadataComment,
-  addPostingOptions,
-  extractMetadata,
-  generatePermlink,
-  makeJsonMetadata,
-} from '~/utils/editor';
-
-// 5%
-const DEFAULT_BENEFICIARY: BeneficiaryItem = {
-  account: 'letsblurt',
-  weight: BLURT_BENEFICIARY_WEIGHT,
-};
 
 interface Props {
   isComment: boolean;
+  originalPost?: string;
   depth?: number;
   close?: boolean;
+  handleBodyChange?: (body: string) => void;
   handleSubmitComment?: (text: string) => Promise<boolean>;
 }
 const EditorContainer = (props: Props): JSX.Element => {
@@ -47,51 +34,25 @@ const EditorContainer = (props: Props): JSX.Element => {
   const {postsState, appendTag, submitPost, updatePost} = useContext(
     PostsContext,
   );
-  const {userState, getFollowings} = useContext(UserContext);
   // states
-  const [originalPost, setOriginalPost] = useState(null);
+  const [originalPost, setOriginalPost] = useState('');
 
-  //// mount event
-  //// edit mode event
+  //////// events
+  //// edit event. set body
   useEffect(() => {
-    console.log('[Posting] uiState', uiState);
-    //
-    if (uiState.editMode) {
-      console.log('[Posting] editMode, postDetails', postsState.postDetails);
-      // get the post details
-      setOriginalPost(postsState.postDetails);
+    if (props.originalPost) {
+      console.log('original body exists', props.originalPost);
+      setOriginalPost(props.originalPost);
     }
-  }, [uiState.editMode]);
-
-  // const _handleSubmitComment = async (comment: string): Promise<boolean> => {
-  //   // check sanity
-  //   if (comment === '') return;
-
-  //   const {username, password} = authState.currentCredentials;
-  //   const permlink = generateCommentPermlink(username);
-  //   const jsonMeta = makeJsonMetadataComment(
-  //     postsState.postDetails.metadata.tags || [TARGET_BLOCKCHAIN],
-  //   );
-  //   // build posting content
-  //   const postingContent: PostingContent = {
-  //     author: username,
-  //     title: '',
-  //     body: comment,
-  //     parent_author: postsState.postRef.author,
-  //     parent_permlink: postsState.postRef.permlink,
-  //     json_metadata: JSON.stringify(jsonMeta) || '',
-  //     permlink: permlink,
-  //   };
-  //   const result = await submitPost(postingContent, password, true);
-  //   if (result) return true;
-  //   return false;
-  // };
+  }, [props.originalPost]);
 
   return (
     <EditorView
       isComment={props.isComment}
+      originalPost={originalPost}
       depth={props.depth}
       close={props.close}
+      handleBodyChange={props.handleBodyChange}
       handleSubmitComment={props.handleSubmitComment}
     />
   );

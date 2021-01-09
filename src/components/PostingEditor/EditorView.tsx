@@ -33,8 +33,10 @@ type Position = {
 
 interface Props {
   isComment: boolean;
+  originalPost: string;
   depth?: number;
   close?: boolean;
+  handleBodyChange?: (body: string) => void;
   handleSubmitComment: (text: string) => Promise<boolean>;
 }
 const EditorView = (props: Props): JSX.Element => {
@@ -46,7 +48,8 @@ const EditorView = (props: Props): JSX.Element => {
   const {userState} = useContext(UserContext);
   //// states
   const [close, setClose] = useState(false);
-  const [body, setBody] = useState('');
+  const [body, setBody] = useState(props.originalPost);
+  const [editable, setEditable] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [previewBody, setPreviewBody] = useState('');
   const [bodySelection, setBodySelection] = useState<Position>({
@@ -59,10 +62,23 @@ const EditorView = (props: Props): JSX.Element => {
   const [showAuthorsModal, setShowAuthorsModal] = useState(false);
   const [uploadedImageUrl, setUploadedImageUrl] = useState('');
 
-  //// refs
-  const inputRef = useRef(null);
+  console.log('EditorView. props original', props.originalPost);
+  console.log('EditorView. props body', body);
 
   //////// events
+  //// mount
+  useEffect(() => {
+    setTimeout(() => setEditable(true), 100);
+  }, []);
+
+  //// edit event. set body
+  useEffect(() => {
+    if (props.originalPost) {
+      console.log('[EditorView] original body exists', props.originalPost);
+      setBody(props.originalPost);
+    }
+  }, [props.originalPost]);
+
   //// close event
   useEffect(() => {
     if (props.close) {
@@ -101,6 +117,8 @@ const EditorView = (props: Props): JSX.Element => {
     // update the post body whenever image is uploaded..
     const _body = renderPostBody(text, true);
     setPreviewBody(_body);
+    // send the change to the parent
+    props.handleBodyChange(_body);
   };
 
   const _insertMentionedAccount = (text: string) => {
@@ -122,6 +140,8 @@ const EditorView = (props: Props): JSX.Element => {
       end: bodySelection.end + text.length,
     });
     setBody(_body);
+    // send the change to the parent
+    props.handleBodyChange(_body);
   };
 
   //// handle press mention icon
@@ -205,7 +225,8 @@ const EditorView = (props: Props): JSX.Element => {
                 ? [styles.commentContainer, {height: containerHeight}]
                 : styles.postContainer
             }
-            value={body}
+            editable={editable}
+            defaultValue={body}
             onChangeText={_handleBodyChange}
             onSelectionChange={_handleOnSelectionChange}
             onKeyPress={_handlePressKey}
@@ -216,7 +237,7 @@ const EditorView = (props: Props): JSX.Element => {
             color="black"
             multiline
             rounded
-            blurOnSubmit
+            blurOnSubmit={false}
             textAlignVertical="top"
             autoCorrect={false}
             onContentSizeChange={_handleContainerHeight}

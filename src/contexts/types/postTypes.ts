@@ -115,6 +115,7 @@ export const INIT_POST_DATA = {
   summary: '',
   image: '',
   tags: [],
+  url: '',
 
   // meta
   json_metadata: '',
