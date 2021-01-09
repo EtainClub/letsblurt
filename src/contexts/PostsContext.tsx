@@ -700,8 +700,9 @@ const PostsProvider = ({children}: Props) => {
       bookmark = await docRef.get();
     } catch (error) {
       console.log('failed to get bookmarks', error);
-      setToastMessage(intl.formatMessage({id: 'fetch_error'}));
-      return;
+      return {
+        bookmarked: false,
+      };
     }
     if (bookmark.exists) {
       return {

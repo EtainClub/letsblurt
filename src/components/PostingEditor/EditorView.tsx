@@ -1,7 +1,7 @@
 //// react
 import React, {useState, useContext, useEffect, useRef} from 'react';
 //// react native
-import {Dimensions, StyleSheet} from 'react-native';
+import {Dimensions, StyleSheet, KeyboardAvoidingView} from 'react-native';
 //// config
 //// language
 import {useIntl} from 'react-intl';
@@ -33,6 +33,9 @@ type Position = {
 
 interface Props {
   isComment: boolean;
+  depth?: number;
+  close?: boolean;
+  handleSubmitComment: (text: string) => Promise<boolean>;
 }
 const EditorView = (props: Props): JSX.Element => {
   //// props
@@ -40,14 +43,17 @@ const EditorView = (props: Props): JSX.Element => {
   //// language
   const intl = useIntl();
   //// contexts
-
+  const {userState} = useContext(UserContext);
   //// states
+  const [close, setClose] = useState(false);
   const [body, setBody] = useState('');
+  const [submitting, setSubmitting] = useState(false);
   const [previewBody, setPreviewBody] = useState('');
   const [bodySelection, setBodySelection] = useState<Position>({
     start: 0,
     end: 0,
   });
+  const [containerHeight, setContainerHeight] = useState(40);
   const [mentioning, setMentioning] = useState(false);
   const [searchAuthor, setSearchAuthor] = useState('');
   const [showAuthorsModal, setShowAuthorsModal] = useState(false);
@@ -55,8 +61,38 @@ const EditorView = (props: Props): JSX.Element => {
 
   //// refs
   const inputRef = useRef(null);
-  const photoUploadRef = useRef(null);
-  const mentionRef = useRef(null);
+
+  //////// events
+  //// close event
+  useEffect(() => {
+    if (props.close) {
+      setBody('');
+      setShowAuthorsModal(false);
+      setClose(true);
+    }
+  }, [props.close]);
+
+  //// uploading image event
+  useEffect(() => {
+    if (uploadedImageUrl) {
+      const _body =
+        body.substring(0, bodySelection.start) +
+        uploadedImageUrl +
+        body.substring(bodySelection.end);
+      _handleBodyChange(_body);
+    }
+  }, [uploadedImageUrl]);
+
+  //// handle press key event and catch '@' key
+  const _handlePressKey = ({nativeEvent}) => {
+    console.log('_handlePressKey', nativeEvent);
+    const {key} = nativeEvent;
+    if (key === '@') {
+      setShowAuthorsModal(true);
+    } else {
+      setShowAuthorsModal(false);
+    }
+  };
 
   const _handleBodyChange = (text: string) => {
     // check validity:
@@ -65,13 +101,6 @@ const EditorView = (props: Props): JSX.Element => {
     // update the post body whenever image is uploaded..
     const _body = renderPostBody(text, true);
     setPreviewBody(_body);
-  };
-
-  const _getTypedCharacter = () => {
-    /// get newly typed character
-    const {start, end} = bodySelection;
-    const char = start === end ? body[start - 1] : body[body.length - 1];
-    return char;
   };
 
   const _insertMentionedAccount = (text: string) => {
@@ -87,7 +116,30 @@ const EditorView = (props: Props): JSX.Element => {
       text +
       body.substring(bodySelection.end, body.length);
     console.log('_finalizeMention. body', _body);
+    // update body selection
+    setBodySelection({
+      start: bodySelection.start + text.length,
+      end: bodySelection.end + text.length,
+    });
     setBody(_body);
+  };
+
+  //// handle press mention icon
+  const _handlePressMention = () => {
+    // put @ in the body
+    const _body =
+      body.substring(0, bodySelection.start) +
+      '@' +
+      body.substring(bodySelection.end, body.length);
+    console.log('_finalizeMention. body', _body);
+    setBody(_body);
+    // update body selection
+    setBodySelection({
+      start: bodySelection.start + 1,
+      end: bodySelection.end + 1,
+    });
+    // show author list modal
+    setShowAuthorsModal(true);
   };
 
   //// update input selection
@@ -96,12 +148,33 @@ const EditorView = (props: Props): JSX.Element => {
   };
 
   ////
+  const _handleContainerHeight = (event) => {
+    if (isComment) {
+      setContainerHeight(event.nativeEvent.contentSize.height);
+    }
+  };
+
+  ////
   const _handleUploadedImageURL = (url: string) => {
     setUploadedImageUrl(url);
   };
 
+  ////
+  const _handleSubmitComment = async () => {
+    setSubmitting(true);
+    const result = await props.handleSubmitComment(body);
+    setSubmitting(false);
+    if (result) {
+      console.log('_handleSubmitComment. result', result);
+      // clear body
+      setBody('');
+    }
+  };
+
   const iconSend = (
     <Button
+      onPress={_handleSubmitComment}
+      loading={submitting}
       onlyIcon
       icon="ios-send"
       iconFamily="ionicon"
@@ -117,44 +190,68 @@ const EditorView = (props: Props): JSX.Element => {
     />
   );
 
-  return (
-    <Block style={{paddingHorizontal: theme.SIZES.BASE}}>
-      <Input
-        innerRef={inputRef}
-        value={body}
-        onChangeText={_handleBodyChange}
-        onSelectionChange={_handleOnSelectionChange}
-        style={isComment ? styles.commentContainer : styles.postContainer}
-        right={isComment ? true : false}
-        iconContent={isComment ? iconSend : null}
-        placeholder={intl.formatMessage({id: 'Posting.body_placeholder'})}
-        placeholderTextColor={argonTheme.COLORS.FACEBOOK}
-        color="black"
-        multiline
-        textAlignVertical="top"
-        autoCorrect={false}
-      />
-      <Block row style={{top: -10}}>
-        <ImageUpload
-          isComment={isComment}
-          containerStyle={{right: true}}
-          getImageURL={_handleUploadedImageURL}
+  return close ? null : (
+    <Block>
+      <KeyboardAvoidingView behavior="height" enabled>
+        <Block
+          center
+          style={[
+            props.depth ? {right: props.depth * 10} : null,
+            {paddingHorizontal: theme.SIZES.BASE},
+          ]}>
+          <Input
+            style={
+              isComment
+                ? [styles.commentContainer, {height: containerHeight}]
+                : styles.postContainer
+            }
+            value={body}
+            onChangeText={_handleBodyChange}
+            onSelectionChange={_handleOnSelectionChange}
+            onKeyPress={_handlePressKey}
+            right={isComment ? true : false}
+            iconContent={isComment ? iconSend : null}
+            placeholder={intl.formatMessage({id: 'Posting.body_placeholder'})}
+            placeholderTextColor={argonTheme.COLORS.FACEBOOK}
+            color="black"
+            multiline
+            rounded
+            blurOnSubmit
+            textAlignVertical="top"
+            autoCorrect={false}
+            onContentSizeChange={_handleContainerHeight}
+          />
+          <Block row left style={{top: -10}}>
+            <ImageUpload
+              isComment={isComment}
+              containerStyle={{right: true}}
+              getImageURL={_handleUploadedImageURL}
+            />
+            <Button
+              onPress={_handlePressMention}
+              onlyIcon
+              icon="at"
+              iconFamily="font-awesome"
+              iconSize={isComment ? 10 : 14}
+              color={argonTheme.COLORS.FACEBOOK}
+            />
+            <Button
+              onlyIcon
+              icon="trash"
+              iconFamily="font-awesome"
+              iconSize={isComment ? 10 : 14}
+              color={argonTheme.COLORS.SWITCH_ON}
+            />
+          </Block>
+        </Block>
+      </KeyboardAvoidingView>
+      {showAuthorsModal && (
+        <AuthorList
+          authors={userState.followings}
+          showModal={showAuthorsModal}
+          handlePressAuthor={_insertMentionedAccount}
         />
-        <Button
-          onlyIcon
-          icon="at"
-          iconFamily="font-awesome"
-          iconSize={isComment ? 10 : 14}
-          color={argonTheme.COLORS.FACEBOOK}
-        />
-        <Button
-          onlyIcon
-          icon="trash"
-          iconFamily="font-awesome"
-          iconSize={isComment ? 10 : 14}
-          color={argonTheme.COLORS.SWITCH_ON}
-        />
-      </Block>
+      )}
     </Block>
   );
 };

@@ -105,7 +105,6 @@ const AuthorListView = (props: Props): JSX.Element => {
     if (text === '') {
       setSearchedItems(authors);
     } else {
-      console.log('authors', authors);
       const _filterdItems = authors.filter(
         (author) => text && author.includes(text),
       );

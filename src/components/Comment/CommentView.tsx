@@ -80,15 +80,15 @@ const Comment = (props: Props): JSX.Element => {
 
   const formatedTime = comment && getTimeFromNow(comment.state.createdAt);
 
-  const _handleSubmitComment = async () => {
+  const _handleSubmitComment = async (_text: string) => {
     // check sanity
-    if (replyText === '') return;
+    if (_text === '') return false;
 
     // set submitted flag
     setSubmitting(true);
     const {username} = authState.currentCredentials;
     // extract meta
-    const _meta = extractMetadata(replyText);
+    const _meta = extractMetadata(_text);
     // split tags by space
     const _tags = [];
     const jsonMeta = makeJsonMetadata(_meta, _tags);
@@ -97,7 +97,7 @@ const Comment = (props: Props): JSX.Element => {
     const postingContent: PostingContent = {
       author: username,
       title: '',
-      body: replyText,
+      body: _text,
       parent_author: comment.state.post_ref.author,
       parent_permlink: comment.state.post_ref.permlink,
       json_metadata: JSON.stringify(jsonMeta) || '',
@@ -124,6 +124,8 @@ const Comment = (props: Props): JSX.Element => {
     // close reply form
     setShowReply(false);
     setEditMode(false);
+    if (result) return true;
+    return false;
   };
 
   const _onCancelReply = () => {
@@ -134,7 +136,7 @@ const Comment = (props: Props): JSX.Element => {
 
   const _handlePressReply = () => {
     // clear reply form
-    setShowReply(true);
+    setShowReply(!showReply);
   };
 
   const _handlePressEditComment = () => {
@@ -315,11 +317,21 @@ const Comment = (props: Props): JSX.Element => {
           handlePressTranslation={_handlePressTranslation}
         />
       </Block>
-      {showReply && _renderCommentForm()}
+      {/* {showReply && _renderCommentForm()} */}
+      {showReply && (
+        <Editor
+          isComment={true}
+          depth={comment.depth}
+          close={false}
+          handleSumbitComment={_handleSubmitComment}
+        />
+      )}
       {nestedComments}
     </View>
   ) : (
-    <View>{_renderCommentForm()}</View>
+    <View>
+      <Editor isComment={true} />
+    </View>
   );
 };
 

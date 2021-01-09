@@ -45,7 +45,7 @@ interface Props {
   comments: CommentData[];
   handleRefresh: () => void;
   fetchComments: () => void;
-  handleSubmitComment: (message: string) => void;
+  handleSubmitComment: (text: string) => Promise<boolean>;
   handlePressTag: (tag: string) => void;
   handlePressTranslation: () => void;
 }
@@ -73,15 +73,11 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
     commentRef.current.scrollTo({y: commentY, animated: true});
   };
 
-  const _onPressSendComment = async () => {
+  const _onPressSendComment = async (text: string) => {
     console.log('[PostDetails] onPressSendComment');
     // set submitting
     setSubmitting(true);
-    await props.handleSubmitComment(message);
-    // clear submitting
-    setSubmitting(false);
-    // clear message
-    setMessage('');
+    const result = await props.handleSubmitComment(text);
   };
 
   const _handlePressHashTag = (tag: string) => {
@@ -93,66 +89,66 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
     setMessage(message + ' ' + url);
   };
 
-  const _renderCommentForm = () => {
-    const iconSend = (
-      <Button
-        onPress={_onPressSendComment}
-        loading={submitting}
-        onlyIcon
-        icon="ios-send"
-        iconFamily="ionicon"
-        iconSize={24}
-        color={argonTheme.COLORS.ERROR}
-        style={{
-          margin: 0,
-          padding: 0,
-          right: -10,
-          width: 24 + 3,
-          height: 24 + 3,
-        }}
-      />
-    );
+  // const _renderCommentForm = () => {
+  //   const iconSend = (
+  //     <Button
+  //       onPress={_onPressSendComment}
+  //       loading={submitting}
+  //       onlyIcon
+  //       icon="ios-send"
+  //       iconFamily="ionicon"
+  //       iconSize={24}
+  //       color={argonTheme.COLORS.ERROR}
+  //       style={{
+  //         margin: 0,
+  //         padding: 0,
+  //         right: -10,
+  //         width: 24 + 3,
+  //         height: 24 + 3,
+  //       }}
+  //     />
+  //   );
 
-    return (
-      <Block
-        center
-        style={{marginTop: 20}}
-        onLayout={(event) => setCommentY(event.nativeEvent.layout.y)}>
-        <ImageUpload
-          isComment={true}
-          containerStyle={{right: true}}
-          getImageURL={_getUploadedImageURL}
-        />
-        <Input
-          color="#9fa5aa"
-          multiline
-          rounded
-          right
-          blurOnSubmit
-          iconContent={iconSend}
-          style={[
-            styles.commentInput,
-            {
-              height: commentNewHeight,
-              borderColor: 'red',
-              borderWidth: 2,
-              marginVertical: 0,
-              paddingVertical: 0,
-            },
-          ]}
-          placeholder="Comment"
-          autoCapitalize="none"
-          textContentType="none"
-          placeholderTextColor="#9fa5aa"
-          defaultValue={message}
-          onChangeText={(text: string) => setMessage(text)}
-          onContentSizeChange={(evt) =>
-            setCommentNeeHeight(evt.nativeEvent.contentSize.height)
-          }
-        />
-      </Block>
-    );
-  };
+  //   return (
+  //     <Block
+  //       center
+  //       style={{marginTop: 20}}
+  //       onLayout={(event) => setCommentY(event.nativeEvent.layout.y)}>
+  //       <ImageUpload
+  //         isComment={true}
+  //         containerStyle={{right: true}}
+  //         getImageURL={_getUploadedImageURL}
+  //       />
+  //       <Input
+  //         color="#9fa5aa"
+  //         multiline
+  //         rounded
+  //         right
+  //         blurOnSubmit
+  //         iconContent={iconSend}
+  //         style={[
+  //           styles.commentInput,
+  //           {
+  //             height: commentNewHeight,
+  //             borderColor: 'red',
+  //             borderWidth: 2,
+  //             marginVertical: 0,
+  //             paddingVertical: 0,
+  //           },
+  //         ]}
+  //         placeholder="Comment"
+  //         autoCapitalize="none"
+  //         textContentType="none"
+  //         placeholderTextColor="#9fa5aa"
+  //         defaultValue={message}
+  //         onChangeText={(text: string) => setMessage(text)}
+  //         onContentSizeChange={(evt) =>
+  //           setCommentNeeHeight(evt.nativeEvent.contentSize.height)
+  //         }
+  //       />
+  //     </Block>
+  //   );
+  // };
 
   const _renderComments = () => {
     const {comments} = props;
@@ -245,7 +241,12 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
             })}
           </Block>
           {/* {_renderCommentForm()} */}
-          <Editor isComment={true} />
+          <Editor
+            isComment={true}
+            depth={0}
+            close={false}
+            handleSubmitComment={props.handleSubmitComment}
+          />
           {_renderComments()}
         </Block>
       </ScrollView>

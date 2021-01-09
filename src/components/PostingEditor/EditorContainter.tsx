@@ -13,10 +13,12 @@ import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
 //// components
 import {Beneficiary, AuthorList} from '~/components';
 import {BeneficiaryItem} from '~/components/Beneficiary/BeneficiaryContainer';
-import {BLURT_BENEFICIARY_WEIGHT} from '~/constants';
+import {BLURT_BENEFICIARY_WEIGHT, TARGET_BLOCKCHAIN} from '~/constants';
 import {EditorView} from './EditorView';
 //// utils
 import {
+  generateCommentPermlink,
+  makeJsonMetadataComment,
   addPostingOptions,
   extractMetadata,
   generatePermlink,
@@ -31,6 +33,9 @@ const DEFAULT_BENEFICIARY: BeneficiaryItem = {
 
 interface Props {
   isComment: boolean;
+  depth?: number;
+  close?: boolean;
+  handleSubmitComment?: (text: string) => Promise<boolean>;
 }
 const EditorContainer = (props: Props): JSX.Element => {
   //// props
@@ -44,16 +49,7 @@ const EditorContainer = (props: Props): JSX.Element => {
   );
   const {userState, getFollowings} = useContext(UserContext);
   // states
-  //  const [editMode, setEditMode] = useState(route.params?.editMode);
   const [originalPost, setOriginalPost] = useState(null);
-  const [uploading, setUploading] = useState(false);
-  const [uploadedImage, setUploadedImage] = useState(null);
-  const [posting, setPosting] = useState(false);
-  const [followingList, setFollowingList] = useState([]);
-  const [filteredFollowings, setFilteredFollowings] = useState([]);
-  const [showBeneficiaryModal, setShowBeneficiaryModal] = useState(false);
-  const [beneficiaries, setBeneficiaries] = useState([]);
-  const [showAuthorsModal, setShowAuthorsModal] = useState(false);
 
   //// mount event
   //// edit mode event
@@ -67,51 +63,38 @@ const EditorContainer = (props: Props): JSX.Element => {
     }
   }, [uiState.editMode]);
 
-  //// get followings
-  const _getFollowingList = async (username: string) => {
-    const _followings = await getFollowings(username);
-    setFollowingList(_followings);
-    setFilteredFollowings(_followings);
-  };
+  // const _handleSubmitComment = async (comment: string): Promise<boolean> => {
+  //   // check sanity
+  //   if (comment === '') return;
 
-  //// handle mentioning: filter following list
-  const _showAuthorsModal = (text: string) => {
-    //    console.log('_showAuthorList. text', text);
-    // let _filtered = followingList;
-    // if (text != '') {
-    //   _filtered = followingList.filter((author) => author.includes(text));
-    // }
-    // setFilteredFollowings(_filtered);
+  //   const {username, password} = authState.currentCredentials;
+  //   const permlink = generateCommentPermlink(username);
+  //   const jsonMeta = makeJsonMetadataComment(
+  //     postsState.postDetails.metadata.tags || [TARGET_BLOCKCHAIN],
+  //   );
+  //   // build posting content
+  //   const postingContent: PostingContent = {
+  //     author: username,
+  //     title: '',
+  //     body: comment,
+  //     parent_author: postsState.postRef.author,
+  //     parent_permlink: postsState.postRef.permlink,
+  //     json_metadata: JSON.stringify(jsonMeta) || '',
+  //     permlink: permlink,
+  //   };
+  //   const result = await submitPost(postingContent, password, true);
+  //   if (result) return true;
+  //   return false;
+  // };
 
-    // @test
-    setShowAuthorsModal(true);
-  };
-
-  ////
-  const _handlePressAuthor = (author: string) => {
-    console.log('press author', author);
-  };
-
-  ////
-  const _getUploadedImageUrl = (url: string) => {
-    console.log('_getUploadedImageUrl', url);
-  };
-
-  const _handlePressBeneficiary = () => {
-    setShowBeneficiaryModal(!showBeneficiaryModal);
-  };
-
-  const _getBeneficiaries = (_beneficiaries: any[]) => {
-    console.log('[Posting] Beneficiaries', _beneficiaries);
-    setBeneficiaries(_beneficiaries);
-  };
-
-  const _handleCancelEditing = () => {
-    // reset edit mode
-    setEditMode(false);
-  };
-
-  return <EditorView isComment={props.isComment} styles={props.styles} />;
+  return (
+    <EditorView
+      isComment={props.isComment}
+      depth={props.depth}
+      close={props.close}
+      handleSubmitComment={props.handleSubmitComment}
+    />
+  );
 };
 
 export {EditorContainer};

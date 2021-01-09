@@ -177,9 +177,9 @@ const PostDetails = (props: Props): JSX.Element => {
     console.log('[PostDetails] refreshed, comments', comments);
   };
 
-  const _onSubmitComment = async (comment: string): Promise<string> => {
+  const _onSubmitComment = async (comment: string): Promise<boolean> => {
     // check sanity
-    if (comment === '') return;
+    if (comment === '') return false;
 
     const {username, password} = authState.currentCredentials;
     const permlink = generateCommentPermlink(username);
@@ -200,6 +200,8 @@ const PostDetails = (props: Props): JSX.Element => {
     const result = await submitPost(postingContent, password, true);
     // set submitted flag
     setSubmitted(true);
+    if (result) return true;
+    return false;
   };
 
   //// handle press hash tag
