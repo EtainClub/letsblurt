@@ -7,7 +7,7 @@ import {
 import {Icon} from 'galio-framework';
 import {injectIntl, useIntl} from 'react-intl';
 
-import {AuthContext} from '~/contexts';
+import {AuthContext, SettingsContext} from '~/contexts';
 
 // screens
 import {
@@ -340,9 +340,9 @@ const SettingsStack = () => {
 const DrawerNavigator = (props) => {
   console.log('DrawerNavigator props', props);
   const {authState} = useContext(AuthContext);
+  const {settingsState} = useContext(SettingsContext);
   const profile = {
-    avatar:
-      'https://cdn.steemitimages.com/DQmeT9tc2mTVcjnf213RF7uBVXWkFiKBo9Y51KYxLWmBUi8/etainclub_profile.png',
+    avatar: `${settingsState.blockchains.image}/u/${authState.currentCredentials.username}/avatar`,
     name: authState.currentCredentials.username,
   };
   return (

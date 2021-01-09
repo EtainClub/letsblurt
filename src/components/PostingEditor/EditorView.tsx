@@ -143,7 +143,7 @@ const EditorView = (props: Props): JSX.Element => {
     });
     setBody(_body);
     // send the change to the parent
-    props.handleBodyChange(_body);
+    _body;
   };
 
   //// handle press mention icon

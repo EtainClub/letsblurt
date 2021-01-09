@@ -265,7 +265,7 @@
     "memo_message": "This memo is public"
   },
   "SecureKey": {
-    "title": "Proper Password Required",
+    "title": "Password Required",
     "password_placeholder": "Password (Wallet Import Format or Master Password)",
     "password_guide": "This operation requires your Active or Owner key or Master password.",
     "confirm_button": "Confirm"

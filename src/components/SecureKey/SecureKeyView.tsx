@@ -33,6 +33,7 @@ import {AuthContext, UserContext} from '~/contexts';
 interface Props {
   username: string;
   useOTP: boolean;
+  phoneNumber: string;
   handleOTPResult?: (result: boolean) => void;
 }
 const SecureKeyView = (props: Props): JSX.Element => {
@@ -40,7 +41,6 @@ const SecureKeyView = (props: Props): JSX.Element => {
   const intl = useIntl();
   //// contexts
   const {authState} = useContext(AuthContext);
-  const {userState} = useContext(UserContext);
   //// states
   const [password, setPassword] = useState('');
   const [showModal, setShowModal] = useState(true);
@@ -82,7 +82,7 @@ const SecureKeyView = (props: Props): JSX.Element => {
                 id: 'SecureKey.password_placeholder',
               })}
               onChangeText={(text) => {
-                setPassword;
+                setPassword(text);
               }}
             />
           </Block>
@@ -97,7 +97,7 @@ const SecureKeyView = (props: Props): JSX.Element => {
   const _renderFooter = () =>
     showOTPModal ? (
       <OTP
-        phoneNumber={userState.phoneNumber}
+        phoneNumber={props.phoneNumber}
         handleOTPResult={props.handleOTPResult}
       />
     ) : (

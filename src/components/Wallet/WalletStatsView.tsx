@@ -66,12 +66,17 @@ const WalletStatsView = (props: Props): JSX.Element => {
   ];
   const savingsOptions = [intl.formatMessage({id: 'Wallet.dropdown_withdraw'})];
 
+  useEffect(() => {
+    props.handlePressTransfer(0);
+  }, []);
+
   const _renderItem = ({item, index}) => {
     const value = parseFloat(get(item, 'value', '')).toFixed(2);
     const op = get(item, 'textKey', '');
     const hideOp = op === 'transfer' ? true : false;
     const description =
       op === 'transfer' ? ' from ' + get(item, 'details', '') : '';
+
     return (
       <Block
         row
@@ -112,7 +117,7 @@ const WalletStatsView = (props: Props): JSX.Element => {
     </Block>
   );
 
-  const _onSelectPowerOption = (index: number, value: string) => {
+  const _onSelectBlurtOption = (index: number, value: string) => {
     console.log('[_onSelectPowerOption] index, value', index, value);
     props.handlePressTransfer(index);
   };
@@ -143,7 +148,7 @@ const WalletStatsView = (props: Props): JSX.Element => {
                   style={styles.dropdown}
                   dropdownStyle={styles.dropdownStyle}
                   textStyle={styles.dropdownText}
-                  onSelect={_onSelectPowerOption}
+                  onSelect={_onSelectBlurtOption}
                   noHighlight
                   isHasChildIcon
                 />
@@ -269,10 +274,10 @@ const styles = StyleSheet.create({
 
   // dropdown
   dropdownText: {
-    fontSize: 14,
-    paddingLeft: 10,
-    paddingHorizontal: 0,
-    color: argonTheme.COLORS.ERROR,
+    // fontSize: 14,
+    // paddingLeft: 10,
+    // paddingHorizontal: 0,
+    // color: argonTheme.COLORS.ERROR,
   },
   rowTextStyle: {
     fontSize: 14,
@@ -287,16 +292,9 @@ const styles = StyleSheet.create({
   dropdownButtonStyle: {
     color: argonTheme.COLORS.ERROR,
     height: 44,
-    width: 40,
-    left: 10,
+    width: 60,
   },
   dropdown: {
-    width: 10,
-  },
-  textStyle: {
-    color: argonTheme.COLORS.DEFAULT,
-  },
-  textButton: {
-    justifyContent: 'center',
+    width: 20,
   },
 });

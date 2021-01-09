@@ -176,7 +176,9 @@ const TokenTransferView = (props: Props): JSX.Element => {
       <Block center card>
         <Block center style={{margin: 10}}>
           <Block row center space="between">
-            <Text style={styles.text}>{intl.formatMessage({id: 'from'})}</Text>
+            <Text style={styles.text}>
+              {intl.formatMessage({id: 'Wallet.from'})}
+            </Text>
             <Input
               style={styles.input}
               editable={false}
@@ -194,7 +196,9 @@ const TokenTransferView = (props: Props): JSX.Element => {
             />
           </Block>
           <Block row center space="between">
-            <Text style={styles.text}>{intl.formatMessage({id: 'to'})}</Text>
+            <Text style={styles.text}>
+              {intl.formatMessage({id: 'Wallet.to'})}
+            </Text>
             <Input
               style={styles.input}
               editable={!showConfirm}

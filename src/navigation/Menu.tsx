@@ -32,13 +32,13 @@ function CustomDrawerContent({
       forceInset={{top: 'always', horizontal: 'never'}}>
       <Block flex={0.7} style={styles.header}>
         <TouchableWithoutFeedback onPress={() => navigate({name: 'Profile'})}>
-          <Block style={styles.profile}>
+          <Block center style={styles.profile}>
             <Image
               source={{uri: profile.avatar || null}}
               style={styles.avatar}
             />
             <Text h5 color={'white'}>
-              {profile.name}
+              @{profile.name}
             </Text>
           </Block>
         </TouchableWithoutFeedback>
@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     marginBottom: theme.SIZES.BASE / 2,
   },
   avatar: {
-    height: 120,
-    width: 120,
+    height: 150,
+    width: 150,
   },
 });

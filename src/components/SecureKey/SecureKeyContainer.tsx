@@ -10,7 +10,7 @@ import {
   TransactionReturnCodes,
 } from '~/providers/blurt/dblurtApi';
 //// context
-import {AuthContext} from '~/contexts';
+import {AuthContext, UserContext, SettingsContext} from '~/contexts';
 //// views
 import {SecureKeyView} from './SecureKeyView';
 import {KeyTypes} from '~/contexts/types';
@@ -21,9 +21,10 @@ interface Props {
 const SecureKeyContainer = (props: Props): JSX.Element => {
   //// contexts
   const {authState} = useContext(AuthContext);
+  const {userState} = useContext(UserContext);
+  const {settingsState} = useContext(SettingsContext);
   //// states
   //// effect
-
   ////
   const _handleOTPResult = (result: boolean) => {
     console.log('_handleOTPResult. result', result);
@@ -31,7 +32,8 @@ const SecureKeyContainer = (props: Props): JSX.Element => {
   return (
     <SecureKeyView
       username={props.username}
-      useOTP={true}
+      useOTP={settingsState.securities.useOTP}
+      phoneNumber={userState.phoneNumber}
       handleOTPResult={_handleOTPResult}
     />
   );
