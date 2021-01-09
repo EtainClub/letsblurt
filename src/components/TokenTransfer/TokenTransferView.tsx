@@ -39,7 +39,7 @@ interface Props {
   username: string;
   followings: string[];
   balance: string;
-  transferToken: (recipient: string, amount: string, memo?: string) => void;
+  transferToken: (recipient: string, amount: number, memo?: string) => void;
 }
 const TokenTransferView = (props: Props): JSX.Element => {
   //// props
@@ -56,7 +56,7 @@ const TokenTransferView = (props: Props): JSX.Element => {
   const [query, setQuery] = useState('');
   const [filteredList, setFilteredList] = useState([]);
   const [hideResult, setHideResult] = useState(false);
-  const [amount, setAmount] = useState('0');
+  const [amount, setAmount] = useState(0);
   const [refresh, setRefresh] = useState(true);
   const [showAuthorsModal, setShowAuthorsModal] = useState(false);
   const [recipient, setRecipient] = useState('');
@@ -79,7 +79,7 @@ const TokenTransferView = (props: Props): JSX.Element => {
     ////
     if (!showConfirm) {
       console.log('_handleChangeAmount', _amount);
-      setAmount(_amount);
+      if (_amount) setAmount(parseFloat(_amount));
     }
   };
 
@@ -144,7 +144,7 @@ const TokenTransferView = (props: Props): JSX.Element => {
     // check recipient
     if (!_checkRecipientValid(recipient)) return false;
     // check validty of amount
-    if (!_checkAmountValid(parseFloat(amount))) return false;
+    if (!_checkAmountValid(amount)) return false;
     return true;
   };
 
@@ -162,6 +162,7 @@ const TokenTransferView = (props: Props): JSX.Element => {
       }
     } else {
       console.log('move to transfer view', showConfirm);
+      console.log('[tokenview] amount. type', amount, typeof amount);
       props.transferToken(recipient, amount, memo);
     }
   };

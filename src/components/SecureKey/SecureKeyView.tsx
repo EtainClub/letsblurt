@@ -28,12 +28,14 @@ const {width, height} = Dimensions.get('window');
 import {OTP} from '~/components';
 //// context
 import {AuthContext, UserContext} from '~/contexts';
+import {verifyPassoword} from '~/providers/blurt';
 //// views
 
 interface Props {
   username: string;
   useOTP: boolean;
   phoneNumber: string;
+  handlePressConfirm: (password: string) => void;
   handleOTPResult?: (result: boolean) => void;
 }
 const SecureKeyView = (props: Props): JSX.Element => {
@@ -47,15 +49,6 @@ const SecureKeyView = (props: Props): JSX.Element => {
   const [errorMessage, setErrorMessage] = useState('');
   const [showOTPModal, setShowOTPModal] = useState(false);
   //// effect
-
-  ////
-  const _handlePressConfirm = () => {
-    // check password
-
-    if (props.useOTP) {
-      setShowOTPModal(true);
-    }
-  };
 
   const _renderForms = () => {
     return (
@@ -77,11 +70,12 @@ const SecureKeyView = (props: Props): JSX.Element => {
               style={styles.input}
               left
               password
+              viewPass
               autoCapitalize="none"
               placeholder={intl.formatMessage({
                 id: 'SecureKey.password_placeholder',
               })}
-              onChangeText={(text) => {
+              onChangeText={(text: string) => {
                 setPassword(text);
               }}
             />
@@ -107,7 +101,7 @@ const SecureKeyView = (props: Props): JSX.Element => {
             size="small"
             shadowless
             color={argonTheme.COLORS.ERROR}
-            onPress={_handlePressConfirm}>
+            onPress={() => props.handlePressConfirm(password)}>
             {intl.formatMessage({id: 'SecureKey.confirm_button'})}
           </Button>
         </Block>

@@ -264,7 +264,7 @@ export const verifyPassoword = async (username: string, password: string) => {
 
   //// handle master password
   // TODO: the master password might not start with 'P', then how??
-  if (password[0] !== '5') {
+  if (password[0] != '5') {
     // if the password is the master key, then it can deduce the public posting key
     // compute private posting key using username and password, and then get wif
     const postingPrivateKey = PrivateKey.fromLogin(
