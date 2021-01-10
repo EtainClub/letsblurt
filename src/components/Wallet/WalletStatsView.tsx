@@ -16,6 +16,7 @@ import {WalletData} from '~/contexts/types';
 import {get} from 'lodash';
 import {putComma} from '~/utils/stats';
 import {getTimeFromNow} from '~/utils/time';
+import {UIContext} from '~/contexts';
 
 const BACKGROUND_COLORS = [
   argonTheme.COLORS.BORDER,
@@ -50,6 +51,7 @@ const WalletStatsView = (props: Props): JSX.Element => {
   rewardBlurt = putComma(rewardBlurt);
   //// language
   const intl = useIntl();
+  const {setToastMessage} = useContext(UIContext);
   //// states
   const [powerIndex, setPowerIndex] = useState(0);
   const [blurtIndex, setBlurtIndex] = useState(0);
@@ -67,9 +69,9 @@ const WalletStatsView = (props: Props): JSX.Element => {
   const savingsOptions = [intl.formatMessage({id: 'Wallet.dropdown_withdraw'})];
 
   // @test
-  useEffect(() => {
-    props.handlePressTransfer(0);
-  }, []);
+  // useEffect(() => {
+  //   props.handlePressTransfer(0);
+  // }, []);
 
   const _renderItem = ({item, index}) => {
     const value = parseFloat(get(item, 'value', '')).toFixed(2);
@@ -119,8 +121,18 @@ const WalletStatsView = (props: Props): JSX.Element => {
   );
 
   const _onSelectBlurtOption = (index: number, value: string) => {
-    console.log('[_onSelectPowerOption] index, value', index, value);
+    console.log('[_onSelectBlurtOption] index, value', index, value);
     props.handlePressTransfer(index);
+  };
+
+  const _onSelectPowerOption = (index: number, value: string) => {
+    console.log('[_onSelectPowerOption] index, value', index, value);
+    setToastMessage('Not supported yet');
+  };
+
+  const _onSelectSavingsOption = (index: number, value: string) => {
+    console.log('[_onSelectSavingOption] index, value', index, value);
+    setToastMessage('Not supported yet');
   };
 
   return (
@@ -137,21 +149,18 @@ const WalletStatsView = (props: Props): JSX.Element => {
           <Block row middle space="between">
             <Text>BLURT</Text>
             <Block row middle>
-              <Text color={argonTheme.COLORS.ERROR}>{`${blurt} BLURT`}</Text>
               {props.isUser && (
                 <DropdownModal
-                  key={blurtOptions[blurtIndex]}
+                  key={blurtIndex}
                   options={blurtOptions}
-                  defaultText=""
+                  defaultText={`${blurt} BLURT`}
                   dropdownButtonStyle={styles.dropdownButtonStyle}
-                  selectedOptionIndex={blurtIndex}
+                  selectedOptionIndex={-1}
                   rowTextStyle={styles.rowTextStyle}
                   style={styles.dropdown}
                   dropdownStyle={styles.dropdownStyle}
                   textStyle={styles.dropdownText}
                   onSelect={_onSelectBlurtOption}
-                  noHighlight
-                  isHasChildIcon
                 />
               )}
             </Block>
@@ -160,21 +169,18 @@ const WalletStatsView = (props: Props): JSX.Element => {
           <Block row middle space="between">
             <Text>BLURT POWER</Text>
             <Block row middle>
-              <Text color={argonTheme.COLORS.ERROR}>{`${power} BLURT`}</Text>
               {props.isUser && (
                 <DropdownModal
-                  key={powerOptions[powerIndex]}
-                  options={powerOptions}
-                  defaultText=""
+                  key={powerIndex}
+                  defaultText={`${power} BLURT`}
                   dropdownButtonStyle={styles.dropdownButtonStyle}
-                  selectedOptionIndex={0}
+                  selectedOptionIndex={-1}
                   rowTextStyle={styles.rowTextStyle}
                   style={styles.dropdown}
                   dropdownStyle={styles.dropdownStyle}
                   textStyle={styles.dropdownText}
-                  onSelect={() => console.log('select')}
-                  noHighlight
-                  isHasChildIcon
+                  options={powerOptions}
+                  onSelect={_onSelectPowerOption}
                 />
               )}
             </Block>
@@ -182,21 +188,18 @@ const WalletStatsView = (props: Props): JSX.Element => {
           <Block row middle space="between">
             <Text>SAVINGS</Text>
             <Block row middle>
-              <Text color={argonTheme.COLORS.ERROR}>{`${savings} BLURT`}</Text>
               {props.isUser && (
                 <DropdownModal
-                  key={savingsOptions[savingsIndex]}
+                  key={savingsIndex}
                   options={savingsOptions}
-                  defaultText=""
+                  defaultText={`${savings} BLURT`}
                   dropdownButtonStyle={styles.dropdownButtonStyle}
-                  selectedOptionIndex={0}
+                  selectedOptionIndex={-1}
                   rowTextStyle={styles.rowTextStyle}
                   style={styles.dropdown}
                   dropdownStyle={styles.dropdownStyle}
                   textStyle={styles.dropdownText}
-                  onSelect={{}}
-                  noHighlight
-                  isHasChildIcon
+                  onSelect={_onSelectSavingsOption}
                 />
               )}
             </Block>
@@ -275,10 +278,10 @@ const styles = StyleSheet.create({
 
   // dropdown
   dropdownText: {
-    // fontSize: 14,
-    // paddingLeft: 10,
-    // paddingHorizontal: 0,
-    // color: argonTheme.COLORS.ERROR,
+    fontSize: 14,
+    paddingLeft: 10,
+    paddingHorizontal: 0,
+    color: argonTheme.COLORS.ERROR,
   },
   rowTextStyle: {
     fontSize: 14,
@@ -286,16 +289,17 @@ const styles = StyleSheet.create({
   },
   dropdownStyle: {
     marginTop: 15,
-    minWidth: 120,
-    width: 160,
+    minWidth: 150,
+    width: 200,
     backgroundColor: argonTheme.COLORS.DEFAULT,
   },
   dropdownButtonStyle: {
     color: argonTheme.COLORS.ERROR,
-    height: 44,
-    width: 60,
+    width: 180,
+    marginRight: 10,
   },
   dropdown: {
-    width: 20,
+    width: 180,
+    marginLeft: 10,
   },
 });

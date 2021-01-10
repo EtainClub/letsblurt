@@ -21,7 +21,6 @@ export type RootParams = {
 export type DrawerParams = {
   Feed: {category: string; tag: string; author?: string};
   AuthorProfile: undefined;
-  AuthorList: undefined;
   Login: undefined;
   Logout: undefined;
   SignUp: undefined;

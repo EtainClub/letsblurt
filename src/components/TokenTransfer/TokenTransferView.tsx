@@ -41,6 +41,7 @@ interface Props {
   balance: string;
   loading: boolean;
   transferToken: (recipient: string, amount: number, memo?: string) => void;
+  cancelModal: () => void;
 }
 const TokenTransferView = (props: Props): JSX.Element => {
   //// props
@@ -71,6 +72,7 @@ const TokenTransferView = (props: Props): JSX.Element => {
 
   ///
   const _handleChangeRecipient = (_recipient: string) => {
+    // clear the field to use the searched text
     setRecipient('');
     setShowAuthorsModal(true);
   };
@@ -81,6 +83,13 @@ const TokenTransferView = (props: Props): JSX.Element => {
     if (!showConfirm) {
       if (_amount) setAmount(parseFloat(_amount));
     }
+  };
+
+  const _handleCancelModal = () => {
+    // hide modal
+    setShowModal(false);
+    // callback
+    props.cancelModal();
   };
 
   ////
@@ -163,6 +172,17 @@ const TokenTransferView = (props: Props): JSX.Element => {
     } else {
       props.transferToken(recipient, amount, memo);
     }
+  };
+
+  ////
+  const _handlePressRecipient = (_recipient: string) => {
+    console.log('_handlePressRecipient', _recipient);
+    setRecipient(_recipient);
+    setRecipientAvatar(
+      `${settingsState.blockchains.image}/u/${_recipient}/avatar`,
+    );
+    //
+    setShowAuthorsModal(false);
   };
 
   const _renderForms = () => {
@@ -276,13 +296,8 @@ const TokenTransferView = (props: Props): JSX.Element => {
       {showAuthorsModal && (
         <AuthorList
           authors={props.followings}
-          showModal={showAuthorsModal}
-          handlePressAuthor={(_recipient) => {
-            setRecipient(_recipient);
-            setRecipientAvatar(
-              `${settingsState.blockchains.image}/u/${_recipient}/avatar`,
-            );
-          }}
+          handlePressAuthor={_handlePressRecipient}
+          cancelModal={() => setShowAuthorsModal(false)}
         />
       )}
       <Block row center>
@@ -310,7 +325,7 @@ const TokenTransferView = (props: Props): JSX.Element => {
       isVisible={showModal}
       animationIn="zoomIn"
       animationOut="zoomOut"
-      onBackdropPress={() => setShowModal(false)}>
+      onBackdropPress={_handleCancelModal}>
       <Block style={styles.listContainer}>
         <Block center>
           <Text

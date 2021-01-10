@@ -42,14 +42,13 @@ const BACKGROUND_COLORS = [
 //// props
 interface Props {
   authors: string[];
-  showModal: boolean;
   handlePressAuthor: (author: string) => void;
+  cancelModal?: () => void;
 }
 
 const AuthorListView = (props: Props): JSX.Element => {
   //// props
   const {authors} = props;
-  console.log('AuthorListView. props', props);
   //// language
   const intl = useIntl();
   //// contexts
@@ -58,7 +57,7 @@ const AuthorListView = (props: Props): JSX.Element => {
   const {setPostRef} = useContext(PostsContext);
   const {settingsState} = useContext(SettingsContext);
   //// states
-  const [showModal, setShowModal] = useState(props.showModal);
+  const [showModal, setShowModal] = useState(true);
   const [searchText, setSearchText] = useState('');
   const [searchedItems, setSearchedItems] = useState(authors || []);
   const [loading, setLoading] = useState(false);
@@ -66,29 +65,10 @@ const AuthorListView = (props: Props): JSX.Element => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [loadedAll, setLoadedAll] = useState(false);
 
-  //// handle refresh event on posts
-  const _onRefresh = async () => {
-    console.log('on refresh');
-    //    setLoading(true);
-    //    await props.refreshPosts();
-    //    setLoading(false);
-  };
-
-  //// load more posts with bottom-reached event
-  const _onLoadMore = async () => {
-    console.log('on load more');
-    //    setLoadingMore(true);
-    //    props.fetchMorePosts();
-  };
-
   const _onPressAuthor = (author: string) => {
     console.log('[AuthorList] onPressAuthor');
     setShowModal(false);
     props.handlePressAuthor(author);
-    // set author param
-    //    setAuthorParam(author);
-    // navigate
-    //    navigate({name: 'AuthorProfile'});
   };
 
   const _onSubmitSearch = () => {
@@ -99,8 +79,8 @@ const AuthorListView = (props: Props): JSX.Element => {
   };
 
   const _handleTextChange = (text: string) => {
-    console.log('search text', searchText);
-    // filter
+    console.log('search text222', searchText);
+    // // filter
     if (text === '') {
       setSearchedItems(authors);
     } else {
@@ -209,10 +189,10 @@ const AuthorListView = (props: Props): JSX.Element => {
 
   return (
     <Modal
-      isVisible={showModal}
+      isVisible
       animationIn="zoomIn"
       animationOut="zoomOut"
-      onBackdropPress={() => setShowModal(false)}>
+      onBackdropPress={props.cancelModal}>
       <Block card style={styles.container}>
         <FlatList
           contentContainerStyle={styles.posts}

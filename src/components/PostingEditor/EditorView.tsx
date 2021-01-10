@@ -266,8 +266,8 @@ const EditorView = (props: Props): JSX.Element => {
       {showAuthorsModal && (
         <AuthorList
           authors={userState.followings}
-          showModal={showAuthorsModal}
           handlePressAuthor={_insertMentionedAccount}
+          cancelModal={() => setShowAuthorsModal(false)}
         />
       )}
     </Block>

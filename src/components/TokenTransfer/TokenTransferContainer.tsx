@@ -130,6 +130,7 @@ const TokenTransferContainer = (props: Props): JSX.Element => {
       balance={props.balance}
       loading={transferring}
       transferToken={_hanldeTokenTransfer}
+      cancelModal={props.callback}
     />
   );
 };

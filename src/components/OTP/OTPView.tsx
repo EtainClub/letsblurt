@@ -22,7 +22,7 @@ import {argonTheme} from '~/constants';
 // country code
 import * as RNLocalize from 'react-native-localize';
 import CountryPicker, {DARK_THEME} from 'react-native-country-picker-modal';
-import {Country, CountryCode} from './types';
+import {Country, CountryCode} from '~/screens/signup/screen/types';
 
 import LinearGradient from 'react-native-linear-gradient';
 import {materialTheme} from '~/constants/';

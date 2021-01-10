@@ -103,7 +103,11 @@ const Wallet = (props: Props): JSX.Element => {
   };
 
   ////
-  const _handlePressTransfer = () => {
+  const _handlePressTransfer = (index: number) => {
+    if (index > 0) {
+      setToastMessage('Not supported yet');
+      return;
+    }
     setShowTransferModal(true);
   };
 

@@ -305,21 +305,21 @@ const AuthorStack = () => {
   );
 };
 
-const AuthorListStack = () => {
-  return (
-    <Stack.Navigator mode="card" headerMode="screen">
-      <Stack.Screen
-        name="AuthorList"
-        component={AuthorList}
-        options={{
-          header: ({navigation}) => {
-            return <Header title="Author List" navigation={navigation} />;
-          },
-        }}
-      />
-    </Stack.Navigator>
-  );
-};
+// const AuthorListStack = () => {
+//   return (
+//     <Stack.Navigator mode="card" headerMode="screen">
+//       <Stack.Screen
+//         name="AuthorList"
+//         component={AuthorList}
+//         options={{
+//           header: ({navigation}) => {
+//             return <Header title="Author List" navigation={navigation} />;
+//           },
+//         }}
+//       />
+//     </Stack.Navigator>
+//   );
+// };
 
 const SettingsStack = () => {
   return (
@@ -378,7 +378,7 @@ const DrawerNavigator = (props) => {
       <Drawer.Screen name="Login" component={Login} />
       <Drawer.Screen name="SignUp" component={Signup} />
       <Drawer.Screen name="AuthorProfile" component={AuthorStack} />
-      <Drawer.Screen name="AuthorList" component={AuthorListStack} />
+      {/* <Drawer.Screen name="AuthorList" component={AuthorListStack} /> */}
       <Drawer.Screen name="PostDetails" component={PostDetailsStack} />
       {!authState.loggedIn ? (
         <Drawer.Screen name="Logout" component={Login} />

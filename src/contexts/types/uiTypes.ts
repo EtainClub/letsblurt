@@ -87,7 +87,6 @@ export interface UIContextType {
 
 export type UIAction =
   | SetToastAction
-  | SetTagParamAction
   | SetAuthorParamAction
   | SetAuthorsParamAction
   | SetEditModeAction

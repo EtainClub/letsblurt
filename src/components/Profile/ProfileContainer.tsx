@@ -27,6 +27,7 @@ import {
 //// dblurt api
 import {isFollowing} from '~/providers/blurt/dblurtApi';
 import {ProfileData} from '~/contexts/types';
+import {AuthorList} from '~/components';
 //// etc
 import {ProfileView} from './ProfileView';
 
@@ -48,7 +49,9 @@ const ProfileContainer = (props: Props): JSX.Element => {
   const {updateFavoriteAuthor, fetchFavorites, isFavoriteAuthor} = useContext(
     PostsContext,
   );
-  const {setToastMessage, setAuthorListParam} = useContext(UIContext);
+  const {setToastMessage, setAuthorParam, setAuthorListParam} = useContext(
+    UIContext,
+  );
   const {updateFollowState, getFollowings, getFollowers} = useContext(
     UserContext,
   );
@@ -61,6 +64,9 @@ const ProfileContainer = (props: Props): JSX.Element => {
   const [favoriting, setFavoriting] = useState(false);
   const [followers, setFollowers] = useState([]);
   const [showFollowers, setShowFollowers] = useState(false);
+  const [showFollowingList, setShowFollowingList] = useState(false);
+  const [showFollowerList, setShowFollowerList] = useState(false);
+
   //////// events
   ////
   useEffect(() => {
@@ -131,39 +137,59 @@ const ProfileContainer = (props: Props): JSX.Element => {
     // get followings of the author
     const _followings = await getFollowings(profile.name);
     // show list
-    //    setFollowings(_followings);
-    // set param
-    setAuthorListParam(_followings);
-    // navigate
-    navigate({name: 'AuthorList', params: {authors: _followings}});
+    setFollowings(_followings);
+    setShowFollowingList(true);
   };
 
   const _handlePressFollowers = async () => {
     // get follower of the author
     const _followers = await getFollowers(profile.name);
     // show list
-    //    setFollowers(_followers);
-    // set param
-    setAuthorListParam(_followers);
+    setFollowers(_followers);
+    setShowFollowerList(true);
+  };
+
+  const _handlePressAuthor = (author: string) => {
+    // close the modal
+    setShowFollowingList(false);
+    setShowFollowerList(false);
+    // set author param
+    setAuthorParam(author);
     // navigate
-    navigate({name: 'AuthorList'});
+    navigate({name: 'AuthorProfile'});
   };
 
   return (
-    <ProfileView
-      profileData={props.profileData}
-      isUser={props.isUser}
-      favoriting={favoriting}
-      favoriteState={favoriteState}
-      following={following}
-      followingState={followingState}
-      imageServer={settingsState.blockchains.image}
-      handlePressFavorite={_handlePressFavorite}
-      handlePressEdit={props.handlePressEdit}
-      handlePressFollow={_handlePressFollow}
-      handlePressFollowings={_handlePressFollowings}
-      handlePressFollowers={_handlePressFollowers}
-    />
+    <Block>
+      <ProfileView
+        profileData={props.profileData}
+        isUser={props.isUser}
+        favoriting={favoriting}
+        favoriteState={favoriteState}
+        following={following}
+        followingState={followingState}
+        imageServer={settingsState.blockchains.image}
+        handlePressFavorite={_handlePressFavorite}
+        handlePressEdit={props.handlePressEdit}
+        handlePressFollow={_handlePressFollow}
+        handlePressFollowings={_handlePressFollowings}
+        handlePressFollowers={_handlePressFollowers}
+      />
+      {showFollowingList && (
+        <AuthorList
+          authors={followings}
+          handlePressAuthor={_handlePressAuthor}
+          cancelModal={() => setShowFollowingList(false)}
+        />
+      )}
+      {showFollowerList && (
+        <AuthorList
+          authors={followers}
+          handlePressAuthor={_handlePressAuthor}
+          cancelModal={() => setShowFollowerList(false)}
+        />
+      )}
+    </Block>
   );
 };
 
