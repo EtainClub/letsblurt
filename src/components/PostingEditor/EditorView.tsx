@@ -62,9 +62,6 @@ const EditorView = (props: Props): JSX.Element => {
   const [showAuthorsModal, setShowAuthorsModal] = useState(false);
   const [uploadedImageUrl, setUploadedImageUrl] = useState('');
 
-  console.log('EditorView. props original', props.originalPost);
-  console.log('EditorView. props body', body);
-
   //////// events
   //// mount
   useEffect(() => {
@@ -101,7 +98,6 @@ const EditorView = (props: Props): JSX.Element => {
 
   //// handle press key event and catch '@' key
   const _handlePressKey = ({nativeEvent}) => {
-    console.log('_handlePressKey', nativeEvent);
     const {key} = nativeEvent;
     if (key === '@') {
       setShowAuthorsModal(true);
@@ -118,13 +114,12 @@ const EditorView = (props: Props): JSX.Element => {
     const _body = renderPostBody(text, true);
     setPreviewBody(_body);
     // for main posting, send the change to the parent
-    if (!isComment) {
-      props.handleBodyChange(_body);
-    }
+    //    if (!isComment) {
+    props.handleBodyChange(_body);
+    //    }
   };
 
   const _insertMentionedAccount = (text: string) => {
-    console.log('_finalizeMention. author', text);
     // hide the modal
     setShowAuthorsModal(false);
     //

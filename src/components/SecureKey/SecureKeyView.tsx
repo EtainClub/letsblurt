@@ -1,19 +1,7 @@
 //// react
 import React, {useState, useContext, useEffect} from 'react';
 //// react native
-import {
-  View,
-  StyleSheet,
-  Dimensions,
-  KeyboardAvoidingView,
-  Alert,
-  Platform,
-  Image,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  FlatList,
-  Linking,
-} from 'react-native';
+import {View, StyleSheet, Dimensions} from 'react-native';
 //// config
 import Config from 'react-native-config';
 //// language

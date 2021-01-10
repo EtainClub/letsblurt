@@ -2,17 +2,11 @@
 import React, {useState, useEffect, useContext} from 'react';
 //// react native
 import {
-  View,
   StyleSheet,
   Dimensions,
-  KeyboardAvoidingView,
-  Alert,
-  Platform,
   Image,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  FlatList,
-  Linking,
 } from 'react-native';
 //// config
 import Config from 'react-native-config';

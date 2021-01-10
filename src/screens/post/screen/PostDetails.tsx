@@ -13,6 +13,7 @@ import {
   ScrollView,
   RefreshControl,
   KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 // SafeAreaView
 import {SafeAreaView} from 'react-native-safe-area-context';
@@ -67,6 +68,7 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
 
   const [commentY, setCommentY] = useState(0);
   const [uploadedImageUrl, setUploadedImageUrl] = useState('');
+  const [avoidKeyboard, setAvoidKeyboard] = useState(false);
 
   const formatedTime = post && getTimeFromNow(state.createdAt);
 
@@ -120,79 +122,83 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
   };
 
   return !props.loading ? (
-    <KeyboardAvoidingView behavior="position" keyboardVerticalOffset={20}>
-      <Block style={{marginHorizontal: 5, marginBottom: 170}}>
-        {props.parentPost && <ParentPost post={props.parentPost} />}
-        <Text size={24}>{post.state.title}</Text>
-        <Block row space="between">
-          <Avatar
-            avatar={post.state.avatar}
-            avatarSize={40}
-            account={post.state.post_ref.author}
-            nickname={nickname ? nickname : post.state.post_ref.author}
-            reputation={reputation}
-            textSize={14}
-            truncate={false}
-          />
-          <Text style={{top: 10, marginRight: 20}}>{formatedTime}</Text>
-        </Block>
-        <Block style={{}}>
-          <ActionBar
-            actionBarStyle={ActionBarStylePost}
-            postState={state}
-            postUrl={post.url}
-            postsType={props.postsType}
-            postIndex={props.index}
-            handlePressComments={_handlePressComments}
-            handlePressTranslation={props.handlePressTranslation}
-          />
-        </Block>
+    <Block style={{marginHorizontal: 5, marginBottom: 130}}>
+      {props.parentPost && <ParentPost post={props.parentPost} />}
+      <Text size={24}>{post.state.title}</Text>
+      <Block row space="between">
+        <Avatar
+          avatar={post.state.avatar}
+          avatarSize={40}
+          account={post.state.post_ref.author}
+          nickname={nickname ? nickname : post.state.post_ref.author}
+          reputation={reputation}
+          textSize={14}
+          truncate={false}
+        />
+        <Text style={{top: 10, marginRight: 20}}>{formatedTime}</Text>
+      </Block>
+      <Block style={{}}>
+        <ActionBar
+          actionBarStyle={ActionBarStylePost}
+          postState={state}
+          postUrl={post.url}
+          postsType={props.postsType}
+          postIndex={props.index}
+          handlePressComments={_handlePressComments}
+          handlePressTranslation={props.handlePressTranslation}
+        />
+      </Block>
 
-        <ScrollView
-          ref={commentRef}
-          contentContainerStyle={{flex: 1}}
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl refreshing={props.loading} onRefresh={_onRefresh} />
-          }>
-          <Block>
-            <Block style={{padding: theme.SIZES.BASE / 3}}>
-              <PostBody body={post.body} />
-            </Block>
-            {!props.parentPost && (
-              <Block row style={{flexWrap: 'wrap'}}>
-                {(tags || []).map((tag, id) => {
-                  return (
-                    <TouchableWithoutFeedback
+      <ScrollView
+        ref={commentRef}
+        contentContainerStyle={{flex: 1}}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={props.loading} onRefresh={_onRefresh} />
+        }>
+        <Block>
+          <Block style={{padding: theme.SIZES.BASE / 3}}>
+            <PostBody body={post.body} />
+          </Block>
+          {!props.parentPost && (
+            <Block row style={{flexWrap: 'wrap'}}>
+              {(tags || []).map((tag, id) => {
+                return (
+                  <TouchableWithoutFeedback
+                    key={id}
+                    onPress={() => _handlePressHashTag(tag)}>
+                    <Block
+                      card
                       key={id}
-                      onPress={() => _handlePressHashTag(tag)}>
-                      <Block
-                        card
-                        key={id}
-                        style={{
-                          backgroundColor: argonTheme.COLORS.INPUT_SUCCESS,
-                          paddingHorizontal: 5,
-                          marginHorizontal: 2,
-                          marginVertical: 3,
-                        }}>
-                        <Text>{tag}</Text>
-                      </Block>
-                    </TouchableWithoutFeedback>
-                  );
-                })}
-              </Block>
-            )}
+                      style={{
+                        backgroundColor: argonTheme.COLORS.INPUT_SUCCESS,
+                        paddingHorizontal: 5,
+                        marginHorizontal: 2,
+                        marginVertical: 3,
+                      }}>
+                      <Text>{tag}</Text>
+                    </Block>
+                  </TouchableWithoutFeedback>
+                );
+              })}
+            </Block>
+          )}
+          <KeyboardAvoidingView behavior="position" keyboardVerticalOffset={20}>
             <Editor
               isComment={true}
               depth={0}
               close={false}
               handleSubmitComment={props.handleSubmitComment}
+              handleBodyChange={(text) => {
+                console.log('editor body change', text);
+                setAvoidKeyboard(true);
+              }}
             />
-            {_renderComments()}
-          </Block>
-        </ScrollView>
-      </Block>
-    </KeyboardAvoidingView>
+          </KeyboardAvoidingView>
+          {_renderComments()}
+        </Block>
+      </ScrollView>
+    </Block>
   ) : (
     <View style={{top: 20}}>
       <ActivityIndicator color={argonTheme.COLORS.ERROR} size="large" />
