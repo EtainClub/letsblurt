@@ -27,8 +27,13 @@ const LoginScreen = (props: Props): JSX.Element => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [active, setActive] = useState({username: false, password: false});
-
+  // temp
+  //  const [passwordEditable, setPasswordEditable] = useState(false);
   const intl = useIntl();
+
+  // useEffect(() => {
+  //   setTimeout(() => setPasswordEditable(true), 100);
+  // }, []);
 
   const _handleUsernameChange = (value: string): void => {
     // set username

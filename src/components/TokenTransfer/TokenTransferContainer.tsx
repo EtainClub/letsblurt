@@ -4,27 +4,31 @@ import React, {useState, useContext, useEffect} from 'react';
 //// config
 import Config from 'react-native-config';
 //// language
+import {useIntl} from 'react-intl';
 //// blockchain
 import {
   transferToken,
   TransactionReturnCodes,
 } from '~/providers/blurt/dblurtApi';
 //// context
-import {AuthContext} from '~/contexts';
+import {AuthContext, UIContext} from '~/contexts';
 //// views
 import {SecureKey} from '~/components';
 import {TokenTransferView} from './TokenTransferView';
 import {KeyTypes} from '~/contexts/types';
 
 interface Props {
-  username: string;
   title: string;
   followings: string[];
   balance: string;
+  callback: () => void;
 }
 const TokenTransferContainer = (props: Props): JSX.Element => {
+  //// language
+  const intl = useIntl();
   //// contexts
   const {authState} = useContext(AuthContext);
+  const {setToastMessage} = useContext(UIContext);
   //// states
   const [showSecureKey, setShowSecureKey] = useState(false);
   const [params, setParams] = useState(null);
@@ -57,9 +61,7 @@ const TokenTransferContainer = (props: Props): JSX.Element => {
     }
     //// good to go
     // transfer
-    const resultCode = await transferToken(username, password, _params);
-    console.log('_hanldeTokenTransfer. resultCode', resultCode);
-    // TODO: handle the result
+    _transferToken(password, _params);
   };
 
   ////
@@ -67,32 +69,66 @@ const TokenTransferContainer = (props: Props): JSX.Element => {
     console.log('_handleSecureKeyResult. result', result);
     if (result) {
       // execute the transfer
-      _transferToken(_password);
+      _transferToken(_password, params);
+      // hide the secure key
+      setShowSecureKey(false);
+      return;
     }
-    // hide the secure key
-    setShowSecureKey(false);
+    // show message
+    setToastMessage(intl.formatMessage({id: 'TokenTransfer.need_higher_key'}));
   };
 
   ////
-  const _transferToken = async (_password: string) => {
+  const _transferToken = async (_password: string, _param: any) => {
+    // set loading
+    setTransferring(true);
     const {username} = authState.currentCredentials;
     // transfer
     const resultCode = await transferToken(username, _password, params);
+    //// show toast message
+    // toast message
+    let message = '';
+    switch (resultCode) {
+      case TransactionReturnCodes.INVALID_PASSWORD:
+        message = intl.formatMessage({id: 'TokenTransfer.invalid_pass'});
+        break;
+      case TransactionReturnCodes.NEED_HIGHER_PASSWORD:
+        message = intl.formatMessage({id: 'TokenTransfer.need_higher_key'});
+        break;
+      case TransactionReturnCodes.TRANSACTION_ERROR:
+        message = intl.formatMessage({id: 'TokenTransfer.fail'});
+        break;
+      case TransactionReturnCodes.TRANSACTION_SUCCESS:
+        message = intl.formatMessage({id: 'TokenTransfer.success'});
+        break;
+      default:
+        message = intl.formatMessage({id: 'TokenTransfer.error'});
+        break;
+    }
+    // show the message
+    setToastMessage(message);
+
+    // clear loading
+    setTransferring(false);
     console.log('_hanldeTokenTransfer. resultCode', resultCode);
+
+    // close the token modal
+    props.callback();
   };
 
   return showSecureKey ? (
     <SecureKey
-      username={props.username}
+      username={authState.currentCredentials.username}
       requiredKeyType={KeyTypes.ACTIVE}
       handleResult={_handleSecureKeyResult}
     />
   ) : (
     <TokenTransferView
-      username={props.username}
+      username={authState.currentCredentials.username}
       title={props.title}
       followings={props.followings}
       balance={props.balance}
+      loading={transferring}
       transferToken={_hanldeTokenTransfer}
     />
   );

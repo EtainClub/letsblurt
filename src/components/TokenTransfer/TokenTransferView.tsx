@@ -39,6 +39,7 @@ interface Props {
   username: string;
   followings: string[];
   balance: string;
+  loading: boolean;
   transferToken: (recipient: string, amount: number, memo?: string) => void;
 }
 const TokenTransferView = (props: Props): JSX.Element => {
@@ -78,7 +79,6 @@ const TokenTransferView = (props: Props): JSX.Element => {
   const _handleChangeAmount = (_amount: string) => {
     ////
     if (!showConfirm) {
-      console.log('_handleChangeAmount', _amount);
       if (_amount) setAmount(parseFloat(_amount));
     }
   };
@@ -161,18 +161,12 @@ const TokenTransferView = (props: Props): JSX.Element => {
         setErrorMessage(intl.formatMessage({id: 'TokenTransfer.error'}));
       }
     } else {
-      console.log('move to transfer view', showConfirm);
-      console.log('[tokenview] amount. type', amount, typeof amount);
       props.transferToken(recipient, amount, memo);
     }
   };
 
   const _renderForms = () => {
     const userAvatar = `${settingsState.blockchains.image}/u/${props.username}/avatar`;
-    //const avatar = `${settingsState.blockchains.image}/u/${recipient}}/avatar`;
-    //const userAvatar = `https://steemitimages.com/u/${props.username}/avatar`;
-    console.log('recipient avatar', recipientAvatar);
-    //       const recipientAvatar = 'https://steemitimages.com/u/rayheyna/avatar';
     return (
       <Block center card>
         <Block center style={{margin: 10}}>
@@ -245,7 +239,7 @@ const TokenTransferView = (props: Props): JSX.Element => {
             </Block>
             <TouchableOpacity
               onPress={() => _handleChangeAmount(props.balance)}>
-              <Text color={argonTheme.COLORS.FACEBOOK} style={{left: 60}}>
+              <Text color={argonTheme.COLORS.FACEBOOK} style={{left: 80}}>
                 {intl.formatMessage(
                   {id: 'TokenTransfer.balance'},
                   {what: props.balance},
@@ -268,7 +262,7 @@ const TokenTransferView = (props: Props): JSX.Element => {
                 })}
               />
             </Block>
-            <Text style={{left: 50}} size={14}>
+            <Text style={{left: 80}} size={14}>
               {intl.formatMessage({id: 'TokenTransfer.memo_message'})}
             </Text>
           </Block>
@@ -296,8 +290,9 @@ const TokenTransferView = (props: Props): JSX.Element => {
           size="small"
           shadowless
           color={argonTheme.COLORS.ERROR}
-          onPress={_handlePressNext}>
-          {showConfirm
+          onPress={_handlePressNext}
+          loading={props.loading}>
+          {showConfirm || props.loading
             ? intl.formatMessage({id: 'TokenTransfer.transfer_button'})
             : intl.formatMessage({id: 'TokenTransfer.next_button'})}
         </Button>
@@ -350,12 +345,12 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   text: {
-    width: 50,
+    width: 70,
     textAlign: 'left',
     marginRight: 10,
   },
   input: {
-    width: width * 0.6,
+    width: width * 0.5,
     marginRight: 10,
   },
   autocompleteContainer: {

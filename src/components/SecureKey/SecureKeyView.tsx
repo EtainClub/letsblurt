@@ -33,8 +33,9 @@ import {verifyPassoword} from '~/providers/blurt';
 
 interface Props {
   username: string;
-  useOTP: boolean;
+  showOTP: boolean;
   phoneNumber: string;
+  message: string;
   handlePressConfirm: (password: string) => void;
   handleOTPResult?: (result: boolean) => void;
 }
@@ -46,9 +47,18 @@ const SecureKeyView = (props: Props): JSX.Element => {
   //// states
   const [password, setPassword] = useState('');
   const [showModal, setShowModal] = useState(true);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState(props.message);
   const [showOTPModal, setShowOTPModal] = useState(false);
-  //// effect
+  //////// effect
+  ////
+  useEffect(() => {
+    setErrorMessage(props.message);
+  }, [props.message]);
+  //// otp
+  useEffect(() => {
+    console.log('[securekeyview. useeffect. show otp modal', props.showOTP);
+    setShowOTPModal(props.showOTP);
+  }, [props.showOTP]);
 
   const _renderForms = () => {
     return (
@@ -77,6 +87,7 @@ const SecureKeyView = (props: Props): JSX.Element => {
               })}
               onChangeText={(text: string) => {
                 setPassword(text);
+                setErrorMessage('');
               }}
             />
           </Block>
@@ -106,7 +117,7 @@ const SecureKeyView = (props: Props): JSX.Element => {
           </Button>
         </Block>
         <Block center>
-          <Text size={16} color="red">
+          <Text size={20} color="red">
             {errorMessage}
           </Text>
         </Block>

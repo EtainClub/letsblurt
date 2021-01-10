@@ -112,7 +112,8 @@
     "phone_button": "Request Code",
     "sms_guide": "Enter the verification code that you've just received.",
     "SMS_code": "SMS code here",
-    "confirm_button": "Confirm"
+    "confirm_button": "Confirm",
+    "code_error": "The code is invalid"
   },
   "Header": {
     "add_account": "Add Account"
@@ -240,7 +241,8 @@
     "danger_msg": "Be careful when changing master password",
     "change_master": "Change Master Password (inactive)",
     "from": "From",
-    "to": "To"
+    "to": "To",
+    "token_transfer_title": "Transfer to Account"
   },
   "Transaction": {
     "no_account": "There is no such account",
@@ -262,7 +264,11 @@
     "balance": "Balance {what} Blurt",
     "amount": "Amount",
     "memo": "Memo",
-    "memo_message": "This memo is public"
+    "memo_message": "This memo is public",
+    "invaild_pass": "Password is invaild",
+    "need_higher_key": "Require higer key",
+    "success": "Transferred",
+    "fail": "Failed to transfer"
   },
   "SecureKey": {
     "title": "Password Required",

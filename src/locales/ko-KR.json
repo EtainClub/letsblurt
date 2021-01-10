@@ -112,7 +112,8 @@
     "phone_button": "인증코드 요청하기",
     "sms_guide": "수신한 인증코드를 입력하세요.",
     "SMS_code": "인증코드를 여기에 입력하세요",
-    "confirm_button": "확인"
+    "confirm_button": "확인",
+    "code_error": "입력한 코드가 올바르지 않습니다."
   },
   "Header": {
     "add_account": "계정 추가"
@@ -240,7 +241,8 @@
     "danger_msg": "마스터 암호를 변경할 때 주의하세요",
     "change_master": "마스터 암호 변경하기 (비활성화)",
     "from": "송신자",
-    "to": "수신자"
+    "to": "수신자",
+    "token_transfer_title": "계정에 송금"
   },
   "Transaction": {
     "no_account": "존재하지 않는 계정이름입니다.",
@@ -259,7 +261,11 @@
     "balance": "잔고 {what} Blurt",
     "amount": "금액",
     "memo": "메모",
-    "memo_message": "이 메모는 누구나 볼 수 있습니다."
+    "memo_message": "이 메모는 누구나 볼 수 있습니다.",
+    "invaild_pass": "키가 올바르지 않습니다.",
+    "need_higher_key": "상위의 키가 필요합니다.",
+    "success": "송금되었습니다.",
+    "fail": "송금 실패"
   },
   "SecureKey": {
     "title": "암호 요구",

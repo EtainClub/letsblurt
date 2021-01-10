@@ -66,6 +66,7 @@ const WalletStatsView = (props: Props): JSX.Element => {
   ];
   const savingsOptions = [intl.formatMessage({id: 'Wallet.dropdown_withdraw'})];
 
+  // @test
   useEffect(() => {
     props.handlePressTransfer(0);
   }, []);
