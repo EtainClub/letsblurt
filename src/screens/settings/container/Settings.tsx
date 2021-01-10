@@ -205,6 +205,9 @@ const SettingsContainer = (props: Props): JSX.Element => {
 
   //// handle switch events: push notifications, securities, dnd times, ui
   const _handleToggleSwitch = async (key: SettingUITypes, value: boolean) => {
+    // check logged in
+    if (!authState.loggedIn) return;
+
     console.log('[_handleToggleSwitch] key, value', key, value);
     // update the switch state
     setSwitchStates({...switchStates, [key]: value});
@@ -291,6 +294,9 @@ const SettingsContainer = (props: Props): JSX.Element => {
     index: number,
     value: string,
   ) => {
+    // check logged in
+    if (!authState.loggedIn) return;
+
     console.log(
       '[_handleDropdownChange] uiType, index, value',
       uiType,
@@ -370,6 +376,9 @@ const SettingsContainer = (props: Props): JSX.Element => {
 
   //// handle button events: terms, privacy, feedback, etc
   const _handlePressButton = async (uiType: SettingUITypes) => {
+    // check logged in
+    if (!authState.loggedIn) return;
+
     console.log('_handlePressButton. uiType', uiType);
     switch (uiType) {
       case SettingUITypes.NOTICE:

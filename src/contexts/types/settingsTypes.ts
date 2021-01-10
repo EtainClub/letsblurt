@@ -46,19 +46,8 @@ export type UITypes = {
   nsfw: boolean;
 };
 
-//// all settings types
-// export type AllSettingsTypes = {
-//   pushNotifications: string[];
-//   blockchains: BlockchainTypes;
-//   securities: SecurityTypes;
-//   dndTimes: DNDTimeTypes;
-//   languages: LanguageTypes;
-//   ui: UITypes;
-// };
-
 // settings state
 export interface SettingsState {
-  // ['vote', 'tranfer', ...]
   [StorageSchema.PUSH_NOTIFICATIONS]: string[];
   [StorageSchema.BLOCKCHAINS]: BlockchainTypes;
   [StorageSchema.SECURITIES]: SecurityTypes;
@@ -69,7 +58,13 @@ export interface SettingsState {
 
 // initial post data
 export const INITIAL_SETTINGS: SettingsState = {
-  [StorageSchema.PUSH_NOTIFICATIONS]: ['vote', 'beneficiary'],
+  [StorageSchema.PUSH_NOTIFICATIONS]: [
+    'transfer',
+    'beneficiary',
+    'reply',
+    'mention',
+    'follow',
+  ],
   [StorageSchema.BLOCKCHAINS]: {
     rpc: BLURT_MAINNETS[0],
     image: BLURT_IMAGE_SERVERS[0],

@@ -329,7 +329,7 @@ const PostsProvider = ({children}: Props) => {
         } else if (postsState.tagList[tagIndex] === 'All') {
           tag = '';
           filter = postsState.filterList[filterIndex];
-        } else if (tagIndex > 1) {
+        } else if (tagIndex > 0) {
           filter = postsState.filterList[filterIndex];
           tag = postsState.tagList[tagIndex];
         } else {

@@ -71,6 +71,7 @@ export const setBlockchainClient = async (server?: string) => {
   let rpc = null;
   if (!server) {
     const _blockchains = await AsyncStorage.getItem('blockchains');
+    console.log('setBlockchainClient. blockchain from storage', _blockchains);
     const blockchains = JSON.parse(_blockchains);
     blockchainSettings = blockchains;
     console.log(
@@ -78,6 +79,11 @@ export const setBlockchainClient = async (server?: string) => {
       blockchains,
       blockchainSettings,
     );
+    // check if the first server is the same as the default list
+    if (blockchains.rpc === BLURT_MAINNETS[0]) {
+      console.log('no need to do re-ordering the server list');
+      return true;
+    }
 
     if (!blockchains) return null;
     rpc = blockchains.rpc;
@@ -857,7 +863,12 @@ export const fetchPostDetails = async (
 ): Promise<PostData> => {
   try {
     const post = await client.database.call('get_content', [author, permlink]);
-    const postData = await parsePost(post, username, isPromoted);
+    const postData = await parsePost(
+      post,
+      username,
+      blockchainSettings.image,
+      isPromoted,
+    );
     if (postData) return postData;
     return null;
   } catch (error) {
@@ -877,7 +888,14 @@ export const fetchPost = async (
     const post = await client.database.call('get_content', [author, permlink]);
     console.log('[fetchPost] post', post);
 
-    return post ? await parsePost(post, currentUserName, isPromoted) : null;
+    return post
+      ? await parsePost(
+          post,
+          currentUserName,
+          blockchainSettings.image,
+          isPromoted,
+        )
+      : null;
   } catch (error) {
     return error;
   }

@@ -98,16 +98,16 @@ const SettingsScreen = (props: Props): JSX.Element => {
       id: SettingUITypes.TRANSFER,
       type: 'switch',
     },
-    {
-      title: intl.formatMessage({id: 'Settings.notify_reblog'}),
-      id: SettingUITypes.REBLOG,
-      type: 'switch',
-    },
-    {
-      title: intl.formatMessage({id: 'Settings.notify_vote'}),
-      id: SettingUITypes.VOTE,
-      type: 'switch',
-    },
+    // {
+    //   title: intl.formatMessage({id: 'Settings.notify_reblog'}),
+    //   id: SettingUITypes.REBLOG,
+    //   type: 'switch',
+    // },
+    // {
+    //   title: intl.formatMessage({id: 'Settings.notify_vote'}),
+    //   id: SettingUITypes.VOTE,
+    //   type: 'switch',
+    // },
   ];
 
   const generalItems = [
