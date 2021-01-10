@@ -53,7 +53,7 @@ const WalletKeyView = (props: Props): JSX.Element => {
       setPassword(_password);
       setShowPassword(!showPassword);
     } else {
-      setToastMessage('Please login with a proper key or master key.');
+      setToastMessage(intl.formatMessage({id: 'Wallet.need_higher_key'}));
     }
   };
   ////

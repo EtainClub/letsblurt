@@ -241,6 +241,7 @@ const Comment = (props: Props): JSX.Element => {
           isComment={true}
           depth={comment.depth}
           close={false}
+          handleBodyChange={(text) => {}}
           handleSubmitComment={_handleSubmitComment}
         />
       )}
@@ -253,6 +254,7 @@ const Comment = (props: Props): JSX.Element => {
         originalPost={body}
         depth={comment.depth}
         close={false}
+        handleBodyChange={(text) => {}}
         handleSubmitComment={_handleSubmitComment}
       />
     </View>

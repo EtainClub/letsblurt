@@ -194,7 +194,8 @@
     "wallet_tab": "Wallet Info"
   },
   "Bookmark": {
-    "already": "You already bookmarked this post"
+    "already": "You already bookmarked this post",
+    "added": "The post has been bookmarked."
   },
   "Favorite": {
     "already": "You already favorited the author",
@@ -242,7 +243,8 @@
     "change_master": "Change Master Password (inactive)",
     "from": "From",
     "to": "To",
-    "token_transfer_title": "Transfer to Account"
+    "token_transfer_title": "Transfer to Account",
+    "need_higher_key": "Please login with a proper key or master key"
   },
   "Transaction": {
     "no_account": "There is no such account",
@@ -252,9 +254,9 @@
     "success": "Transaction succeeded"
   },
   "TokenTransfer": {
-    "recipient_placeholder": "Recipient",
+    "recipient_placeholder": "Search a Recipient",
     "amount_placeholder": "Amount to transfer",
-    "memo_placeholder": "Memo",
+    "memo_placeholder": "Transfer Memo",
     "next_button": "Next",
     "transfer_button": "Transfer",
     "confirm_title": "Confirm Transfer",

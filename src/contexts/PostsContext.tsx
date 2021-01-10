@@ -645,7 +645,6 @@ const PostsProvider = ({children}: Props) => {
     postRef: PostRef,
     username: string,
     title: string,
-    setToastMessage?: (message: string) => void,
   ) => {
     console.log('[addBookmark] postRef', postRef);
     //// get the firebase user doc ref
@@ -682,6 +681,8 @@ const PostsProvider = ({children}: Props) => {
       type: PostsActionTypes.BOOKMARK_POST,
       payload: true,
     });
+    //
+    setToastMessage(intl.formatMessage({id: 'Bookmark.added'}));
   };
 
   //// fetch database state

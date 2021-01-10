@@ -68,17 +68,17 @@ let blockchainSettings = null;
 //// change server orders and setup the client again
 export const setBlockchainClient = async (server?: string) => {
   // get blockchain servers from storage
+  const _blockchains = await AsyncStorage.getItem('blockchains');
+  console.log('setBlockchainClient. blockchain from storage', _blockchains);
+  const blockchains = JSON.parse(_blockchains);
+  blockchainSettings = blockchains;
+  console.log(
+    '[changeServerOrder] blockchains',
+    blockchains,
+    blockchainSettings,
+  );
   let rpc = null;
   if (!server) {
-    const _blockchains = await AsyncStorage.getItem('blockchains');
-    console.log('setBlockchainClient. blockchain from storage', _blockchains);
-    const blockchains = JSON.parse(_blockchains);
-    blockchainSettings = blockchains;
-    console.log(
-      '[changeServerOrder] blockchains',
-      blockchains,
-      blockchainSettings,
-    );
     // check if the first server is the same as the default list
     if (blockchains.rpc === BLURT_MAINNETS[0]) {
       console.log('no need to do re-ordering the server list');

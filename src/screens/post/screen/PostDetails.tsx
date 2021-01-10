@@ -122,7 +122,7 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
   };
 
   return !props.loading ? (
-    <Block style={{marginHorizontal: 5, marginBottom: 130}}>
+    <Block style={{marginHorizontal: 5, marginBottom: 150}}>
       {props.parentPost && <ParentPost post={props.parentPost} />}
       <Text size={24}>{post.state.title}</Text>
       <Block row space="between">
@@ -183,18 +183,16 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
               })}
             </Block>
           )}
-          <KeyboardAvoidingView behavior="position" keyboardVerticalOffset={20}>
-            <Editor
-              isComment={true}
-              depth={0}
-              close={false}
-              handleSubmitComment={props.handleSubmitComment}
-              handleBodyChange={(text) => {
-                console.log('editor body change', text);
-                setAvoidKeyboard(true);
-              }}
-            />
-          </KeyboardAvoidingView>
+          <Editor
+            isComment={true}
+            depth={0}
+            close={false}
+            handleSubmitComment={props.handleSubmitComment}
+            handleBodyChange={(text) => {
+              console.log('editor body change', text);
+              setAvoidKeyboard(true);
+            }}
+          />
           {_renderComments()}
         </Block>
       </ScrollView>

@@ -275,7 +275,11 @@ const ActionBarView = (props: Props): JSX.Element => {
           </TouchableWithoutFeedback>
         )}
         {actionBarStyle.bookmark ? (
-          <TouchableWithoutFeedback onPress={props.handlePressBookmark}>
+          <TouchableWithoutFeedback
+            onPress={() => {
+              setBookmarked(true);
+              props.handlePressBookmark();
+            }}>
             <Block row style={{paddingRight: 10}}>
               <Icon
                 size={actionBarStyle.iconSize}

@@ -194,7 +194,8 @@
     "wallet_tab": "지갑 정보"
   },
   "Bookmark": {
-    "already": "이미 북마크된 포스트입니다."
+    "already": "이미 북마크된 포스트입니다.",
+    "added": "포스트가 북마크 되었습니다."
   },
   "Favorite": {
     "already": "이미 등록된 관심저자입니다.",
@@ -242,7 +243,8 @@
     "change_master": "마스터 암호 변경하기 (비활성화)",
     "from": "송신자",
     "to": "수신자",
-    "token_transfer_title": "계정에 송금"
+    "token_transfer_title": "계정에 송금",
+    "need_higher_key": "상위의 키로 로그인 해주세요."
   },
   "Transaction": {
     "no_account": "존재하지 않는 계정이름입니다.",
@@ -252,6 +254,9 @@
     "success": "거래 성공"
   },
   "TokenTransfer": {
+    "recipient_placeholder": "수신자 계정을 검색",
+    "amount_placeholder": "송금하고자 하는 금액",
+    "memo_placeholder": "송금 메시지",
     "next_button": "계속 진행",
     "transfer_button": "송금하기",
     "confirm_title": "송금 내용 확인",
