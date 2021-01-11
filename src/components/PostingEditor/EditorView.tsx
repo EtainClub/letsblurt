@@ -223,7 +223,7 @@ const EditorView = (props: Props): JSX.Element => {
                 : styles.postContainer
             }
             editable={editable}
-            defaultValue={body}
+            value={body}
             onChangeText={_handleBodyChange}
             onSelectionChange={_handleOnSelectionChange}
             onKeyPress={_handlePressKey}

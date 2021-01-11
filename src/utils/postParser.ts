@@ -331,6 +331,7 @@ export const parseComment = async (comment: Discussion, username: string) => {
       // comments
       isComment: true,
     },
+    url: '',
   };
 
   try {
@@ -363,7 +364,10 @@ export const parseComment = async (comment: Discussion, username: string) => {
   //  extComment.postUserState.reputation = calculateReputation(
   //    comment.author_reputation,
   //  );
-  commentData.state.avatar = getResizedAvatar(get(comment, 'author'));
+  commentData.state.avatar = getResizedAvatar(
+    get(comment, 'author'),
+    IMAGE_SERVER,
+  );
   commentData.state.voters!.sort((a, b) => b.rshares - a.rshares);
   commentData.markdownBody = get(comment, 'body');
   commentData.body = renderPostBody(comment.body, true, webp);

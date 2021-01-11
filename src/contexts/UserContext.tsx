@@ -95,8 +95,6 @@ const userReducer = (state: UserState, action: UserAction) => {
       return {...state, followings: action.payload};
     case UserActionTypes.SET_FOLLOWERS:
       return {...state, followers: action.payload};
-    case UserActionTypes.SET_PHONE_NUMBER:
-      return {...state, phoneNumber: action.payload};
     case UserActionTypes.SET_PROFILE_DATA:
       return {...state, profileData: action.payload};
     default:
@@ -329,14 +327,6 @@ const UserProvider = ({children}: Props) => {
     return followers;
   };
 
-  const setPhoneNumberState = (phoneNumber: string) => {
-    // dispatch action
-    dispatch({
-      type: UserActionTypes.SET_PHONE_NUMBER,
-      payload: phoneNumber,
-    });
-  };
-
   return (
     <UserContext.Provider
       value={{
@@ -350,7 +340,6 @@ const UserProvider = ({children}: Props) => {
         updateFollowState,
         getFollowings,
         getFollowers,
-        setPhoneNumberState,
       }}>
       {children}
     </UserContext.Provider>

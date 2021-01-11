@@ -41,6 +41,7 @@ import {
   BLURT_TAG_ENDPOINT,
   BLURT_PRICE_ENDPOINT,
   BLURT_MAINNETS,
+  BLURT_IMAGE_SERVERS,
   BLURT_CHAIN_ID,
   BLURT_CHAIN_PREFIX,
   CHAIN_TIMEOUT,
@@ -119,7 +120,7 @@ export const setBlockchainClient = async (server?: string) => {
   return true;
 };
 
-setBlockchainClient();
+//setBlockchainClient();
 
 // patch
 const diff_match_patch = require('diff-match-patch');
@@ -840,7 +841,8 @@ export const fetchPostsSummary = async (
     );
 
     let postDataList: PostData[];
-    postDataList = await parsePosts(posts, username, blockchainSettings.image);
+    //    postDataList = await parsePosts(posts, username, blockchainSettings.image);
+    postDataList = await parsePosts(posts, username, BLURT_IMAGE_SERVERS[0]);
 
     // TODO: implement later
     // if (filterNsfw) {
@@ -866,7 +868,8 @@ export const fetchPostDetails = async (
     const postData = await parsePost(
       post,
       username,
-      blockchainSettings.image,
+      BLURT_IMAGE_SERVERS[0],
+      //      blockchainSettings.image,
       isPromoted,
     );
     if (postData) return postData;
@@ -892,7 +895,8 @@ export const fetchPost = async (
       ? await parsePost(
           post,
           currentUserName,
-          blockchainSettings.image,
+          BLURT_IMAGE_SERVERS[0],
+          //          blockchainSettings.image,
           isPromoted,
         )
       : null;

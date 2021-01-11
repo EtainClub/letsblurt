@@ -16,7 +16,6 @@ export enum UserActionTypes {
   SET_PRICE,
   SET_FOLLOWINGS,
   SET_FOLLOWERS,
-  SET_PHONE_NUMBER,
 }
 
 // profile data type
@@ -63,7 +62,6 @@ export interface UserState {
   //  voteAmount: string;
   followings: string[];
   followers: string[];
-  phoneNumber: string;
 }
 
 //// actions
@@ -132,11 +130,6 @@ interface SetFollowersAction {
   type: UserActionTypes.SET_FOLLOWERS;
   payload: string[];
 }
-// set phone number
-interface SetPhoneNumberAction {
-  type: UserActionTypes.SET_PHONE_NUMBER;
-  payload: string;
-}
 // user context type
 export interface UserContextType {
   // ui state
@@ -165,8 +158,6 @@ export interface UserContextType {
   getFollowings: (follower: string) => Promise<string[]>;
   // get followers of the user
   getFollowers: (username: string) => Promise<string[]>;
-  // set phone number
-  setPhoneNumberState: (phoneNumber: string) => void;
 }
 
 export type UserAction =
@@ -182,5 +173,4 @@ export type UserAction =
   | SetProfileDataAction
   | SetPriceAction
   | SetFollowingsAction
-  | SetFollowersAction
-  | SetPhoneNumberAction;
+  | SetFollowersAction;

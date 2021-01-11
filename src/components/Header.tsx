@@ -83,8 +83,11 @@ const Header = (props: Props): JSX.Element => {
     let _keyTypes = [];
     for (const key of iterator) {
       const _username = Object.keys(key)[0];
-      _accounts.push(_username);
-      _keyTypes.push(key[_username].type);
+      // store if it exists
+      if (_username) {
+        _accounts.push(_username);
+        _keyTypes.push(key[_username].type);
+      }
     }
     // set accounts
     setAccounts(_accounts);

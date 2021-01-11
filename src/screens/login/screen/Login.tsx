@@ -18,7 +18,7 @@ import {useIntl} from 'react-intl';
 const {width, height} = Dimensions.get('window');
 
 interface Props {
-  processLogin(username: string, password: string): void;
+  processLogin: (username: string, password: string) => Promise<boolean>;
 }
 
 const LoginScreen = (props: Props): JSX.Element => {
@@ -53,6 +53,12 @@ const LoginScreen = (props: Props): JSX.Element => {
     setLoading(true);
     const success = await props.processLogin(username, password);
     setLoading(false);
+    // clean up
+    if (success) {
+      setUsername('');
+      setPasword('');
+      setMessage('');
+    }
   };
 
   return (
