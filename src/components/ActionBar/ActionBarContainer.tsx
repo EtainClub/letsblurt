@@ -8,7 +8,6 @@ import {useIntl} from 'react-intl';
 import {navigate} from '~/navigation/service';
 import {PostState, PostsTypes} from '~/contexts/types';
 import {AuthContext, PostsContext, UserContext, UIContext} from '~/contexts';
-import {PostRef} from '~/contexts/types';
 import {ActionBarView} from './ActionBarView';
 import {ActionBarStyle} from '~/constants/actionBarTypes';
 import {reblog} from '~/providers/blurt/dblurtApi';
@@ -30,69 +29,108 @@ const ActionBarContainer = (props: Props): JSX.Element => {
   //// language
   const intl = useIntl();
   //// contexts
-  const {postsState, upvote, bookmarkPost, setPostRef} = useContext(
-    PostsContext,
-  );
+  const {upvote, bookmarkPost} = useContext(PostsContext);
   const {authState} = useContext(AuthContext);
   const {userState} = useContext(UserContext);
   const {uiState, setToastMessage, setAuthorParam, setEditMode} = useContext(
     UIContext,
   );
-  // states
+  //// states
   const [postState, setPostState] = useState<PostState>(props.postState);
-
-  //////// use effect
-  // set new post state
+  const [voting, setVoting] = useState(false);
+  const [votingWeight, setVotingWeight] = useState(100);
+  const [votingDollar, setVotingDollar] = useState<string>(postState.payout);
+  const [showVotingModal, setShowVotingModal] = useState(false);
+  const [showOriginal, setShowOriginal] = useState(true);
+  //// events
+  // // event: post state changes
   // useEffect(() => {
-  //   console.log(
-  //     '[ActionBarContainer|useEffect] props post state',
-  //     props.postState,
-  //   );
-  //   // for only postpostState
-  //   if (!props.postState.isComment) {
-  //     setPostState(props.postState);
+  //   // only for post
+  //   if (!postState.isComment) {
+  //     // update voted flag
+  //     const _state = {...postState, voted: }
+  //     setVoted(postState.voted);
+  //     // update payout
+  //     setVotingDollar(postState.payout);
   //   }
-  // }, [props.postState]);
+  // }, [postState]);
 
-  // useEffect(() => {
-  //   // for only post
-  //   if (!props.postState.isComment) {
-  //     setPostState(props.postState);
-  //   }
-  // }, [voted]);
-
-  const _processVoting = async (votingWeight: number) => {
-    // check sanity
+  //// handle press vote icon of action bar
+  const _handlePressVoteIcon = () => {
+    // get vote amount of ther user
+    const voteAmount = parseFloat(userState.profileData.profile.voteAmount);
+    console.log('[Action] _onPressVoteIcon');
+    // set vote amount to string state which is a string
+    setVotingDollar(voteAmount.toFixed(2));
     if (!authState.loggedIn) {
-      return false;
+      console.log('You need to login to vote');
+      setToastMessage(intl.formatMessage({id: 'Actionbar.vote_wo_login'}));
+      return;
     }
+    console.log('[_onPressVoteIcon] voted', postState.voted);
+    // check if the user votes before
+    if (postState.voted) {
+      console.log('You already voted on this post');
+      setToastMessage(intl.formatMessage({id: 'Actionbar.vote_again'}));
+      return;
+    }
+    console.log('vote amount', voteAmount);
+    // show voting modal
+    setShowVotingModal(true);
+  };
 
-    console.log('_processVoting. props, userState', props, userState);
-
+  //// handle press the vote button in the voting modal
+  const _handlePressVote = async () => {
+    // check sanity
+    if (!authState.loggedIn) return;
+    // get credentials
+    const {username, password} = authState.currentCredentials;
+    // set loading
+    setVoting(true);
+    // hide voting modal
+    setShowVotingModal(false);
+    // submit upvote transaction
     const results = await upvote(
       props.postsType,
       props.postIndex,
       postState.isComment,
       postState.post_ref,
-      authState.currentCredentials.username,
-      authState.currentCredentials.password,
+      username,
+      password,
       votingWeight,
       parseFloat(userState.profileData.profile.voteAmount),
     );
     console.log('[ActionBarContainer|_processVoting] results', results);
     if (results) {
+      // show toast
       setToastMessage(intl.formatMessage({id: 'Actionbar.voted'}));
-      // update the post state
-      setPostState(
-        postsState[postsState.postsType].posts[props.postIndex].state,
-      );
-      return true;
+      //// update voting related states
+      // get vote amount of ther user
+      const voteAmount = parseFloat(userState.profileData.profile.voteAmount);
+      // new payout estimate
+      const _payout = (
+        parseFloat(postState.payout) +
+        (voteAmount * votingWeight) / 100
+      ).toFixed(2);
+      // append the user to ther voters
+      const _voters = [`${username} (${voteAmount})`, ...postState.voters];
+      // update states
+      const _state = {
+        ...postState,
+        voted: true,
+        payout: _payout,
+        voters: _voters,
+      };
     }
-    return false;
+    // cancel loading
+    setVoting(false);
   };
 
+  //// handle press a voter
   const _handlePressVoter = (voter: string) => {
+    // set author param in the UIContext
     setAuthorParam(voter);
+    // if the author is the user, then navigate to the profile, otherwise, navigate to the author profile
     if (authState.currentCredentials.username === voter) {
       navigate({name: 'Profile'});
     } else {
@@ -100,9 +138,9 @@ const ActionBarContainer = (props: Props): JSX.Element => {
     }
   };
 
-  ////
+  //// handle press edit button
   const _handlePressEditPost = () => {
-    // set edit mode
+    // set edit mode in the UIContext
     setEditMode(true);
     // navigate to the posting
     navigate({name: 'Posting'});
@@ -118,17 +156,21 @@ const ActionBarContainer = (props: Props): JSX.Element => {
       authState.currentCredentials.username,
       postState.title,
     );
+    // update the post state
+    const _state = {...postState, bookmarked: true};
+    setPostState(_state);
   };
 
-  ////
+  //// handle press a reblog button
   const _handlePressReblog = async () => {
+    // check sanity
     if (!authState.loggedIn) return;
     const {username, password} = authState.currentCredentials;
     const {author, permlink} = postState.post_ref;
     const {chainProps} = userState.globalProps;
     const op_fee = parseFloat(chainProps.operation_flat_fee.split(' ')[0]);
     const bw_fee = parseFloat(chainProps.bandwidth_kbytes_fee.split(' ')[0]);
-
+    // submit reblog transaction
     const result = await reblog(
       username,
       password,
@@ -137,24 +179,44 @@ const ActionBarContainer = (props: Props): JSX.Element => {
       op_fee,
       bw_fee,
     );
+    // handle the result
+    if (result) {
+      setToastMessage(intl.formatMessage({id: 'Actionbar.reblogged'}));
+    }
   };
 
-  ////
-  const _handlePressTranslation = (showOriginal: boolean) => {
-    props.handlePressTranslation(showOriginal);
+  //// handle press the translation button
+  const _handlePressTranslation = () => {
+    const _showOriginal = !showOriginal;
+    setShowOriginal(showOriginal);
+    // call the given function
+    props.handlePressTranslation(_showOriginal);
   };
 
-  ////
+  //// handle press the share button
   const _handlePressShare = () => {
     // open sharing ui
     const message = `${BLURT_BASE_URL}${props.postUrl}`;
     console.log('_handlePressShare. message', message);
     Share.share({
-      title: "Let's Blurt",
+      title: intl.formatMessage({id: 'title'}),
       message: message,
     });
   };
 
+  //// handle slide completion event
+  const _handleVotingSlidingComplete = (weight: number) => {
+    // get vote amount of ther user
+    const voteAmount = parseFloat(userState.profileData.profile.voteAmount);
+    const price = (voteAmount * weight) / 100;
+    setVotingDollar(price.toFixed(2));
+    setVotingWeight(weight);
+  };
+
+  //// handle cancel voting modal
+  const handleCancelVotingModal = () => {
+    setShowVotingModal(false);
+  };
   return (
     <ActionBarView
       actionBarStyle={props.actionBarStyle}
@@ -164,8 +226,16 @@ const ActionBarContainer = (props: Props): JSX.Element => {
       isUser={
         authState.currentCredentials.username === postState.post_ref.author
       }
+      showVotingModal={showVotingModal}
+      voting={voting}
+      votingDollar={votingDollar}
+      votingWeight={votingWeight}
       voteAmount={parseFloat(userState.profileData.profile.voteAmount)}
-      handlePressVoting={_processVoting}
+      showOriginal={showOriginal}
+      handleCancelVotingModal={handleCancelVotingModal}
+      handlePressVoteIcon={_handlePressVoteIcon}
+      handleVotingSlidingComplete={_handleVotingSlidingComplete}
+      handlePressVoting={_handlePressVote}
       handlePressEditPost={_handlePressEditPost}
       handlePressReply={props.handlePressReply}
       handlePressComments={props.handlePressComments}

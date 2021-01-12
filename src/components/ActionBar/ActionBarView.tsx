@@ -1,43 +1,42 @@
-import React, {useState, useEffect, useContext} from 'react';
-
+//// react
+import React from 'react';
+//// react native
 import {
   View,
   StyleSheet,
   Dimensions,
-  Image,
-  ActivityIndicator,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  ActionSheetIOS,
-  Share,
-  //  Slider,
 } from 'react-native';
-import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
+import {Block, Icon, Button, Text, theme} from 'galio-framework';
 // html render
 const {width} = Dimensions.get('screen');
 import {useIntl} from 'react-intl';
 import Modal from 'react-native-modal';
 import Slider from '@react-native-community/slider';
-import {materialTheme} from '~/constants/materialTheme';
 import {argonTheme} from '~/constants/argonTheme';
-import {AccountScreen} from '~/screens/signup/screen/Account';
 
 import {ActionBarStyle} from '~/constants/actionBarTypes';
 import {PostState} from '~/contexts/types';
 import ModalDropdown from 'react-native-modal-dropdown';
 
-import {UIContext} from '~/contexts';
-import {PostRef} from '~/contexts/types';
-import {navigate} from '~/navigation/service';
-
+//// props
 interface Props {
   postState: PostState;
   postIndex?: number;
   actionBarStyle: ActionBarStyle;
   username: string;
   isUser: boolean;
+  showVotingModal: boolean;
+  voting: boolean;
   voteAmount: number;
-  handlePressVoting: (votingWeight: number) => Promise<boolean>;
+  votingDollar: string;
+  votingWeight: number;
+  showOriginal: boolean;
+  handleCancelVotingModal: () => void;
+  handlePressVoteIcon: () => void;
+  handleVotingSlidingComplete: (weight: number) => void;
+  handlePressVoting: (votingWeight: number) => void;
   handlePressComments?: () => void;
   handlePressEditPost?: () => void;
   handlePressEditComment?: () => void;
@@ -47,128 +46,37 @@ interface Props {
   handlePressReply?: () => void;
   handlePressVoter?: (voter: string) => void;
   handlePressReblog?: () => void;
-  handlePressTranslation?: (showOriginal: boolean) => void;
+  handlePressTranslation?: () => void;
 }
 
 const ActionBarView = (props: Props): JSX.Element => {
   // props
-  const {actionBarStyle, postState, handlePressVoting} = props;
-  const {voteAmount, isUser} = props;
+  const {actionBarStyle, postState} = props;
   // language
   const intl = useIntl();
-  // contexts
-  const {setToastMessage} = useContext(UIContext);
-  // states
-  const [voting, setVoting] = useState(false);
-  const [voted, setVoted] = useState(postState.voted);
-  const [voters, setVoters] = useState(postState.voters);
-  const [payout, setPayout] = useState(postState.payout);
-  const [commentCount, setCommentCount] = useState(postState.comment_count);
-  const [bookmarked, setBookmarked] = useState(postState.bookmarked);
-  const [bookmarking, setBookmarking] = useState(false);
-  const [votingWeight, setVotingWeight] = useState(100);
-  const [votingDollar, setVotingDollar] = useState<string>(postState.payout);
-  const [showVotingModal, setShowVotingModal] = useState(false);
-  const [showEdit, setShowEdit] = useState(false);
-  const [showOriginal, setShowOriginal] = useState(true);
-
-  //////// use effects
-  // callback when postsState changes only for post
-  useEffect(() => {
-    // only for post
-    if (!postState.isComment) {
-      // update voted flag
-      setVoted(postState.voted);
-      // update payout
-      setVotingDollar(postState.payout);
-    }
-  }, [postState]);
-
-  //////// functions
-  //// handle press vote icon of action bar
-  const _onPressVoteIcon = () => {
-    console.log('[Action] _onPressVoteIcon');
-    setVotingDollar(voteAmount.toFixed(2));
-    if (!props.username) {
-      console.log('You need to login to vote');
-      setToastMessage(intl.formatMessage({id: 'Actionbar.vote_wo_login'}));
-      return;
-    }
-    console.log('[_onPressVoteIcon] voted', voted);
-    if (voted) {
-      //      console.log('You already voted on this post');
-      setToastMessage(intl.formatMessage({id: 'Actionbar.vote_again'}));
-      return;
-    }
-    console.log('vote amount', voteAmount);
-    // get voting value
-    if (voteAmount < 0.01) {
-      console.log('voting value is too low', voteAmount);
-      //      return;
-    }
-    // show voting modal
-    setShowVotingModal(true);
-  };
-
-  //// handle press vote
-  const _onPressVote = async () => {
-    setVoting(true);
-    setShowVotingModal(false);
-    const _voted = await handlePressVoting(votingWeight);
-    setVoting(false);
-    if (_voted) {
-      setVoted(_voted);
-      // update payout
-      const _payout = (
-        parseFloat(payout) +
-        (voteAmount * votingWeight) / 100
-      ).toFixed(2);
-      setPayout(_payout);
-      // update the voters and the count
-      const _voters = [`${props.username} (${voteAmount})`, ...voters];
-      setVoters(_voters);
-    }
-  };
-
-  //// handle press share icon of action bar
-  const _onPressShare = () => {
-    console.log('[ActionBar] onPressShare');
-    props.handlePressShare();
-  };
-
-  const _onPressTranslate = () => {
-    const _showOriginal = !showOriginal;
-    setShowOriginal(_showOriginal);
-    props.handlePressTranslation(!_showOriginal);
-  };
-
-  //// handle slide completion event
-  const _onVotingSlidingComplete = (weight: number) => {
-    const price = (voteAmount * weight) / 100;
-    setVotingDollar(price.toFixed(2));
-    setVotingWeight(weight);
-  };
 
   //// render voting modal
   const _renderVotingModal = () => {
     // return if voting finishes
-    if (voted) return null;
+    if (postState.voted) return null;
 
     return (
       <Modal
-        isVisible={showVotingModal}
+        isVisible={props.showVotingModal}
         animationIn="zoomIn"
         animationOut="zoomOut"
-        onBackdropPress={() => setShowVotingModal(false)}>
+        onBackdropPress={props.handleCancelVotingModal}>
         <Block card center style={styles.votingContainer}>
           <Text color={argonTheme.COLORS.ERROR}>
-            {votingWeight} % ({votingDollar} B)
+            {props.votingWeight} % ({props.votingDollar} B)
           </Text>
 
           <Slider
             style={{width: width * 0.5, height: 40}}
             value={100}
-            onValueChange={(weight) => _onVotingSlidingComplete(weight)}
+            onValueChange={(weight) =>
+              props.handleVotingSlidingComplete(weight)
+            }
             minimumValue={0}
             maximumValue={100}
             step={1}
@@ -178,7 +86,7 @@ const ActionBarView = (props: Props): JSX.Element => {
             color={argonTheme.COLORS.ERROR}
             name="upcircleo"
             family="antdesign"
-            onPress={_onPressVote}
+            onPress={props.handlePressVoting}
           />
         </Block>
       </Modal>
@@ -201,13 +109,13 @@ const ActionBarView = (props: Props): JSX.Element => {
             size={actionBarStyle.textSize}
             color={argonTheme.COLORS.ERROR}
             style={{paddingRight: 5}}>
-            {payout} B
+            {postState.payout} B
           </Text>
           <Button
-            onPress={_onPressVoteIcon}
-            loading={voting}
+            onPress={props.handlePressVoteIcon}
+            loading={props.voting}
             onlyIcon
-            icon={voted ? 'upcircleo' : 'upcircle'}
+            icon={postState.voted ? 'upcircleo' : 'upcircle'}
             iconFamily="antdesign"
             iconSize={actionBarStyle.iconSize}
             color={argonTheme.COLORS.ERROR}
@@ -221,7 +129,7 @@ const ActionBarView = (props: Props): JSX.Element => {
           />
         </Block>
         <ModalDropdown
-          options={voters}
+          options={postState.voters}
           renderRow={_renderVoterRow}
           dropdownStyle={{
             backgroundColor: argonTheme.COLORS.DEFAULT,
@@ -237,7 +145,9 @@ const ActionBarView = (props: Props): JSX.Element => {
               name="chevron-up"
               family="material-community"
             />
-            <Text size={actionBarStyle.textSize}>{voters.length}</Text>
+            <Text size={actionBarStyle.textSize}>
+              {postState.voters.length}
+            </Text>
           </Block>
         </ModalDropdown>
 
@@ -250,7 +160,7 @@ const ActionBarView = (props: Props): JSX.Element => {
                 </Text>
               </Block>
             </TouchableWithoutFeedback>
-            {isUser ? (
+            {props.isUser ? (
               <TouchableWithoutFeedback onPress={props.handlePressEditComment}>
                 <Block row style={{paddingRight: 10}}>
                   <Text size={actionBarStyle.textSize}>
@@ -270,21 +180,19 @@ const ActionBarView = (props: Props): JSX.Element => {
                 family="font-awesome"
                 style={{paddingRight: 2}}
               />
-              <Text size={actionBarStyle.textSize}>{commentCount}</Text>
+              <Text size={actionBarStyle.textSize}>
+                {postState.comment_count}
+              </Text>
             </Block>
           </TouchableWithoutFeedback>
         )}
         {actionBarStyle.bookmark ? (
-          <TouchableWithoutFeedback
-            onPress={() => {
-              setBookmarked(true);
-              props.handlePressBookmark();
-            }}>
+          <TouchableWithoutFeedback onPress={props.handlePressBookmark}>
             <Block row style={{paddingRight: 10}}>
               <Icon
                 size={actionBarStyle.iconSize}
                 color={argonTheme.COLORS.ERROR}
-                name={bookmarked ? 'heart' : 'hearto'}
+                name={postState.bookmarked ? 'heart' : 'hearto'}
                 family="antdesign"
                 style={{paddingHorizontal: 10}}
               />
@@ -305,7 +213,7 @@ const ActionBarView = (props: Props): JSX.Element => {
           </TouchableOpacity>
         ) : null}
         {actionBarStyle.share ? (
-          <TouchableWithoutFeedback onPress={_onPressShare}>
+          <TouchableWithoutFeedback onPress={props.handlePressShare}>
             <Block row style={{paddingRight: 10}}>
               <Icon
                 size={actionBarStyle.iconSize}
@@ -318,12 +226,12 @@ const ActionBarView = (props: Props): JSX.Element => {
           </TouchableWithoutFeedback>
         ) : null}
         {actionBarStyle.translation ? (
-          <TouchableWithoutFeedback onPress={_onPressTranslate}>
+          <TouchableWithoutFeedback onPress={props.handlePressTranslation}>
             <Block row style={{top: 0}}>
               <Icon
                 size={18}
                 color={
-                  showOriginal
+                  props.showOriginal
                     ? argonTheme.COLORS.ERROR
                     : argonTheme.COLORS.FACEBOOK
                 }
@@ -334,11 +242,19 @@ const ActionBarView = (props: Props): JSX.Element => {
             </Block>
           </TouchableWithoutFeedback>
         ) : null}
-        {actionBarStyle.bookmark && isUser ? (
-          <TouchableWithoutFeedback onPress={props.handlePressEditPost}>
-            <Text>{intl.formatMessage({id: 'edit'})}</Text>
-          </TouchableWithoutFeedback>
-        ) : null}
+        {actionBarStyle.bookmark && props.isUser ? (
+          <Icon
+            size={18}
+            color={argonTheme.COLORS.ERROR}
+            name="pencil"
+            family="font-awesome"
+            style={{paddingHorizontal: 5}}
+            onPress={props.handlePressEditPost}
+          />
+        ) : // <TouchableWithoutFeedback onPress={props.handlePressEditPost}>
+        //   <Text>{intl.formatMessage({id: 'edit'})}</Text>
+        // </TouchableWithoutFeedback>
+        null}
       </Block>
       {_renderVotingModal()}
     </Block>
