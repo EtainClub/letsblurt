@@ -5,6 +5,8 @@ import {PostBodyView} from './PostBodyView';
 import {UIContext, AuthContext, PostsContext} from '~/contexts';
 import {navigate} from '~/navigation/service';
 
+import {Text} from 'react-native';
+
 interface Props {
   body: string;
   commentDepth?: number;

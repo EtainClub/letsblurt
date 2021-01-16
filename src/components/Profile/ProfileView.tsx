@@ -152,13 +152,13 @@ const ProfileView: React.FC<Props> = ({
           <Text
             size={14}
             color="#32325D"
-            style={{marginTop: 10, fontFamily: 'open-sans-light'}}>
+            style={{marginTop: 10}}>
             {profile.metadata.about}
           </Text>
           <Text
             size={14}
             color="#32325D"
-            style={{marginTop: 10, fontFamily: 'open-sans-light'}}>
+            style={{marginTop: 10}}>
             {profile.metadata.location}
           </Text>
           <TouchableOpacity onPress={_handlePressWebsite}>
@@ -171,13 +171,11 @@ const ProfileView: React.FC<Props> = ({
               size={18}
               color="#525F7F"
               style={{
-                marginBottom: 4,
-                fontFamily: 'open-sans-bold',
+                marginBottom: 4
               }}>
               {getNumberStat(profile.stats.post_count)}
             </Text>
             <Text
-              style={{fontFamily: 'open-sans-regular'}}
               size={12}
               color={argonTheme.COLORS.TEXT}>
               {intl.formatMessage({id: 'Profile.postings'})}
@@ -189,12 +187,10 @@ const ProfileView: React.FC<Props> = ({
               size={18}
               style={{
                 marginBottom: 4,
-                fontFamily: 'open-sans-bold',
               }}>
               {getNumberStat(parseInt(profile.power))}
             </Text>
             <Text
-              style={{fontFamily: 'open-sans-regular'}}
               size={12}
               color={argonTheme.COLORS.TEXT}>
               {intl.formatMessage({id: 'Profile.power'})}
@@ -206,12 +202,10 @@ const ProfileView: React.FC<Props> = ({
               size={18}
               style={{
                 marginBottom: 4,
-                fontFamily: 'open-sans-bold',
               }}>
               {profile.voteAmount} B
             </Text>
             <Text
-              style={{fontFamily: 'open-sans-regular'}}
               size={12}
               color={argonTheme.COLORS.TEXT}>
               {intl.formatMessage({id: 'Profile.vote_amount'})}

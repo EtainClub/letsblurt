@@ -2,7 +2,6 @@ import React, {useState, useEffect, useContext, useCallback} from 'react';
 // keychain to store data securely
 import * as Keychain from 'react-native-keychain';
 import {useFocusEffect} from '@react-navigation/native';
-import {FeedScreen} from '../screen/Feed';
 import SplashScreen from 'react-native-splash-screen';
 import {navigate} from '~/navigation/service';
 import {

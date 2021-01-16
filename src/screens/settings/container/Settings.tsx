@@ -574,6 +574,7 @@ const SettingsContainer = (props: Props): JSX.Element => {
             break;
           case SettingUITypes.TRANSLATION:
             defaultText = translation;
+            if (item.options)
             selectedIndex = item.options.indexOf(translation);
             break;
           default:
@@ -593,7 +594,7 @@ const SettingsContainer = (props: Props): JSX.Element => {
               style={styles.dropdown}
               dropdownStyle={styles.dropdownStyle}
               textStyle={styles.dropdownText}
-              options={item.options}
+              options={item.options || []}
               onSelect={(index, value) =>
                 _handleDropdownChange(item.id, index, value)
               }

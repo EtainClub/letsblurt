@@ -94,7 +94,7 @@ const WalletStatsView = (props: Props): JSX.Element => {
           family={item.iconType}
         />
         <Text
-          style={{textAlign: 'left', fontFamily: 'open-sans-regular'}}
+          style={{textAlign: 'left'}}
           color="#525F7F"
           size={12}>
           {!hideOp &&
@@ -246,14 +246,13 @@ const WalletStatsView = (props: Props): JSX.Element => {
               props.isUser && (
                 <Block style={styles.title}>
                   <Text
-                    style={{fontFamily: 'open-sans-bold', paddingBottom: 5}}
+                    style={{paddingBottom: 5}}
                     center
                     size={16}
                     color={argonTheme.COLORS.TEXT}>
                     {intl.formatMessage({id: 'Wallet.transaction_header'})}
                   </Text>
                   <Text
-                    style={{fontFamily: 'open-sans-regular'}}
                     center
                     size={12}
                     color={argonTheme.COLORS.TEXT}>
