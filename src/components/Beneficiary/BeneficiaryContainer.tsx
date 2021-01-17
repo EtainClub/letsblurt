@@ -64,6 +64,7 @@ const BeneficiaryContainer = (props: Props): JSX.Element => {
   const _handlePressAuthor = (_author: string) => {
     // set selected author
     setAuthor(_author);
+    console.log('hanle press author', _author);
     // close modal
     setShowAuthorsModal(false);
   };
