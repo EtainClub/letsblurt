@@ -60,7 +60,6 @@ const BeneficiaryView = (props: Props): JSX.Element => {
     console.log('bene list', beneficiaries);
     return beneficiaries.map((item, index) => {
       const {account, weight} = item;
-      console.log('weight', weight);
       const avatar = `${props.imageServer}/u/${account}/avatar`;
       return (
         <Block
