@@ -1,12 +1,19 @@
 //// react
 import React, {useState, useContext, useEffect} from 'react';
 //// react native
+import {View} from 'react-native';
 //// config
 import Config from 'react-native-config';
 //// language
+import {useIntl} from 'react-intl';
 //// contexts
 import {SettingsContext} from '~/contexts';
+//// components
+import {AuthorList} from '~/components';
+//// views
 import {BeneficiaryView} from './BeneficiaryView';
+//// constants
+export const WEIGHT_OPTIONS = ['100', '75', '50', '25', '10', '0'];
 
 export interface BeneficiaryItem {
   account: string;
@@ -20,14 +27,47 @@ interface Props {
   getBeneficiaries: (beneficiaries: any[]) => void;
 }
 const BeneficiaryContainer = (props: Props): JSX.Element => {
+  //// language
+  const intl = useIntl();
   //// contexts
   const {settingsState} = useContext(SettingsContext);
   //// states
   const [beneficiaries, setBeneficiaries] = useState<BeneficiaryItem[]>(
     props.beneficiaries,
   );
-  //// effect
-  ////
+  const [showModal, setShowModal] = useState(true);
+  const [showAuthorsModal, setShowAuthorsModal] = useState(false);
+  const [author, setAuthor] = useState('');
+  const [weight, setWeight] = useState('0');
+  const [appended, setAppended] = useState(false);
+  const [refresh, setRefresh] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  //////// events
+  //// event: beneficiary appended
+  useEffect(() => {
+    if (appended) {
+      setAppended(false);
+      setRefresh(true);
+    }
+  }, [appended]);
+
+  //////// functions
+
+  //// handle change account name
+  const _handleChangeAccount = () => {
+    // show authors list
+    setShowAuthorsModal(true);
+  };
+
+  //// handle press author
+  const _handlePressAuthor = (_author: string) => {
+    // set selected author
+    setAuthor(_author);
+    // close modal
+    setShowAuthorsModal(false);
+  };
+  //// add beneficiary
   const _addBeneficiary = (beneficiary: BeneficiaryItem) => {
     //
     console.log('beneficiaries', beneficiaries);
@@ -57,7 +97,63 @@ const BeneficiaryContainer = (props: Props): JSX.Element => {
     // return false;
   };
 
+  /// handle weight change
+  const _handleChangeWeight = (_weight: string) => {
+    // set weight
+    setWeight(_weight);
+  };
+
+  //// handle press add a new beneficiary
+  const _handlePressAdd = () => {
+    //
+    if (author === '' || weight === '') return;
+    // check uniqueness
+    const duplicated = beneficiaries.some((item) => item.account === author);
+    if (duplicated) return;
+    // append
+    const _appended = _addBeneficiary({
+      account: author,
+      weight: parseInt(weight) * 100,
+    });
+    if (_appended) {
+      setAppended(true);
+      // clear inputs
+      setAuthor('');
+      setWeight('');
+    } else {
+      setErrorMessage(intl.formatMessage({id: 'Beneficiary.error_total'}));
+    }
+  };
+
   ////
+  const _handlePressSave = () => {
+    // send back the beneficiary list
+    let valid = true;
+    // check sum of weights
+    let sum = 0;
+    beneficiaries.forEach((item) => {
+      if (item.weight < 0) valid = false;
+      sum += item.weight;
+    });
+    if (sum < 0 || sum > 10000) valid = false;
+
+    // handle error
+    if (!valid) {
+      setErrorMessage(intl.formatMessage({id: 'Beneficiary.error_total'}));
+      return;
+    }
+
+    //// handle success
+    // return the resulting beneficiaries to the parent
+    props.getBeneficiaries(beneficiaries);
+    // clear inputs
+    setAuthor('');
+    setWeight('');
+    // close modal
+    setShowModal(false);
+  };
+
+  //// remove beneficiary from the list
   const _removeBeneficiary = (beneficiary: BeneficiaryItem) => {
     const {account, weight} = beneficiary;
     // remove the account
@@ -68,31 +164,31 @@ const BeneficiaryContainer = (props: Props): JSX.Element => {
     setBeneficiaries(_list);
   };
 
-  ////
-  const _handlePressSave = () => {
-    let valid = true;
-    // check sum of weights
-    let sum = 0;
-    beneficiaries.forEach((item) => {
-      if (item.weight < 0) valid = false;
-      sum += item.weight;
-    });
-    if (!valid) return false;
-    if (sum < 0 || sum > 10000) return false;
-    // return the resulting beneficiaries
-    props.getBeneficiaries(beneficiaries);
-    return true;
-  };
-
   return (
-    <BeneficiaryView
-      sourceList={props.sourceList}
-      beneficiaries={beneficiaries}
-      imageServer={settingsState.blockchains.image}
-      handlePressRemove={_removeBeneficiary}
-      addBeneficiary={_addBeneficiary}
-      handlePressSave={_handlePressSave}
-    />
+    <View>
+      <BeneficiaryView
+        author={author}
+        weight={weight}
+        beneficiaries={beneficiaries}
+        showModal={showModal}
+        refresh={refresh}
+        errorMessage={errorMessage}
+        imageServer={settingsState.blockchains.image}
+        handleChangeAccount={_handleChangeAccount}
+        handleChangeWeight={_handleChangeWeight}
+        handlePressAdd={_handlePressAdd}
+        handlePressRemove={_removeBeneficiary}
+        handlePressSave={_handlePressSave}
+        handleCancelModal={() => setShowModal(false)}
+      />
+      {showAuthorsModal && (
+        <AuthorList
+          authors={props.sourceList}
+          handlePressAuthor={_handlePressAuthor}
+          cancelModal={() => setShowAuthorsModal(false)}
+        />
+      )}
+    </View>
   );
 };
 

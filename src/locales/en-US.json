@@ -153,8 +153,9 @@
   "Beneficiary": {
     "header": "Beneficiary Setting",
     "list_header": "Beneficiary List",
+    "choose_account": "Choose",
     "account_placeholder": "Account",
-    "weight_placeholder": "Weight (%)",
+    "weight_placeholder": "Weight",
     "add_button": "Add",
     "save_button": "Save",
     "cancel_button": "Cancel",
