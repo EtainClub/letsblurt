@@ -30,6 +30,7 @@ interface Props {
   handleContainerHeight: (event: any) => void;
   handleUploadedImageURL: (url: string) => void;
   handlePressMention: () => void;
+  handlePressClear: () => void;
 }
 const EditorView = (props: Props): JSX.Element => {
   //// props
@@ -112,6 +113,7 @@ const EditorView = (props: Props): JSX.Element => {
               color={argonTheme.COLORS.FACEBOOK}
             />
             <Button
+              onPress={props.handlePressClear}
               onlyIcon
               icon="trash"
               iconFamily="font-awesome"

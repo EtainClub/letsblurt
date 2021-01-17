@@ -21,11 +21,13 @@ interface Props {
   originalPost?: string;
   depth?: number;
   close?: boolean;
+  clearBody?: boolean;
   handleBodyChange?: (body: string) => void;
   handleSubmitComment?: (text: string) => Promise<boolean>;
 }
 const EditorContainer = (props: Props): JSX.Element => {
   //// props
+  const {clearBody} = props;
   //// language
   //// contexts
   const {userState} = useContext(UserContext);
@@ -46,6 +48,12 @@ const EditorContainer = (props: Props): JSX.Element => {
   useEffect(() => {
     setTimeout(() => setEditable(true), 100);
   }, []);
+  //// event: clear body
+  useEffect(() => {
+    if (clearBody) {
+      setBody('');
+    }
+  }, [clearBody]);
 
   //// edit event. set body
   useEffect(() => {
@@ -93,7 +101,6 @@ const EditorContainer = (props: Props): JSX.Element => {
   };
 
   const _handleBodyChange = (text: string) => {
-    console.log('_handleBodyChange. text', text);
     // check validity:
     setBody(text);
     // return the body (markdown) to the parent
@@ -167,6 +174,11 @@ const EditorContainer = (props: Props): JSX.Element => {
     }
   };
 
+  //// clear body
+  const _handlePressClear = () => {
+    setBody('');
+  };
+
   return (
     <Block>
       <EditorView
@@ -184,6 +196,7 @@ const EditorContainer = (props: Props): JSX.Element => {
         handleContainerHeight={_handleContainerHeight}
         handleUploadedImageURL={_handleUploadedImageURL}
         handlePressMention={_handlePressMention}
+        handlePressClear={_handlePressClear}
       />
       {showAuthorsModal && (
         <AuthorList

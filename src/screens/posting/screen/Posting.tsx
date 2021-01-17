@@ -17,31 +17,42 @@ import {PostData} from '~/contexts/types';
 //// components
 import {PostBody, Editor} from '~/components';
 //// constants
-const MAX_TAGS = 5;
-const BACKGROUND_COLORS = [
-  argonTheme.COLORS.BORDER,
-  argonTheme.COLORS.SECONDARY,
-];
-
-type Position = {
-  start: number;
-  end: number;
-};
 
 interface Props {
+  title: string;
+  body: string;
+  previewBody: string;
+  rewardIndex: number;
+  tagMessage: string;
   originalPost?: PostData;
   uploading: boolean;
   uploadedImage: {};
   posting: boolean;
-  handlePressPostSumbit: (title: string, body: string, tags: string) => void;
+  tags: string;
+  clearBody?: boolean;
+  handleTitleChange: (title: string) => void;
+  handleBodyChange: (body: string) => void;
+  handleTagsChange: (tags: string) => void;
+  handleRewardChange: (index: number) => void;
+  handlePressPostSumbit: () => void;
   followingList?: string[];
   handlePressBeneficiary: () => void;
+  handleClearAll: () => void;
   handleCancelEditing: () => void;
 }
 
 const PostingScreen = (props: Props): JSX.Element => {
   //// props
-  const {originalPost} = props;
+  const {
+    title,
+    body,
+    tags,
+    previewBody,
+    rewardIndex,
+    tagMessage,
+    originalPost,
+    clearBody,
+  } = props;
   let markdownBody = '';
   if (originalPost) markdownBody = originalPost.markdownBody;
   //// language
@@ -50,115 +61,33 @@ const PostingScreen = (props: Props): JSX.Element => {
   const inputRef = useRef(null);
   //// contexts
   const {userState, getFollowings} = useContext(UserContext);
-  // states
-  const [title, setTitle] = useState('');
+  //// states
+  // this is a workaround to use copy/paste
   const [titleEditable, setTitleEditable] = useState(false);
-  const [body, setBody] = useState('');
-  const [previewBody, setPreviewBody] = useState('');
-  const [tags, setTags] = useState('');
-  const [message, setMessage] = useState(null);
-  const [rewardIndex, setRewardIndex] = useState(0);
 
   //////// events
   //// mount
   useEffect(() => {
     setTimeout(() => setTitleEditable(true), 100);
   }, []);
-  //// set original post event
-  useEffect(() => {
-    if (originalPost) {
-      setTitle(originalPost.state.title);
-      setBody(markdownBody);
-      // tags
-      const _tags = originalPost.metadata.tags.reduce(
-        (tagString, tag) => tagString + tag + ' ',
-        '',
-      );
-      setTags(_tags);
-      // get html from markdown
-      const _body = renderPostBody(markdownBody, true);
-      // set preview
-      setPreviewBody(_body);
-    }
-  }, [originalPost]);
 
-  const _handleTitleChange = (text: string) => {
-    // check validity: max-length
-    setTitle(text);
-  };
-
-  const _handleTagsChange = (text: string) => {
-    // check validity: maximum tags, wrong tag, max-length-per-tag
-    setTags(text);
-    const tagString = text.replace(/,/g, ' ').replace(/#/g, '');
-    let cats = tagString.split(' ');
-    // validate
-    _validateTags(cats);
-  };
-
-  //// validate the tags
-  const _validateTags = (tags: string[]) => {
-    if (tags.length > 0) {
-      tags.length > MAX_TAGS
-        ? setMessage(intl.formatMessage({id: 'Posting.limited_tags'}))
-        : tags.find((c) => c.length > 24)
-        ? setMessage(intl.formatMessage({id: 'Posting.limited_length'}))
-        : tags.find((c) => c.split('-').length > 2)
-        ? setMessage(intl.formatMessage({id: 'Posting.limited_dash'}))
-        : tags.find((c) => c.indexOf(',') >= 0)
-        ? setMessage(intl.formatMessage({id: 'Posting.limited_space'}))
-        : tags.find((c) => /[A-Z]/.test(c))
-        ? setMessage(intl.formatMessage({id: 'Posting.limited_lowercase'}))
-        : tags.find((c) => !/^[a-z0-9-#]+$/.test(c))
-        ? setMessage(intl.formatMessage({id: 'Posting.limited_characters'}))
-        : tags.find((c) => !/^[a-z-#]/.test(c))
-        ? setMessage(intl.formatMessage({id: 'Posting.limited_firstchar'}))
-        : tags.find((c) => !/[a-z0-9]$/.test(c))
-        ? setMessage(intl.formatMessage({id: 'Posting.limited_lastchar'}))
-        : setMessage(null);
-    }
-  };
-
-  ////
-  const _onPressPostSubmit = () => {
-    props.handlePressPostSumbit(title, body, tags);
-  };
-
-  //// clear contents
-  const _clearContents = () => {
-    setTitle('');
-    setBody('');
-    setTags('');
-    setPreviewBody('');
-    setMessage(null);
-  };
-  const _onPressClear = () => {
-    _clearContents();
-  };
-
-  //// cancel editing
-  const _onPressCancel = () => {
-    console.log('[Posting] _onPressCancel');
-    // clear contents
-    _clearContents();
-    // go back
-    props.handleCancelEditing();
-  };
-
-  //// handle reward option chnage
-  const _handleRewardChange = (index: number, value: string) => {
-    console.log('_handleRewardChange index', index);
-    setRewardIndex(index);
-  };
-
-  ////
-  const _handleBodyChange = (_body: string) => {
-    // set body
-    setBody(_body);
-    // set preview
-    const _preview = renderPostBody(_body, true);
-    setPreviewBody(_preview);
-  };
+  // //// set original post event
+  // useEffect(() => {
+  //   if (originalPost) {
+  //     setTitle(originalPost.state.title);
+  //     setBody(markdownBody);
+  //     // tags
+  //     const _tags = originalPost.metadata.tags.reduce(
+  //       (tagString, tag) => tagString + tag + ' ',
+  //       '',
+  //     );
+  //     setTags(_tags);
+  //     // get html from markdown
+  //     const _body = renderPostBody(markdownBody, true);
+  //     // set preview
+  //     setPreviewBody(_body);
+  //   }
+  // }, [originalPost]);
 
   //// render preview of posting
   const _renderPreview = () => (
@@ -182,7 +111,7 @@ const PostingScreen = (props: Props): JSX.Element => {
             <Input
               value={title}
               editable={titleEditable}
-              onChangeText={_handleTitleChange}
+              onChangeText={props.handleTitleChange}
               maxLength={100}
               borderless
               color="black"
@@ -197,7 +126,8 @@ const PostingScreen = (props: Props): JSX.Element => {
           <Editor
             isComment={false}
             originalPost={markdownBody}
-            handleBodyChange={_handleBodyChange}
+            clearBody={clearBody}
+            handleBodyChange={props.handleBodyChange}
           />
 
           <Block style={{paddingHorizontal: theme.SIZES.BASE}}>
@@ -208,9 +138,9 @@ const PostingScreen = (props: Props): JSX.Element => {
               bgColor="transparent"
               style={styles.input}
               value={tags}
-              onChangeText={_handleTagsChange}
+              onChangeText={props.handleTagsChange}
             />
-            {message && <Text color="red">{message}</Text>}
+            <Text color="red">{tagMessage}</Text>
           </Block>
           <Block row>
             <DropdownModal
@@ -223,7 +153,7 @@ const PostingScreen = (props: Props): JSX.Element => {
               dropdownStyle={styles.dropdownStyle}
               textStyle={styles.dropdownText}
               options={rewardOptions}
-              onSelect={_handleRewardChange}
+              onSelect={props.handleRewardChange}
             />
             <Button
               size="small"
@@ -236,7 +166,7 @@ const PostingScreen = (props: Props): JSX.Element => {
 
           <Block center row>
             <Button
-              onPress={_onPressPostSubmit}
+              onPress={props.handlePressPostSumbit}
               shadowless
               loading={props.posting}
               lodingSize="large"
@@ -246,11 +176,14 @@ const PostingScreen = (props: Props): JSX.Element => {
                 : intl.formatMessage({id: 'Posting.post_button'})}
             </Button>
             {props.originalPost ? (
-              <Button onPress={_onPressCancel} shadowless color="gray">
+              <Button
+                onPress={props.handleCancelEditing}
+                shadowless
+                color="gray">
                 {intl.formatMessage({id: 'Posting.cancel_button'})}
               </Button>
             ) : (
-              <Button onPress={_onPressClear} shadowless color="gray">
+              <Button onPress={props.handleClearAll} shadowless color="gray">
                 {intl.formatMessage({id: 'Posting.clear_button'})}
               </Button>
             )}

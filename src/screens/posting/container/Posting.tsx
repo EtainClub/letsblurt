@@ -13,10 +13,12 @@ import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
 //// components
 import {Beneficiary, AuthorList} from '~/components';
 import {BeneficiaryItem} from '~/components/Beneficiary/BeneficiaryContainer';
-import {BLURT_BENEFICIARY_WEIGHT} from '~/constants';
+//// constants
+import {BLURT_BENEFICIARY_WEIGHT, MAX_NUM_TAGS} from '~/constants';
 // types
 import {PostRef, PostsState, PostsTypes} from '~/contexts/types';
 //// utils
+import renderPostBody from '~/utils/render-helpers/markdown-2-html';
 import {
   addPostingOptions,
   extractMetadata,
@@ -53,6 +55,13 @@ const Posting = (props: Props): JSX.Element => {
   const {userState, getFollowings} = useContext(UserContext);
   // states
   //  const [editMode, setEditMode] = useState(route.params?.editMode);
+  const [title, setTitle] = useState('');
+  const [body, setBody] = useState('');
+  const [previewBody, setPreviewBody] = useState('');
+  const [tags, setTags] = useState('');
+  const [tagMessage, setTagMessage] = useState('');
+  const [rewardIndex, setRewardIndex] = useState(0);
+
   const [originalPost, setOriginalPost] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [uploadedImage, setUploadedImage] = useState(null);
@@ -62,39 +71,47 @@ const Posting = (props: Props): JSX.Element => {
   const [showBeneficiaryModal, setShowBeneficiaryModal] = useState(false);
   const [beneficiaries, setBeneficiaries] = useState([]);
   const [showAuthorsModal, setShowAuthorsModal] = useState(false);
+  const [clearBody, setClearBody] = useState(false);
 
-  //// mount event
+  //// event: mount
   useEffect(() => {
     // get following
     if (authState.loggedIn) {
       const {username} = authState.currentCredentials;
       // get following list
       _getFollowingList(username);
-      // add default beneficairy
-      if (username === 'letsblurt') {
-        setBeneficiaries([
-          {account: username, weight: 5000},
-          {account: 'etainclub', weight: 5000},
-        ]);
-      } else {
-        const userWeight = 10000 - DEFAULT_BENEFICIARY.weight;
-        setBeneficiaries([
-          DEFAULT_BENEFICIARY,
-          {account: username, weight: userWeight},
-        ]);
-      }
+      // initialize beneficiaries
+      _initBeneficiaries();
     }
   }, []);
-  //// edit mode event
+  //// event: edit mode
   useEffect(() => {
     console.log('[Posting] uiState', uiState);
     //
     if (uiState.editMode) {
       console.log('[Posting] editMode, postDetails', postsState.postDetails);
-      // get the post details
-      setOriginalPost(postsState.postDetails);
+      // check if original post exists
+      if (originalPost) {
+        // get the post details
+        setOriginalPost(postsState.postDetails);
+        // set title
+        setTitle(originalPost.state.title);
+        // set body
+        setBody(originalPost.markdownBody);
+        // tags
+        const _tags = originalPost.metadata.tags.reduce(
+          (tagString, tag) => tagString + tag + ' ',
+          '',
+        );
+        setTags(_tags);
+        // get html from markdown
+        const _body = renderPostBody(originalPost.markdownBody, true);
+        // set preview
+        setPreviewBody(_body);
+      }
     }
   }, [uiState.editMode]);
+
   //// on blur event
   useEffect(() => {
     const unsubscribe = navigation.addListener('blur', () => {
@@ -107,6 +124,31 @@ const Posting = (props: Props): JSX.Element => {
     return unsubscribe;
   }, [navigation]);
 
+  //// event: clear body in editor
+  useEffect(() => {
+    // toggle the clear body state
+    if (clearBody) setClearBody(false);
+  }, [clearBody]);
+
+  //// initialize beneficiary
+  const _initBeneficiaries = () => {
+    const {username} = authState.currentCredentials;
+
+    // add default beneficairy
+    if (username === 'letsblurt') {
+      setBeneficiaries([
+        {account: username, weight: 5000},
+        {account: 'etainclub', weight: 5000},
+      ]);
+    } else {
+      const userWeight = 10000 - DEFAULT_BENEFICIARY.weight;
+      setBeneficiaries([
+        DEFAULT_BENEFICIARY,
+        {account: username, weight: userWeight},
+      ]);
+    }
+  };
+
   //// get followings
   const _getFollowingList = async (username: string) => {
     const _followings = await getFollowings(username);
@@ -115,11 +157,7 @@ const Posting = (props: Props): JSX.Element => {
   };
 
   //// handle press post
-  const _handlePressPostSumbit = async (
-    title: string,
-    body: string,
-    tags: string,
-  ) => {
+  const _handlePressPostSumbit = async () => {
     setPosting(true);
 
     ////// build a post
@@ -161,14 +199,6 @@ const Posting = (props: Props): JSX.Element => {
       console.log('[updatePost] originalPost', originalPost);
       // TODO: use submitPost after patching instead of updatePost
       // patch = utils editors createPatch
-      // ({success, message} = await updatePost(
-      //   originalPost.body,
-      //   originalPost.state.post_ref.permlink,
-      //   originalPost.state.parent_ref.permlink,
-      //   postingContent,
-      //   password,
-      //   false,
-      // ));
       postingContent.permlink = originalPost.state.post_ref.permlink;
       postingContent.parent_permlink = originalPost.state.parent_ref.permlink;
       console.log('[updatePost] postingContent', postingContent);
@@ -229,9 +259,81 @@ const Posting = (props: Props): JSX.Element => {
     setBeneficiaries(_beneficiaries);
   };
 
+  const _handleTitleChange = (text: string) => {
+    // check validity: max-length
+    setTitle(text);
+  };
+
+  const _handleBodyChange = (_body: string) => {
+    // set body
+    setBody(_body);
+    // set preview
+    const _preview = renderPostBody(_body, true);
+    setPreviewBody(_preview);
+  };
+
+  const _handleTagsChange = (_tags: string) => {
+    // check validity: maximum tags, wrong tag, max-length-per-tag
+    setTags(_tags);
+    const tagString = _tags.replace(/,/g, ' ').replace(/#/g, '');
+    let cats = tagString.split(' ');
+    // validate
+    _validateTags(cats);
+  };
+
+  //// handle reward option chnage
+  const _handleRewardChange = (index: number) => {
+    console.log('_handleRewardChange index', index);
+    setRewardIndex(index);
+  };
+
+  //// validate the tags
+  const _validateTags = (tags: string[]) => {
+    if (tags.length > 0) {
+      tags.length > MAX_NUM_TAGS
+        ? setTagMessage(intl.formatMessage({id: 'Posting.limited_tags'}))
+        : tags.find((c) => c.length > 24)
+        ? setTagMessage(intl.formatMessage({id: 'Posting.limited_length'}))
+        : tags.find((c) => c.split('-').length > 2)
+        ? setTagMessage(intl.formatMessage({id: 'Posting.limited_dash'}))
+        : tags.find((c) => c.indexOf(',') >= 0)
+        ? setTagMessage(intl.formatMessage({id: 'Posting.limited_space'}))
+        : tags.find((c) => /[A-Z]/.test(c))
+        ? setTagMessage(intl.formatMessage({id: 'Posting.limited_lowercase'}))
+        : tags.find((c) => !/^[a-z0-9-#]+$/.test(c))
+        ? setTagMessage(intl.formatMessage({id: 'Posting.limited_characters'}))
+        : tags.find((c) => !/^[a-z-#]/.test(c))
+        ? setTagMessage(intl.formatMessage({id: 'Posting.limited_firstchar'}))
+        : tags.find((c) => !/[a-z0-9]$/.test(c))
+        ? setTagMessage(intl.formatMessage({id: 'Posting.limited_lastchar'}))
+        : setTagMessage('');
+    }
+  };
+
+  //// clear contents
+  const _handleClearAll = () => {
+    console.log('handleClearAll');
+    // clear title
+    setTitle('');
+    // clear body
+    setBody('');
+    // clear tags
+    setTags('');
+    // clear preview
+    setPreviewBody('');
+    // clear beneficiary
+    _initBeneficiaries();
+    // clear tag message
+    setTagMessage('');
+    // clear body of editor
+    setClearBody(true);
+  };
+
   const _handleCancelEditing = () => {
     // reset edit mode
     setEditMode(false);
+    // clear contents
+    _handleClearAll();
     // go back
     navigation.goBack();
   };
@@ -239,13 +341,25 @@ const Posting = (props: Props): JSX.Element => {
   return (
     <Block>
       <PostingScreen
+        title={title}
+        body={body}
+        tags={tags}
+        previewBody={previewBody}
+        rewardIndex={rewardIndex}
+        tagMessage={tagMessage}
         originalPost={originalPost}
         uploading={uploading}
         uploadedImage={uploadedImage}
         posting={posting}
+        clearBody={clearBody}
+        handleTitleChange={_handleTitleChange}
+        handleBodyChange={_handleBodyChange}
+        handleTagsChange={_handleTagsChange}
+        handleRewardChange={_handleRewardChange}
         handlePressPostSumbit={_handlePressPostSumbit}
         followingList={filteredFollowings}
         handlePressBeneficiary={_handlePressBeneficiary}
+        handleClearAll={_handleClearAll}
         handleCancelEditing={_handleCancelEditing}
       />
       {showBeneficiaryModal ? (
