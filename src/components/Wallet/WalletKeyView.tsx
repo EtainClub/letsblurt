@@ -17,6 +17,7 @@ import {getRequestedPassword} from '~/providers/blurt/dblurtApi';
 //// ui
 import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
 import {argonTheme} from '~/constants';
+import Clipboard from '@react-native-community/clipboard';
 const {width, height} = Dimensions.get('window');
 import {AuthContext, UIContext} from '~/contexts';
 import {KeyTypes} from '~/contexts/types';
@@ -61,6 +62,14 @@ const WalletKeyView = (props: Props): JSX.Element => {
     setShowPassword(false);
     setPassword(HIDE_PASSWORD);
   };
+
+  //// copy the key to clipboard
+  const copyKeyToClipboard = async (wif: string) => {
+    Clipboard.setString(wif);
+    // set toast message
+    setToastMessage(intl.formatMessage({id: 'Signup.msg_copied'}));
+  };
+
   const iconLock = showPassword ? (
     <TouchableWithoutFeedback onPress={_hidePassword}>
       <Icon
@@ -102,7 +111,7 @@ const WalletKeyView = (props: Props): JSX.Element => {
           style={styles.input}
         />
         <Icon
-          onPress={() => console.log('copy the key')}
+          onPress={() => copyKeyToClipboard(password)}
           size={16}
           color={theme.COLORS.BLACK}
           name="pencil"

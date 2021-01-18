@@ -62,6 +62,7 @@ const OTPContainer = (props: Props): JSX.Element => {
 
   //// handle phone number change
   const _handlePhoneNumberChange = (_phoneNumber: string) => {
+    // this phone number does not include the country code
     setPhoneNumber(_phoneNumber);
   };
 
@@ -78,24 +79,25 @@ const OTPContainer = (props: Props): JSX.Element => {
   };
 
   //// send sms code
-  const _sendSMSCode = async (_phoneNumber: string) => {
+  const _sendSMSCode = async () => {
     // set code requested flag
     setSMSRequested(true);
     // clear guide message
     setGuideMessage('');
     // build phone number including the country code
-    const phone = '+' + country.callingCode[0] + phoneNumber;
+    const _phone = '+' + country.callingCode[0] + phoneNumber;
     // check sanity of the phone number
-    const valid = _validatePhoneNumber(_phoneNumber);
+    const valid = _validatePhoneNumber(_phone);
     if (!valid) {
+      console.log('invalid phone number', _phone);
       setToastMessage(intl.formatMessage({id: 'Signup.invalid_phonenumber'}));
       return;
     }
-    // set phone number
-    setPhoneNumber(_phoneNumber);
+    // set phone number (this includes the country code)
+    setPhoneNumber(_phone);
     // verify phone auth of firebase and send sms code
     auth()
-      .verifyPhoneNumber(_phoneNumber)
+      .verifyPhoneNumber(_phone)
       .on(
         'state_changed',
         (phoneAuthSnapshot) => {
@@ -105,17 +107,15 @@ const OTPContainer = (props: Props): JSX.Element => {
               setToastMessage(intl.formatMessage({id: 'Signup.code_sent'}));
               break;
             case firebase.auth.PhoneAuthState.ERROR: // or 'error'
-              console.log('verification error');
+              console.log('verification error', phoneAuthSnapshot.error);
               setToastMessage(
                 intl.formatMessage({id: 'Signup.verification_error'}),
               );
-              console.log(phoneAuthSnapshot.error);
               break;
             case firebase.auth.PhoneAuthState.AUTO_VERIFIED: // or 'verified'
               // auto verified means the code has also been automatically confirmed as correct/received
               // phoneAuthSnapshot.code will contain the auto verified sms code - no need to ask the user for input.
-              console.log('auto verified on android');
-              console.log(phoneAuthSnapshot);
+              console.log('auto verified on android', phoneAuthSnapshot);
               // set sms code
               setSMSCode(phoneAuthSnapshot.code);
           }

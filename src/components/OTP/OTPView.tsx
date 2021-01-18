@@ -29,7 +29,7 @@ interface Props {
   handlePhoneNumberChange: (phoneNumber: string) => void;
   handleSMSCodeChange: (code: string) => void;
   onCountrySelect: (country: Country) => void;
-  sendSMSCode: (phoneNumber: string) => void;
+  sendSMSCode: () => void;
   verifySMSCode: () => void;
   handleCancelModal: () => void;
 }

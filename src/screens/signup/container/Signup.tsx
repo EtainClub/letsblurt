@@ -67,16 +67,6 @@ const Signup = (props: Props): JSX.Element => {
 
   const _createAccount = async () => {
     console.log('userState global props', userState.globalProps);
-    // now create an account
-    // const success = await createAccount(
-    //   username,
-    //   password,
-    //   Config.CREATOR_ACCOUNT,
-    //   Config.CREATOR_ACTIVE_WIF,
-    //   userState.globalProps.chainProps.account_creation_fee,
-    // );
-
-    //    const {username, password, creationFee} = data;
     const options = {
       username,
       password,
@@ -94,22 +84,23 @@ const Signup = (props: Props): JSX.Element => {
     }
   };
 
+  // TODO: make the phone number as doc.id
   const addPhonenumberToDB = async (username: string, phoneNumber: string) => {
-    // get the current user
-    const user = auth().currentUser;
-    // get user document from phones collection
-    const phoneRef = firestore().collection('phones').doc(user.uid);
-    const phoneDoc = await phoneRef.get();
-    // check user exists
-    if (phoneDoc.exists) {
-      console.log('phone number exists', phoneDoc);
-      return;
-    }
-    // set phone data
-    await phoneRef.set({
-      username,
-      phoneNumber,
-    });
+    // // get the current user
+    // const user = auth().currentUser;
+    // // get user document from phones collection
+    // const phoneRef = firestore().collection('phones').doc(user.uid);
+    // const phoneDoc = await phoneRef.get();
+    // // check user exists
+    // if (phoneDoc.exists) {
+    //   console.log('phone number exists', phoneDoc);
+    //   return;
+    // }
+    // // set phone data
+    // await phoneRef.set({
+    //   username,
+    //   phoneNumber,
+    // });
   };
 
   const _handleOTPResult = async (result: boolean, _phoneNumber?: string) => {
@@ -118,9 +109,12 @@ const Signup = (props: Props): JSX.Element => {
       setPhoneNumber(_phoneNumber);
     }
     console.log('opt result', result);
-    // @test
-    if (__DEV__) {
-      //    if (__DEV__ || result) {
+
+    if (__DEV__ || result) {
+      // TODO: check duplicated phone number in firebase phones db
+      // if not duplicated, then create an account
+      // setToastMessage(intl.formatMessage({id: 'Signup.duplicated_phone'}));
+
       setShowAccountScreen(true);
     } else {
       setToastMessage(intl.formatMessage({id: 'Signup.otp_error'}));
@@ -139,22 +133,8 @@ const Signup = (props: Props): JSX.Element => {
       checkUsernameAvailable={_checkUsernameAvailable}
     />
   ) : (
-    <OTP phoneNumber="" handleOTPResult={_handleOTPResult} />
+    <OTP handleOTPResult={_handleOTPResult} />
   );
-
-  // return showAccountScreen ? (
-  //   <AccountScreen account={username} password={password} />
-  // ) : showSignupScreen ? (
-  //   <SignupScreen
-  //     onCreateAccount={_onStartSignup}
-  //     checkUsernameAvailable={_checkUsernameAvailable}
-  //   />
-  // ) : (
-  //   <PhoneAuthScreen
-  //     onCreateAccount={_onCreateAccount}
-  //     signinPhoneNumber={_signinPhoneNumber}
-  //   />
-  // );
 };
 
 export {Signup};

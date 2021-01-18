@@ -91,7 +91,9 @@
     "welcome_header": "모든 게 완료되었습니다!",
     "welcome_guide": "이제 생성한 계정과 암호로 렛츠 블러트 모바일 앱 및 다른 블러트 앱을 사용할 수 있습니다.",
     "login_button": "렛츠 블러트!",
-    "otp_error": "인증코드 입력 에러"
+    "otp_error": "인증코드 입력 에러",
+    "invalid_phonenumber": "잘못된 전화번호입니다.",
+    "verification_error": "인증 오류"
   },
   "Login": {
     "header": "로그인",

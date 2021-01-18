@@ -92,7 +92,9 @@
     "welcome_header": "You're all set!",
     "welcome_guide": "Now you can use the Let's Blurt app and other BLURT Dapps via your username and private key",
     "login_button": "Let's Blurt!",
-    "otp_error": "code is not correct"
+    "otp_error": "code is not correct",
+    "invalid_phonenumber": "Invalid phone number",
+    "verification_error": "Verification error"
   },
   "Login": {
     "header": "Login",

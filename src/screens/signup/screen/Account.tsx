@@ -46,9 +46,6 @@ const AccountScreen = (props: Props): JSX.Element => {
   const copyPasswordToClipboard = async (password: string) => {
     console.log('Clipboard', Clipboard);
     Clipboard.setString(password);
-    // check
-    const text = await Clipboard.getString();
-    console.log('copied text', text);
     // update state to show toast
     setCopied(true);
     // set toast message
