@@ -60,6 +60,7 @@ const NotificationScreen = (props: Props): JSX.Element => {
     let author = item.author;
     let permlink = null;
     switch (notiType) {
+      // TODO: handle reblog
       case 'follow':
         iconName = 'adduser';
         iconFamily = 'antdesign';
