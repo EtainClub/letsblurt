@@ -1,15 +1,6 @@
 //// react
 import React, {useState, useEffect, useContext, useCallback} from 'react';
 //// react native
-import {
-  View,
-  StyleSheet,
-  Dimensions,
-  FlatList,
-  ActivityIndicator,
-  Animated,
-  Alert,
-} from 'react-native';
 //// react navigation
 import {navigate} from '~/navigation/service';
 //// language

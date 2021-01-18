@@ -1,16 +1,7 @@
 //// react
 import React, {useState, useEffect} from 'react';
 //// react native
-import {
-  View,
-  StyleSheet,
-  Dimensions,
-  KeyboardAvoidingView,
-  Alert,
-  Platform,
-  TouchableOpacity,
-  Linking,
-} from 'react-native';
+import {View, StyleSheet, Dimensions} from 'react-native';
 //// config
 import Config from 'react-native-config';
 //// language
@@ -23,83 +14,40 @@ import {argonTheme} from '~/constants';
 import * as RNLocalize from 'react-native-localize';
 import CountryPicker, {DARK_THEME} from 'react-native-country-picker-modal';
 import {Country, CountryCode} from '~/screens/signup/screen/types';
-
-import LinearGradient from 'react-native-linear-gradient';
 import {materialTheme} from '~/constants/';
-import {HeaderHeight, iPhoneX} from '~/constants/utils';
 
 const {width, height} = Dimensions.get('window');
 
-const countryData = require('react-native-country-picker-modal/lib/assets/data/countries-emoji.json');
-
 interface Props {
-  usePhoneNumberForm: boolean;
+  showModal: boolean;
+  phoneNumber: string;
+  countryCode: CountryCode;
   smsCode?: string;
-  verifyPhoneNumber(phoneNumber: string): Promise<void>;
-  confirmOTP(smsCode: string): Promise<boolean>;
+  guideMessage: string;
+  loading: boolean;
+  smsRequested: boolean;
+  handlePhoneNumberChange: (phoneNumber: string) => void;
+  handleSMSCodeChange: (code: string) => void;
+  onCountrySelect: (country: Country) => void;
+  sendSMSCode: (phoneNumber: string) => void;
+  verifySMSCode: () => void;
+  handleCancelModal: () => void;
 }
 const OTPView = (props: Props): JSX.Element => {
   //// props
+  const {
+    showModal,
+    phoneNumber,
+    smsCode,
+    countryCode,
+    guideMessage,
+    loading,
+    smsRequested,
+  } = props;
   //// language
   const intl = useIntl();
-  //// contexts
-  //// states
-  const [showModal, setShowModal] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const [smsCode, setSMSCode] = useState(props.smsCode);
-  const [countryCode, setCountryCode] = useState<CountryCode>('KR');
-  const [withFlag, setWithFlag] = useState<boolean>(true);
-  const [country, setCountry] = useState<Country>(null);
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [smsRequested, setSMSRequested] = useState(false);
-  const [message, setMessage] = useState('');
 
-  //// events
-  useEffect(() => {
-    if (props.usePhoneNumberForm) {
-      console.log('countryData', countryData);
-
-      // get device country based on language setting not based on timezone
-      console.log('locale', intl.locale);
-      const code = intl.locale.split('-')[1];
-      console.log('code', code);
-
-      console.log('country', countryData[code]);
-      setCountry(countryData[code]);
-      // set country code
-      setCountryCode(code);
-      console.log('country code', code);
-
-      // message
-      setMessage(intl.formatMessage({id: 'Signup.phonenumber_guide'}));
-    } else {
-      // login process stated with the given number
-      // so otp code is requested
-      setSMSRequested(true);
-    }
-  }, []);
-
-  //// event: sms code from props
-  useEffect(() => {
-    if (props.smsCode) {
-      setSMSCode(props.smsCode);
-    }
-  }, [props.smsCode]);
-
-  const _handlePhoneNumberChange = (value: string) => {
-    setPhoneNumber(value);
-  };
-
-  const _handleSMSCodeChange = (value: string) => {
-    setSMSCode(value);
-  };
-
-  const _onCountrySelect = (country: Country) => {
-    console.log('country', country);
-    setCountry(country);
-    setCountryCode(country.cca2);
-  };
-
+  //////// functions
   const _renderPhoneInput = () => {
     return (
       <Block card center style={styles.itemContainer}>
@@ -112,9 +60,7 @@ const OTPView = (props: Props): JSX.Element => {
             withAlphaFilter
             withCallingCode
             withCallingCodeButton
-            onSelect={(country) => {
-              _onCountrySelect(country);
-            }}
+            onSelect={props.onCountrySelect}
           />
           <Block>
             <Input
@@ -126,11 +72,11 @@ const OTPView = (props: Props): JSX.Element => {
               placeholder={intl.formatMessage({id: 'OTP.phone_number'})}
               value={phoneNumber.replace(/\-/g, '')}
               autoCapitalize="none"
-              help={<Text>{message}</Text>}
+              help={<Text>{guideMessage}</Text>}
               bottomHelp
               style={styles.input}
               type="number-pad"
-              onChangeText={(text) => _handlePhoneNumberChange(text)}
+              onChangeText={props.handlePhoneNumberChange}
             />
           </Block>
         </Block>
@@ -139,23 +85,12 @@ const OTPView = (props: Props): JSX.Element => {
             size="small"
             shadowless
             color={materialTheme.COLORS.BUTTON_COLOR}
-            onPress={() => _onSendSMS()}>
+            onPress={props.sendSMSCode}>
             {intl.formatMessage({id: 'OTP.phone_button'})}
           </Button>
         </Block>
       </Block>
     );
-  };
-
-  // handle creation of a new account
-  const _onSendSMS = async () => {
-    setSMSRequested(true);
-    setMessage('');
-    const phone = '+' + country.callingCode[0] + phoneNumber;
-    // @test test phone number
-    //    const phone = Config.TEST_PHONE_NUMBER;
-    // process sign in
-    props.verifyPhoneNumber(phone);
   };
 
   const _renderSMSInput = () => {
@@ -174,7 +109,7 @@ const OTPView = (props: Props): JSX.Element => {
             autoCapitalize="none"
             style={styles.input}
             type="number-pad"
-            onChangeText={(text) => _handleSMSCodeChange(text)}
+            onChangeText={props.handleSMSCodeChange}
           />
         </Block>
         <Block center style={{marginTop: 20}}>
@@ -188,7 +123,7 @@ const OTPView = (props: Props): JSX.Element => {
                 ? materialTheme.COLORS.BUTTON_COLOR
                 : materialTheme.COLORS.MUTED
             }
-            onPress={() => props.confirmOTP(smsCode)}>
+            onPress={props.verifySMSCode}>
             {intl.formatMessage({id: 'OTP.confirm_button'})}
           </Button>
         </Block>
@@ -201,7 +136,7 @@ const OTPView = (props: Props): JSX.Element => {
       isVisible={showModal}
       animationIn="zoomIn"
       animationOut="zoomOut"
-      onBackdropPress={() => setShowModal(false)}>
+      onBackdropPress={props.handleCancelModal}>
       <Block card center style={styles.modalContainer}>
         <Text
           style={{
@@ -210,7 +145,7 @@ const OTPView = (props: Props): JSX.Element => {
           }}>
           {intl.formatMessage({id: 'OTP.header'})}
         </Text>
-        {props.usePhoneNumberForm ? _renderPhoneInput() : null}
+        {_renderPhoneInput()}
         {_renderSMSInput()}
       </Block>
     </Modal>

@@ -1,11 +1,5 @@
 //// react
-import React, {
-  useState,
-  useEffect,
-  useContext,
-  useRef,
-  useCallback,
-} from 'react';
+import React from 'react';
 //// react native
 import {
   View,
@@ -16,8 +10,6 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 //// react navigation
-import {useFocusEffect} from '@react-navigation/native';
-import {navigate} from '~/navigation/service';
 //// language
 import {useIntl} from 'react-intl';
 //// ui, styles
@@ -28,8 +20,7 @@ import ActionSheet from 'react-native-actions-sheet';
 import {argonTheme} from '~/constants/argonTheme';
 const {width, height} = Dimensions.get('screen');
 //// contexts
-import {PostsContext, AuthContext, UIContext} from '~/contexts';
-import {PostData, PostRef, PostsTypes} from '~/contexts/types';
+import {PostData} from '~/contexts/types';
 //// etc
 import {Post} from '~/components/Post';
 import {ActionBarStyleFeed} from '~/constants/actionBarTypes';
@@ -37,9 +28,14 @@ import {ActionBarStyleFeed} from '~/constants/actionBarTypes';
 //// props
 interface Props {
   posts: PostData[];
+  query: string;
   username?: string;
   reloading: boolean;
   loadingMore: boolean;
+  showSearchFAB: boolean;
+  searchRef: any;
+  handlePressFAB: () => void;
+  handleQueryChange: (query: string) => void;
   handleSubmitSearch: (searchText: string) => void;
   refreshPosts: () => void;
   fetchMorePosts: () => void;
@@ -47,47 +43,60 @@ interface Props {
 
 const PostsFeedView = (props: Props): JSX.Element => {
   //// props
+  const {
+    query,
+    showSearchFAB,
+    searchRef,
+    posts,
+    username,
+    loadingMore,
+    reloading,
+  } = props;
   //// language
   const intl = useIntl();
-  //// contexts
-  //// states
-  const [searchFAB, setSearchFAB] = useState(false);
-  const [searchText, setSearchText] = useState('');
-  //// ref
-  const searchRef = useRef(null);
 
-  useEffect(() => {
-    if (props.posts) setSearchFAB(true);
-  }, [props.posts]);
-
-  //////// functions
-
-  //// handle refresh event on posts
-  const _onRefresh = async () => {
-    console.log('on refresh');
-    setSearchFAB(false);
-    await props.refreshPosts();
-    setSearchFAB(true);
-  };
-
-  //// load more posts with bottom-reached event
-  const _onLoadMore = async () => {
-    console.log('on load more');
-    await props.fetchMorePosts();
-  };
-
+  //// header
   const _renderHeader = () => {
     return <Block></Block>;
   };
 
-  const _handlePressSearch = () => {
-    // show the action modal
-    searchRef.current?.setModalVisible(true);
+  //// render posts
+  const _renderPosts = () => {
+    if (!props.posts) return;
+
+    return (
+      <FlatList
+        contentContainerStyle={styles.posts}
+        refreshing={props.reloading}
+        onRefresh={props.refreshPosts}
+        onEndReached={props.fetchMorePosts}
+        onEndReachedThreshold={1}
+        data={posts}
+        renderItem={({item, index}) => _renderPost(item, index)}
+        keyExtractor={(item, index) => String(index)}
+        initialNumToRender={5}
+        ListHeaderComponent={_renderHeader}
+        ListFooterComponent={_renderFooter}
+        showsVerticalScrollIndicator={false}
+      />
+    );
+  };
+
+  //// render a post
+  const _renderPost = (item: PostData, index: number) => {
+    return (
+      <Post
+        post={item}
+        index={index}
+        username={username}
+        actionBarStyle={ActionBarStyleFeed}
+      />
+    );
   };
 
   //// render footer when loading more
   const _renderFooter = () => {
-    if (!props.loadingMore) return null;
+    if (!loadingMore) return null;
 
     return (
       <View
@@ -105,47 +114,9 @@ const PostsFeedView = (props: Props): JSX.Element => {
     );
   };
 
-  //// render a post
-  const _renderPost = (item: PostData, index: number) => {
-    return (
-      <Post
-        post={item}
-        index={index}
-        username={props.username}
-        actionBarStyle={ActionBarStyleFeed}
-      />
-    );
-  };
-
-  //// render posts
-  const _renderPosts = () => {
-    if (!props.posts) return;
-
-    // the last post is hidden for the next fetch
-    const posts = props.posts;
-    const username = props.username;
-
-    return (
-      <FlatList
-        contentContainerStyle={styles.posts}
-        refreshing={props.reloading}
-        onRefresh={_onRefresh}
-        onEndReached={_onLoadMore}
-        onEndReachedThreshold={1}
-        data={posts}
-        renderItem={({item, index}) => _renderPost(item, index)}
-        keyExtractor={(item, index) => String(index)}
-        initialNumToRender={5}
-        ListHeaderComponent={_renderHeader}
-        ListFooterComponent={_renderFooter}
-        showsVerticalScrollIndicator={false}
-      />
-    );
-  };
-
   return (
     <View>
-      {!props.reloading ? (
+      {!reloading ? (
         _renderPosts()
       ) : (
         <View style={{top: 20}}>
@@ -156,8 +127,8 @@ const PostsFeedView = (props: Props): JSX.Element => {
         <FAB
           buttonColor="red"
           iconTextColor="#FFFFFF"
-          onClickAction={_handlePressSearch}
-          visible
+          onClickAction={props.handlePressFAB}
+          visible={showSearchFAB}
           iconTextComponent={
             <Icon family="antdesign" size={16} name="search1" />
           }
@@ -173,10 +144,10 @@ const PostsFeedView = (props: Props): JSX.Element => {
             color="black"
             style={styles.search}
             autoFocus
-            onChangeText={(text: string) => setSearchText(text)}
+            onChangeText={props.handleQueryChange}
             onSubmitEditing={() => {
               searchRef.current?.setModalVisible(false);
-              props.handleSubmitSearch(searchText);
+              props.handleSubmitSearch(query);
             }}
             placeholder={intl.formatMessage({
               id: 'Actionsheet.search_placeholder',
@@ -186,7 +157,7 @@ const PostsFeedView = (props: Props): JSX.Element => {
               <TouchableWithoutFeedback
                 onPress={() => {
                   searchRef.current?.setModalVisible(false);
-                  props.handleSubmitSearch(searchText);
+                  props.handleSubmitSearch(query);
                 }}>
                 <Icon
                   size={24}

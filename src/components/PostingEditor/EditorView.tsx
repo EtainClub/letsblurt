@@ -1,196 +1,55 @@
 //// react
-import React, {useState, useContext, useEffect, useRef} from 'react';
+import React from 'react';
 //// react native
 import {Dimensions, StyleSheet, KeyboardAvoidingView} from 'react-native';
 //// config
 //// language
 import {useIntl} from 'react-intl';
 //// blockchain
-import {signImage, fetchRawPost} from '~/providers/blurt/dblurtApi';
-import {Discussion} from 'dblurt';
 //// contexts
-import {AuthContext, PostsContext, UIContext, UserContext} from '~/contexts';
-import {PostingContent} from '~/contexts/types';
 //// navigation
-import {navigate} from '~/navigation/service';
 //// UIs
 import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
-import ActionSheet from 'react-native-actions-sheet';
-import {DropdownModal} from '~/components/DropdownModal';
 import {argonTheme} from '~/constants/argonTheme';
 const {height, width} = Dimensions.get('window');
 //// components
-import {Beneficiary, AuthorList, ImageUpload} from '~/components';
-import {BeneficiaryItem} from '~/components/Beneficiary/BeneficiaryContainer';
-import {BLURT_BENEFICIARY_WEIGHT} from '~/constants';
-//// utils
-import renderPostBody from '~/utils/render-helpers/markdown-2-html';
-
-type Position = {
-  start: number;
-  end: number;
-};
+import {ImageUpload} from '~/components';
 
 interface Props {
   isComment: boolean;
-  originalPost: string;
   depth?: number;
+  body: string;
+  editable: boolean;
+  containerHeight: number;
+  submitting: boolean;
   close?: boolean;
   handleBodyChange?: (body: string) => void;
-  handleSubmitComment: (text: string) => Promise<boolean>;
+  handleSubmitComment: (text: string) => void;
+  handleOnSelectionChange: (event: any) => void;
+  handlePressKey: (event: any) => void;
+  handleContainerHeight: (event: any) => void;
+  handleUploadedImageURL: (url: string) => void;
+  handlePressMention: () => void;
+  handlePressClear: () => void;
 }
 const EditorView = (props: Props): JSX.Element => {
   //// props
-  const {isComment} = props;
+  const {
+    isComment,
+    depth,
+    body,
+    editable,
+    containerHeight,
+    submitting,
+    close,
+  } = props;
   //// language
   const intl = useIntl();
-  //// contexts
-  const {userState} = useContext(UserContext);
-  //// states
-  const [close, setClose] = useState(false);
-  const [body, setBody] = useState(props.originalPost);
-  const [editable, setEditable] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [previewBody, setPreviewBody] = useState('');
-  const [bodySelection, setBodySelection] = useState<Position>({
-    start: 0,
-    end: 0,
-  });
-  const [containerHeight, setContainerHeight] = useState(40);
-  const [mentioning, setMentioning] = useState(false);
-  const [searchAuthor, setSearchAuthor] = useState('');
-  const [showAuthorsModal, setShowAuthorsModal] = useState(false);
-  const [uploadedImageUrl, setUploadedImageUrl] = useState('');
 
-  //////// events
-  //// mount
-  useEffect(() => {
-    setTimeout(() => setEditable(true), 100);
-  }, []);
-
-  //// edit event. set body
-  useEffect(() => {
-    if (props.originalPost) {
-      console.log('[EditorView] original body exists', props.originalPost);
-      setBody(props.originalPost);
-    }
-  }, [props.originalPost]);
-
-  //// close event
-  useEffect(() => {
-    if (props.close) {
-      setBody('');
-      setShowAuthorsModal(false);
-      setClose(true);
-    }
-  }, [props.close]);
-
-  //// uploading image event
-  useEffect(() => {
-    if (uploadedImageUrl) {
-      const _body =
-        body.substring(0, bodySelection.start) +
-        uploadedImageUrl +
-        body.substring(bodySelection.end);
-      _handleBodyChange(_body);
-    }
-  }, [uploadedImageUrl]);
-
-  //// handle press key event and catch '@' key
-  const _handlePressKey = ({nativeEvent}) => {
-    const {key} = nativeEvent;
-    if (key === '@') {
-      setShowAuthorsModal(true);
-    } else {
-      setShowAuthorsModal(false);
-    }
-  };
-
-  const _handleBodyChange = (text: string) => {
-    // check validity:
-    setBody(text);
-    // set preview body
-    // update the post body whenever image is uploaded..
-    const _body = renderPostBody(text, true);
-    setPreviewBody(_body);
-    // for main posting, send the change to the parent
-    //    if (!isComment) {
-    props.handleBodyChange(_body);
-    //    }
-  };
-
-  const _insertMentionedAccount = (text: string) => {
-    // hide the modal
-    setShowAuthorsModal(false);
-    //
-    setSearchAuthor('');
-
-    // append the author int the body
-    const _body =
-      body.substring(0, bodySelection.start) +
-      text +
-      body.substring(bodySelection.end, body.length);
-    console.log('_finalizeMention. body', _body);
-    // update body selection
-    setBodySelection({
-      start: bodySelection.start + text.length,
-      end: bodySelection.end + text.length,
-    });
-    setBody(_body);
-    // send the change to the parent
-    _body;
-  };
-
-  //// handle press mention icon
-  const _handlePressMention = () => {
-    // put @ in the body
-    const _body =
-      body.substring(0, bodySelection.start) +
-      '@' +
-      body.substring(bodySelection.end, body.length);
-    console.log('_finalizeMention. body', _body);
-    setBody(_body);
-    // update body selection
-    setBodySelection({
-      start: bodySelection.start + 1,
-      end: bodySelection.end + 1,
-    });
-    // show author list modal
-    setShowAuthorsModal(true);
-  };
-
-  //// update input selection
-  const _handleOnSelectionChange = async (event) => {
-    setBodySelection(event.nativeEvent.selection);
-  };
-
-  ////
-  const _handleContainerHeight = (event) => {
-    if (isComment) {
-      setContainerHeight(event.nativeEvent.contentSize.height);
-    }
-  };
-
-  ////
-  const _handleUploadedImageURL = (url: string) => {
-    setUploadedImageUrl(url);
-  };
-
-  ////
-  const _handleSubmitComment = async () => {
-    setSubmitting(true);
-    const result = await props.handleSubmitComment(body);
-    setSubmitting(false);
-    if (result) {
-      console.log('_handleSubmitComment. result', result);
-      // clear body
-      setBody('');
-    }
-  };
-
+  // icon for submitting a comment
   const iconSend = (
     <Button
-      onPress={_handleSubmitComment}
+      onPress={props.handleSubmitComment}
       loading={submitting}
       onlyIcon
       icon="ios-send"
@@ -213,7 +72,7 @@ const EditorView = (props: Props): JSX.Element => {
         <Block
           center
           style={[
-            props.depth ? {right: props.depth * 10} : null,
+            depth ? {right: depth * 10} : null,
             {paddingHorizontal: theme.SIZES.BASE},
           ]}>
           <Input
@@ -224,9 +83,9 @@ const EditorView = (props: Props): JSX.Element => {
             }
             editable={editable}
             value={body}
-            onChangeText={_handleBodyChange}
-            onSelectionChange={_handleOnSelectionChange}
-            onKeyPress={_handlePressKey}
+            onChangeText={props.handleBodyChange}
+            onSelectionChange={props.handleOnSelectionChange}
+            onKeyPress={props.handlePressKey}
             right={isComment ? true : false}
             iconContent={isComment ? iconSend : null}
             placeholder={intl.formatMessage({id: 'Posting.body_placeholder'})}
@@ -237,16 +96,16 @@ const EditorView = (props: Props): JSX.Element => {
             blurOnSubmit={false}
             textAlignVertical="top"
             autoCorrect={false}
-            onContentSizeChange={_handleContainerHeight}
+            onContentSizeChange={props.handleContainerHeight}
           />
           <Block row left style={{top: -10}}>
             <ImageUpload
               isComment={isComment}
               containerStyle={{right: true}}
-              getImageURL={_handleUploadedImageURL}
+              getImageURL={props.handleUploadedImageURL}
             />
             <Button
-              onPress={_handlePressMention}
+              onPress={props.handlePressMention}
               onlyIcon
               icon="at"
               iconFamily="font-awesome"
@@ -254,6 +113,7 @@ const EditorView = (props: Props): JSX.Element => {
               color={argonTheme.COLORS.FACEBOOK}
             />
             <Button
+              onPress={props.handlePressClear}
               onlyIcon
               icon="trash"
               iconFamily="font-awesome"
@@ -263,13 +123,6 @@ const EditorView = (props: Props): JSX.Element => {
           </Block>
         </Block>
       </KeyboardAvoidingView>
-      {showAuthorsModal && (
-        <AuthorList
-          authors={userState.followings}
-          handlePressAuthor={_insertMentionedAccount}
-          cancelModal={() => setShowAuthorsModal(false)}
-        />
-      )}
     </Block>
   );
 };

@@ -21,155 +21,45 @@ const {width, height} = Dimensions.get('window');
 import {BeneficiaryItem} from './BeneficiaryContainer';
 import {UIContext} from '~/contexts';
 
-const WEIGHT_OPTIONS = ['100', '75', '50', '25', '10', '0'];
+//// constants
+import {WEIGHT_OPTIONS} from './BeneficiaryContainer';
 const BACKGROUND_COLORS = [
   argonTheme.COLORS.BORDER,
   argonTheme.COLORS.SECONDARY,
 ];
 interface Props {
-  sourceList: string[];
+  author: string;
+  weight: string;
   beneficiaries: BeneficiaryItem[];
+  showModal: boolean;
+  refresh: boolean;
+  errorMessage: string;
   imageServer: string;
+  handleChangeAccount: () => void;
+  handleChangeWeight: (weight: string) => void;
+  handlePressAdd: () => void;
   handlePressRemove: (beneficiary: BeneficiaryItem) => void;
-  addBeneficiary: (beneficiary: BeneficiaryItem) => boolean;
-  handlePressSave: () => boolean;
+  handlePressSave: () => void;
+  handleCancelModal: () => void;
 }
 const BeneficiaryView = (props: Props): JSX.Element => {
   //// props
-  const {beneficiaries} = props;
+  const {
+    author,
+    weight,
+    beneficiaries,
+    showModal,
+    refresh,
+    errorMessage,
+  } = props;
   //// language
   const intl = useIntl();
-  //// contexts
-  const {setToastMessage} = useContext(UIContext);
-  //// states
-  const [showModal, setShowModal] = useState(true);
-  const [hideResult, setHideResult] = useState(false);
-  const [query, setQuery] = useState('');
-  const [filteredList, setFilteredList] = useState([]);
-  const [weight, setWeight] = useState(WEIGHT_OPTIONS[0]);
-  const [hideWeightResult, setHideWeightResult] = useState(true);
-  const [appended, setAppended] = useState(false);
-  const [refresh, setRefresh] = useState(true);
-  const [errorMessage, setErrorMessage] = useState('');
-  //// effect
-  useEffect(() => {
-    if (appended) {
-      setAppended(false);
-      setRefresh(true);
-    }
-  }, [appended]);
-
-  const _handleChangeAccount = (text) => {
-    setQuery(text);
-    // filter
-    const _filtered = props.sourceList.filter((item) => item.includes(text));
-    setFilteredList(_filtered);
-    // clear hide
-    setHideResult(false);
-  };
-
-  ////
-  const _renderItem = (item: string, index: number) => {
-    const avatar = `${props.imageServer}/u/${item}/avatar`;
-    return (
-      <TouchableWithoutFeedback
-        key={item}
-        onPress={() => _handlePressItem(item)}>
-        <Block
-          flex
-          card
-          row
-          space="between"
-          style={{
-            marginBottom: 5,
-            padding: 5,
-            backgroundColor:
-              BACKGROUND_COLORS[index % BACKGROUND_COLORS.length],
-          }}>
-          <Block row middle>
-            <Image
-              source={{
-                uri: avatar || null,
-              }}
-              style={styles.avatar}
-            />
-            <Text size={14} style={{marginHorizontal: 5}}>
-              {item}
-            </Text>
-          </Block>
-        </Block>
-      </TouchableWithoutFeedback>
-    );
-  };
-
-  ////
-  const _handlePressItem = (item) => {
-    // set query
-    setQuery(item);
-    // hide result
-    setHideResult(true);
-  };
-
-  ///
-  const _handleChangeWeight = (text) => {
-    setWeight(text);
-    setHideWeightResult(false);
-  };
-
-  ////
-  const _handlePressWeightItem = (item) => {
-    // filter
-    setWeight(item);
-    // hide result
-    setHideWeightResult(true);
-  };
-
-  ////
-  const _handlePressAdd = () => {
-    //
-    if (query === '' || weight === '') return;
-    // hide results
-    setHideResult(true);
-    setHideWeightResult(true);
-    // check uniqueness
-    const duplicated = beneficiaries.some((item) => item.account === query);
-    if (duplicated) return;
-    // append
-    const _appended = props.addBeneficiary({
-      account: query,
-      weight: parseInt(weight) * 100,
-    });
-    if (_appended) {
-      setAppended(true);
-      // clear inputs
-      setQuery('');
-      setWeight('');
-    } else {
-      setErrorMessage(intl.formatMessage({id: 'Beneficiary.error_total'}));
-    }
-  };
-
-  ////
-  const _handlePressSave = () => {
-    // send back the beneficiary list
-    const valid = props.handlePressSave();
-    if (!valid) {
-      setErrorMessage(intl.formatMessage({id: 'Beneficiary.error_total'}));
-      return;
-    }
-    // close modal
-    setShowModal(false);
-    // clear inputs
-    setQuery('');
-    setWeight('');
-  };
 
   ////
   const _renderBeneficiaries = () => {
     console.log('bene list', beneficiaries);
     return beneficiaries.map((item, index) => {
       const {account, weight} = item;
-      console.log('weight', weight);
       const avatar = `${props.imageServer}/u/${account}/avatar`;
       return (
         <Block
@@ -227,49 +117,54 @@ const BeneficiaryView = (props: Props): JSX.Element => {
     });
   };
 
-  const _renderHeader = () => (
-    <Block center>
-      <Block>
-        <Button
-          size="small"
-          shadowless
-          color={argonTheme.COLORS.FACEBOOK}
-          onPress={_handlePressAdd}>
-          {intl.formatMessage({id: 'Beneficiary.add_button'})}
-        </Button>
+  const _renderHeader = () => {
+    return (
+      <Block
+        row
+        space="between"
+        style={{
+          marginBottom: 5,
+          marginHorizontal: 10,
+          padding: 5,
+          height: 50,
+        }}>
+        <Block middle style={{width: '45%'}}>
+          <Input
+            placeholder={intl.formatMessage({
+              id: 'Beneficiary.account_placeholder',
+            })}
+            placeholderTextColor={argonTheme.COLORS.PLACEHOLDER}
+            onFocus={props.handleChangeAccount}
+            defaultValue={author}
+          />
+        </Block>
+        <Block row right style={{width: '50%', top: -0}}>
+          <Block center>
+            <Input
+              placeholder={intl.formatMessage({
+                id: 'Beneficiary.weight_placeholder',
+              })}
+              placeholderTextColor={argonTheme.COLORS.PLACEHOLDER}
+              type="number-pad"
+              value={weight}
+              onChangeText={props.handleChangeWeight}
+            />
+          </Block>
+          <Block row center style={{marginLeft: 10}}>
+            <Text>%</Text>
+            <Button
+              onPress={props.handlePressAdd}
+              onlyIcon
+              icon="plus"
+              iconFamily="font-awesome"
+              iconSize={14}
+              color={argonTheme.COLORS.FACEBOOK}
+            />
+          </Block>
+        </Block>
       </Block>
-      <Block card row space="between" style={{marginHorizontal: 10}}>
-        <Autocomplete
-          placeholder={intl.formatMessage({
-            id: 'Beneficiary.account_placeholder',
-          })}
-          style={{width: width * 0.5}}
-          data={hideResult ? [] : filteredList}
-          value={query}
-          onChangeText={_handleChangeAccount}
-          renderItem={({item, index}) => _renderItem(item, index)}
-          keyExtractor={(item, index) => String(index)}
-        />
-        <Autocomplete
-          placeholder={intl.formatMessage({
-            id: 'Beneficiary.weight_placeholder',
-          })}
-          style={{width: width * 0.3}}
-          data={hideWeightResult ? [] : WEIGHT_OPTIONS}
-          value={weight}
-          onChangeText={_handleChangeWeight}
-          renderItem={({item, index}) => (
-            <TouchableOpacity
-              key={item}
-              onPress={() => _handlePressWeightItem(item)}>
-              <Text>{item}</Text>
-            </TouchableOpacity>
-          )}
-          keyExtractor={(item, index) => String(index)}
-        />
-      </Block>
-    </Block>
-  );
+    );
+  };
 
   const _renderFooter = () => (
     <Block>
@@ -278,14 +173,14 @@ const BeneficiaryView = (props: Props): JSX.Element => {
           size="small"
           shadowless
           color={argonTheme.COLORS.ERROR}
-          onPress={_handlePressSave}>
+          onPress={props.handlePressSave}>
           {intl.formatMessage({id: 'Beneficiary.save_button'})}
         </Button>
         <Button
           size="small"
           shadowless
           color={argonTheme.COLORS.MUTED}
-          onPress={() => setShowModal(false)}>
+          onPress={props.handleCancelModal}>
           {intl.formatMessage({id: 'Beneficiary.cancel_button'})}
         </Button>
       </Block>
@@ -302,7 +197,7 @@ const BeneficiaryView = (props: Props): JSX.Element => {
       isVisible={showModal}
       animationIn="zoomIn"
       animationOut="zoomOut"
-      onBackdropPress={() => setShowModal(false)}>
+      onBackdropPress={props.handleCancelModal}>
       <Block style={styles.listContainer}>
         <Block center>
           <Text

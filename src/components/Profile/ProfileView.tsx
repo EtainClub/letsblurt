@@ -1,21 +1,15 @@
 //// react
-import React, {useState, useEffect, useContext, useCallback} from 'react';
+import React from 'react';
 //// react native
 import {
-  View,
   StyleSheet,
   Dimensions,
   ScrollView,
   Image,
   Platform,
   Linking,
-  FlatList,
-  ActivityIndicator,
-  Animated,
-  Alert,
 } from 'react-native';
 //// react navigation
-import {navigate} from '~/navigation/service';
 //// language
 import {useIntl} from 'react-intl';
 //// ui, styles
@@ -24,7 +18,7 @@ import {Images, argonTheme} from '~/constants';
 const {width, height} = Dimensions.get('screen');
 import {HeaderHeight} from '~/constants/utils';
 //// contexts
-import {PostData, PostRef, PostsTypes, ProfileData} from '~/contexts/types';
+import {ProfileData} from '~/contexts/types';
 //// etc
 import {getNumberStat} from '~/utils/stats';
 import {TouchableOpacity} from 'react-native-gesture-handler';

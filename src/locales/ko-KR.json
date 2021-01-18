@@ -1,6 +1,7 @@
 {
   "title": "렛츠 블러트",
   "feed": "피드",
+  "search": "검색",
   "post": "포스트",
   "notification": "알림",
   "posting": "포스팅",
@@ -153,8 +154,9 @@
   "Beneficiary": {
     "header": "베네피셔리 설정",
     "list_header": "베네피셔리 목록",
+    "choose_account": "계정 Select",
     "account_placeholder": "계정",
-    "weight_placeholder": "가중치 (%)",
+    "weight_placeholder": "가중치",
     "add_button": "추가",
     "save_button": "저장",
     "cancel_button": "취소",

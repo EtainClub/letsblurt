@@ -32,3 +32,6 @@ export const BLURT_NOTIFICATIONS_ENDPOINT = 'wss://notifications.blurt.world/';
 //export const BLURT_BENEFICIARY_WEIGHT = 100;
 // official version
 export const BLURT_BENEFICIARY_WEIGHT = 500;
+
+// max number of tags
+export const MAX_NUM_TAGS = 5;

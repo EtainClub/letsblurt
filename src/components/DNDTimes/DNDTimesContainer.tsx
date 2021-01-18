@@ -1,41 +1,16 @@
 //// react
 import React, {useState, useEffect, useContext} from 'react';
 //// react native
-import {
-  TouchableHighlight,
-  TouchableOpacity,
-  StyleSheet,
-  Dimensions,
-  Switch,
-  ScrollView,
-  FlatList,
-  Platform,
-} from 'react-native';
-//// UIs
-import {Button, Icon, Block, Input, Text, theme} from 'galio-framework';
-import {materialTheme} from '~/constants/materialTheme';
-const {height, width} = Dimensions.get('window');
-import {argonTheme} from '~/constants';
-import {DropdownModal} from '~/components';
-import ModalDropdown from 'react-native-modal-dropdown';
+import {Dimensions} from 'react-native';
 //// storage
 import AsyncStorage from '@react-native-community/async-storage';
+//// UIs
+const {height, width} = Dimensions.get('window');
 //// contexts
-import {AuthContext} from '~/contexts';
 //// viewes
 import {DNDTimesView} from './DNDTimesView';
 //// times
 import moment from 'moment';
-// start date and time: 1AM
-// const DATE1 = new Date(2020, 12, 12, 1, 0, 0);
-// // end date and time: 8AM
-// const DATE2 = new Date(2020, 12, 12, 8, 0, 0);
-// // local time offset in hours from UTC+0
-// const UTC_OFFSET_IN_MINUTES = DATE1.getTimezoneOffset();
-// // get timestamp of the date1
-// const START_TIME = DATE1.getTime();
-// // get timestamp of the date2
-// const END_TIME = DATE2.getTime();
 
 const UTC_OFFSET_IN_MINUTES = new Date().getTimezoneOffset();
 

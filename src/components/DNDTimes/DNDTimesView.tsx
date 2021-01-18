@@ -1,31 +1,13 @@
 //// react
-import React, {useState, useEffect, useContext} from 'react';
+import React from 'react';
 //// react native
-import {
-  TouchableHighlight,
-  TouchableOpacity,
-  StyleSheet,
-  Dimensions,
-  Switch,
-  ScrollView,
-  FlatList,
-  Platform,
-} from 'react-native';
+import {Dimensions} from 'react-native';
 //// language
 import {useIntl} from 'react-intl';
 //// UIs
-import {Button, Icon, Block, Input, Text, theme} from 'galio-framework';
-import {materialTheme} from '~/constants/materialTheme';
+import {Block} from 'galio-framework';
 const {height, width} = Dimensions.get('window');
-import {argonTheme} from '~/constants';
-import {DropdownModal} from '~/components';
-import ModalDropdown from 'react-native-modal-dropdown';
-//// storage
-import AsyncStorage from '@react-native-community/async-storage';
-//// contexts
-import {AuthContext} from '~/contexts';
 //// times
-import moment from 'moment';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 interface Props {
