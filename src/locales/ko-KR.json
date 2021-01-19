@@ -67,6 +67,8 @@
     "username_guide": "계정이름은 4자이상 15자 이하여야 합니다.",
     "signin_guide": "계정이 잇으신가요? 로그인 하기",
     "msg_ok": "사용할 수 있는 계정입니다.",
+    "username_available": "사용할 수 있는 계정입니다",
+    "username_exists": "이미 사용중인 계정입니다",
     "msg_ng": "사용할 수 없는 계정입니다.",
     "msg_too_short": "계정이름은 4자 이상이어야 합니다.",
     "msg_too_long": "계정이름은 15자 이하여야 합니다.",
@@ -90,10 +92,7 @@
     "finish_button": "끝내기",
     "welcome_header": "모든 게 완료되었습니다!",
     "welcome_guide": "이제 생성한 계정과 암호로 렛츠 블러트 모바일 앱 및 다른 블러트 앱을 사용할 수 있습니다.",
-    "login_button": "렛츠 블러트!",
-    "otp_error": "인증코드 입력 에러",
-    "invalid_phonenumber": "잘못된 전화번호입니다.",
-    "verification_error": "인증 오류"
+    "login_button": "렛츠 블러트!"
   },
   "Login": {
     "header": "로그인",
@@ -116,7 +115,12 @@
     "sms_guide": "수신한 인증코드를 입력하세요.",
     "SMS_code": "인증코드를 여기에 입력하세요",
     "confirm_button": "확인",
-    "code_error": "입력한 코드가 올바르지 않습니다."
+    "code_error": "입력한 코드가 올바르지 않습니다.",
+    "code_sent": "코드가 전송되었습니다.",
+    "otp_error": "인증코드 입력 에러",
+    "invalid_phonenumber": "잘못된 전화번호입니다.",
+    "duplicated_phonenumber": "이미 사용된 번호입니다. 다른 번호를 사용하세요",
+    "verification_error": "인증 오류"
   },
   "Header": {
     "add_account": "계정 추가"

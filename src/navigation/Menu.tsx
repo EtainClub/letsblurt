@@ -30,7 +30,7 @@ function CustomDrawerContent({
     <Block
       style={styles.container}
       forceInset={{top: 'always', horizontal: 'never'}}>
-      <Block flex={0.7} style={styles.header}>
+      <Block flex={0.6} style={styles.header}>
         <TouchableWithoutFeedback onPress={() => navigate({name: 'Profile'})}>
           <Block center style={styles.profile}>
             <Image
@@ -64,7 +64,9 @@ function CustomDrawerContent({
           })}
         </ScrollView>
       </Block>
-      <Block flex={0.3} style={{paddingLeft: 7, paddingRight: 14}}>
+      <Block
+        flex={0.4}
+        style={{paddingLeft: 7, paddingRight: 14, marginBottom: 50}}>
         <DrawerCustomItem
           title="Login"
           focused={state.index === 8 ? true : false}
@@ -101,5 +103,6 @@ const styles = StyleSheet.create({
   avatar: {
     height: 150,
     width: 150,
+    borderRadius: 150 / 2,
   },
 });

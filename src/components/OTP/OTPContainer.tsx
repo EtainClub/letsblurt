@@ -18,6 +18,7 @@ import {UIContext} from '~/contexts';
 const countryData = require('react-native-country-picker-modal/lib/assets/data/countries-emoji.json');
 
 interface Props {
+  checkDuplicatedPhone?: (phone: string) => Promise<boolean>;
   handleOTPResult: (confirm: boolean, phoneNumber?: string) => void;
 }
 const OTPContainer = (props: Props): JSX.Element => {
@@ -38,7 +39,7 @@ const OTPContainer = (props: Props): JSX.Element => {
   const [withFlag, setWithFlag] = useState<boolean>(true);
   const [country, setCountry] = useState<Country>(null);
   const [smsRequested, setSMSRequested] = useState(false);
-  const [guideMessage, setGuideMessage] = useState('');
+  const [phoneMessage, setPhoneMessage] = useState('');
 
   //////// events
   //// event: mount
@@ -55,13 +56,12 @@ const OTPContainer = (props: Props): JSX.Element => {
     // set country code
     setCountryCode(code);
     console.log('country code', code);
-
-    // message
-    setGuideMessage(intl.formatMessage({id: 'Signup.phonenumber_guide'}));
   }, []);
 
   //// handle phone number change
   const _handlePhoneNumberChange = (_phoneNumber: string) => {
+    // clear phone message
+    setPhoneMessage('');
     // this phone number does not include the country code
     setPhoneNumber(_phoneNumber);
   };
@@ -80,21 +80,30 @@ const OTPContainer = (props: Props): JSX.Element => {
 
   //// send sms code
   const _sendSMSCode = async () => {
-    // set code requested flag
-    setSMSRequested(true);
-    // clear guide message
-    setGuideMessage('');
     // build phone number including the country code
     const _phone = '+' + country.callingCode[0] + phoneNumber;
     // check sanity of the phone number
     const valid = _validatePhoneNumber(_phone);
     if (!valid) {
       console.log('invalid phone number', _phone);
-      setToastMessage(intl.formatMessage({id: 'Signup.invalid_phonenumber'}));
+      setPhoneMessage(intl.formatMessage({id: 'OTP.invalid_phonenumber'}));
       return;
     }
-    // set phone number (this includes the country code)
-    setPhoneNumber(_phone);
+    // set phone number
+    setPhoneNumber(phoneNumber);
+    // check duplicated phone number
+    const duplicated = await props.checkDuplicatedPhone(_phone);
+    if (duplicated) {
+      console.log('phone number exists in db', _phone);
+      setPhoneMessage(intl.formatMessage({id: 'OTP.duplicated_phonenumber'}));
+      return;
+    }
+
+    //// now send sms code
+    // set code requested flag
+    setSMSRequested(true);
+    // clear phone message
+    setPhoneMessage('');
     // verify phone auth of firebase and send sms code
     auth()
       .verifyPhoneNumber(_phone)
@@ -104,12 +113,12 @@ const OTPContainer = (props: Props): JSX.Element => {
           switch (phoneAuthSnapshot.state) {
             case firebase.auth.PhoneAuthState.CODE_SENT:
               console.log('[_verifyPhoneNumber] code sent');
-              setToastMessage(intl.formatMessage({id: 'Signup.code_sent'}));
+              setPhoneMessage(intl.formatMessage({id: 'OTP.code_sent'}));
               break;
             case firebase.auth.PhoneAuthState.ERROR: // or 'error'
               console.log('verification error', phoneAuthSnapshot.error);
-              setToastMessage(
-                intl.formatMessage({id: 'Signup.verification_error'}),
+              setPhoneMessage(
+                intl.formatMessage({id: 'OTP.verification_error'}),
               );
               break;
             case firebase.auth.PhoneAuthState.AUTO_VERIFIED: // or 'verified'
@@ -122,9 +131,7 @@ const OTPContainer = (props: Props): JSX.Element => {
         },
         (error) => {
           console.log('failed to verify phone number', error);
-          setToastMessage(
-            intl.formatMessage({id: 'Signup.verification_error'}),
-          );
+          setPhoneMessage(intl.formatMessage({id: 'OTP.verification_error'}));
         },
       );
   };
@@ -140,10 +147,12 @@ const OTPContainer = (props: Props): JSX.Element => {
     // @test
     //    smsCode = Config.SMS_TEST_CODE;
     console.log('sms code', smsCode);
+    // build phone number including the country code
+    const _phone = '+' + country.callingCode[0] + phoneNumber;
     // handle android auto login
     if (Platform.OS === 'android') {
       const valid = smsCode === smsCode ? true : false;
-      props.handleOTPResult(valid, phoneNumber);
+      props.handleOTPResult(valid, _phone);
       return true;
     }
     let user = null;
@@ -151,12 +160,12 @@ const OTPContainer = (props: Props): JSX.Element => {
       user = await confirmation.confirm(smsCode);
       console.log('[_confirmOTP] user', user);
       // send back the result
-      props.handleOTPResult(true, phoneNumber);
+      props.handleOTPResult(true, _phone);
       return true;
     } catch (error) {
       console.log('invalid code', error);
       // send back the result
-      props.handleOTPResult(false, phoneNumber);
+      props.handleOTPResult(false, _phone);
       return false;
     }
   };
@@ -172,7 +181,7 @@ const OTPContainer = (props: Props): JSX.Element => {
       phoneNumber={phoneNumber}
       smsCode={smsCode}
       countryCode={countryCode}
-      guideMessage={guideMessage}
+      phoneMessage={phoneMessage}
       loading={loading}
       smsRequested={smsRequested}
       handlePhoneNumberChange={_handlePhoneNumberChange}

@@ -9,7 +9,7 @@ import {
 import {Block, Button, Input, Text, theme, Icon} from 'galio-framework';
 
 import LinearGradient from 'react-native-linear-gradient';
-import {materialTheme} from '~/constants/';
+import {argonTheme} from '~/constants';
 import {HeaderHeight, iPhoneX} from '~/constants/utils';
 
 import {navigate} from '~/navigation/service';
@@ -19,63 +19,18 @@ import {useIntl} from 'react-intl';
 const {width, height} = Dimensions.get('window');
 
 interface Props {
-  onCreateAccount(username: string): void;
-  checkUsernameAvailable(username: string): Promise<boolean>;
+  username: string;
+  usernameMessage: string;
+  accountAvailable: boolean;
+  handleUsernameChange: (text: string) => void;
+  onContinue: () => void;
 }
 
 const SignupScreen = (props: Props): JSX.Element => {
-  const [username, setUsername] = useState('');
-  const [message, setMessage] = useState('');
-  const [accountAvailable, setAccountAvailable] = useState(false);
-  const [active, setActive] = useState({username: false, password: false});
+  //// props
+  const {username, accountAvailable, usernameMessage} = props;
 
   const intl = useIntl();
-
-  const _checkUsernameValid = (username: string) => {
-    if (username.length < 3) {
-      console.log('username must be longer than 3.', username);
-      setMessage(intl.formatMessage({id: 'Signup.msg_too_short'}));
-      return false;
-    }
-    // long length
-    if (username.length > 16) {
-      console.log('username must be shorter than 16.', username);
-      setMessage(intl.formatMessage({id: 'Signup.msg_too_long'}));
-      return false;
-    }
-    // start with number
-    if (username.match(/^\d/)) {
-      console.log('username must not start with a number.', username);
-      setMessage(intl.formatMessage({id: 'Signup.msg_number'}));
-      return false;
-    }
-    return true;
-  };
-
-  const _handleUsernameChange = async (value: string) => {
-    // set username
-    setUsername(value);
-    // check username valid
-    const valid = _checkUsernameValid(value);
-    if (valid) {
-      setAccountAvailable(true);
-      setMessage('');
-    } else {
-      setAccountAvailable(false);
-    }
-  };
-
-  const _onCreateAccount = async () => {
-    const available = await props.checkUsernameAvailable(username);
-    console.log('username avail?', available);
-    setAccountAvailable(available);
-    if (available) {
-      setMessage('The username is avaliable.');
-      props.onCreateAccount(username);
-    } else {
-      setMessage('The username is already in use.');
-    }
-  };
 
   const iconContent = (
     <Icon
@@ -120,7 +75,7 @@ const SignupScreen = (props: Props): JSX.Element => {
             <Block center>
               <Input
                 bgColor="transparent"
-                placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
+                placeholderTextColor={argonTheme.COLORS.PLACEHOLDER}
                 borderless
                 color="white"
                 placeholder="Username"
@@ -128,14 +83,14 @@ const SignupScreen = (props: Props): JSX.Element => {
                 iconContent={iconContent}
                 help={
                   accountAvailable ? (
-                    <Text style={{color: 'orange'}}>{message}</Text>
+                    <Text style={{color: 'orange'}}>{usernameMessage}</Text>
                   ) : (
-                    <Text style={{color: 'red'}}>{message}</Text>
+                    <Text style={{color: 'red'}}>{usernameMessage}</Text>
                   )
                 }
                 bottomHelp
-                style={[styles.input, active.user ? styles.inputActive : null]}
-                onChangeText={(text: string) => _handleUsernameChange(text)}
+                style={styles.input}
+                onChangeText={props.handleUsernameChange}
               />
             </Block>
             <Block flex style={{marginTop: 20}}>
@@ -144,11 +99,11 @@ const SignupScreen = (props: Props): JSX.Element => {
                 disabled={!accountAvailable}
                 color={
                   accountAvailable
-                    ? materialTheme.COLORS.BUTTON_COLOR
-                    : materialTheme.COLORS.MUTED
+                    ? argonTheme.COLORS.ERROR
+                    : argonTheme.COLORS.MUTED
                 }
                 style={styles.button}
-                onPress={_onCreateAccount}>
+                onPress={props.onContinue}>
                 {intl.formatMessage({id: 'Signup.button'})}
               </Button>
               <Button
@@ -161,7 +116,7 @@ const SignupScreen = (props: Props): JSX.Element => {
                 <Text
                   center
                   color={theme.COLORS.WHITE}
-                  size={theme.SIZES.FONT * 0.75}>
+                  size={theme.SIZES.FONT * 1}>
                   {intl.formatMessage({id: 'Signup.signin_guide'})}
                 </Text>
               </Button>
@@ -187,7 +142,7 @@ const styles = StyleSheet.create({
     width: width * 0.9,
     borderRadius: 0,
     borderBottomWidth: 1,
-    borderBottomColor: materialTheme.COLORS.PLACEHOLDER,
+    borderBottomColor: argonTheme.COLORS.PLACEHOLDER,
   },
   inputActive: {
     borderBottomColor: 'white',

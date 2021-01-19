@@ -23,7 +23,7 @@ interface Props {
   phoneNumber: string;
   countryCode: CountryCode;
   smsCode?: string;
-  guideMessage: string;
+  phoneMessage: string;
   loading: boolean;
   smsRequested: boolean;
   handlePhoneNumberChange: (phoneNumber: string) => void;
@@ -40,7 +40,7 @@ const OTPView = (props: Props): JSX.Element => {
     phoneNumber,
     smsCode,
     countryCode,
-    guideMessage,
+    phoneMessage,
     loading,
     smsRequested,
   } = props;
@@ -50,41 +50,42 @@ const OTPView = (props: Props): JSX.Element => {
   //////// functions
   const _renderPhoneInput = () => {
     return (
-      <Block card center style={styles.itemContainer}>
-        <Block center row>
-          <CountryPicker
-            theme={DARK_THEME}
-            countryCode={countryCode}
-            withFlag
-            withFilter
-            withAlphaFilter
-            withCallingCode
-            withCallingCodeButton
-            onSelect={props.onCountrySelect}
-          />
-          <Block>
-            <Input
-              bgColor="transparent"
-              placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
-              borderless
-              family="antdesign"
-              color="black"
-              placeholder={intl.formatMessage({id: 'OTP.phone_number'})}
-              value={phoneNumber.replace(/\-/g, '')}
-              autoCapitalize="none"
-              help={<Text>{guideMessage}</Text>}
-              bottomHelp
-              style={styles.input}
-              type="number-pad"
-              onChangeText={props.handlePhoneNumberChange}
+      <Block style={{marginTop: 20}}>
+        <Block row space="around">
+          <Block
+            center
+            middle
+            style={{borderWidth: 1, width: 100, height: 45, top: 0}}>
+            <CountryPicker
+              countryCode={countryCode}
+              withFlag
+              withFilter
+              withAlphaFilter
+              withCallingCode
+              withCallingCodeButton
+              onSelect={props.onCountrySelect}
             />
           </Block>
+          <Input
+            placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
+            family="antdesign"
+            color="black"
+            placeholder={intl.formatMessage({id: 'OTP.phone_number'})}
+            value={phoneNumber.replace(/\-/g, '')}
+            autoCapitalize="none"
+            bottomHelp
+            style={styles.input}
+            type="number-pad"
+            onChangeText={props.handlePhoneNumberChange}
+          />
         </Block>
-        <Block style={{marginTop: 20}}>
+        <Text color="red">{phoneMessage}</Text>
+        <Block center style={{marginTop: 0}}>
           <Button
-            size="small"
+            style={{width: width * 0.8}}
+            size="large"
             shadowless
-            color={materialTheme.COLORS.BUTTON_COLOR}
+            color={argonTheme.COLORS.ERROR}
             onPress={props.sendSMSCode}>
             {intl.formatMessage({id: 'OTP.phone_button'})}
           </Button>
@@ -95,33 +96,30 @@ const OTPView = (props: Props): JSX.Element => {
 
   const _renderSMSInput = () => {
     return (
-      <Block card style={styles.itemContainer}>
-        <Block>
+      <Block style={{marginTop: 20}}>
+        <Block center>
           <Input
             bgColor="transparent"
-            placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
-            borderless
+            placeholderTextColor={argonTheme.COLORS.PLACEHOLDER}
             family="antdesign"
             color="black"
             placeholder={intl.formatMessage({id: 'OTP.SMS_code'})}
             value={smsCode}
-            bottomHelp
             autoCapitalize="none"
-            style={styles.input}
+            style={{width: width * 0.8}}
             type="number-pad"
             onChangeText={props.handleSMSCodeChange}
           />
         </Block>
-        <Block center style={{marginTop: 20}}>
+        <Block center style={{marginTop: 0}}>
           <Button
-            size="small"
+            style={{width: width * 0.8}}
+            size="large"
             shadowless
             disabled={!smsRequested}
             loading={loading}
             color={
-              smsRequested
-                ? materialTheme.COLORS.BUTTON_COLOR
-                : materialTheme.COLORS.MUTED
+              smsRequested ? argonTheme.COLORS.ERROR : argonTheme.COLORS.MUTED
             }
             onPress={props.verifySMSCode}>
             {intl.formatMessage({id: 'OTP.confirm_button'})}
@@ -139,6 +137,7 @@ const OTPView = (props: Props): JSX.Element => {
       onBackdropPress={props.handleCancelModal}>
       <Block card center style={styles.modalContainer}>
         <Text
+          h6
           style={{
             borderBottomColor: 'red',
             borderBottomWidth: 5,
@@ -156,13 +155,13 @@ export {OTPView};
 
 const styles = StyleSheet.create({
   modalContainer: {
-    width: '90%',
+    width: '100%',
     height: 'auto',
     backgroundColor: theme.COLORS.WHITE,
     paddingVertical: 10,
   },
   itemContainer: {
-    width: width * 0.6,
+    width: width * 0.9,
     margin: 10,
   },
   input: {

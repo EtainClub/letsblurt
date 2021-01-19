@@ -68,6 +68,8 @@
     "username_guide": "must be longer than 3 and shorter than 16 characters.",
     "signin_guide": "Already have an account? Sign In",
     "msg_ok": "The username is available",
+    "username_available": "The username is avaliable.",
+    "username_exists": "The username is already in use",
     "msg_ng": "The username is not available",
     "msg_too_short": "username must be longer than 3.",
     "msg_too_long": "username must be shorter than 16.",
@@ -91,10 +93,7 @@
     "finish_button": "Finish",
     "welcome_header": "You're all set!",
     "welcome_guide": "Now you can use the Let's Blurt app and other BLURT Dapps via your username and private key",
-    "login_button": "Let's Blurt!",
-    "otp_error": "code is not correct",
-    "invalid_phonenumber": "Invalid phone number",
-    "verification_error": "Verification error"
+    "login_button": "Let's Blurt!"
   },
   "Login": {
     "header": "Login",
@@ -116,7 +115,12 @@
     "sms_guide": "Enter the verification code that you've just received.",
     "SMS_code": "SMS code here",
     "confirm_button": "Confirm",
-    "code_error": "The code is invalid"
+    "code_error": "The code is invalid",
+    "code_sent": "Code sent",
+    "otp_error": "code is not correct",
+    "invalid_phonenumber": "Invalid phone number",
+    "duplicated_phonenumber": "The phone number was used before. Try with another.",
+    "verification_error": "Verification error"
   },
   "Header": {
     "add_account": "Add Account"
