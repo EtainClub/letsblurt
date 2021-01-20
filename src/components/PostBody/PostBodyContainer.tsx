@@ -234,6 +234,13 @@ const PostBodyContainer = (props: Props): JSX.Element => {
     return RNFetchBlob.config({
       fileCache: true,
       appendExt: 'jpg',
+      addAndroidDownloads: {
+        useDownloadManager: true,
+        notification: true,
+        title: 'Lets Blurt',
+        description: 'image downloaded',
+        mime: 'image/png',
+      },
     })
       .fetch('GET', uri)
       .then((res) => {
