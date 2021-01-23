@@ -1,9 +1,7 @@
 //// react
-import React, {useState, useContext, useEffect} from 'react';
+import React from 'react';
 //// react native
 import {View, StyleSheet, Dimensions} from 'react-native';
-//// config
-import Config from 'react-native-config';
 //// language
 import {useIntl} from 'react-intl';
 //// ui
@@ -13,21 +11,18 @@ import {argonTheme} from '~/constants';
 const {width, height} = Dimensions.get('window');
 //// blockchain
 //// components
-//// context
-import {AuthContext, UserContext} from '~/contexts';
-import {verifyPassoword} from '~/providers/blurt';
-//// views
 
 interface Props {
   username: string;
   message: string;
+  showModal: boolean;
   handlePasswordChange: (password: string) => void;
   handlePressConfirm: () => void;
   cancelModal: () => void;
 }
 const SecureKeyView = (props: Props): JSX.Element => {
   //// props
-  const {username, message} = props;
+  const {username, message, showModal} = props;
   //// language
   const intl = useIntl();
 
@@ -89,7 +84,7 @@ const SecureKeyView = (props: Props): JSX.Element => {
   ////
   return (
     <Modal
-      isVisible
+      isVisible={showModal}
       animationIn="zoomIn"
       animationOut="zoomOut"
       onBackdropPress={props.cancelModal}>

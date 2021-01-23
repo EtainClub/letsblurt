@@ -1,8 +1,7 @@
 //// react
 import React, {useState, useContext, useEffect} from 'react';
 //// react native
-//// config
-import Config from 'react-native-config';
+import {View} from 'react-native';
 //// language
 import {useIntl} from 'react-intl';
 //// blockchain
@@ -116,22 +115,32 @@ const TokenTransferContainer = (props: Props): JSX.Element => {
     props.callback();
   };
 
-  return showSecureKey ? (
-    <SecureKey
-      username={authState.currentCredentials.username}
-      requiredKeyType={KeyTypes.ACTIVE}
-      handleResult={_handleSecureKeyResult}
-    />
-  ) : (
-    <TokenTransferView
-      username={authState.currentCredentials.username}
-      title={props.title}
-      followings={props.followings}
-      balance={props.balance}
-      loading={transferring}
-      transferToken={_hanldeTokenTransfer}
-      cancelModal={props.callback}
-    />
+  const _cancelSecureKey = () => {
+    setShowSecureKey(false);
+    // cancel transfer modal, too
+    props.callback();
+  };
+
+  return (
+    <View>
+      <TokenTransferView
+        username={authState.currentCredentials.username}
+        title={props.title}
+        followings={props.followings}
+        balance={props.balance}
+        loading={transferring}
+        transferToken={_hanldeTokenTransfer}
+        cancelModal={props.callback}
+      />
+      {showSecureKey && (
+        <SecureKey
+          username={authState.currentCredentials.username}
+          requiredKeyType={KeyTypes.ACTIVE}
+          handleResult={_handleSecureKeyResult}
+          cancelProcess={_cancelSecureKey}
+        />
+      )}
+    </View>
   );
 };
 

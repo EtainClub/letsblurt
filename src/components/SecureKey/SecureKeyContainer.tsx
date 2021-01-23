@@ -7,11 +7,7 @@ import Config from 'react-native-config';
 //// language
 import {useIntl} from 'react-intl';
 //// blockchain
-import {
-  verifyPassoword,
-  transferToken,
-  TransactionReturnCodes,
-} from '~/providers/blurt/dblurtApi';
+import {verifyPassoword} from '~/providers/blurt/dblurtApi';
 //// context
 import {AuthContext, UserContext, SettingsContext} from '~/contexts';
 //// components
@@ -24,6 +20,7 @@ interface Props {
   username: string;
   requiredKeyType: KeyTypes;
   handleResult: (result: boolean, password: string) => void;
+  cancelProcess: () => void;
 }
 const SecureKeyContainer = (props: Props): JSX.Element => {
   //// language
@@ -81,6 +78,8 @@ const SecureKeyContainer = (props: Props): JSX.Element => {
 
   const _cancelModal = () => {
     setShowModal(false);
+    // cancel process
+    props.cancelProcess();
   };
 
   return (
@@ -88,6 +87,7 @@ const SecureKeyContainer = (props: Props): JSX.Element => {
       <SecureKeyView
         username={props.username}
         message={message}
+        showModal={showModal}
         handlePasswordChange={_handlePasswordChange}
         handlePressConfirm={_handlePressConfirm}
         cancelModal={_cancelModal}
