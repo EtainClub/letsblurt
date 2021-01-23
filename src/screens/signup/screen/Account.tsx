@@ -15,7 +15,7 @@ import {navigate} from '~/navigation/service';
 //// UI
 import {Block, Button, Text, theme, Checkbox} from 'galio-framework';
 import LinearGradient from 'react-native-linear-gradient';
-import {materialTheme} from '~/constants/';
+import {argonTheme, materialTheme} from '~/constants/';
 import {HeaderHeight, iPhoneX} from '~/constants/utils';
 
 const {width, height} = Dimensions.get('window');
@@ -24,6 +24,7 @@ interface Props {
   account: string;
   password: string;
   keyCopied: boolean;
+  loading: boolean;
   finalized: boolean;
   createAccount: () => void;
   copyPasswordToClipboard: () => void;
@@ -32,7 +33,7 @@ interface Props {
 
 const AccountScreen = (props: Props): JSX.Element => {
   //// props
-  const {keyCopied, finalized} = props;
+  const {account, password, keyCopied, loading, finalized} = props;
   //// language
   const intl = useIntl();
 
@@ -49,7 +50,7 @@ const AccountScreen = (props: Props): JSX.Element => {
             {intl.formatMessage({id: 'Signup.header'})}
           </Text>
           <Text color="orange" center size={theme.SIZES.FONT * 0.875}>
-            {`${intl.formatMessage({id: 'account'})}: ${props.account}`}
+            {`${intl.formatMessage({id: 'account'})}: ${account}`}
           </Text>
           <Text color="red" center size={theme.SIZES.FONT * 0.875}>
             {intl.formatMessage({id: 'Signup.key_guide'})}
@@ -62,7 +63,7 @@ const AccountScreen = (props: Props): JSX.Element => {
             paddingHorizontal: 50,
           }}>
           <Text color="orange" center size={theme.SIZES.FONT * 0.875}>
-            {props.password}
+            {password}
           </Text>
         </Block>
         <Block flex center style={{marginTop: 20}}>
@@ -86,7 +87,7 @@ const AccountScreen = (props: Props): JSX.Element => {
           <Button
             shadowless
             disabled={!keyCopied}
-            loading={finalized}
+            loading={loading}
             style={styles.button}
             color={
               keyCopied
@@ -110,10 +111,10 @@ const AccountScreen = (props: Props): JSX.Element => {
             paddingVertical: theme.SIZES.BASE * 0.625,
             paddingHorizontal: 50,
           }}>
-          <Text color="#fff" center size={theme.SIZES.FONT * 1.475}>
+          <Text color="pink" center size={theme.SIZES.FONT * 1.475}>
             {intl.formatMessage({id: 'Signup.welcome_header'})}
           </Text>
-          <Text color="red" center size={theme.SIZES.FONT * 0.875}>
+          <Text color="white" center size={theme.SIZES.FONT * 0.875}>
             {intl.formatMessage({id: 'Signup.welcome_guide'})}
           </Text>
         </Block>
@@ -121,7 +122,7 @@ const AccountScreen = (props: Props): JSX.Element => {
           <Button
             shadowless
             style={styles.button}
-            color={materialTheme.COLORS.BUTTON_COLOR}
+            color={argonTheme.COLORS.ERROR}
             onPress={() => navigate({name: 'Login'})}>
             {intl.formatMessage({id: 'Signup.login_button'})}
           </Button>

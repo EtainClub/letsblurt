@@ -74,6 +74,7 @@ exports.createAccountRequest = functions.https.onCall(async (data, context) => {
   // get creator account
   const creator = functions.config().creator.account;
   const creatorWif = functions.config().creator.wif;
+  const welcomeBlurt = functions.config().creator.welcome_blurt;
 
   // private active key of creator account
   const creatorKey = dblurt.PrivateKey.fromString(creatorWif);
@@ -124,24 +125,35 @@ exports.createAccountRequest = functions.https.onCall(async (data, context) => {
   console.log(create_op);
   // push the creation operation
   operations.push(create_op);
-  // broadcast operation to blockchain
-  // let result = null;
-  // client.broadcast
-  //   .sendOperations(operations, creatorKey)
-  //   .then((response) => {
-  //     console.log('creation result', result);
-  //     result = response;
-  //   })
-  //   .catch((error) => console.log('account creation failed', error));
-
   try {
     const result = await client.broadcast.sendOperations(
       operations,
       creatorKey,
     );
     console.log('create account, result', result);
-    // TODO if successful, transfer 10 blurt to the account
-    return result;
+
+    //// if successful, transfer 3 blurt to the account
+    if (result) {
+      // get privake key from creator active wif
+      const privateKey = dblurt.PrivateKey.from(creatorWif);
+      // transfer
+      if (privateKey) {
+        const args = {
+          from: creator,
+          to: username,
+          amount: welcomeBlurt,
+          memo: 'Welcome Gift. Enjoy Blurt',
+        };
+        const resultTransfer = await client.broadcast.transfer(
+          args,
+          privateKey,
+        );
+        console.log('transfer result', resultTransfer);
+        return resultTransfer;
+      }
+      return null;
+    }
+    return null;
   } catch (error) {
     console.log('failed to create account', error);
     return null;

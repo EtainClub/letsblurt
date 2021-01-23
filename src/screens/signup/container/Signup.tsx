@@ -53,6 +53,7 @@ const Signup = (props: Props): JSX.Element => {
   const [copied, setCopied] = useState(false);
   const [keyCopied, setKeyCopied] = useState(false);
   const [finalized, setFinalized] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     SplashScreen.hide();
@@ -122,8 +123,8 @@ const Signup = (props: Props): JSX.Element => {
 
   const _createAccount = async () => {
     console.log('userState global props', userState.globalProps);
-    // update the finalize flag
-    setFinalized(false);
+    // set loading flag
+    setLoading(true);
     const options = {
       username,
       password,
@@ -145,10 +146,18 @@ const Signup = (props: Props): JSX.Element => {
       // update the finalize flag
       setFinalized(true);
     }
+    // clear loading
+    setLoading(false);
   };
 
   //// check if the given phone number exists in db
   const _checkDuplicatedPhone = async (_phone: string) => {
+    // sign in to firebase anonymously to use firebase firestore
+    await auth()
+      .signInAnonymously()
+      .then((result) => console.log('signed in firebase', result))
+      .catch((error) => console.log('failed to sign in firebase', error));
+
     // reference to phones collection
     const phonesRef = firestore().collection('phones');
     let duplicated = false;
@@ -203,6 +212,8 @@ const Signup = (props: Props): JSX.Element => {
     setShowSignupScreen(true);
     // hide account screen
     setShowAccountScreen(false);
+    //
+    setLoading(false);
   };
 
   return showAccountScreen ? (
@@ -210,6 +221,7 @@ const Signup = (props: Props): JSX.Element => {
       account={username}
       password={password}
       keyCopied={keyCopied}
+      loading={loading}
       finalized={finalized}
       createAccount={_createAccount}
       copyPasswordToClipboard={_copyPasswordToClipboard}
