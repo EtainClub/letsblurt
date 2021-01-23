@@ -59,7 +59,6 @@ export interface UserState {
   walletData: WalletData;
   // price in usd
   price?: number;
-  //  voteAmount: string;
   followings: string[];
   followers: string[];
 }

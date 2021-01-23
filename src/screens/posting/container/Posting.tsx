@@ -86,29 +86,26 @@ const Posting = (props: Props): JSX.Element => {
   }, []);
   //// event: edit mode
   useEffect(() => {
-    console.log('[Posting] uiState', uiState);
     //
     if (uiState.editMode) {
-      console.log('[Posting] editMode, postDetails', postsState.postDetails);
+      const {postDetails} = postsState;
       // check if original post exists
-      if (originalPost) {
-        // get the post details
-        setOriginalPost(postsState.postDetails);
-        // set title
-        setTitle(originalPost.state.title);
-        // set body
-        setBody(originalPost.markdownBody);
-        // tags
-        const _tags = originalPost.metadata.tags.reduce(
-          (tagString, tag) => tagString + tag + ' ',
-          '',
-        );
-        setTags(_tags);
-        // get html from markdown
-        const _body = renderPostBody(originalPost.markdownBody, true);
-        // set preview
-        setPreviewBody(_body);
-      }
+      // get the post details
+      setOriginalPost(postDetails);
+      // set title
+      setTitle(postDetails.state.title);
+      // set body
+      setBody(postDetails.markdownBody);
+      // tags
+      const _tags = postDetails.metadata.tags.reduce(
+        (tagString, tag) => tagString + tag + ' ',
+        '',
+      );
+      setTags(_tags);
+      // get html from markdown
+      const _body = renderPostBody(postDetails.markdownBody, true);
+      // set preview
+      setPreviewBody(_body);
     }
   }, [uiState.editMode]);
 
@@ -327,6 +324,8 @@ const Posting = (props: Props): JSX.Element => {
     setTagMessage('');
     // clear body of editor
     setClearBody(true);
+    // clear original post
+    setOriginalPost('');
   };
 
   const _handleCancelEditing = () => {

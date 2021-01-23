@@ -47,7 +47,6 @@ const initialState = {
     blogRefs: [],
     blogs: [],
   },
-  //  voteAmount: '0',
   globalProps: {
     steemPerMVests: 0,
     base: 0,

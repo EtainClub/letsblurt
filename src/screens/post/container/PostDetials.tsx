@@ -39,8 +39,6 @@ interface Props {
 
 const PostDetails = (props: Props): JSX.Element => {
   // props
-  console.log('[PostDetails] props', props);
-
   //// language
   const intl = useIntl();
   // contexts

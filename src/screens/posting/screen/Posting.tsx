@@ -71,24 +71,6 @@ const PostingScreen = (props: Props): JSX.Element => {
     setTimeout(() => setTitleEditable(true), 100);
   }, []);
 
-  // //// set original post event
-  // useEffect(() => {
-  //   if (originalPost) {
-  //     setTitle(originalPost.state.title);
-  //     setBody(markdownBody);
-  //     // tags
-  //     const _tags = originalPost.metadata.tags.reduce(
-  //       (tagString, tag) => tagString + tag + ' ',
-  //       '',
-  //     );
-  //     setTags(_tags);
-  //     // get html from markdown
-  //     const _body = renderPostBody(markdownBody, true);
-  //     // set preview
-  //     setPreviewBody(_body);
-  //   }
-  // }, [originalPost]);
-
   //// render preview of posting
   const _renderPreview = () => (
     <Block>
@@ -125,7 +107,7 @@ const PostingScreen = (props: Props): JSX.Element => {
           </Block>
           <Editor
             isComment={false}
-            originalPost={markdownBody}
+            originalBody={markdownBody}
             clearBody={clearBody}
             handleBodyChange={props.handleBodyChange}
           />

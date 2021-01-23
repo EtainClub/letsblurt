@@ -8,7 +8,6 @@ import {AuthorList} from '~/components';
 //// screens, views
 import {EditorView} from './EditorView';
 //// utils
-import renderPostBody from '~/utils/render-helpers/markdown-2-html';
 
 //// types
 type Position = {
@@ -18,7 +17,7 @@ type Position = {
 //// props
 interface Props {
   isComment: boolean;
-  originalPost?: string;
+  originalBody?: string;
   depth?: number;
   close?: boolean;
   clearBody?: boolean;
@@ -27,12 +26,12 @@ interface Props {
 }
 const EditorContainer = (props: Props): JSX.Element => {
   //// props
-  const {clearBody} = props;
+  const {clearBody, originalBody} = props;
   //// language
   //// contexts
   const {userState} = useContext(UserContext);
   //// states
-  const [body, setBody] = useState(props.originalPost);
+  const [body, setBody] = useState(originalBody);
   const [editable, setEditable] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [bodySelection, setBodySelection] = useState<Position>({
@@ -55,20 +54,23 @@ const EditorContainer = (props: Props): JSX.Element => {
     }
   }, [clearBody]);
 
-  //// edit event. set body
-  useEffect(() => {
-    if (props.originalPost) {
-      console.log('[EditorView] original body exists', props.originalPost);
-      setBody(props.originalPost);
-    }
-  }, [props.originalPost]);
+  // //// edit event. set body
+  // useEffect(() => {
+  //   console.log('[EditorView] original body exists', props.originalBody);
+
+  //   if (props.originalBody) {
+  //     console.log('[EditorView] original body exists', props.originalBody);
+  //     setBody(props.originalBody);
+  //   }
+  // }, [props.originalBody]);
 
   //// edit event. set body
   useEffect(() => {
-    if (props.originalPost) {
-      console.log('original body exists', props.originalPost);
+    if (originalBody) {
+      console.log('original body exists', props.originalBody);
+      setBody(originalBody);
     }
-  }, [props.originalPost]);
+  }, [originalBody]);
 
   //// event: close of comment input
   useEffect(() => {
