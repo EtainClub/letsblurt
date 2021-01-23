@@ -31,6 +31,8 @@ interface Props {
   showTransactions?: boolean;
   price?: number;
   handlePressTransfer?: (index: number) => void;
+  reloading: boolean;
+  onRefresh: () => void;
 }
 const WalletStatsView = (props: Props): JSX.Element => {
   //// props
@@ -93,10 +95,7 @@ const WalletStatsView = (props: Props): JSX.Element => {
           name={item.icon}
           family={item.iconType}
         />
-        <Text
-          style={{textAlign: 'left'}}
-          color="#525F7F"
-          size={12}>
+        <Text style={{textAlign: 'left'}} color="#525F7F" size={12}>
           {!hideOp &&
             intl.formatMessage({id: `Wallet.${get(item, 'textKey')}`})}{' '}
           {value} BLURT
@@ -240,27 +239,29 @@ const WalletStatsView = (props: Props): JSX.Element => {
         <Block style={styles.notification}>
           <FlatList
             data={transactions}
+            refreshing={props.reloading}
+            onRefresh={props.onRefresh}
             keyExtractor={(item, index) => index.toString()}
             renderItem={_renderItem}
-            ListHeaderComponent={
-              props.isUser && (
-                <Block style={styles.title}>
-                  <Text
-                    style={{paddingBottom: 5}}
-                    center
-                    size={16}
-                    color={argonTheme.COLORS.TEXT}>
-                    {intl.formatMessage({id: 'Wallet.transaction_header'})}
-                  </Text>
-                  <Text
-                    center
-                    size={12}
-                    color={argonTheme.COLORS.TEXT}>
-                    {intl.formatMessage({id: 'Wallet.transaction_desc'})}
-                  </Text>
-                </Block>
-              )
-            }
+            // ListHeaderComponent={
+            //   props.isUser && (
+            //     <Block style={styles.title}>
+            //       <Text
+            //         style={{paddingBottom: 5}}
+            //         center
+            //         size={16}
+            //         color={argonTheme.COLORS.TEXT}>
+            //         {intl.formatMessage({id: 'Wallet.transaction_header'})}
+            //       </Text>
+            //       <Text
+            //         center
+            //         size={12}
+            //         color={argonTheme.COLORS.TEXT}>
+            //         {intl.formatMessage({id: 'Wallet.transaction_desc'})}
+            //       </Text>
+            //     </Block>
+            //   )
+            // }
           />
         </Block>
       </Block>

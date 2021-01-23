@@ -1,20 +1,17 @@
 //// react
 import React, {useState, useEffect, useContext} from 'react';
 //// react native
-import {WalletScreen} from '../screen/Wallet';
 //// language
 import {useIntl} from 'react-intl';
 ////
 import {AuthContext, UIContext, UserContext} from '~/contexts';
 import {WalletData, KeyTypes} from '~/contexts/types';
 //// blockchain
-import {
-  claimRewardBalance,
-  transferToken,
-  TransactionReturnCodes,
-} from '~/providers/blurt/dblurtApi';
+import {claimRewardBalance} from '~/providers/blurt/dblurtApi';
 //// components
 import {TokenTransfer} from '~/components';
+//// vies
+import {WalletScreen} from '../screen/Wallet';
 
 //// props
 interface Props {
@@ -41,6 +38,7 @@ const Wallet = (props: Props): JSX.Element => {
   const [price, setPrice] = useState(0);
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [followingList, setFollowingList] = useState([]);
+  const [reloading, setReloading] = useState(false);
   //////// events
   //// event: mount
   useEffect(() => {
@@ -66,6 +64,18 @@ const Wallet = (props: Props): JSX.Element => {
     });
     return unsubscribe;
   }, [navigation]);
+  //// event: account switched
+  useEffect(() => {
+    if (authState.loggedIn) {
+      const {username} = authState.currentCredentials;
+      // fetch user data
+      getWalletData(username);
+      // fetch price
+      getPrice();
+      // get following list
+      _getFollowingList(username);
+    }
+  }, [authState.currentCredentials]);
 
   //// event: wallet fetched
   useEffect(() => {
@@ -78,6 +88,15 @@ const Wallet = (props: Props): JSX.Element => {
     setPrice(userState.price);
     console.log('[Wallet] set price', userState.price);
   }, [userState.price]);
+
+  //// get wallet data
+  const _getWalletData = () => {
+    const {username} = authState.currentCredentials;
+    // fetch user data
+    getWalletData(username);
+    // fetch price
+    getPrice();
+  };
 
   //// get followings
   const _getFollowingList = async (username: string) => {
@@ -111,12 +130,22 @@ const Wallet = (props: Props): JSX.Element => {
     setShowTransferModal(true);
   };
 
+  ////
+  const _handleTransferResult = (result: boolean) => {
+    // hide transfer modal
+    setShowTransferModal(false);
+    // refresh wallet if result is successulf
+    if (result) {
+      _getWalletData();
+    }
+  };
+
   return showTransferModal ? (
     <TokenTransfer
       title={intl.formatMessage({id: 'Wallet.token_transfer_title'})}
       followings={followingList}
       balance={walletData.blurt}
-      callback={() => setShowTransferModal(false)}
+      handleResult={_handleTransferResult}
     />
   ) : (
     <WalletScreen
@@ -124,6 +153,8 @@ const Wallet = (props: Props): JSX.Element => {
       handlePressClaim={_handlePressClaim}
       claiming={claiming}
       price={price}
+      reloading={reloading}
+      onRefresh={_getWalletData}
       handlePressTransfer={_handlePressTransfer}
     />
   );

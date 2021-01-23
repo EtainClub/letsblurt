@@ -20,7 +20,7 @@ interface Props {
   title: string;
   followings: string[];
   balance: string;
-  callback: () => void;
+  handleResult: (result: boolean) => void;
 }
 const TokenTransferContainer = (props: Props): JSX.Element => {
   //// language
@@ -112,13 +112,13 @@ const TokenTransferContainer = (props: Props): JSX.Element => {
     console.log('_hanldeTokenTransfer. resultCode', resultCode);
 
     // close the token modal
-    props.callback();
+    props.handleResult(true);
   };
 
   const _cancelSecureKey = () => {
     setShowSecureKey(false);
     // cancel transfer modal, too
-    props.callback();
+    props.handleResult(false);
   };
 
   return (
@@ -130,7 +130,7 @@ const TokenTransferContainer = (props: Props): JSX.Element => {
         balance={props.balance}
         loading={transferring}
         transferToken={_hanldeTokenTransfer}
-        cancelModal={props.callback}
+        cancelModal={() => props.handleResult(false)}
       />
       {showSecureKey && (
         <SecureKey
