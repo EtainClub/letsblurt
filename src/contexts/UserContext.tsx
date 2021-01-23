@@ -33,7 +33,7 @@ const initialState = {
     profile: {
       metadata: {},
       name: '',
-      voteAmount: '',
+      voteAmount: '0',
       votePower: '',
       balance: '',
       power: '',

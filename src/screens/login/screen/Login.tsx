@@ -18,48 +18,25 @@ import {useIntl} from 'react-intl';
 const {width, height} = Dimensions.get('window');
 
 interface Props {
-  processLogin: (username: string, password: string) => Promise<boolean>;
+  username: string;
+  password: string;
+  message: string;
+  loading: boolean;
+  handleUsernameChange: (username: string) => void;
+  handlePasswordChange: (password: string) => void;
+  processLogin: () => void;
 }
 
 const LoginScreen = (props: Props): JSX.Element => {
-  const [username, setUsername] = useState('');
-  const [password, setPasword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  const [active, setActive] = useState({username: false, password: false});
+  //// props
+  const {username, password, message, loading} = props;
+  // const [username, setUsername] = useState('');
+  // const [password, setPasword] = useState('');
+  // const [loading, setLoading] = useState(false);
+  // const [message, setMessage] = useState('');
   // temp
   //  const [passwordEditable, setPasswordEditable] = useState(false);
   const intl = useIntl();
-
-  // useEffect(() => {
-  //   setTimeout(() => setPasswordEditable(true), 100);
-  // }, []);
-
-  const _handleUsernameChange = (value: string): void => {
-    // set username
-    setUsername(value);
-    // clear message
-    setMessage('');
-  };
-
-  const _handlePasswordChange = (value: string): void => {
-    // set password
-    setPasword(value);
-    // clear message
-    setMessage('');
-  };
-
-  const _processLogin = async () => {
-    setLoading(true);
-    const success = await props.processLogin(username, password);
-    setLoading(false);
-    // clean up
-    if (success) {
-      setUsername('');
-      setPasword('');
-      setMessage('');
-    }
-  };
 
   return (
     <LinearGradient
@@ -93,36 +70,28 @@ const LoginScreen = (props: Props): JSX.Element => {
           <Block center>
             <Input
               borderless
+              defaultValue={username}
               color="white"
               placeholder="Username"
               type="email-address"
               autoCapitalize="none"
               bgColor="transparent"
-              onBlur={() => console.log('onBlur username')}
-              onFocus={() => console.log('onFocus username')}
               placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
-              onChangeText={(text: string) => _handleUsernameChange(text)}
-              style={[
-                styles.input,
-                active.username ? styles.inputActive : null,
-              ]}
+              onChangeText={props.handleUsernameChange}
+              style={styles.input}
             />
             <Input
               password
               viewPass
               borderless
+              defaultValue={password}
               color="white"
               iconColor="white"
               placeholder="Password"
               bgColor="transparent"
-              onBlur={() => console.log('onBlur password')}
-              onFocus={() => console.log('onFocus password')}
               placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
-              onChangeText={(text: string) => _handlePasswordChange(text)}
-              style={[
-                styles.input,
-                active.password ? styles.inputActive : null,
-              ]}
+              onChangeText={props.handlePasswordChange}
+              style={styles.input}
             />
             <Text style={{color: 'red'}}>{message}</Text>
           </Block>
@@ -132,7 +101,7 @@ const LoginScreen = (props: Props): JSX.Element => {
               color={argonTheme.COLORS.ERROR}
               style={styles.button}
               loading={loading}
-              onPress={_processLogin}>
+              onPress={props.processLogin}>
               {intl.formatMessage({id: 'Login.button'})}
             </Button>
             <Button

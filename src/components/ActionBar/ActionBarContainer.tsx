@@ -57,6 +57,7 @@ const ActionBarContainer = (props: Props): JSX.Element => {
 
   //// handle press vote icon of action bar
   const _handlePressVoteIcon = () => {
+    console.log('user state', userState);
     // get vote amount of ther user
     const voteAmount = parseFloat(userState.profileData.profile.voteAmount);
     console.log('[Action] _onPressVoteIcon');
