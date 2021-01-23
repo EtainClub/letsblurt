@@ -321,17 +321,17 @@ const _removePushToken = async (username: string) => {
   const userRef = firestore().doc(`users/${username}`);
   // remove push token
   let removed = false;
-  userRef
+  await userRef
     .get()
     .then((doc) => {
       if (doc.exists) {
         console.log('[logout] doc exists');
         userRef.update({pushToken: null});
+        removed = true;
         // sign out from firebase
         auth()
           .signOut()
           .then(() => {
-            removed = true;
             console.log('sign out from firebase');
           })
           .catch((error) =>
@@ -342,10 +342,8 @@ const _removePushToken = async (username: string) => {
     .catch((error) =>
       console.log('[remove push token] failed to get user document', error),
     );
-  if (removed) {
-    return true;
-  }
-  return null;
+
+  return removed;
 };
 
 export {AuthContext, AuthProvider};
