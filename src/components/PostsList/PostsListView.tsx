@@ -22,6 +22,7 @@ import {sliceByByte} from '~/utils/strings';
 //// ui, styles
 import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
 import {argonTheme} from '~/constants/argonTheme';
+import {LIST_TITLE_LENGTH} from '~/constants/utils';
 const {width, height} = Dimensions.get('screen');
 //// contexts
 import {PostsContext, SettingsContext} from '~/contexts';
@@ -32,8 +33,6 @@ const BACKGROUND_COLORS = [
   argonTheme.COLORS.BORDER,
   argonTheme.COLORS.SECONDARY,
 ];
-
-const LIST_TITLE_LENGTH = 32;
 
 //// props
 interface Props {
@@ -119,7 +118,7 @@ const PostsListView = (props: Props): JSX.Element => {
               BACKGROUND_COLORS[index % BACKGROUND_COLORS.length],
           }}>
           <Block row middle style={{left: -20}}>
-            <Block center width={70}>
+            <Block center width={80}>
               <Image
                 source={{
                   uri: avatar || null,

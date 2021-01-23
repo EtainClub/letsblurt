@@ -199,7 +199,11 @@
     "blog_tab": "Blogs",
     "bookmark_tab": "Bookmarks",
     "favorite_tab": "Favorites",
-    "wallet_tab": "Wallet Info"
+    "wallet_tab": "Wallet Info",
+    "bookmark_remove_title": "Remove a Bookmark",
+    "bookmark_remove_body": "Do you want to remove this bookmark? {what}",
+    "favorite_remove_title": "Remove a Favorite Author",
+    "favorite_remove_body": "Do you want to remove this author? @{what}"
   },
   "Bookmark": {
     "already": "You already bookmarked this post",

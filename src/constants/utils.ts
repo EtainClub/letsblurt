@@ -11,3 +11,6 @@ const iPhoneX = () =>
   Platform.OS === 'ios' && (height === 812 || width === 812);
 
 export {StatusHeight, HeaderHeight, iPhoneX};
+
+export const POST_TITLE_LENGTH = 45;
+export const LIST_TITLE_LENGTH = 40;

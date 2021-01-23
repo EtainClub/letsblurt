@@ -1,8 +1,9 @@
 import React, {useState, useContext, useEffect, useCallback} from 'react';
-import {View, ActivityIndicator} from 'react-native';
+import {View, ActivityIndicator, Alert} from 'react-native';
 import {useFocusEffect} from '@react-navigation/native';
 //// language
 import {useIntl} from 'react-intl';
+import firestore from '@react-native-firebase/firestore';
 import {get, has} from 'lodash';
 import {ProfileScreen} from '../screen/Profile';
 import {ProfileEditForm} from '../screen/ProfileEdit';
@@ -13,7 +14,7 @@ import {
   PostsContext,
   SettingsContext,
 } from '~/contexts';
-import {PostsTypes, PostData, ProfileData} from '~/contexts/types';
+import {PostsTypes, PostData, PostRef, ProfileData} from '~/contexts/types';
 import {
   signImage,
   broadcastProfileUpdate,
@@ -34,6 +35,7 @@ const Profile = ({navigation}): JSX.Element => {
   const intl = useIntl();
   // contexts
   const {authState} = useContext(AuthContext)!;
+  const {setPostRef} = useContext(PostsContext);
   const {
     userState,
     getUserProfileData,
@@ -66,17 +68,17 @@ const Profile = ({navigation}): JSX.Element => {
 
   console.log('[ProfileContainer] navigation', navigation);
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     if (authState.loggedIn) {
-  //       const {username} = authState.currentCredentials;
-  //       setProfileFetched(false);
-  //       _getUserProfileData(username);
-  //       _fetchBookmarks(username);
-  //       _fetchFavorites(username);
-  //     }
-  //   }, []),
-  // );
+  useFocusEffect(
+    useCallback(() => {
+      if (authState.loggedIn) {
+        const {username} = authState.currentCredentials;
+        setProfileFetched(false);
+        _getUserProfileData(username);
+        _fetchBookmarks(username);
+        _fetchFavorites(username);
+      }
+    }, []),
+  );
 
   //// fetch user state
   useEffect(() => {
@@ -237,6 +239,13 @@ const Profile = ({navigation}): JSX.Element => {
       });
   };
 
+  //// handle press bookmark
+  const _handlePressBookmark = (postRef: PostRef) => {
+    // set post ref
+    setPostRef(postRef);
+    // navigate to the post details
+    navigate({name: 'PostDetails'});
+  };
   //// update the profile
   const _handlePressUpdate = async (_params: any) => {
     if (authState.loggedIn) {
@@ -256,6 +265,76 @@ const Profile = ({navigation}): JSX.Element => {
     }
   };
 
+  //// remove a bookmark in firestore
+  const _removeBookmark = async (postRef: PostRef) => {
+    const {username} = authState.currentCredentials;
+    const docId = `${postRef.author}${postRef.permlink}`;
+    // remove the bookmark doc
+    firestore()
+      .doc(`users/${username}`)
+      .collection('bookmarks')
+      .doc(docId)
+      .delete()
+      .then(() => {
+        // refresh
+        _fetchBookmarks(username);
+        console.log('removed the bookmark successfully');
+      })
+      .catch((error) => console.log('failed to remove a bookmark', error));
+  };
+
+  //// remove a bookmark in firestore
+  const _handleRemoveBookmark = async (postRef: PostRef, title: string) => {
+    // show alert
+    Alert.alert(
+      intl.formatMessage({id: 'Profile.bookmark_remove_title'}),
+      intl.formatMessage({id: 'Profile.bookmark_remove_body'}, {what: title}),
+      [
+        {text: intl.formatMessage({id: 'no'}), style: 'cancel'},
+        {
+          text: intl.formatMessage({id: 'yes'}),
+          onPress: () => _removeBookmark(postRef),
+        },
+      ],
+      {cancelable: true},
+    );
+  };
+
+  //// remove a favorite author in firestore
+  const _removeFavoriteAuthor = async (account: string) => {
+    const {username} = authState.currentCredentials;
+    // remove the favorite doc
+    firestore()
+      .doc(`users/${username}`)
+      .collection('favorites')
+      .doc(account)
+      .delete()
+      .then(() => {
+        // refresh
+        _fetchFavorites(username);
+        console.log('removed the favorite successfully');
+      })
+      .catch((error) =>
+        console.log('failed to remove a favorite author', error),
+      );
+  };
+
+  const _handleRemoveFavorite = (account: string) => {
+    // show alert
+    Alert.alert(
+      intl.formatMessage({id: 'Profile.favorite_remove_title'}),
+      intl.formatMessage({id: 'Profile.favorite_remove_body'}, {what: account}),
+      [
+        {text: intl.formatMessage({id: 'no'}), style: 'cancel'},
+        {
+          text: intl.formatMessage({id: 'yes'}),
+          onPress: () => _removeFavoriteAuthor(account),
+        },
+      ],
+      {cancelable: true},
+    );
+  };
+
   return !editMode ? (
     profileData ? (
       <ProfileScreen
@@ -267,6 +346,9 @@ const Profile = ({navigation}): JSX.Element => {
         handlePressFavoriteItem={_handlePressFavoriteItem}
         clearPosts={_clearPosts}
         handlePressEdit={_handlePressEdit}
+        handlePressBookmark={_handlePressBookmark}
+        removeBookmark={_handleRemoveBookmark}
+        removeFavorite={_handleRemoveFavorite}
       />
     ) : (
       !profileFetched && (

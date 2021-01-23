@@ -26,9 +26,8 @@ import {materialTheme} from '~/constants/materialTheme';
 
 import {ActionBar} from '../ActionBar';
 import {ActionBarStyle} from '~/constants/actionBarTypes';
+import {POST_TITLE_LENGTH} from '~/constants/utils';
 import {Avatar} from '~/components/Avatar';
-
-const POST_TITLE_LENGTH = 45;
 
 interface Props {
   post: PostData;

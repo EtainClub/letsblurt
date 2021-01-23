@@ -199,7 +199,11 @@
     "blog_tab": "게시글",
     "bookmark_tab": "북마크",
     "favorite_tab": "관심작가",
-    "wallet_tab": "지갑 정보"
+    "wallet_tab": "지갑 정보",
+    "bookmark_remove_title": "북마크 삭제",
+    "bookmark_remove_body": "다음 포스팅을 북마크 삭제할까요? {what}",
+    "favorite_remove_title": "관심 저자 삭제",
+    "favorite_remove_body": "다음 저자를 관심 목록에서 삭제할까요? @{what}"
   },
   "Bookmark": {
     "already": "이미 북마크된 포스트입니다.",

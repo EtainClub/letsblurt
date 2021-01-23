@@ -17,12 +17,13 @@ import {TabView, SceneMap} from 'react-native-tab-view';
 import {useIntl} from 'react-intl';
 import {navigate} from '~/navigation/service';
 import {Images, argonTheme} from '~/constants';
-import {HeaderHeight} from '~/constants/utils';
+import {HeaderHeight, LIST_TITLE_LENGTH} from '~/constants/utils';
 import {getNumberStat} from '~/utils/stats';
 import {Feed} from '~/screens';
 import {PostsListView, ProfileContainer, DraggableList} from '~/components';
-import {PostsTypes, PostData, ProfileData} from '~/contexts/types';
-import {getTimeFromNow} from '~/utils/time';
+import {PostsTypes, PostData, PostRef, ProfileData} from '~/contexts/types';
+import {sliceByByte} from '~/utils/strings';
+
 const BACKGROUND_COLORS = [
   argonTheme.COLORS.BORDER,
   argonTheme.COLORS.SECONDARY,
@@ -40,6 +41,9 @@ interface Props {
   imageServer: string;
   handlePressFavoriteItem: (author: string) => void;
   handlePressEdit: () => void;
+  handlePressBookmark: (postRef: PostRef) => void;
+  removeBookmark: (postRef: PostRef, title: string) => void;
+  removeFavorite: (account: string) => void;
   clearPosts: () => void;
 }
 const ProfileScreen = (props: Props): JSX.Element => {
@@ -57,7 +61,9 @@ const ProfileScreen = (props: Props): JSX.Element => {
     props.blogs && <PostsListView posts={props.blogs} isUser />;
 
   const BookmarkList = () =>
-    props.bookmarks && <PostsListView posts={props.bookmarks} isUser />;
+    props.bookmarks && (
+      <DraggableList data={props.bookmarks} renderItem={_renderBookmarkItem} />
+    );
 
   const FavoriteList = () =>
     props.favorites && (
@@ -71,24 +77,22 @@ const ProfileScreen = (props: Props): JSX.Element => {
   });
 
   ////
-  const _renderFavoriteItem = ({item, index, drag, isActive}) => {
+  const _renderBookmarkItem = ({item, index, drag, isActive}) => {
     const avatar = `${props.imageServer}/u/${item.author}/avatar`;
     return (
-      <TouchableWithoutFeedback
-        onPress={() => props.handlePressFavoriteItem(item.author)}>
-        <Block
-          flex
-          card
-          row
-          space="between"
-          style={{
-            marginBottom: 5,
-            padding: 5,
-            backgroundColor:
-              BACKGROUND_COLORS[index % BACKGROUND_COLORS.length],
-          }}>
-          <Block row middle>
-            <Block center width={70}>
+      <Block
+        card
+        row
+        space="between"
+        style={{
+          marginBottom: 5,
+          padding: 5,
+          backgroundColor: BACKGROUND_COLORS[index % BACKGROUND_COLORS.length],
+        }}>
+        <TouchableWithoutFeedback
+          onPress={() => props.handlePressBookmark(item.postRef)}>
+          <Block row middle style={{left: -20}}>
+            <Block center width={80}>
               <Image
                 source={{
                   uri: avatar || null,
@@ -97,12 +101,59 @@ const ProfileScreen = (props: Props): JSX.Element => {
               />
               <Text size={10}>{item.author}</Text>
             </Block>
+            {<Text>{sliceByByte(item.title, LIST_TITLE_LENGTH)}</Text>}
           </Block>
-          <Block middle>
-            <Text>{getTimeFromNow(item.createdAt).split('ago')[0]}</Text>
-          </Block>
+        </TouchableWithoutFeedback>
+        <Block center>
+          <Icon
+            onPress={() => props.removeBookmark(item.postRef, item.title)}
+            size={20}
+            name="remove-circle"
+            family="ionicon"
+            color={argonTheme.COLORS.MUTED}
+          />
         </Block>
-      </TouchableWithoutFeedback>
+      </Block>
+    );
+  };
+
+  ////
+  const _renderFavoriteItem = ({item, index, drag, isActive}) => {
+    const avatar = `${props.imageServer}/u/${item.author}/avatar`;
+    return (
+      <Block
+        card
+        row
+        space="between"
+        style={{
+          marginBottom: 5,
+          padding: 5,
+          backgroundColor: BACKGROUND_COLORS[index % BACKGROUND_COLORS.length],
+        }}>
+        <TouchableWithoutFeedback
+          onPress={() => props.handlePressFavoriteItem(item.author)}>
+          <Block row center>
+            <Image
+              source={{
+                uri: avatar || null,
+              }}
+              style={styles.itemAvatar}
+            />
+            <Text size={14} color={argonTheme.COLORS.FACEBOOK}>
+              {item.author}
+            </Text>
+          </Block>
+        </TouchableWithoutFeedback>
+        <Block center>
+          <Icon
+            onPress={() => props.removeFavorite(item.author)}
+            size={20}
+            name="remove-circle"
+            family="ionicon"
+            color={argonTheme.COLORS.MUTED}
+          />
+        </Block>
+      </Block>
     );
   };
 
@@ -179,5 +230,6 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 24 / 2,
+    marginHorizontal: 10,
   },
 });
