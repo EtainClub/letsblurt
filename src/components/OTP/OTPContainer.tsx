@@ -20,6 +20,7 @@ const countryData = require('react-native-country-picker-modal/lib/assets/data/c
 interface Props {
   checkDuplicatedPhone?: (phone: string) => Promise<boolean>;
   handleOTPResult: (confirm: boolean, phoneNumber?: string) => void;
+  cancelModal?: () => void;
 }
 const OTPContainer = (props: Props): JSX.Element => {
   //// props
@@ -173,6 +174,7 @@ const OTPContainer = (props: Props): JSX.Element => {
   ///// cancle the modal
   const _handleCancelModal = () => {
     setShowModal(false);
+    props.cancelModal();
   };
 
   return (

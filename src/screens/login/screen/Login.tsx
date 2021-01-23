@@ -9,7 +9,7 @@ import {
 import {Block, Button, Input, Text, theme} from 'galio-framework';
 
 import LinearGradient from 'react-native-linear-gradient';
-import {materialTheme} from '~/constants/';
+import {argonTheme, materialTheme} from '~/constants/';
 import {HeaderHeight, iPhoneX} from '~/constants/utils';
 import {navigate} from '~/navigation/service';
 
@@ -129,7 +129,7 @@ const LoginScreen = (props: Props): JSX.Element => {
           <Block flex top style={{marginTop: 20}}>
             <Button
               shadowless
-              color={materialTheme.COLORS.BUTTON_COLOR}
+              color={argonTheme.COLORS.ERROR}
               style={styles.button}
               loading={loading}
               onPress={_processLogin}>

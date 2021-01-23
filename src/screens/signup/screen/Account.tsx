@@ -1,4 +1,6 @@
+//// react
 import React, {useState, useContext} from 'react';
+//// react native
 import {
   StyleSheet,
   Dimensions,
@@ -6,59 +8,33 @@ import {
   Alert,
   Platform,
 } from 'react-native';
-import {
-  Block,
-  Button,
-  Text,
-  theme,
-  Toast,
-  Checkbox,
-  Icon,
-} from 'galio-framework';
-
+//// language
+import {useIntl} from 'react-intl';
+//// navigation
+import {navigate} from '~/navigation/service';
+//// UI
+import {Block, Button, Text, theme, Checkbox} from 'galio-framework';
 import LinearGradient from 'react-native-linear-gradient';
 import {materialTheme} from '~/constants/';
 import {HeaderHeight, iPhoneX} from '~/constants/utils';
 
-import {navigate} from '~/navigation/service';
-import Clipboard from '@react-native-community/clipboard';
-
-import {useIntl} from 'react-intl';
-import {UIContext} from '~/contexts';
 const {width, height} = Dimensions.get('window');
 
 interface Props {
   account: string;
   password: string;
+  keyCopied: boolean;
+  finalized: boolean;
   createAccount: () => void;
+  copyPasswordToClipboard: () => void;
+  handleKeyCheckChange: () => void;
 }
 
 const AccountScreen = (props: Props): JSX.Element => {
+  //// props
+  const {keyCopied, finalized} = props;
   //// language
   const intl = useIntl();
-  //// contexts
-  const {setToastMessage} = useContext(UIContext);
-
-  const [copied, setCopied] = useState(false);
-  const [keyCopied, setKeyCopied] = useState(false);
-  const [finalized, setFinalized] = useState(false);
-
-  const copyPasswordToClipboard = async (password: string) => {
-    console.log('Clipboard', Clipboard);
-    Clipboard.setString(password);
-    // update state to show toast
-    setCopied(true);
-    // set toast message
-    setToastMessage(intl.formatMessage({id: 'Signup.msg_copied'}));
-  };
-
-  const _createAccount = () => {
-    // create an account
-    props.createAccount();
-    // set finalized
-    setFinalized(true);
-    console.log('finish button, key copied?', keyCopied);
-  };
 
   const _renderKey = () => {
     return (
@@ -94,7 +70,7 @@ const AccountScreen = (props: Props): JSX.Element => {
             shadowless
             style={styles.button}
             color={materialTheme.COLORS.BUTTON_COLOR}
-            onPress={() => copyPasswordToClipboard(props.password)}>
+            onPress={props.copyPasswordToClipboard}>
             {intl.formatMessage({id: 'Signup.copy_key'})}
           </Button>
           <Block style={{marginTop: 20}}>
@@ -104,22 +80,20 @@ const AccountScreen = (props: Props): JSX.Element => {
               initialValue={false}
               flexDirection="row-reverse"
               label={intl.formatMessage({id: 'Signup.confirm_check'})}
-              onChange={async () => {
-                setKeyCopied(!keyCopied);
-                console.log('key copied', keyCopied);
-              }}
+              onChange={props.handleKeyCheckChange}
             />
           </Block>
           <Button
             shadowless
             disabled={!keyCopied}
+            loading={finalized}
             style={styles.button}
             color={
               keyCopied
                 ? materialTheme.COLORS.ERROR
                 : materialTheme.COLORS.MUTED
             }
-            onPress={_createAccount}>
+            onPress={props.createAccount}>
             {intl.formatMessage({id: 'Signup.finish_button'})}
           </Button>
         </Block>

@@ -72,7 +72,7 @@ const SignupScreen = (props: Props): JSX.Element => {
           </Block>
 
           <Block flex={1} center space="between">
-            <Block center>
+            <Block>
               <Input
                 bgColor="transparent"
                 placeholderTextColor={argonTheme.COLORS.PLACEHOLDER}
@@ -81,17 +81,14 @@ const SignupScreen = (props: Props): JSX.Element => {
                 placeholder="Username"
                 autoCapitalize="none"
                 iconContent={iconContent}
-                help={
-                  accountAvailable ? (
-                    <Text style={{color: 'orange'}}>{usernameMessage}</Text>
-                  ) : (
-                    <Text style={{color: 'red'}}>{usernameMessage}</Text>
-                  )
-                }
-                bottomHelp
                 style={styles.input}
                 onChangeText={props.handleUsernameChange}
               />
+              {accountAvailable ? (
+                <Text style={{color: 'orange'}}>{usernameMessage}</Text>
+              ) : (
+                <Text style={{color: 'red'}}>{usernameMessage}</Text>
+              )}
             </Block>
             <Block flex style={{marginTop: 20}}>
               <Button

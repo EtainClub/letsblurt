@@ -14,9 +14,9 @@ import {useFocusEffect} from '@react-navigation/native';
 
 import SplashScreen from 'react-native-splash-screen';
 import {SignupScreen} from '../screen/Signup';
-import {PhoneAuthScreen} from '../screen/PhoneAuth';
 import {AccountScreen} from '../screen/Account';
-
+////
+import Clipboard from '@react-native-community/clipboard';
 import {OTP} from '~/components';
 
 import {
@@ -46,10 +46,13 @@ const Signup = (props: Props): JSX.Element => {
   const [showAccountScreen, setShowAccountScreen] = useState(false);
   const [password, setPassword] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
-
   const [confirmation, setConfirmation] = useState<
     FirebaseAuthTypes.ConfirmationResult
   >(null);
+
+  const [copied, setCopied] = useState(false);
+  const [keyCopied, setKeyCopied] = useState(false);
+  const [finalized, setFinalized] = useState(false);
 
   useEffect(() => {
     SplashScreen.hide();
@@ -117,16 +120,10 @@ const Signup = (props: Props): JSX.Element => {
     }
   };
 
-  const _checkUsernameAvailable = async (username: string) => {
-    const available = await checkUsernameAvailable(username);
-    console.log('account available?', available);
-    // set username
-    setUsername(username);
-    return available;
-  };
-
   const _createAccount = async () => {
     console.log('userState global props', userState.globalProps);
+    // update the finalize flag
+    setFinalized(false);
     const options = {
       username,
       password,
@@ -145,6 +142,8 @@ const Signup = (props: Props): JSX.Element => {
         phoneNumber: phoneNumber,
         createdAt: new Date(),
       });
+      // update the finalize flag
+      setFinalized(true);
     }
   };
 
@@ -152,16 +151,19 @@ const Signup = (props: Props): JSX.Element => {
   const _checkDuplicatedPhone = async (_phone: string) => {
     // reference to phones collection
     const phonesRef = firestore().collection('phones');
-    // query
     let duplicated = false;
-    phonesRef
+    await phonesRef
       .where('phoneNumber', '==', _phone)
       .get()
-      .then(() => {
-        duplicated = true;
+      .then((querySnapshot) => {
+        if (!querySnapshot.empty) {
+          console.log('phone duplicated');
+          duplicated = true;
+        }
+      })
+      .catch((error) => {
+        console.log('failed to query phones', error);
       });
-
-    console.log('phone duplicated?', duplicated);
     return duplicated;
   };
 
@@ -179,11 +181,39 @@ const Signup = (props: Props): JSX.Element => {
     }
   };
 
+  const _copyPasswordToClipboard = () => {
+    console.log('Clipboard', Clipboard);
+    Clipboard.setString(password);
+    // update state to show toast
+    setCopied(true);
+    // set toast message
+    setToastMessage(intl.formatMessage({id: 'Signup.msg_copied'}));
+  };
+
+  const _handleKeyCheckChange = () => {
+    setKeyCopied(!keyCopied);
+  };
+
+  const _cancelOTPModal = () => {
+    // clear username message
+    setUsernameMsg('');
+    // reset account avaliable
+    setAccountAvailable(false);
+    // show signup screen
+    setShowSignupScreen(true);
+    // hide account screen
+    setShowAccountScreen(false);
+  };
+
   return showAccountScreen ? (
     <AccountScreen
       account={username}
       password={password}
+      keyCopied={keyCopied}
+      finalized={finalized}
       createAccount={_createAccount}
+      copyPasswordToClipboard={_copyPasswordToClipboard}
+      handleKeyCheckChange={_handleKeyCheckChange}
     />
   ) : showSignupScreen ? (
     <SignupScreen
@@ -197,6 +227,7 @@ const Signup = (props: Props): JSX.Element => {
     <OTP
       checkDuplicatedPhone={_checkDuplicatedPhone}
       handleOTPResult={_handleOTPResult}
+      cancelModal={_cancelOTPModal}
     />
   );
 };
