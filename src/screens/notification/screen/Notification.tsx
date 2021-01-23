@@ -83,7 +83,6 @@ const NotificationScreen = (props: Props): JSX.Element => {
         permlink = item.permlink;
         break;
       case 'transfer':
-        console.log('transfer. item', item);
         author = item.from;
         iconName = 'exchange';
         iconFamily = 'font-awesome';

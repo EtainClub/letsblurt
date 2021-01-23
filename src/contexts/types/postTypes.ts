@@ -5,12 +5,14 @@ export enum PostsActionTypes {
   SET_POSTS,
   SET_POST_INDEX,
   SET_FETCHED,
+  SET_NEED_FETCH,
   CLEAR_POSTS,
   APPEND_POSTS,
   SET_TAG_INDEX,
   SET_TAG_LIST,
   SET_FILTER_INDEX,
   SET_POST_DETAILS,
+  SET_TAG_AND_FILTER,
   BOOKMARK_POST,
   RESTEEM_POST,
   FAVORITE_POST,
@@ -186,6 +188,8 @@ export interface PostsState {
   postDetails: PostData;
   // fetched flag
   fetched: boolean;
+  // need to fetch flag
+  needToFetch: boolean;
   // fetch retry count;
   retryCount: number;
 
@@ -251,6 +255,11 @@ interface SetFetchedAction {
   type: PostsActionTypes.SET_FETCHED;
   payload: boolean;
 }
+// set need to fetch flat
+interface SetNeedToFetchAction {
+  type: PostsActionTypes.SET_NEED_FETCH;
+  payload: boolean;
+}
 // clear posts of the given type
 interface ClearPostsAction {
   type: PostsActionTypes.CLEAR_POSTS;
@@ -278,7 +287,14 @@ interface AppendTagAction {
     filterIndex: number;
   };
 }
-
+// set tag and filter index
+interface SetTagAndFilterAction {
+  type: PostsActionTypes.SET_TAG_AND_FILTER;
+  payload: {
+    tagIndex: number;
+    filterIndex: number;
+  };
+}
 // set tag index
 interface SetTagIndexAction {
   type: PostsActionTypes.SET_TAG_INDEX;
@@ -409,6 +425,13 @@ export interface PostsContextType {
   setPostRef: (postRef: PostRef) => void;
   // set post index
   setPostIndex: (postsType: PostsTypes, postIndex: number) => void;
+  // set tag and filter index
+  setTagAndFilter: (
+    tagIndex: number,
+    filterIndex: number,
+    postsType: PostsTypes,
+    username?: string,
+  ) => void;
   // fetch tag list
   getTagList: (username?: string) => void;
   // set communities
@@ -423,12 +446,15 @@ export interface PostsContextType {
   setFilterIndex: (index: number, username?: string) => void;
   // append a tag
   appendTag: (tag: string) => void;
+  // set need to fetch flag
+  setNeedToFetch: (needing: boolean) => void;
 }
 
 export type PostsAction =
   | SetPostsAction
   | SetPostIndexAction
   | SetFetchedAction
+  | SetNeedToFetchAction
   | SetPostRefAction
   | ClearPostsAction
   | AppendPostsAction
@@ -438,6 +464,7 @@ export type PostsAction =
   | CommentAction
   | BookmarkAction
   | SetCommunitiesAction
+  | SetTagAndFilterAction
   | SetTagIndexAction
   | SetTagListAction
   | SetFilterIndexAction

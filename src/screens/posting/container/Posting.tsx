@@ -50,6 +50,7 @@ const Posting = (props: Props): JSX.Element => {
     submitPost,
     setTagIndex,
     setFilterIndex,
+    setTagAndFilter,
     updatePost,
   } = useContext(PostsContext);
   const {userState, getFollowings} = useContext(UserContext);
@@ -223,9 +224,15 @@ const Posting = (props: Props): JSX.Element => {
 
       ////
       // set tag to all
-      setTagIndex(1, PostsTypes.FEED, authState.currentCredentials.username);
+      setTagAndFilter(
+        1,
+        1,
+        PostsTypes.FEED,
+        authState.currentCredentials.username,
+      );
+      // setTagIndex(1, PostsTypes.FEED, authState.currentCredentials.username);
       // set filter to created
-      setFilterIndex(1, authState.currentCredentials.username);
+      // setFilterIndex(1, authState.currentCredentials.username);
       // navigate feed
       navigate({name: 'Feed'});
     }

@@ -3,10 +3,10 @@ const axios = require('axios');
 const dblurt = require('./dblurt');
 
 const MAINNET_OFFICIAL = [
-  'https://api.blurt.blog',
   'https://rpc.blurt.world',
-  'https://blurtd.privex.io',
   'https://rpc.blurt.buzz',
+  'https://api.blurt.blog',
+  'https://blurtd.privex.io',
 ];
 const client = new dblurt.Client(MAINNET_OFFICIAL, {
   timeout: 5000,

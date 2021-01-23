@@ -53,6 +53,8 @@ const initialState: PostsState = {
   postDetails: INIT_POST_DATA,
   // fetched flag
   fetched: false,
+  //
+  needToFetch: false,
   // retry count
   retryCount: 0,
   //// tag, filter
@@ -126,28 +128,36 @@ const postsReducer = (state: PostsState, action: PostsAction) => {
 
     case PostsActionTypes.RETRY_FETCHING:
       return {...state, retryCount: state.retryCount++};
+
     case PostsActionTypes.SET_FETCHED:
       console.log('[postsReducer] set fetched. payload', action.payload);
       return {...state, fetched: action.payload};
+
+    case PostsActionTypes.SET_NEED_FETCH:
+      return {...state, needToFetch: action.payload};
 
     case PostsActionTypes.SET_POST_REF:
       return {...state, postRef: action.payload};
 
     case PostsActionTypes.CLEAR_POSTS:
       console.log('[postReducer] clearing action payload', action.payload);
-
       return {
-        ...state,
-        [state.postsType]: {
-          posts: [],
-          startPostRef: {author: null, permlink: null},
-          index: 0,
-        },
-        fetched: true,
+        ...initialState,
+        tagList: state.tagList,
+        tagIndex: state.tagIndex,
+        filterList: state.filterList,
+        filterIndex: state.filterIndex,
       };
 
+    case PostsActionTypes.SET_TAG_AND_FILTER:
+      return {
+        ...state,
+        tagIndex: action.payload.tagIndex,
+        filterIndex: action.payload.filterIndex,
+        needToFetch: true,
+      };
     case PostsActionTypes.SET_TAG_INDEX:
-      return {...state, tagIndex: action.payload};
+      return {...state, tagIndex: action.payload, needToFetch: true};
 
     case PostsActionTypes.APPEND_TAG:
       return {
@@ -158,7 +168,7 @@ const postsReducer = (state: PostsState, action: PostsAction) => {
         filterIndex: action.payload.filterIndex,
       };
     case PostsActionTypes.SET_FILTER_INDEX:
-      return {...state, filterIndex: action.payload};
+      return {...state, filterIndex: action.payload, needToFetch: true};
 
     case PostsActionTypes.SET_POST_DETAILS:
       return {
@@ -225,7 +235,7 @@ const PostsProvider = ({children}: Props) => {
   // userReducer hook
   // set auth reducer with initial state of auth state
   const [postsState, dispatch] = useReducer(postsReducer, initialState);
-  console.log('[posts provider] posts', postsState);
+  // console.log('[posts provider] posts', postsState);
   //// language
   const intl = useIntl();
   //// contexts
@@ -304,6 +314,7 @@ const PostsProvider = ({children}: Props) => {
     if (appending) {
       startPostRef = postsState[postsState.postsType].startPostRef;
     }
+
     //// setup tag and filter value based on the tagIndex and filterIndex
     let tag = '';
     let filter = '';
@@ -451,6 +462,23 @@ const PostsProvider = ({children}: Props) => {
     }
     setToastMessage(intl.formatMessage({id: 'fetch_error'}));
     return null;
+  };
+
+  //// set tag and filter index
+  const setTagAndFilter = (
+    tagIndex: number,
+    filterIndex: number,
+    postsType: PostsTypes,
+    username?: string,
+  ) => {
+    // dispatch action
+    dispatch({
+      type: PostsActionTypes.SET_TAG_AND_FILTER,
+      payload: {
+        tagIndex,
+        filterIndex,
+      },
+    });
   };
 
   //// set tag index
@@ -822,6 +850,16 @@ const PostsProvider = ({children}: Props) => {
       payload: postRef,
     });
   };
+
+  //// set need to fetch
+  const setNeedToFetch = (needing: boolean) => {
+    // dispatch action
+    dispatch({
+      type: PostsActionTypes.SET_NEED_FETCH,
+      payload: needing,
+    });
+  };
+
   return (
     <PostsContext.Provider
       value={{
@@ -832,6 +870,7 @@ const PostsProvider = ({children}: Props) => {
         setPostIndex,
         clearPosts,
         getPostDetails,
+        setTagAndFilter,
         setTagIndex,
         appendTag,
         setFilterIndex,
@@ -844,6 +883,7 @@ const PostsProvider = ({children}: Props) => {
         updateFavoriteAuthor,
         fetchFavorites,
         isFavoriteAuthor,
+        setNeedToFetch,
       }}>
       {children}
     </PostsContext.Provider>

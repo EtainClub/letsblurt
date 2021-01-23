@@ -53,7 +53,8 @@ const Feed = (props: Props): JSX.Element => {
   //// header tag/fiter change event
   useEffect(() => {
     _fetchPosts(false);
-  }, [postsState.filterIndex, postsState.tagIndex]);
+  }, [postsState.needToFetch]);
+
   // account change event
   useEffect(() => {
     if (!reloading) {
@@ -126,7 +127,7 @@ const Feed = (props: Props): JSX.Element => {
       appending,
     );
     //
-    console.log('[Feed] after fetching, posts', _posts);
+    //    console.log('[Feed] after fetching, posts', _posts);
     // if nothing fetched,
     if (!_posts || _posts.length < NUM_FETCH_POSTS - 1) {
       setFetchedAll(true);
@@ -137,7 +138,7 @@ const Feed = (props: Props): JSX.Element => {
     if (!appending) {
       setReloading(false);
     }
-    console.log('[Feed]_fetchPosts, posts', _posts);
+    //    console.log('[Feed]_fetchPosts, posts', _posts);
   };
 
   return (
