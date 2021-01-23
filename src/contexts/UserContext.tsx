@@ -47,7 +47,7 @@ const initialState = {
     blogRefs: [],
     blogs: [],
   },
-  voteAmount: '0',
+  //  voteAmount: '0',
   globalProps: {
     steemPerMVests: 0,
     base: 0,
@@ -84,7 +84,13 @@ const userReducer = (state: UserState, action: UserAction) => {
       console.log('[UserContext|userReducer] set global props', state, action);
       return {...state, globalProps: action.payload};
     case UserActionTypes.SET_VOTE_AMOUNT:
-      return {...state, voteAmount: action.payload};
+      return {
+        ...state,
+        profileData: {
+          ...state.profileData,
+          profile: {...state.profileData.profile, voteAmount: action.payload},
+        },
+      };
     case UserActionTypes.FOLLOW:
       return state;
     case UserActionTypes.SET_WALLET_DATA:
