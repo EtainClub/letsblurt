@@ -13,7 +13,6 @@ import {argonTheme} from '~/constants';
 const {width, height} = Dimensions.get('window');
 //// blockchain
 //// components
-import {OTP} from '~/components';
 //// context
 import {AuthContext, UserContext} from '~/contexts';
 import {verifyPassoword} from '~/providers/blurt';
@@ -21,32 +20,16 @@ import {verifyPassoword} from '~/providers/blurt';
 
 interface Props {
   username: string;
-  showOTP: boolean;
-  phoneNumber: string;
   message: string;
-  handlePressConfirm: (password: string) => void;
-  handleOTPResult?: (result: boolean) => void;
+  handlePasswordChange: (password: string) => void;
+  handlePressConfirm: () => void;
+  cancelModal: () => void;
 }
 const SecureKeyView = (props: Props): JSX.Element => {
+  //// props
+  const {username, message} = props;
   //// language
   const intl = useIntl();
-  //// contexts
-  const {authState} = useContext(AuthContext);
-  //// states
-  const [password, setPassword] = useState('');
-  const [showModal, setShowModal] = useState(true);
-  const [errorMessage, setErrorMessage] = useState(props.message);
-  const [showOTPModal, setShowOTPModal] = useState(false);
-  //////// effect
-  ////
-  useEffect(() => {
-    setErrorMessage(props.message);
-  }, [props.message]);
-  //// otp
-  useEffect(() => {
-    console.log('[securekeyview. useeffect. show otp modal', props.showOTP);
-    setShowOTPModal(props.showOTP);
-  }, [props.showOTP]);
 
   const _renderForms = () => {
     return (
@@ -56,7 +39,7 @@ const SecureKeyView = (props: Props): JSX.Element => {
             <Input
               style={styles.input}
               editable={false}
-              defaultValue={props.username}
+              defaultValue={username}
               autoCapitalize="none"
               left
               icon="at"
@@ -73,10 +56,7 @@ const SecureKeyView = (props: Props): JSX.Element => {
               placeholder={intl.formatMessage({
                 id: 'SecureKey.password_placeholder',
               })}
-              onChangeText={(text: string) => {
-                setPassword(text);
-                setErrorMessage('');
-              }}
+              onChangeText={props.handlePasswordChange}
             />
           </Block>
           <Text color="red">
@@ -87,38 +67,32 @@ const SecureKeyView = (props: Props): JSX.Element => {
     );
   };
 
-  const _renderFooter = () =>
-    showOTPModal ? (
-      <OTP
-        phoneNumber={props.phoneNumber}
-        handleOTPResult={props.handleOTPResult}
-      />
-    ) : (
-      <Block>
-        <Block row center>
-          <Button
-            size="small"
-            shadowless
-            color={argonTheme.COLORS.ERROR}
-            onPress={() => props.handlePressConfirm(password)}>
-            {intl.formatMessage({id: 'SecureKey.confirm_button'})}
-          </Button>
-        </Block>
-        <Block center>
-          <Text size={20} color="red">
-            {errorMessage}
-          </Text>
-        </Block>
+  const _renderFooter = () => (
+    <Block>
+      <Block row center>
+        <Button
+          size="small"
+          shadowless
+          color={argonTheme.COLORS.ERROR}
+          onPress={props.handlePressConfirm}>
+          {intl.formatMessage({id: 'SecureKey.confirm_button'})}
+        </Button>
       </Block>
-    );
+      <Block center>
+        <Text size={20} color="red">
+          {message}
+        </Text>
+      </Block>
+    </Block>
+  );
 
   ////
   return (
     <Modal
-      isVisible={showModal}
+      isVisible
       animationIn="zoomIn"
       animationOut="zoomOut"
-      onBackdropPress={() => setShowModal(false)}>
+      onBackdropPress={props.cancelModal}>
       <Block style={styles.listContainer}>
         <Block center>
           <Text

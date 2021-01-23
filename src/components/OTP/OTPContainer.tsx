@@ -93,13 +93,14 @@ const OTPContainer = (props: Props): JSX.Element => {
     // set phone number
     setPhoneNumber(phoneNumber);
     // check duplicated phone number
-    const duplicated = await props.checkDuplicatedPhone(_phone);
-    if (duplicated) {
-      console.log('phone number exists in db', _phone);
-      setPhoneMessage(intl.formatMessage({id: 'OTP.duplicated_phonenumber'}));
-      return;
+    if (props.checkDuplicatedPhone) {
+      const duplicated = await props.checkDuplicatedPhone(_phone);
+      if (duplicated) {
+        console.log('phone number exists in db', _phone);
+        setPhoneMessage(intl.formatMessage({id: 'OTP.duplicated_phonenumber'}));
+        return;
+      }
     }
-
     //// now send sms code
     // set code requested flag
     setSMSRequested(true);

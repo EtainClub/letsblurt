@@ -1,6 +1,7 @@
 //// react
 import React, {useState, useContext, useEffect} from 'react';
 //// react native
+import {View} from 'react-native';
 //// config
 import Config from 'react-native-config';
 //// language
@@ -13,6 +14,8 @@ import {
 } from '~/providers/blurt/dblurtApi';
 //// context
 import {AuthContext, UserContext, SettingsContext} from '~/contexts';
+//// components
+import {OTP} from '~/components';
 //// views
 import {SecureKeyView} from './SecureKeyView';
 import {KeyTypes} from '~/contexts/types';
@@ -33,17 +36,22 @@ const SecureKeyContainer = (props: Props): JSX.Element => {
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
   const [showOTP, setShowOTP] = useState(false);
+  const [showModal, setShowModal] = useState(true);
+
   //// effect
+
+  //// update password
+  const _handlePasswordChange = (_password: string) => {
+    setPassword(_password);
+  };
+
   ////
-  const _handlePressConfirm = async (_password: string) => {
+  const _handlePressConfirm = async () => {
     const {username} = authState.currentCredentials;
     // check password
-    const {keyType} = await verifyPassoword(username, _password);
+    const {keyType} = await verifyPassoword(username, password);
     // check key type
     if (keyType && keyType >= props.requiredKeyType) {
-      // update the password
-      setPassword(_password);
-      // TODO: handle OTP here
       if (settingsState.securities.useOTP) {
         setShowOTP(true);
         return;
@@ -51,12 +59,13 @@ const SecureKeyContainer = (props: Props): JSX.Element => {
       // clear message
       setMessage('');
       // send back the result
-      props.handleResult(true, _password);
+      props.handleResult(true, password);
     } else {
       // show message
       setMessage(intl.formatMessage({id: 'Transaction.need_higher_password'}));
     }
   };
+
   ////
   const _handleOTPResult = (result: boolean) => {
     console.log('_handleOTPResult. result', result);
@@ -70,15 +79,21 @@ const SecureKeyContainer = (props: Props): JSX.Element => {
     }
   };
 
+  const _cancelModal = () => {
+    setShowModal(false);
+  };
+
   return (
-    <SecureKeyView
-      username={props.username}
-      showOTP={showOTP}
-      phoneNumber={userState.phoneNumber}
-      message={message}
-      handlePressConfirm={_handlePressConfirm}
-      handleOTPResult={_handleOTPResult}
-    />
+    <View>
+      <SecureKeyView
+        username={props.username}
+        message={message}
+        handlePasswordChange={_handlePasswordChange}
+        handlePressConfirm={_handlePressConfirm}
+        cancelModal={_cancelModal}
+      />
+      {showOTP && <OTP handleOTPResult={_handleOTPResult} />}
+    </View>
   );
 };
 
