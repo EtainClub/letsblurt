@@ -15,6 +15,7 @@ import {navigate} from '~/navigation/service';
 //// language
 import {useIntl} from 'react-intl';
 //// ui, styles
+import {argonTheme} from '~/constants/argonTheme';
 import {Block, Text, Icon} from 'galio-framework';
 import DraggableFlatList from 'react-native-draggable-flatlist';
 //// contexts
@@ -31,9 +32,19 @@ import {PostData, PostRef, PostsTypes, ProfileData} from '~/contexts/types';
 interface Props {
   data: any[];
   renderItem: (item: any) => JSX.Element;
+  onRefresh: () => void;
 }
 //// component
 const DraggableListView = (props: Props): JSX.Element => {
+  const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const _onRefresh = async () => {
+    setLoading(true);
+    await props.onRefresh();
+    setLoading(false);
+  };
+
   //// contexts
   // return (
   //   <View style={{flex: 1}}>
@@ -47,15 +58,21 @@ const DraggableListView = (props: Props): JSX.Element => {
   //     />
   //   </View>
   // );
-  return (
+  return !loading ? (
     <FlatList
       contentContainerStyle={{marginTop: 15, marginHorizontal: 20}}
       data={props.data}
       renderItem={props.renderItem}
+      refreshing={refreshing}
+      onRefresh={_onRefresh}
       keyExtractor={(item, index) => String(index)}
       initialNumToRender={5}
       showsVerticalScrollIndicator={false}
     />
+  ) : (
+    <View style={{top: 20}}>
+      <ActivityIndicator color={argonTheme.COLORS.ERROR} />
+    </View>
   );
 };
 

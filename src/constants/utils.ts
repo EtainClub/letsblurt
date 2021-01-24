@@ -13,4 +13,4 @@ const iPhoneX = () =>
 export {StatusHeight, HeaderHeight, iPhoneX};
 
 export const POST_TITLE_LENGTH = 45;
-export const LIST_TITLE_LENGTH = 40;
+export const LIST_TITLE_LENGTH = 35;

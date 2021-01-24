@@ -163,10 +163,12 @@ const Profile = ({navigation}): JSX.Element => {
   const _handlePressEdit = () => {
     setEditMode(true);
   };
+
   //// clear posts
+  // TODO: is this necessary?
   const _clearPosts = async () => {
     console.log('[ProfileContainer] clear posts');
-    clearPosts(PostsTypes.FEED);
+    //    clearPosts(PostsTypes.FEED);
   };
 
   /////// edit related
@@ -335,6 +337,28 @@ const Profile = ({navigation}): JSX.Element => {
     );
   };
 
+  //// refresh user's blogs
+  const _refreshPosts = async () => {
+    // clear blogs
+    setBlogs(null);
+    const {username} = authState.currentCredentials;
+    await _getUserProfileData(username);
+  };
+
+  //// refresh bookmarks
+  const _refreshBookmarks = () => {
+    setBookmarks(null);
+    const {username} = authState.currentCredentials;
+    _fetchBookmarks(username);
+  };
+
+  //// refresh favorites
+  const _refreshFavorites = () => {
+    setFavorites(null);
+    const {username} = authState.currentCredentials;
+    _fetchFavorites(username);
+  };
+
   return !editMode ? (
     profileData ? (
       <ProfileScreen
@@ -344,6 +368,9 @@ const Profile = ({navigation}): JSX.Element => {
         favorites={favorites}
         imageServer={settingsState.blockchains.image}
         handlePressFavoriteItem={_handlePressFavoriteItem}
+        refreshPosts={_refreshPosts}
+        refreshBookmarks={_refreshBookmarks}
+        refreshFavorites={_refreshFavorites}
         clearPosts={_clearPosts}
         handlePressEdit={_handlePressEdit}
         handlePressBookmark={_handlePressBookmark}

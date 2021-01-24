@@ -89,18 +89,24 @@ const WalletStatsView = (props: Props): JSX.Element => {
               BACKGROUND_COLORS[index % BACKGROUND_COLORS.length],
           },
         ]}>
-        <Icon
-          size={20}
-          color={argonTheme.COLORS.ERROR}
-          name={item.icon}
-          family={item.iconType}
-        />
-        <Text style={{textAlign: 'left'}} color="#525F7F" size={12}>
-          {!hideOp &&
-            intl.formatMessage({id: `Wallet.${get(item, 'textKey')}`})}{' '}
-          {value} BLURT
-          {description}
-        </Text>
+        <Block row>
+          <Icon
+            size={20}
+            style={{width: 30}}
+            color={argonTheme.COLORS.ERROR}
+            name={item.icon}
+            family={item.iconType}
+          />
+          <Text
+            style={{marginHorizontal: 5, textAlign: 'left'}}
+            color="#525F7F"
+            size={12}>
+            {!hideOp &&
+              intl.formatMessage({id: `Wallet.${get(item, 'textKey')}`})}{' '}
+            {value} BLURT
+            {description}
+          </Text>
+        </Block>
         <Text>{getTimeFromNow(get(item, 'created'))}</Text>
       </Block>
     );

@@ -44,10 +44,12 @@ interface Props {
   handlePressBookmark: (postRef: PostRef) => void;
   removeBookmark: (postRef: PostRef, title: string) => void;
   removeFavorite: (account: string) => void;
+  refreshPosts: () => void;
+  refreshBookmarks: () => void;
+  refreshFavorites: () => void;
   clearPosts: () => void;
 }
 const ProfileScreen = (props: Props): JSX.Element => {
-  console.log('[ProfileSceeen] props', props);
   const intl = useIntl();
 
   const [index, setIndex] = React.useState(0);
@@ -58,16 +60,30 @@ const ProfileScreen = (props: Props): JSX.Element => {
   ]);
 
   const BlogList = () =>
-    props.blogs && <PostsListView posts={props.blogs} isUser />;
+    props.blogs && (
+      <PostsListView
+        posts={props.blogs}
+        isUser
+        refreshPosts={props.refreshPosts}
+      />
+    );
 
   const BookmarkList = () =>
     props.bookmarks && (
-      <DraggableList data={props.bookmarks} renderItem={_renderBookmarkItem} />
+      <DraggableList
+        data={props.bookmarks}
+        renderItem={_renderBookmarkItem}
+        onRefresh={props.refreshBookmarks}
+      />
     );
 
   const FavoriteList = () =>
     props.favorites && (
-      <DraggableList data={props.favorites} renderItem={_renderFavoriteItem} />
+      <DraggableList
+        data={props.favorites}
+        renderItem={_renderFavoriteItem}
+        onRefresh={props.refreshFavorites}
+      />
     );
 
   const renderScene = SceneMap({

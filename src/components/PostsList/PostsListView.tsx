@@ -61,7 +61,9 @@ const PostsListView = (props: Props): JSX.Element => {
 
   //// handle refresh event on posts
   const _onRefresh = async () => {
-    //    props.refreshPosts();
+    setLoading(true);
+    await props.refreshPosts();
+    setLoading(false);
   };
 
   //// load more posts with bottom-reached event
