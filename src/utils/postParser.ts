@@ -131,7 +131,6 @@ export const parsePost = async (
     postData.markdownBody = post.body;
   }
   postData.state.isPromoted = promoted;
-  // TODO: this uploads the first image to the ececy image server
   // thumbnail image
   postData.image = postImage(postData.metadata, post.body);
   postData.state.voters = activeVotes;
@@ -225,30 +224,34 @@ const postImage = (metaData: MetaData, body: string) => {
   const urlRegex = /(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?/gm;
   const imageRegex = /(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png)/g;
   let imageLink;
-  if (metaData && metaData.image && metaData.image[0]) {
-    [imageLink] = metaData.image;
-  } else if (!imageLink && body && markdownImageRegex.test(body)) {
-    const markdownMatch = body.match(markdownImageRegex);
-    if (markdownMatch[0]) {
-      const firstMarkdownMatch = markdownMatch[0];
-      [imageLink] = firstMarkdownMatch.match(urlRegex);
+  try {
+    if (metaData && metaData.image && metaData.image[0]) {
+      [imageLink] = metaData.image;
+    } else if (!imageLink && body && markdownImageRegex.test(body)) {
+      const markdownMatch = body.match(markdownImageRegex);
+      if (markdownMatch[0]) {
+        const firstMarkdownMatch = markdownMatch[0];
+        [imageLink] = firstMarkdownMatch.match(urlRegex);
+      }
     }
-  }
 
-  if (!imageLink && imageRegex.test(body)) {
-    const imageMatch = body.match(imageRegex);
-    [imageLink] = imageMatch;
-  }
-
-  if (!imageLink && imgTagRegex.test(body)) {
-    const _imgTag = body.match(imgTagRegex);
-    const match = _imgTag[0].match(urlRegex);
-
-    if (match && match[0]) {
-      [imageLink] = match;
+    if (!imageLink && imageRegex.test(body)) {
+      const imageMatch = body.match(imageRegex);
+      [imageLink] = imageMatch;
     }
-  }
 
+    if (!imageLink && imgTagRegex.test(body)) {
+      const _imgTag = body.match(imgTagRegex);
+      const match = _imgTag[0].match(urlRegex);
+
+      if (match && match[0]) {
+        [imageLink] = match;
+      }
+    }
+  } catch (error) {
+    console.log('[postImage] failed to get image link', error);
+    return '';
+  }
   if (imageLink) {
     return getResizedImage(imageLink, 600);
   }
