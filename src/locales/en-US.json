@@ -155,7 +155,8 @@
     "limited_firstchar": "Tag must start with a letter",
     "limited_lastchar": "Tag must end with letter or number",
     "beneficiary_button": "Beneficiary",
-    "preview": "Preview"
+    "preview": "Preview",
+    "missing": "title, body, or tags is missing"
   },
   "Beneficiary": {
     "header": "Beneficiary Setting",

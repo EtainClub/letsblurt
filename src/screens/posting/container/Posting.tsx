@@ -155,7 +155,13 @@ const Posting = (props: Props): JSX.Element => {
   };
 
   //// handle press post
-  const _handlePressPostSumbit = async () => {
+  const _handlePressPostSubmit = async () => {
+    // check sanity: title, body, tags
+    if (!tags || !body || !title) {
+      setToastMessage(intl.formatMessage({id: 'Posting.missing'}));
+      return;
+    }
+
     setPosting(true);
 
     ////// build a post
@@ -362,7 +368,7 @@ const Posting = (props: Props): JSX.Element => {
         handleBodyChange={_handleBodyChange}
         handleTagsChange={_handleTagsChange}
         handleRewardChange={_handleRewardChange}
-        handlePressPostSumbit={_handlePressPostSumbit}
+        handlePressPostSubmit={_handlePressPostSubmit}
         followingList={filteredFollowings}
         handlePressBeneficiary={_handlePressBeneficiary}
         handleClearAll={_handleClearAll}

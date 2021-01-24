@@ -122,7 +122,7 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
   };
 
   return !props.loading ? (
-    <Block style={{marginHorizontal: 5, marginBottom: 150}}>
+    <Block style={{marginHorizontal: 5, marginBottom: 170}}>
       {props.parentPost && <ParentPost post={props.parentPost} />}
       <Text size={24}>{post.state.title}</Text>
       <Block row space="between">

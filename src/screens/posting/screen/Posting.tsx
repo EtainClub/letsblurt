@@ -34,7 +34,7 @@ interface Props {
   handleBodyChange: (body: string) => void;
   handleTagsChange: (tags: string) => void;
   handleRewardChange: (index: number) => void;
-  handlePressPostSumbit: () => void;
+  handlePressPostSubmit: () => void;
   followingList?: string[];
   handlePressBeneficiary: () => void;
   handleClearAll: () => void;
@@ -148,7 +148,7 @@ const PostingScreen = (props: Props): JSX.Element => {
 
           <Block center row>
             <Button
-              onPress={props.handlePressPostSumbit}
+              onPress={props.handlePressPostSubmit}
               shadowless
               loading={props.posting}
               lodingSize="large"
