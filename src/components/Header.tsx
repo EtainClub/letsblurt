@@ -123,7 +123,8 @@ const Header = (props: Props): JSX.Element => {
           ) : (
             <Image
               source={{
-                uri: `${settingsState.blockchains.image}/u/${option}/avatar`,
+                //                uri: `${settingsState.blockchains.image}/u/${option}/avatar`,
+                uri: userState.profileData.profile.metadata.profile_image,
               }}
               style={[
                 styles.avatar,
@@ -204,7 +205,8 @@ const Header = (props: Props): JSX.Element => {
         onSelect={_handleChangeAccount}>
         <Image
           source={{
-            uri: `${settingsState.blockchains.image}/u/${username}/avatar`,
+            //            uri: `${settingsState.blockchains.image}/u/${username}/avatar`,
+            uri: userState.profileData.profile.metadata.profile_image,
           }}
           style={[styles.avatar]}
         />

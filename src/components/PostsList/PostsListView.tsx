@@ -25,7 +25,7 @@ import {argonTheme} from '~/constants/argonTheme';
 import {LIST_TITLE_LENGTH} from '~/constants/utils';
 const {width, height} = Dimensions.get('screen');
 //// contexts
-import {PostsContext, SettingsContext} from '~/contexts';
+import {PostsContext, SettingsContext, UserContext} from '~/contexts';
 //// components
 import {ActionBar} from '../ActionBar';
 import {ActionBarStyleProfile} from '~/constants/actionBarTypes';
@@ -56,6 +56,7 @@ const PostsListView = (props: Props): JSX.Element => {
   const intl = useIntl();
   //// contexts
   const {setPostRef} = useContext(PostsContext);
+  const {userState} = useContext(UserContext);
   const {settingsState} = useContext(SettingsContext);
   //// states
   const [loading, setLoading] = useState(false);
@@ -110,7 +111,8 @@ const PostsListView = (props: Props): JSX.Element => {
   //// render a post
   const _renderPost = (item: any, index: number) => {
     const {state} = item;
-    const {avatar, title, createdAt} = state;
+    const {title, createdAt} = state;
+    const avatar = userState.profileData.profile.metadata.profile_image;
     const {author} = state.post_ref;
     return (
       <TouchableWithoutFeedback onPress={() => _onPressPost(index)}>

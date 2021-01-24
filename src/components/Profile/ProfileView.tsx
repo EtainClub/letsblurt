@@ -98,7 +98,8 @@ const ProfileView: React.FC<Props> = ({
               <Block row>
                 <Image
                   source={{
-                    uri: `${props.imageServer}/u/${profile.name}/avatar`,
+                    //                    uri: `${props.imageServer}/u/${profile.name}/avatar`,
+                    uri: props.profileData.profile.metadata.profile_image,
                   }}
                   style={[styles.avatar, {left: 10}]}
                 />
@@ -143,16 +144,10 @@ const ProfileView: React.FC<Props> = ({
               ) : null}
             </Block>
           </Block>
-          <Text
-            size={14}
-            color="#32325D"
-            style={{marginTop: 10}}>
+          <Text size={14} color="#32325D" style={{marginTop: 10}}>
             {profile.metadata.about}
           </Text>
-          <Text
-            size={14}
-            color="#32325D"
-            style={{marginTop: 10}}>
+          <Text size={14} color="#32325D" style={{marginTop: 10}}>
             {profile.metadata.location}
           </Text>
           <TouchableOpacity onPress={_handlePressWebsite}>
@@ -165,13 +160,11 @@ const ProfileView: React.FC<Props> = ({
               size={18}
               color="#525F7F"
               style={{
-                marginBottom: 4
+                marginBottom: 4,
               }}>
               {getNumberStat(profile.stats.post_count)}
             </Text>
-            <Text
-              size={12}
-              color={argonTheme.COLORS.TEXT}>
+            <Text size={12} color={argonTheme.COLORS.TEXT}>
               {intl.formatMessage({id: 'Profile.postings'})}
             </Text>
           </Block>
@@ -184,9 +177,7 @@ const ProfileView: React.FC<Props> = ({
               }}>
               {getNumberStat(parseInt(profile.power))}
             </Text>
-            <Text
-              size={12}
-              color={argonTheme.COLORS.TEXT}>
+            <Text size={12} color={argonTheme.COLORS.TEXT}>
               {intl.formatMessage({id: 'Profile.power'})}
             </Text>
           </Block>
@@ -199,9 +190,7 @@ const ProfileView: React.FC<Props> = ({
               }}>
               {profile.voteAmount} B
             </Text>
-            <Text
-              size={12}
-              color={argonTheme.COLORS.TEXT}>
+            <Text size={12} color={argonTheme.COLORS.TEXT}>
               {intl.formatMessage({id: 'Profile.vote_amount'})}
             </Text>
           </Block>

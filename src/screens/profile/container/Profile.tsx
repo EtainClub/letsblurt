@@ -65,12 +65,12 @@ const Profile = ({navigation}): JSX.Element => {
   const [updating, setUpdating] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState(null);
 
-  console.log('[ProfileContainer] navigation', navigation);
-
   useFocusEffect(
     useCallback(() => {
       if (authState.loggedIn) {
         const {username} = authState.currentCredentials;
+        // clear edit mode
+        setEditMode(false);
         setProfileFetched(false);
         _getUserProfileData(username);
         _fetchBookmarks(username);
@@ -101,7 +101,6 @@ const Profile = ({navigation}): JSX.Element => {
   const _getUserProfileData = async (author: string) => {
     // fetch user profile data
     const _profileData = await getUserProfileData(author);
-    console.log('[_getUserProfileData] profile data', _profileData);
     if (!_profileData) {
       console.log('[_getUserProfileData] profile data', profileData);
       setProfileFetched(true);
@@ -109,10 +108,10 @@ const Profile = ({navigation}): JSX.Element => {
     }
     // set profile data
     setProfileData(_profileData);
-
-    console.log('profile container. profiledata', _profileData);
     // build summaries of blogs
     if (_profileData) {
+      setAvatarUrl(_profileData.profile.metadata.profile_image);
+      //      setAvatarUrl(`${settingsState.blockchains.image}/u/${author}/avatar`);
       const startRef = {author: null, permlink: null};
       const posts = await fetchPostsSummary(
         'blog',
@@ -121,6 +120,7 @@ const Profile = ({navigation}): JSX.Element => {
         author,
         20,
       );
+
       // // extract summary data from blogs
       // const summaries = _profileData.blogRefs.map((blogRef) => {
       //   // get content
@@ -182,72 +182,8 @@ const Profile = ({navigation}): JSX.Element => {
 
   /////// edit related
   ////
-  const _handlePhotoUpload = () => {
-    ImagePicker.openPicker({
-      width: 640,
-      includeBase64: true,
-    })
-      .then((photos) => {
-        _uploadPhoto(photos);
-      })
-      .catch((error) => {
-        _handleSelectionFailure(error);
-      });
-  };
-
-  ////
-  const _handleCameraUpload = () => {
-    ImagePicker.openCamera({
-      includeBase64: true,
-    })
-      .then((image) => {
-        _uploadPhoto(image);
-      })
-      .catch((error) => {
-        _handleSelectionFailure(error);
-      });
-  };
-
-  //// handle selection failure
-  const _handleSelectionFailure = (error) => {};
-
-  //// upload a photo
-  const _uploadPhoto = async (photo: ImageOrVideo) => {
-    console.log('[ProfileEdit] _uploadPhoto. photo', photo);
-    setUploading(true);
-    // check logged in
-    if (!authState.loggedIn) return;
-    const {username, password} = authState.currentCredentials;
-    // sign the photo
-    let sign = await signImage(photo, username, password);
-    console.log('[_uploadPhoto] sign', sign);
-    // check sanity
-    if (!sign) return;
-    // upload photo
-    uploadImage(photo, username, sign)
-      .then((res) => {
-        console.log('[PostingContainer] uploadImage, res', res);
-        if (res.data && res.data.url) {
-          res.data.hash = res.data.url.split('/').pop();
-          setUploading(false);
-          setToastMessage('Upload Successful!');
-          setAvatarUrl(res.data.url);
-        }
-      })
-      .catch((error) => {
-        console.log('Failed to upload image', error, error.message);
-        if (error.toString().includes('code 413')) {
-          setToastMessage(intl.formatMessage({id: 'Alert.payload_too_large'}));
-        } else if (error.toString().includes('code 429')) {
-          setToastMessage(intl.formatMessage({id: 'Alert.quota_exceeded'}));
-        } else if (error.toString().includes('code 400')) {
-          setToastMessage(intl.formatMessage({id: 'Alert.invalid_image'}));
-        } else {
-          setToastMessage(intl.formatMessage({id: 'Alert.failed'}));
-        }
-        // clear uploading
-        setUploading(false);
-      });
+  const _handleUploadedImageURL = (url: string) => {
+    setAvatarUrl(url);
   };
 
   //// handle press bookmark
@@ -273,6 +209,12 @@ const Profile = ({navigation}): JSX.Element => {
       setToastMessage('updated');
       setUpdating(false);
       setEditMode(false);
+      // update profile data
+      const _profileData = {
+        ...profileData,
+        profile: {...profileData.profile, metadata: params},
+      };
+      setProfileData(_profileData);
     }
   };
 
@@ -401,8 +343,7 @@ const Profile = ({navigation}): JSX.Element => {
         updating={updating}
         avatarUrl={avatarUrl}
         handlePressUpdate={_handlePressUpdate}
-        handlePhotoUpload={_handlePhotoUpload}
-        handleCameraUpload={_handleCameraUpload}
+        handleUploadedImageURL={_handleUploadedImageURL}
       />
     )
   );

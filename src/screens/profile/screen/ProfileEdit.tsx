@@ -27,11 +27,11 @@ import {useIntl} from 'react-intl';
 //// ui, styles
 import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
 import ActionSheet from 'react-native-actions-sheet';
-import {materialTheme} from '~/constants/';
-
-import {Images, argonTheme} from '~/constants';
+import {materialTheme, Images, argonTheme} from '~/constants/';
 const {width, height} = Dimensions.get('screen');
 import {HeaderHeight} from '~/constants/utils';
+//// components
+import {ImageUpload} from '~/components';
 //// contexts
 import {PostData, PostRef, PostsTypes, ProfileData} from '~/contexts/types';
 //// etc
@@ -43,8 +43,7 @@ interface Props {
   updating: boolean;
   avatarUrl: string;
   handlePressUpdate: (profile: any) => void;
-  handlePhotoUpload: () => void;
-  handleCameraUpload: () => void;
+  handleUploadedImageURL: (url: string) => void;
 }
 //// component with default props
 const ProfileEditForm = (props: Props): JSX.Element => {
@@ -73,32 +72,6 @@ const ProfileEditForm = (props: Props): JSX.Element => {
     props.handlePressUpdate(profile);
   };
 
-  //// handle press photo upload
-  const _handlePressPhotoUpload = () => {
-    // show the action modal
-    photoUploadRef.current?.setModalVisible(true);
-  };
-
-  ////
-  const _openImagePicker = () => {
-    props.handlePhotoUpload();
-    // hide the modal
-    photoUploadRef.current?.setModalVisible(false);
-  };
-
-  ///
-  const _openCamera = () => {
-    props.handleCameraUpload();
-    // hide the modal
-    photoUploadRef.current?.setModalVisible(false);
-  };
-
-  ////
-  const _closeActionSheet = () => {
-    // hide the modal
-    photoUploadRef.current?.setModalVisible(false);
-  };
-
   return (
     <Block flex style={styles.profileScreen}>
       <ImageBackground
@@ -117,7 +90,14 @@ const ProfileEditForm = (props: Props): JSX.Element => {
                   }}
                   style={[styles.avatar, {left: 10}]}
                 />
-                <Button
+                <Block style={{position: 'absolute', left: 80, top: 80}}>
+                  <ImageUpload
+                    isComment={false}
+                    containerStyle={{right: true}}
+                    getImageURL={props.handleUploadedImageURL}
+                  />
+                </Block>
+                {/* <Button
                   onPress={_handlePressPhotoUpload}
                   loading={props.uploading}
                   onlyIcon
@@ -144,7 +124,7 @@ const ProfileEditForm = (props: Props): JSX.Element => {
                       {intl.formatMessage({id: 'Actionsheet.close'})}
                     </Button>
                   </Block>
-                </ActionSheet>
+                </ActionSheet> */}
               </Block>
             </Block>
           </Block>
