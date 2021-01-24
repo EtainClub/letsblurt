@@ -31,7 +31,6 @@ interface Props {
   showTransactions?: boolean;
   price?: number;
   handlePressTransfer?: (index: number) => void;
-  reloading: boolean;
   onRefresh: () => void;
 }
 const WalletStatsView = (props: Props): JSX.Element => {
@@ -58,6 +57,7 @@ const WalletStatsView = (props: Props): JSX.Element => {
   const [powerIndex, setPowerIndex] = useState(0);
   const [blurtIndex, setBlurtIndex] = useState(0);
   const [savingsIndex, setSavingsIndex] = useState(0);
+  const [reloading, setReloading] = useState(false);
   //// constants
   const powerOptions = [
     intl.formatMessage({id: 'Wallet.dropdown_powerdown'}),
@@ -69,6 +69,12 @@ const WalletStatsView = (props: Props): JSX.Element => {
     intl.formatMessage({id: 'Wallet.dropdown_powerup'}),
   ];
   const savingsOptions = [intl.formatMessage({id: 'Wallet.dropdown_withdraw'})];
+
+  const _onRefresh = async () => {
+    setReloading(true);
+    await props.onRefresh();
+    setReloading(false);
+  };
 
   const _renderItem = ({item, index}) => {
     const value = parseFloat(get(item, 'value', '')).toFixed(2);
@@ -245,8 +251,8 @@ const WalletStatsView = (props: Props): JSX.Element => {
         <Block style={styles.notification}>
           <FlatList
             data={transactions}
-            refreshing={props.reloading}
-            onRefresh={props.onRefresh}
+            refreshing={reloading}
+            onRefresh={_onRefresh}
             keyExtractor={(item, index) => index.toString()}
             renderItem={_renderItem}
             // ListHeaderComponent={

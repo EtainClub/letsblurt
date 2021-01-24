@@ -26,8 +26,12 @@ import {LIST_TITLE_LENGTH} from '~/constants/utils';
 const {width, height} = Dimensions.get('screen');
 //// contexts
 import {PostsContext, SettingsContext} from '~/contexts';
+//// components
+import {ActionBar} from '../ActionBar';
+import {ActionBarStyleProfile} from '~/constants/actionBarTypes';
 //// etc
 import {getTimeFromNow} from '~/utils/time';
+import {PostsTypes} from '~/contexts/types';
 
 const BACKGROUND_COLORS = [
   argonTheme.COLORS.BORDER,
@@ -69,13 +73,13 @@ const PostsListView = (props: Props): JSX.Element => {
   //// load more posts with bottom-reached event
   const _onLoadMore = async () => {
     //    setLoadingMore(true);
-    props.fetchMore && props.fetchMore();
+    //props.fetchMore && props.fetchMore();
   };
 
   const _onPressPost = (index: number) => {
-    console.log('onPressPost');
-    // TODO: navigate to the post details
-    setPostRef(props.posts[index].postRef);
+    console.log('onPressPost. postRef');
+    // navigate to the post details
+    setPostRef(props.posts[index].state.post_ref);
     navigate({name: 'PostDetails'});
   };
 
@@ -105,7 +109,9 @@ const PostsListView = (props: Props): JSX.Element => {
 
   //// render a post
   const _renderPost = (item: any, index: number) => {
-    const avatar = `${settingsState.blockchains.image}/u/${item.author}/avatar`;
+    const {state} = item;
+    const {avatar, title, createdAt} = state;
+    const {author} = state.post_ref;
     return (
       <TouchableWithoutFeedback onPress={() => _onPressPost(index)}>
         <Block
@@ -127,21 +133,71 @@ const PostsListView = (props: Props): JSX.Element => {
                 }}
                 style={styles.avatar}
               />
-              {props.isUser && <Text size={10}>{item.author}</Text>}
+              {props.isUser && <Text size={10}>{author}</Text>}
             </Block>
-            {/* <Text>{substr_utf8_bytes(item.title, 0, 32)}</Text> */}
-            {/* {<Text>{runes.substr(item.title, 0, 30)}</Text>} */}
-            {<Text>{sliceByByte(item.title, LIST_TITLE_LENGTH)}</Text>}
+            <Block>
+              <Text>{sliceByByte(title, LIST_TITLE_LENGTH)}</Text>
+              <ActionBar
+                actionBarStyle={ActionBarStyleProfile}
+                postState={item.state}
+                postsType={PostsTypes.FEED}
+                postIndex={index}
+              />
+            </Block>
           </Block>
           <Block middle>
-            {item.createdAt && (
-              <Text>{getTimeFromNow(item.createdAt).split('ago')[0]}</Text>
-            )}
+            {createdAt && <Text>{getTimeFromNow(createdAt)}</Text>}
           </Block>
         </Block>
       </TouchableWithoutFeedback>
     );
   };
+
+  //// render a post
+  // const _renderPost = (item: any, index: number) => {
+  //   const avatar = `${settingsState.blockchains.image}/u/${item.author}/avatar`;
+  //   return (
+  //     <TouchableWithoutFeedback onPress={() => _onPressPost(index)}>
+  //       <Block
+  //         flex
+  //         card
+  //         row
+  //         space="between"
+  //         style={{
+  //           marginBottom: 5,
+  //           padding: 5,
+  //           backgroundColor:
+  //             BACKGROUND_COLORS[index % BACKGROUND_COLORS.length],
+  //         }}>
+  //         <Block row middle style={{left: -20}}>
+  //           <Block center width={80}>
+  //             <Image
+  //               source={{
+  //                 uri: avatar || null,
+  //               }}
+  //               style={styles.avatar}
+  //             />
+  //             {props.isUser && <Text size={10}>{item.author}</Text>}
+  //           </Block>
+  //           <Block>
+  //             <Text>{sliceByByte(item.title, LIST_TITLE_LENGTH)}</Text>
+  //             {/* <ActionBar
+  //               actionBarStyle={ActionBarStyleFeed}
+  //               postState={item.state}
+  //               postsType={PostsTypes.FEED}
+  //               postIndex={index}
+  //             /> */}
+  //           </Block>
+  //         </Block>
+  //         <Block middle>
+  //           {item.createdAt && (
+  //             <Text>{getTimeFromNow(item.createdAt).split('ago')[0]}</Text>
+  //           )}
+  //         </Block>
+  //       </Block>
+  //     </TouchableWithoutFeedback>
+  //   );
+  // };
 
   return !loading ? (
     <FlatList

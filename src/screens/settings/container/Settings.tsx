@@ -180,7 +180,7 @@ const SettingsContainer = (props: Props): JSX.Element => {
     const follow = switchStates[SettingUITypes.FOLLOW];
     const transfer = switchStates[SettingUITypes.TRANSFER];
     const vote = switchStates[SettingUITypes.VOTE];
-    // reblog
+    const reblog = switchStates[SettingUITypes.REBLOG];
     // delegate
     let notifications = [];
     if (beneficiary) notifications.push(SettingUITypes.BENEFICIARY);
@@ -189,6 +189,8 @@ const SettingsContainer = (props: Props): JSX.Element => {
     if (follow) notifications.push(SettingUITypes.MENTION);
     if (transfer) notifications.push(SettingUITypes.TRANSFER);
     if (vote) notifications.push(SettingUITypes.VOTE);
+    if (reblog) notifications.push(SettingUITypes.REBLOG);
+
     // handle the event item
     if (value) {
       // update the value of the event item
@@ -574,8 +576,7 @@ const SettingsContainer = (props: Props): JSX.Element => {
             break;
           case SettingUITypes.TRANSLATION:
             defaultText = translation;
-            if (item.options)
-            selectedIndex = item.options.indexOf(translation);
+            if (item.options) selectedIndex = item.options.indexOf(translation);
             break;
           default:
             break;

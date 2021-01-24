@@ -826,7 +826,7 @@ export const fetchPostsSummary = async (
   // build query
   const query: DisqussionQuery = {
     tag: tag,
-    limit: NUM_FETCH_POSTS + 1,
+    limit: limit,
     start_permlink: startPostRef.permlink || undefined,
     start_author: startPostRef.author || undefined,
     truncate_body: TRUNCATE_BODY_LENGTH,

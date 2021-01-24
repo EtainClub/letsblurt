@@ -98,11 +98,11 @@ const SettingsScreen = (props: Props): JSX.Element => {
       id: SettingUITypes.TRANSFER,
       type: 'switch',
     },
-    // {
-    //   title: intl.formatMessage({id: 'Settings.notify_reblog'}),
-    //   id: SettingUITypes.REBLOG,
-    //   type: 'switch',
-    // },
+    {
+      title: intl.formatMessage({id: 'Settings.notify_reblog'}),
+      id: SettingUITypes.REBLOG,
+      type: 'switch',
+    },
     // {
     //   title: intl.formatMessage({id: 'Settings.notify_vote'}),
     //   id: SettingUITypes.VOTE,
@@ -149,7 +149,7 @@ const SettingsScreen = (props: Props): JSX.Element => {
       title: intl.formatMessage({id: 'Settings.app_version'}),
       id: SettingUITypes.APP_VERSION,
       type: 'text',
-      defaultText: '0.4.0',
+      defaultText: '0.4.5',
     },
     {
       title: intl.formatMessage({id: 'Settings.terms'}),

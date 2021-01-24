@@ -24,6 +24,16 @@ export const ActionBarStyleFeed: ActionBarStyle = {
   edit: false,
 };
 
+export const ActionBarStyleProfile: ActionBarStyle = {
+  textSize: 14,
+  iconSize: 16,
+  styles: {
+    alignItems: 'flex-start',
+  },
+  reply: false,
+  edit: false,
+};
+
 export const ActionBarStylePost: ActionBarStyle = {
   textSize: 14,
   iconSize: 16,

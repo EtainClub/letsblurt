@@ -40,6 +40,8 @@ interface Props {
   profileData: ProfileData;
   blogs: any[];
   walletData: WalletData;
+  refreshPosts: () => void;
+  refreshWallet: () => void;
 }
 //// component
 const AuthorProfileScreen = (props: Props): JSX.Element => {
@@ -51,11 +53,21 @@ const AuthorProfileScreen = (props: Props): JSX.Element => {
     {key: 'blogs', title: intl.formatMessage({id: 'Profile.blog_tab'})},
     {key: 'wallet', title: intl.formatMessage({id: 'Profile.wallet_tab'})},
   ]);
-  const BlogList = () => <PostsListView posts={props.blogs} isUser={false} />;
+  const BlogList = () => (
+    <PostsListView
+      posts={props.blogs}
+      isUser={false}
+      refreshPosts={props.refreshPosts}
+    />
+  );
 
   const WalletStats = () =>
     props.walletData ? (
-      <WalletStatsView walletData={props.walletData} isUser={false} />
+      <WalletStatsView
+        walletData={props.walletData}
+        isUser={false}
+        onRefresh={props.refreshWallet}
+      />
     ) : null;
 
   const renderScene = SceneMap({

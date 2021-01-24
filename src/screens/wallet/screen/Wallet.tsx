@@ -18,7 +18,6 @@ interface Props {
   handlePressClaim: () => void;
   claiming: boolean;
   handlePressTransfer: (index: number) => void;
-  reloading: boolean;
   onRefresh: () => void;
 }
 const WalletScreen = (props: Props): JSX.Element => {
@@ -40,7 +39,6 @@ const WalletScreen = (props: Props): JSX.Element => {
       handlePressClaim={props.handlePressClaim}
       claiming={props.claiming}
       price={props.price}
-      reloading={props.reloading}
       onRefresh={props.onRefresh}
       handlePressTransfer={props.handlePressTransfer}
     />

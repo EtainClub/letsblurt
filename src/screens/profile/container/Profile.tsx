@@ -18,10 +18,9 @@ import {PostsTypes, PostData, PostRef, ProfileData} from '~/contexts/types';
 import {
   signImage,
   broadcastProfileUpdate,
-  getVoteAmount,
+  fetchPostsSummary,
 } from '~/providers/blurt/dblurtApi';
 import {uploadImage} from '~/providers/blurt/imageApi';
-
 import {argonTheme} from '~/constants';
 
 import ImagePicker, {ImageOrVideo} from 'react-native-image-crop-picker';
@@ -110,29 +109,39 @@ const Profile = ({navigation}): JSX.Element => {
     }
     // set profile data
     setProfileData(_profileData);
+
+    console.log('profile container. profiledata', _profileData);
     // build summaries of blogs
     if (_profileData) {
-      // extract summary data from blogs
-      const summaries = _profileData.blogRefs.map((blogRef) => {
-        // get content
-        const blog = get(_profileData.blogs, blogRef, {});
-        // get avatar
-        const avatar = `${settingsState.blockchains.image}/u/${author}/avatar`;
-        // update avatar url state
-        setAvatarUrl(avatar);
-        return {
-          author,
-          //          avatar,
-          title: blog.title,
-          createdAt: blog.created,
-          postRef: {
-            author: author,
-            permlink: blogRef.split('/')[1],
-          },
-        };
-      });
-      console.log('[_getAuthorProfile] blog summarys', summaries);
-      setBlogs(summaries);
+      const startRef = {author: null, permlink: null};
+      const posts = await fetchPostsSummary(
+        'blog',
+        author,
+        startRef,
+        author,
+        20,
+      );
+      // // extract summary data from blogs
+      // const summaries = _profileData.blogRefs.map((blogRef) => {
+      //   // get content
+      //   const blog = get(_profileData.blogs, blogRef, {});
+      //   // get avatar
+      //   const avatar = `${settingsState.blockchains.image}/u/${author}/avatar`;
+      //   // update avatar url state
+      //   setAvatarUrl(avatar);
+      //   return {
+      //     author,
+      //     //          avatar,
+      //     title: blog.title,
+      //     createdAt: blog.created,
+      //     postRef: {
+      //       author: author,
+      //       permlink: blogRef.split('/')[1],
+      //     },
+      //   };
+      // });
+      console.log('[_getAuthorProfile] blog summarys', posts);
+      setBlogs(posts);
       setProfileFetched(true);
     }
   };
