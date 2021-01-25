@@ -16,7 +16,6 @@ import {
   SearchFeed,
   Profile,
   AuthorProfile,
-  AuthorList,
   Posting,
   Wallet,
   Notification,
@@ -378,7 +377,6 @@ const DrawerNavigator = (props) => {
       <Drawer.Screen name="Login" component={Login} />
       <Drawer.Screen name="SignUp" component={Signup} />
       <Drawer.Screen name="AuthorProfile" component={AuthorStack} />
-      {/* <Drawer.Screen name="AuthorList" component={AuthorListStack} /> */}
       <Drawer.Screen name="PostDetails" component={PostDetailsStack} />
       {!authState.loggedIn ? (
         <Drawer.Screen name="Logout" component={Login} />
@@ -414,37 +412,3 @@ const NavigationStack = ({intl}) => {
 };
 
 export default injectIntl(NavigationStack);
-
-/*
-// signup, phone verify, account stack
-const DrawerSignupStack = (): JSX.Element => {
-  console.log('DrawerSignupStack');
-  console.log('SignupStack');
-  return (
-    <Stack.Navigator initialRouteName="SignUp" mode="card">
-      <Stack.Screen
-        name="SignUp"
-        component={Signup}
-        options={{
-          header: () => <Header transparent title="SignUp" />,
-          headerTransparent: true,
-        }}
-      />
-      <Stack.Screen
-        name="PhoneVerify"
-        component={Signup}
-        options={{
-          header: () => <Header back transparent title="SignUp" />,
-        }}
-      />
-      <Stack.Screen
-        name="AccountCreation"
-        component={Signup}
-        options={{
-          header: () => <Header back transparent title="SignUp" />,
-        }}
-      />
-    </Stack.Navigator>
-  );
-};
-*/

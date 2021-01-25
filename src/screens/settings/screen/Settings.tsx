@@ -149,7 +149,7 @@ const SettingsScreen = (props: Props): JSX.Element => {
       title: intl.formatMessage({id: 'Settings.app_version'}),
       id: SettingUITypes.APP_VERSION,
       type: 'text',
-      defaultText: '0.4.6',
+      defaultText: '0.4.7',
     },
     {
       title: intl.formatMessage({id: 'Settings.terms'}),

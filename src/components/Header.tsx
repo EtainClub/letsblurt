@@ -249,9 +249,11 @@ const Header = (props: Props): JSX.Element => {
 
   ////
   const _handleLeftPress = () => {
+    console.log('header. _handleLeftPress');
     const {back, navigation} = props;
-    if (back) navigation.goBack();
-    else navigation.openDrawer();
+    navigation.goBack();
+    //    if (back) navigation.goBack();
+    //    else navigation.openDrawer();
   };
 
   ////
@@ -325,7 +327,7 @@ const Header = (props: Props): JSX.Element => {
   return (
     <Block style={headerStyles}>
       <NavBar
-        back={back}
+        back={true}
         title={intl.formatMessage({id: `${title.toLowerCase()}`})}
         style={styles.navbar}
         transparent={transparent}
@@ -337,8 +339,9 @@ const Header = (props: Props): JSX.Element => {
           left: -70,
         }}
         leftStyle={{paddingTop: 3, flex: 0.3}}
-        leftIconName={back ? null : 'navicon'}
-        // leftIconFamily="font-awesome"
+        //        leftIconName={back ? null : 'navicon'}
+        leftIconName="chevron-left"
+        leftIconFamily="entypo"
         leftIconColor={white ? theme.COLORS.WHITE : theme.COLORS.ICON}
         titleStyle={[
           styles.title,
