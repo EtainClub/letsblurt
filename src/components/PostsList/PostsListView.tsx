@@ -111,8 +111,7 @@ const PostsListView = (props: Props): JSX.Element => {
   //// render a post
   const _renderPost = (item: any, index: number) => {
     const {state} = item;
-    const {title, createdAt} = state;
-    const avatar = userState.profileData.profile.metadata.profile_image;
+    const {title, createdAt, avatar} = state;
     const {author} = state.post_ref;
     return (
       <TouchableWithoutFeedback onPress={() => _onPressPost(index)}>
