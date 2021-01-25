@@ -133,7 +133,8 @@
     "follow": "당신을 팔로잉합니다.",
     "reply": "글에 답글을 달았습니다.",
     "mention": "포스트에서 당신을 멘션했습니다.",
-    "transfer": "{what}를 전송했습니다."
+    "transfer": "{what}를 전송했습니다.",
+    "reblog": "당신의 글을 공유했습니다."
   },
   "Posting": {
     "title": "제목",

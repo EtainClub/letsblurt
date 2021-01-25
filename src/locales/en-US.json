@@ -3,7 +3,7 @@
   "feed": "Feed",
   "search": "Search",
   "post": "Post",
-  "notification": "Notification",
+  "notification": "Notifications",
   "posting": "Posting",
   "profile": "Profile",
   "author": "Author",
@@ -133,7 +133,8 @@
     "follow": " started following you",
     "reply": " replied to your post",
     "mention": "mentioned you in this post",
-    "transfer": "transferred {what} to you"
+    "transfer": "transferred {what} to you",
+    "reblog": "reblogged your post"
   },
   "Posting": {
     "title": "Title",

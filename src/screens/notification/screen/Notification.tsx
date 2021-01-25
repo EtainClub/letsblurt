@@ -61,6 +61,13 @@ const NotificationScreen = (props: Props): JSX.Element => {
     let permlink = null;
     switch (notiType) {
       // TODO: handle reblog
+      case 'reblog':
+        iconName = 'repeat';
+        iconFamily = 'material-community';
+        author = author;
+        avatar = `${imageServer}/u/${author}/avatar`;
+        text = intl.formatMessage({id: 'Notifications.reblog'});
+        break;
       case 'follow':
         iconName = 'adduser';
         iconFamily = 'antdesign';

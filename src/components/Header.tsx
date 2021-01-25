@@ -123,8 +123,8 @@ const Header = (props: Props): JSX.Element => {
           ) : (
             <Image
               source={{
-                //                uri: `${settingsState.blockchains.image}/u/${option}/avatar`,
-                uri: userState.profileData.profile.metadata.profile_image,
+                uri: `${settingsState.blockchains.image}/u/${option}/avatar`,
+                //uri: userState.profileData.profile.metadata.profile_image,
               }}
               style={[
                 styles.avatar,
