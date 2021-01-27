@@ -47,9 +47,6 @@ const NotificationScreen = (props: Props): JSX.Element => {
   //// lanugage
   const intl = useIntl();
 
-  //// TODO: need author, permlink, parent_author, parent_author to track the post
-  //// show blurt world like view: if comment, show comment only and
-  //// add a button to go to the main post
   //// render item
   const _renderItem = ({item, index}) => {
     const notiType = item.type;

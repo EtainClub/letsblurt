@@ -52,23 +52,18 @@ interface Props {
   handlePressTranslation: () => void;
 }
 const PostDetailsScreen = (props: Props): JSX.Element => {
-  const {uiState, setToastMessage} = useContext(UIContext);
-  const intl = useIntl();
-  const commentRef = useRef(null);
-  const [submitting, setSubmitting] = useState(false);
-  const [message, setMessage] = useState('');
-  const [commentNewHeight, setCommentNeeHeight] = useState(40);
-
+  //// props
   const {post} = props;
-
   const {state} = post;
   const {nickname} = state;
   const {tags} = post.metadata;
   const reputation = state.reputation.toFixed(0);
-
+  //// contexts
+  //// states
   const [commentY, setCommentY] = useState(0);
-  const [uploadedImageUrl, setUploadedImageUrl] = useState('');
   const [avoidKeyboard, setAvoidKeyboard] = useState(false);
+  //// refs
+  const commentRef = useRef(null);
 
   const formatedTime = post && getTimeFromNow(state.createdAt);
 
@@ -76,20 +71,8 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
     commentRef.current.scrollTo({y: commentY, animated: true});
   };
 
-  const _onPressSendComment = async (text: string) => {
-    console.log('[PostDetails] onPressSendComment');
-    // set submitting
-    setSubmitting(true);
-    const result = await props.handleSubmitComment(text);
-  };
-
   const _handlePressHashTag = (tag: string) => {
     props.handlePressTag(tag);
-  };
-
-  const _getUploadedImageURL = (url: string) => {
-    setUploadedImageUrl(url);
-    setMessage(message + ' ' + url);
   };
 
   const _renderComments = () => {
@@ -182,16 +165,18 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
               })}
             </Block>
           )}
-          <Editor
-            isComment={true}
-            depth={0}
-            close={false}
-            handleSubmitComment={props.handleSubmitComment}
-            handleBodyChange={(text) => {
-              console.log('editor body change', text);
-              setAvoidKeyboard(true);
-            }}
-          />
+          <Block onLayout={(event) => setCommentY(event.nativeEvent.layout.y)}>
+            <Editor
+              isComment={true}
+              depth={0}
+              close={false}
+              handleSubmitComment={props.handleSubmitComment}
+              handleBodyChange={(text) => {
+                console.log('editor body change', text);
+                setAvoidKeyboard(true);
+              }}
+            />
+          </Block>
           {_renderComments()}
         </Block>
       </ScrollView>

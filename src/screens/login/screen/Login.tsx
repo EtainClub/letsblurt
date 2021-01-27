@@ -30,12 +30,6 @@ interface Props {
 const LoginScreen = (props: Props): JSX.Element => {
   //// props
   const {username, password, message, loading} = props;
-  // const [username, setUsername] = useState('');
-  // const [password, setPasword] = useState('');
-  // const [loading, setLoading] = useState(false);
-  // const [message, setMessage] = useState('');
-  // temp
-  //  const [passwordEditable, setPasswordEditable] = useState(false);
   const intl = useIntl();
 
   return (
