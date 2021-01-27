@@ -157,7 +157,8 @@
     "limited_lastchar": "태그의 끝은 문자나 숫자로 끝나야 합니다.",
     "beneficiary_button": "베네피셔리 설정",
     "preview": "미리보기",
-    "missing": "제목/본문/태그가 빠졌습니다."
+    "missing": "제목/본문/태그가 빠졌습니다.",
+    "tag_error": "태그가 올바르지 않습니다."
   },
   "Beneficiary": {
     "header": "베네피셔리 설정",

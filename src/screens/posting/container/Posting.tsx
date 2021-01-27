@@ -162,6 +162,13 @@ const Posting = (props: Props): JSX.Element => {
       return;
     }
 
+    // check validity of tags
+    if (tagMessage !== '') {
+      setToastMessage(intl.formatMessage({id: 'Posting.tag_error'}));
+      return;
+    }
+
+    // set loading for posting
     setPosting(true);
 
     ////// build a post
@@ -170,7 +177,9 @@ const Posting = (props: Props): JSX.Element => {
     // extract meta
     const _meta = extractMetadata(body);
     // split tags by space
-    const _tags = tags.split(' ');
+    let _tags = tags.split(' ');
+    // filter out empty tags
+    _tags = _tags.filter((tag) => tag && tag !== ' ');
     const jsonMeta = makeJsonMetadata(_meta, _tags);
     let permlink = '';
     let options = null;
@@ -207,6 +216,7 @@ const Posting = (props: Props): JSX.Element => {
       postingContent.parent_permlink = originalPost.state.parent_ref.permlink;
       console.log('[updatePost] postingContent', postingContent);
     }
+
     //// submit the post
     const result = await submitPost(postingContent, password, false, options);
     if (result) {

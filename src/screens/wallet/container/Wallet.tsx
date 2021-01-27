@@ -1,6 +1,7 @@
 //// react
 import React, {useState, useEffect, useContext} from 'react';
 //// react native
+import {View} from 'react-native';
 //// language
 import {useIntl} from 'react-intl';
 ////
@@ -38,7 +39,6 @@ const Wallet = (props: Props): JSX.Element => {
   const [price, setPrice] = useState(0);
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [followingList, setFollowingList] = useState([]);
-  const [reloading, setReloading] = useState(false);
   //////// events
   //// event: mount
   useEffect(() => {
@@ -153,7 +153,6 @@ const Wallet = (props: Props): JSX.Element => {
       handlePressClaim={_handlePressClaim}
       claiming={claiming}
       price={price}
-      reloading={reloading}
       onRefresh={_getWalletData}
       handlePressTransfer={_handlePressTransfer}
     />

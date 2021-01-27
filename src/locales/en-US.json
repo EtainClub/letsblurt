@@ -157,7 +157,8 @@
     "limited_lastchar": "Tag must end with letter or number",
     "beneficiary_button": "Beneficiary",
     "preview": "Preview",
-    "missing": "title, body, or tags is missing"
+    "missing": "title, body, or tags is missing",
+    "tag_error": "some of tags are not correct"
   },
   "Beneficiary": {
     "header": "Beneficiary Setting",
