@@ -50,7 +50,8 @@ const SearchFeed = (props: Props): JSX.Element => {
   const [searchText, setSearchText] = useState('');
   const [startIndex, setStartIndex] = useState(1);
   const [loadedAll, setLoadedAll] = useState(false);
-  const [autoFocus, setAutoFocus] = useState(true);
+  const [active, setActive] = useState(false);
+
   //// effects
   useEffect(() => {
     if (uiState.searchText != '') {
@@ -60,25 +61,40 @@ const SearchFeed = (props: Props): JSX.Element => {
       _fetchSearch(uiState.searchText);
     }
   }, [uiState.searchText]);
+
   ////
-  useEffect(() => {
-    console.log('[useEffect|searchText] searchText', searchText);
+  // useEffect(() => {
+  //   console.log('[useEffect|searchText] searchText', searchText);
+  //   if (searchText.length > 0 && startIndex < 100) {
+  //     // clear loaded all
+  //     setLoadedAll(false);
+  //     // start search
+  //     _fetchSearch(searchText);
+  //   } else if (startIndex >= 100) setLoadedAll(true);
+  // }, [searchText]);
+
+  const _handleSearch = async () => {
+    console.log('_handleSearch. text', searchText);
+    // clear search items
+    setSearchItems([]);
+    // start search text
     if (searchText.length > 0 && startIndex < 100) {
       // clear loaded all
       setLoadedAll(false);
       // start search
       _fetchSearch(searchText);
     } else if (startIndex >= 100) setLoadedAll(true);
-  }, [searchText]);
 
-  const _handleSearch = async (search: string) => {
-    console.log('_handleSearch. text', search);
-    // clear search items
-    setSearchItems([]);
-    // set search text
-    setSearchText(search);
     // clear start index
     setStartIndex(1);
+  };
+
+  const _handleActive = (_active: boolean) => {
+    setActive(_active);
+  };
+
+  const _handleSearchChange = (_text: string) => {
+    setSearchText(_text);
   };
 
   const _handleLoadMore = async (text?: string) => {
@@ -148,17 +164,22 @@ const SearchFeed = (props: Props): JSX.Element => {
     //    setSearchText('');
   };
 
-  const _handleRefresh = async (text: string) => {
+  const _handleRefresh = async () => {
     setSearchItems([]);
     setStartIndex(1);
-    setSearchText(text);
+    setSearchText(searchText);
+    // search
+    _handleSearch();
   };
 
   return (
     <SearchScreen
-      initialText={uiState.searchText}
+      searchText={uiState.searchText}
+      active={active}
       items={searchItems}
       handleSearch={_handleSearch}
+      handleSearchChange={_handleSearchChange}
+      handleActive={_handleActive}
       handleRefresh={_handleRefresh}
       handleLoadMore={_handleLoadMore}
     />

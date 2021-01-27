@@ -57,10 +57,6 @@ const PostingScreen = (props: Props): JSX.Element => {
   if (originalPost) markdownBody = originalPost.markdownBody;
   //// language
   const intl = useIntl();
-  //// references
-  const inputRef = useRef(null);
-  //// contexts
-  const {userState, getFollowings} = useContext(UserContext);
   //// states
   // this is a workaround to use copy/paste
   const [titleEditable, setTitleEditable] = useState(false);

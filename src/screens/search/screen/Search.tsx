@@ -28,26 +28,30 @@ import {PostsListView} from '~/components';
 
 //// props
 interface Props {
-  initialText: string;
+  searchText: string;
+  active: boolean;
   items: any[];
-  handleSearch: (search: string) => void;
-  handleRefresh: (search: string) => void;
+  handleSearchChange: (text: string) => void;
+  handleSearch: () => void;
+  handleRefresh: () => void;
   handleLoadMore: () => void;
+  handleActive: (active: boolean) => void;
 }
 //// component
 const SearchScreen = (props: Props): JSX.Element => {
   //// props
+  const {searchText, active, items} = props;
   //// language
   const intl = useIntl();
   //// states
-  const [searchText, setSearchText] = useState(props.initialText);
-  const [searching, setSearching] = useState(false);
-  const [active, setActive] = useState(false);
+  // const [searchText, setSearchText] = useState(props.initialText);
+  // const [searching, setSearching] = useState(false);
+  // const [active, setActive] = useState(false);
 
   const SearchBar = () => {
     const iconSearch =
       searchText != '' ? (
-        <TouchableWithoutFeedback onPress={() => setSearchText('')}>
+        <TouchableWithoutFeedback onPress={() => props.handleSearchChange('')}>
           <Icon
             size={16}
             color={theme.COLORS.MUTED}
@@ -56,8 +60,7 @@ const SearchScreen = (props: Props): JSX.Element => {
           />
         </TouchableWithoutFeedback>
       ) : (
-        <TouchableWithoutFeedback
-          onPress={() => props.handleSearch(searchText)}>
+        <TouchableWithoutFeedback onPress={props.handleSearch}>
           <Icon
             size={16}
             color={theme.COLORS.MUTED}
@@ -82,28 +85,22 @@ const SearchScreen = (props: Props): JSX.Element => {
           returnKeyType="search"
           style={[styles.search, active ? styles.shadow : null]}
           placeholder={intl.formatMessage({id: 'Search.search_placeholder'})}
-          onFocus={() => setActive(true)}
-          onBlur={() => setActive(false)}
-          onChangeText={(text: string) => {
-            setSearchText(text);
-          }}
-          onSubmitEditing={() => props.handleSearch(searchText)}
+          onFocus={() => props.handleActive(true)}
+          onBlur={() => props.handleActive(false)}
+          onChangeText={props.handleSearchChange}
+          onSubmitEditing={props.handleSearch}
         />
       </Block>
     );
-  };
-
-  const _handleRefresh = () => {
-    props.handleRefresh(searchText);
   };
 
   return (
     <Block style={{marginBottom: 70}}>
       {SearchBar()}
       <PostsListView
-        posts={props.items}
+        posts={items}
         isUser={false}
-        refreshPosts={_handleRefresh}
+        refreshPosts={props.handleRefresh}
         fetchMore={props.handleLoadMore}
       />
     </Block>

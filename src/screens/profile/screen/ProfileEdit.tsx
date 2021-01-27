@@ -58,8 +58,6 @@ const ProfileEditForm = (props: Props): JSX.Element => {
   const [about, setAbout] = useState(profile.metadata.about);
   const [location, setLocation] = useState(profile.metadata.location);
   const [website, setWebsite] = useState(profile.metadata.website);
-  // ref
-  const photoUploadRef = useRef(null);
 
   ////
   const _handlePressUpdate = () => {
@@ -97,34 +95,6 @@ const ProfileEditForm = (props: Props): JSX.Element => {
                     getImageURL={props.handleUploadedImageURL}
                   />
                 </Block>
-                {/* <Button
-                  onPress={_handlePressPhotoUpload}
-                  loading={props.uploading}
-                  onlyIcon
-                  icon="pencil"
-                  iconFamily="font-awesome"
-                  iconSize={15}
-                  color={argonTheme.COLORS.ERROR}
-                  style={{
-                    position: 'absolute',
-                    left: 80,
-                    top: 80,
-                  }}
-                />
-
-                <ActionSheet ref={photoUploadRef}>
-                  <Block center>
-                    <Button color="primary" onPress={_openImagePicker}>
-                      {intl.formatMessage({id: 'Actionsheet.gallery'})}
-                    </Button>
-                    <Button color="warning" onPress={_openCamera}>
-                      {intl.formatMessage({id: 'Actionsheet.camera'})}
-                    </Button>
-                    <Button color="gray" onPress={_closeActionSheet}>
-                      {intl.formatMessage({id: 'Actionsheet.close'})}
-                    </Button>
-                  </Block>
-                </ActionSheet> */}
               </Block>
             </Block>
           </Block>

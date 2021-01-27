@@ -12,16 +12,9 @@ import {
   TouchableWithoutFeedback,
   ScrollView,
   RefreshControl,
-  KeyboardAvoidingView,
-  Platform,
 } from 'react-native';
-// SafeAreaView
-import {SafeAreaView} from 'react-native-safe-area-context';
-//import { ScrollView } from 'react-native-gesture-handler';
 import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
 const {height, width} = Dimensions.get('window');
-import {useIntl} from 'react-intl';
-import {navigate} from '~/navigation/service';
 import {PostData, CommentData, PostsTypes} from '~/contexts/types';
 import {ActionBarStylePost} from '~/constants/actionBarTypes';
 import {

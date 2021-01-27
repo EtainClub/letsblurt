@@ -1,4 +1,7 @@
+//// react
 import React, {useState, useEffect, useContext, useCallback} from 'react';
+//// react native
+import {BackHandler} from 'react-native';
 // keychain to store data securely
 import * as Keychain from 'react-native-keychain';
 import {useFocusEffect} from '@react-navigation/native';
@@ -63,6 +66,9 @@ const Feed = (props: Props): JSX.Element => {
       _fetchPosts(false);
     }
   }, [authState.currentCredentials]);
+
+  ////
+
   //// focus event with tag param
   // useFocusEffect(
   //   useCallback(() => {

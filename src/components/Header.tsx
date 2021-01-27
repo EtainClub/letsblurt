@@ -1,6 +1,7 @@
 import React, {useState, useContext, useEffect} from 'react';
 import {
   TouchableOpacity,
+  Alert,
   StyleSheet,
   Platform,
   Image,
@@ -251,7 +252,23 @@ const Header = (props: Props): JSX.Element => {
   const _handleLeftPress = () => {
     console.log('header. _handleLeftPress');
     const {back, navigation} = props;
-    navigation.goBack();
+    try {
+      navigation.goBack();
+    } catch {
+      // show modal
+      Alert.alert(
+        intl.formatMessage({id: 'App.push_title'}),
+        intl.formatMessage({id: 'App.push_body'}),
+        [
+          {text: intl.formatMessage({id: 'no'}), style: 'cancel'},
+          {
+            text: intl.formatMessage({id: 'yes'}),
+            onPress: () => console.log('go back. yes'),
+          },
+        ],
+        {cancelable: true},
+      );
+    }
     //    if (back) navigation.goBack();
     //    else navigation.openDrawer();
   };
