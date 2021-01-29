@@ -11,6 +11,8 @@ import Config from 'react-native-config';
 import {firebase} from '@react-native-firebase/functions';
 // axios
 import axios from 'axios';
+import TTS from 'react-native-tts';
+
 import {PostDetailsScreen} from '../screen/PostDetails';
 // blurt api
 import {fetchComments} from '~/providers/blurt/dblurtApi';
@@ -76,6 +78,7 @@ const PostDetails = (props: Props): JSX.Element => {
     if (authState.loggedIn) {
       updateVoteAmount(authState.currentCredentials.username);
     }
+    _initTTS();
   }, []);
   //// event: new post ref set
   useEffect(() => {
@@ -110,6 +113,36 @@ const PostDetails = (props: Props): JSX.Element => {
   //   }
   // }, [uiState.selectedLanguage]);
 
+  //// initialize tts
+  const _initTTS = async () => {
+    TTS.setDefaultRate(0.5);
+    TTS.setDefaultPitch(1);
+    try {
+      const result = await TTS.getInitStatus();
+      console.log('init tts result', result);
+    } catch (error) {
+      console.log('failed to init TTS', error);
+      return;
+    }
+
+    TTS.speak('TTS has been initialized');
+
+    TTS.setDefaultLanguage('en-US');
+    TTS.addEventListener('tts-start', (event) => console.log('start', event));
+    TTS.addEventListener('tts-finish', (event) => console.log('finish', event));
+    TTS.addEventListener('tts-cancel', (event) => console.log('cancel', event));
+  };
+
+  const _speakBody = () => {
+    if (postDetails) {
+      TTS.stop();
+      const hhtmlRegex = /!\[img/g;
+      const text = postDetails.markdownBody.replace(hhtmlRegex, '');
+      console.log('postDetais, text', text);
+      //      console.log('postDetails, markdown', postDetails.markdownBody);
+      //      TTS.speak(postDetails.markdownBody.match(textRegex));
+    }
+  };
   const _fetchPostDetailsEntry = async () => {
     console.log('_fetchPostDetailsEntry postRef', postsState.postRef);
     // clear the previous post
@@ -291,6 +324,7 @@ const PostDetails = (props: Props): JSX.Element => {
       handleSubmitComment={_onSubmitComment}
       handlePressTag={_handlePressTag}
       handlePressTranslation={_translateLanguage}
+      handlePressSpeak={_speakBody}
     />
   ) : (
     <View style={{top: 20}}>

@@ -43,6 +43,7 @@ interface Props {
   handleSubmitComment: (text: string) => Promise<boolean>;
   handlePressTag: (tag: string) => void;
   handlePressTranslation: () => void;
+  handlePressSpeak: () => void;
 }
 const PostDetailsScreen = (props: Props): JSX.Element => {
   //// props
@@ -122,6 +123,7 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
           postIndex={props.index}
           handlePressComments={_handlePressComments}
           handlePressTranslation={props.handlePressTranslation}
+          handlePressSpeak={props.handlePressSpeak}
         />
       </Block>
 

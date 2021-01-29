@@ -47,6 +47,7 @@ interface Props {
   handlePressVoter?: (voter: string) => void;
   handlePressReblog?: () => void;
   handlePressTranslation?: () => void;
+  handlePressSpeak?: () => void;
 }
 
 const ActionBarView = (props: Props): JSX.Element => {
@@ -103,8 +104,8 @@ const ActionBarView = (props: Props): JSX.Element => {
 
   return (
     <Block>
-      <Block row style={actionBarStyle.styles}>
-        <Block row style={{paddingRight: 10}}>
+      <Block row space="between" style={actionBarStyle.styles}>
+        <Block row style={{paddingRight: 5}}>
           <Text
             size={actionBarStyle.textSize}
             color={argonTheme.COLORS.ERROR}
@@ -160,7 +161,7 @@ const ActionBarView = (props: Props): JSX.Element => {
                 </Text>
               </Block>
             </TouchableWithoutFeedback>
-            {props.isUser ? (
+            {props.isUser && (
               <TouchableWithoutFeedback onPress={props.handlePressEditComment}>
                 <Block row style={{paddingRight: 10}}>
                   <Text size={actionBarStyle.textSize}>
@@ -168,7 +169,7 @@ const ActionBarView = (props: Props): JSX.Element => {
                   </Text>
                 </Block>
               </TouchableWithoutFeedback>
-            ) : null}
+            )}
           </Block>
         ) : (
           <TouchableWithoutFeedback onPress={props.handlePressComments}>
@@ -186,9 +187,9 @@ const ActionBarView = (props: Props): JSX.Element => {
             </Block>
           </TouchableWithoutFeedback>
         )}
-        {actionBarStyle.bookmark ? (
+        {actionBarStyle.bookmark && (
           <TouchableWithoutFeedback onPress={props.handlePressBookmark}>
-            <Block row style={{paddingRight: 10}}>
+            <Block row style={{paddingRight: 5}}>
               <Icon
                 size={actionBarStyle.iconSize}
                 color={argonTheme.COLORS.ERROR}
@@ -198,34 +199,34 @@ const ActionBarView = (props: Props): JSX.Element => {
               />
             </Block>
           </TouchableWithoutFeedback>
-        ) : null}
-        {actionBarStyle.resteem ? (
+        )}
+        {actionBarStyle.resteem && (
           <TouchableOpacity onPress={props.handlePressReblog}>
-            <Block row style={{paddingRight: 10}}>
+            <Block row style={{paddingRight: 5}}>
               <Icon
                 size={actionBarStyle.iconSize}
                 color={argonTheme.COLORS.ERROR}
                 name="repeat"
                 family="material-community"
-                style={{paddingHorizontal: 10}}
+                style={{paddingHorizontal: 5}}
               />
             </Block>
           </TouchableOpacity>
-        ) : null}
-        {actionBarStyle.share ? (
+        )}
+        {actionBarStyle.share && (
           <TouchableWithoutFeedback onPress={props.handlePressShare}>
-            <Block row style={{paddingRight: 10}}>
+            <Block row style={{paddingRight: 5}}>
               <Icon
                 size={actionBarStyle.iconSize}
                 color={argonTheme.COLORS.ERROR}
                 name="sharealt"
                 family="antdesign"
-                style={{paddingHorizontal: 10}}
+                style={{paddingHorizontal: 5}}
               />
             </Block>
           </TouchableWithoutFeedback>
-        ) : null}
-        {actionBarStyle.translation ? (
+        )}
+        {actionBarStyle.translation && (
           <TouchableWithoutFeedback onPress={props.handlePressTranslation}>
             <Block row style={{top: 0}}>
               <Icon
@@ -241,8 +242,18 @@ const ActionBarView = (props: Props): JSX.Element => {
               />
             </Block>
           </TouchableWithoutFeedback>
-        ) : null}
-        {actionBarStyle.bookmark && props.isUser ? (
+        )}
+        {actionBarStyle.read && (
+          <Icon
+            size={18}
+            color={argonTheme.COLORS.ERROR}
+            name="sound"
+            family="antdesign"
+            style={{paddingHorizontal: 5}}
+            onPress={props.handlePressSpeak}
+          />
+        )}
+        {actionBarStyle.bookmark && props.isUser && (
           <Icon
             size={18}
             color={argonTheme.COLORS.ERROR}
@@ -251,10 +262,7 @@ const ActionBarView = (props: Props): JSX.Element => {
             style={{paddingHorizontal: 5}}
             onPress={props.handlePressEditPost}
           />
-        ) : // <TouchableWithoutFeedback onPress={props.handlePressEditPost}>
-        //   <Text>{intl.formatMessage({id: 'edit'})}</Text>
-        // </TouchableWithoutFeedback>
-        null}
+        )}
       </Block>
       {_renderVotingModal()}
     </Block>

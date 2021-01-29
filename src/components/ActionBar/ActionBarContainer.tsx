@@ -22,6 +22,7 @@ interface Props {
   handlePressEditComment?: () => void;
   handlePressReply?: () => void;
   handlePressTranslation?: (showOriginal: boolean) => void;
+  handlePressSpeak?: () => void;
 }
 
 const ActionBarContainer = (props: Props): JSX.Element => {
@@ -43,6 +44,13 @@ const ActionBarContainer = (props: Props): JSX.Element => {
   const [showVotingModal, setShowVotingModal] = useState(false);
   const [showOriginal, setShowOriginal] = useState(true);
   //// events
+
+  //// handle press read button
+  const _handlePressRead = () => {
+    TTS.stop();
+    TTS.speak();
+  };
+
   // // event: post state changes
   // useEffect(() => {
   //   // only for post
@@ -246,6 +254,7 @@ const ActionBarContainer = (props: Props): JSX.Element => {
       handlePressReblog={_handlePressReblog}
       handlePressTranslation={_handlePressTranslation}
       handlePressShare={_handlePressShare}
+      handlePressSpeak={props.handlePressSpeak}
     />
   );
 };

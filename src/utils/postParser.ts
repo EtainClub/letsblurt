@@ -127,9 +127,9 @@ export const parsePost = async (
     postData.state.post_ref.permlink,
   );
   // store markdown body to edit later for the user
-  if (username === postData.state.post_ref.author) {
-    postData.markdownBody = post.body;
-  }
+  //  if (username === postData.state.post_ref.author) {
+  postData.markdownBody = post.body;
+  //  }
   postData.state.isPromoted = promoted;
   // thumbnail image
   postData.image = postImage(postData.metadata, post.body);
