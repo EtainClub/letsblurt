@@ -59,7 +59,7 @@ const Comment = (props: Props): JSX.Element => {
   const intl = useIntl();
   //// contexts
   const {authState} = useContext(AuthContext);
-  const {setToastMessage} = useContext(UIContext);
+  const {setToastMessage, speakBody} = useContext(UIContext);
   const {postsState, submitPost, updatePost} = useContext(PostsContext);
   const {settingsState} = useContext(SettingsContext);
   //// stats
@@ -76,6 +76,8 @@ const Comment = (props: Props): JSX.Element => {
   const [originalBody, setOriginalBody] = useState(comment.body);
   const [translatedBody, setTranslatedBody] = useState(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState('');
+  // tts
+  const [speaking, setSpeaking] = useState(false);
   const reputation = comment.state.reputation.toFixed(0);
 
   const formatedTime = comment && getTimeFromNow(comment.state.createdAt);
@@ -186,6 +188,17 @@ const Comment = (props: Props): JSX.Element => {
     }
   };
 
+  //// handle press speaker
+  const _handlePressSpeak = () => {
+    if (speaking) {
+      speakBody(comment.markdownBody, true);
+    } else {
+      speakBody(comment.markdownBody, false);
+    }
+    // toggle the state
+    setSpeaking(!speaking);
+  };
+
   // netsting the comments
   const nestedComments = (comment.comments || []).map((comment) => {
     return (
@@ -234,6 +247,7 @@ const Comment = (props: Props): JSX.Element => {
           handlePressReply={_handlePressReply}
           handlePressEditComment={_handlePressEditComment}
           handlePressTranslation={_handlePressTranslation}
+          handlePressSpeak={_handlePressSpeak}
         />
       </Block>
       {showReply && (

@@ -11,7 +11,6 @@ import Config from 'react-native-config';
 import {firebase} from '@react-native-firebase/functions';
 // axios
 import axios from 'axios';
-import TTS from 'react-native-tts';
 
 import {PostDetailsScreen} from '../screen/PostDetails';
 // blurt api
@@ -41,6 +40,7 @@ interface Props {
 
 const PostDetails = (props: Props): JSX.Element => {
   // props
+  const {navigation} = props;
   //// language
   const intl = useIntl();
   // contexts
@@ -54,7 +54,7 @@ const PostDetails = (props: Props): JSX.Element => {
     appendTag,
   } = useContext(PostsContext);
   const postIndex = postsState[postsState.postsType].index;
-  const {setToastMessage} = useContext(UIContext);
+  const {setToastMessage, speakBody} = useContext(UIContext);
   const {settingsState} = useContext(SettingsContext);
   //// states
   const [loading, setLoading] = useState(true);
@@ -70,6 +70,8 @@ const PostDetails = (props: Props): JSX.Element => {
   const [submitted, setSubmitted] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [parentPost, setParentPost] = useState<PostData>(null);
+  // tts
+  const [speaking, setSpeaking] = useState(false);
   //////// events
   //// event: component creation
   useEffect(() => {
@@ -78,7 +80,6 @@ const PostDetails = (props: Props): JSX.Element => {
     if (authState.loggedIn) {
       updateVoteAmount(authState.currentCredentials.username);
     }
-    _initTTS();
   }, []);
   //// event: new post ref set
   useEffect(() => {
@@ -102,6 +103,17 @@ const PostDetails = (props: Props): JSX.Element => {
       _fetchParentPost(postDetails.state.parent_ref);
     }
   }, [postDetails]);
+
+  //// event: on blur
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('blur', () => {
+      console.log('[PostDetails] blur event');
+      // stop tts before go back
+      speakBody('', true);
+    });
+    return unsubscribe;
+  }, [navigation]);
+
   // //// event: translate language change
   // useEffect(() => {
   //   if (postDetails && uiState.selectedLanguage != '') {
@@ -113,36 +125,6 @@ const PostDetails = (props: Props): JSX.Element => {
   //   }
   // }, [uiState.selectedLanguage]);
 
-  //// initialize tts
-  const _initTTS = async () => {
-    TTS.setDefaultRate(0.5);
-    TTS.setDefaultPitch(1);
-    try {
-      const result = await TTS.getInitStatus();
-      console.log('init tts result', result);
-    } catch (error) {
-      console.log('failed to init TTS', error);
-      return;
-    }
-
-    TTS.speak('TTS has been initialized');
-
-    TTS.setDefaultLanguage('en-US');
-    TTS.addEventListener('tts-start', (event) => console.log('start', event));
-    TTS.addEventListener('tts-finish', (event) => console.log('finish', event));
-    TTS.addEventListener('tts-cancel', (event) => console.log('cancel', event));
-  };
-
-  const _speakBody = () => {
-    if (postDetails) {
-      TTS.stop();
-      const hhtmlRegex = /!\[img/g;
-      const text = postDetails.markdownBody.replace(hhtmlRegex, '');
-      console.log('postDetais, text', text);
-      //      console.log('postDetails, markdown', postDetails.markdownBody);
-      //      TTS.speak(postDetails.markdownBody.match(textRegex));
-    }
-  };
   const _fetchPostDetailsEntry = async () => {
     console.log('_fetchPostDetailsEntry postRef', postsState.postRef);
     // clear the previous post
@@ -309,6 +291,17 @@ const PostDetails = (props: Props): JSX.Element => {
         intl.formatMessage({id: 'PostDetails.translation_error'}),
       );
     }
+  };
+
+  ////
+  const _speakBody = () => {
+    if (speaking) {
+      speakBody(postDetails.markdownBody, true);
+    } else {
+      speakBody(postDetails.markdownBody, false);
+    }
+    // toggle the state
+    setSpeaking(!speaking);
   };
 
   return postDetails ? (

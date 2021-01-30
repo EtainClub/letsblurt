@@ -83,6 +83,10 @@ export interface UIContextType {
   setTranslateLanguages: (languages: []) => void;
   //
   setLanguageParam: (language: string) => void;
+  //
+  initTTS: (locale: string) => void;
+  //
+  speakBody: (markdown: string, stop?: boolean) => void;
 }
 
 export type UIAction =

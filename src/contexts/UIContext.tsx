@@ -1,5 +1,7 @@
 import React, {useReducer, createContext} from 'react';
 
+import TTS from 'react-native-tts';
+
 import {UIActionTypes, UIState, UIContextType, UIAction} from './types/uiTypes';
 
 // steem api
@@ -118,6 +120,59 @@ const UIProvider = ({children}: Props) => {
     });
   };
 
+  //// initialize tts
+  const initTTS = async (locale: string) => {
+    TTS.setDefaultRate(0.5);
+    TTS.setDefaultPitch(1);
+    try {
+      const result = await TTS.getInitStatus();
+      console.log('init tts result', result);
+    } catch (error) {
+      console.log('failed to init TTS', error);
+      return;
+    }
+
+    TTS.setDefaultLanguage(locale);
+
+    // TTS.addEventListener('tts-start', (event) => console.log('start', event));
+    // TTS.addEventListener('tts-finish', (event) => console.log('finish', event));
+    // TTS.addEventListener('tts-cancel', (event) => console.log('cancel', event));
+  };
+
+  ////
+  const speakBody = (markdown: string, stop?: boolean) => {
+    if (stop) {
+      TTS.stop();
+      return;
+    }
+    if (markdown) {
+      TTS.stop();
+      // TODO: handle html too
+      const text = markdown
+        .replace(
+          /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/gim,
+          '',
+        )
+        // .replace(/^### (.*$)/gim, '')
+        // .replace(/^## (.*$)/gim, '')
+        // .replace(/^# (.*$)/gim, '')
+        // .replace(/^###/gim, '')
+        // .replace(/^##/gim, '')
+        // .replace(/^#/gim, '')
+        .replace(/^#+/gim, '')
+        .replace(/!\[(.*?)\]/gim, '')
+        .replace(/^\> (.*$)/gim, '')
+        .replace(/\*\*(.*)\*\*/gim, '')
+        .replace(/\*(.*)\*/gim, '')
+        .replace(/!\[(.*?)\]\((.*?)\)/gim, '')
+        .replace(/\[(.*?)\]\((.*?)\)/gim, '')
+        .replace(/\n$/gim, ' ');
+
+      console.log('tts text', text);
+      TTS.speak(text);
+    }
+  };
+
   return (
     <UIContext.Provider
       value={{
@@ -129,6 +184,8 @@ const UIProvider = ({children}: Props) => {
         setSearchParam,
         setTranslateLanguages,
         setLanguageParam,
+        initTTS,
+        speakBody,
       }}>
       {children}
     </UIContext.Provider>

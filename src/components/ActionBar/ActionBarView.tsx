@@ -104,7 +104,7 @@ const ActionBarView = (props: Props): JSX.Element => {
 
   return (
     <Block>
-      <Block row space="between" style={actionBarStyle.styles}>
+      <Block row style={actionBarStyle.styles}>
         <Block row style={{paddingRight: 5}}>
           <Text
             size={actionBarStyle.textSize}

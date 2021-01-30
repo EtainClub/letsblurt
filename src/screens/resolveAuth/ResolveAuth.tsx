@@ -18,8 +18,6 @@ import {navigate} from '~/navigation/service';
 
 export const LOGIN_TOKEN = 'loginToken';
 
-import {OTP} from '~/components';
-
 export const ResolveAuth = (props) => {
   //// props
   //// contexts
@@ -30,8 +28,12 @@ export const ResolveAuth = (props) => {
     getUserProfileData,
   } = useContext(UserContext);
   const {postsState, getTagList} = useContext(PostsContext);
-  const {setToastMessage, setTranslateLanguages} = useContext(UIContext);
-  const {getAllSettingsFromStorage} = useContext(SettingsContext);
+  const {setToastMessage, setTranslateLanguages, initTTS} = useContext(
+    UIContext,
+  );
+  const {settingsState, getAllSettingsFromStorage} = useContext(
+    SettingsContext,
+  );
   // state
   const [fetched, setFetched] = useState(false);
   const [username, setUsername] = useState(null);
@@ -63,6 +65,8 @@ export const ResolveAuth = (props) => {
     const languages = await _getSupportedLanguages();
     // set languages
     setTranslateLanguages(languages);
+    // initialize tts
+    initTTS(settingsState.languages.locale);
     // set category to feed if username exists
     if (username) {
       console.log('[resolveAuth] username', username);
@@ -100,6 +104,7 @@ export const ResolveAuth = (props) => {
   };
 
   /////
+  // TODO: put this in the backend
   const _getSupportedLanguages = async () => {
     const key =
       Platform.OS === 'android'
