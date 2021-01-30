@@ -919,8 +919,39 @@ export const fetchRawPost = async (
 };
 
 // fetch comments
-// TODO: use Promise All to fetch comment
 export const fetchComments = async (
+  author: string,
+  permlink: string,
+  username: string = null,
+) => {
+  let results;
+  try {
+    // get all comments of depth 1
+    results = await client.database.call('get_content_replies', [
+      author,
+      permlink,
+    ]);
+  } catch (error) {
+    console.log('failed to fetch comments', error);
+  }
+
+  // return if no comments
+  if (!results) return null;
+
+  // setup comments of parent
+  const comments = [];
+  // loop over children
+  for (let i = 0; i < results.length; i++) {
+    // parse comment
+    const extComment = await parseComment(results[i], username);
+    comments.push(extComment);
+  }
+
+  return comments;
+};
+
+// fetch comments recursively
+export const fetchRecursiveComments = async (
   author: string,
   permlink: string,
   username: string = null,
@@ -958,6 +989,7 @@ export const fetchComments = async (
   }
   return comments;
 };
+
 //
 
 //// broadcast post

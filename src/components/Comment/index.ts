@@ -1,3 +1,3 @@
-import {Comment} from './CommentView';
+import {CommentContainer} from './CommentContainer';
 
-export {Comment};
+export {CommentContainer as Comment};

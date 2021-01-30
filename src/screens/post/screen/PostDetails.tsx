@@ -172,8 +172,8 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
               }}
             />
           </Block>
-          {_renderComments()}
         </Block>
+        {_renderComments()}
       </ScrollView>
     </Block>
   ) : (

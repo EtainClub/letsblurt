@@ -45,12 +45,6 @@ const ActionBarContainer = (props: Props): JSX.Element => {
   const [showOriginal, setShowOriginal] = useState(true);
   //// events
 
-  //// handle press read button
-  const _handlePressRead = () => {
-    TTS.stop();
-    TTS.speak();
-  };
-
   // // event: post state changes
   // useEffect(() => {
   //   // only for post

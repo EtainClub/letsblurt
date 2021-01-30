@@ -90,11 +90,14 @@ const PostDetails = (props: Props): JSX.Element => {
   }, [postsState.postRef]);
   //// event: comment submitted
   useEffect(() => {
-    // clear submitted
-    setSubmitted(false);
-    // fetch comments
-    _fetchComments();
+    if (submitted) {
+      // clear submitted
+      setSubmitted(false);
+      // fetch comments
+      _fetchComments();
+    }
   }, [submitted]);
+
   //// event: parent post exists
   useEffect(() => {
     // parent post exist?

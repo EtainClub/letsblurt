@@ -7,7 +7,7 @@ import {Block, Icon, Button, Input, Text, theme} from 'galio-framework';
 interface Props {
   account: string;
   nickname?: string;
-  reputation: string;
+  reputation?: string;
   avatar: string;
   avatarSize: number;
   textSize: number;
