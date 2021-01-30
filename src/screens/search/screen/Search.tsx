@@ -1,5 +1,5 @@
 //// react
-import React, {useState, useEffect, useContext, useCallback} from 'react';
+import React from 'react';
 //// react native
 import {
   View,
@@ -7,10 +7,8 @@ import {
   Dimensions,
   FlatList,
   ActivityIndicator,
-  Animated,
-  Alert,
-  TouchableOpacity,
   TouchableWithoutFeedback,
+  Image,
 } from 'react-native';
 //// react navigation
 import {useFocusEffect} from '@react-navigation/native';
@@ -19,34 +17,40 @@ import {navigate} from '~/navigation/service';
 import {useIntl} from 'react-intl';
 //// ui, styles
 import {Block, Text, Input, Icon, theme} from 'galio-framework';
+import {argonTheme} from '~/constants';
 const {height, width} = Dimensions.get('window');
 //// contexts
-import {PostsContext, AuthContext, UIContext} from '~/contexts';
-import {PostData, PostRef, PostsTypes} from '~/contexts/types';
-//// etc
-import {PostsListView} from '~/components';
+//// components
+//// utils
+import {getTimeFromNow} from '~/utils/time';
+import {sliceByByte} from '~/utils/strings';
+import {LIST_TITLE_LENGTH} from '~/constants/utils';
+
+const BACKGROUND_COLORS = [
+  argonTheme.COLORS.BORDER,
+  argonTheme.COLORS.SECONDARY,
+];
 
 //// props
 interface Props {
   searchText: string;
   active: boolean;
   items: any[];
+  loading: boolean;
+  imageServer: string;
   handleSearchChange: (text: string) => void;
   handleSearch: () => void;
   handleRefresh: () => void;
   handleLoadMore: () => void;
   handleActive: (active: boolean) => void;
+  handlePressPost: (index: number) => void;
 }
 //// component
 const SearchScreen = (props: Props): JSX.Element => {
   //// props
-  const {searchText, active, items} = props;
+  const {searchText, active, items, loading, imageServer} = props;
   //// language
   const intl = useIntl();
-  //// states
-  // const [searchText, setSearchText] = useState(props.initialText);
-  // const [searching, setSearching] = useState(false);
-  // const [active, setActive] = useState(false);
 
   const SearchBar = () => {
     const iconSearch =
@@ -70,8 +74,6 @@ const SearchScreen = (props: Props): JSX.Element => {
         </TouchableWithoutFeedback>
       );
 
-    console.log('search bar. search text', searchText);
-
     return (
       <Block center>
         <Input
@@ -94,15 +96,71 @@ const SearchScreen = (props: Props): JSX.Element => {
     );
   };
 
+  //// load more posts with bottom-reached event
+  const _onLoadMore = async () => {
+    //    setLoadingMore(true);
+    //props.fetchMore && props.fetchMore();
+  };
+
+  //// render a search item
+  const _renderSearchItem = (item: any, index: number) => {
+    const avatar = `${imageServer}/u/${item.author}/avatar`;
+    console.log('search. item');
+    return (
+      <TouchableWithoutFeedback onPress={() => props.handlePressPost(index)}>
+        <Block
+          flex
+          card
+          row
+          space="between"
+          style={{
+            marginBottom: 5,
+            padding: 5,
+            backgroundColor:
+              BACKGROUND_COLORS[index % BACKGROUND_COLORS.length],
+          }}>
+          <Block row middle style={{left: -20}}>
+            <Block center width={80}>
+              <Image
+                source={{
+                  uri: avatar || null,
+                }}
+                style={styles.avatar}
+              />
+            </Block>
+            <Block>
+              <Text>{sliceByByte(item.title, LIST_TITLE_LENGTH)}</Text>
+            </Block>
+          </Block>
+          <Block middle>
+            {item.createdAt && <Text>{getTimeFromNow(item.createdAt)}</Text>}
+          </Block>
+        </Block>
+      </TouchableWithoutFeedback>
+    );
+  };
+
   return (
     <Block style={{marginBottom: 70}}>
       {SearchBar()}
-      <PostsListView
-        posts={items}
-        isUser={false}
-        refreshPosts={props.handleRefresh}
-        fetchMore={props.handleLoadMore}
-      />
+      {!loading ? (
+        <FlatList
+          contentContainerStyle={styles.posts}
+          refreshing={loading}
+          onRefresh={props.handleRefresh}
+          onEndReached={_onLoadMore}
+          onEndReachedThreshold={1}
+          data={items}
+          renderItem={({item, index}) => _renderSearchItem(item, index)}
+          keyExtractor={(item, index) => String(index)}
+          initialNumToRender={5}
+          showsVerticalScrollIndicator={false}
+        />
+      ) : (
+        <View style={{top: 20}}>
+          <ActivityIndicator color={argonTheme.COLORS.ERROR} />
+        </View>
+      )}
     </Block>
   );
 };
@@ -113,10 +171,6 @@ const styles = StyleSheet.create({
   item: {
     height: theme.SIZES.BASE * 1.5,
     marginBottom: theme.SIZES.BASE,
-  },
-  searchContainer: {
-    width: width,
-    paddingHorizontal: theme.SIZES.BASE,
   },
   search: {
     height: 48,
@@ -133,13 +187,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     elevation: 2,
   },
-  header: {
-    backgroundColor: theme.COLORS.WHITE,
-    shadowColor: 'rgba(0, 0, 0, 0.2)',
-    shadowOffset: {width: 0, height: 2},
-    shadowRadius: 8,
-    shadowOpacity: 1,
-    elevation: 2,
-    zIndex: 2,
+  posts: {
+    width: '100%',
+    paddingHorizontal: theme.SIZES.BASE,
+    paddingVertical: theme.SIZES.BASE * 1,
+  },
+  avatar: {
+    width: 24,
+    height: 24,
+    borderRadius: 24 / 2,
   },
 });

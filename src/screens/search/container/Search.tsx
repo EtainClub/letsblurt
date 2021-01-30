@@ -25,7 +25,12 @@ import {useIntl} from 'react-intl';
 //// ui, styles
 import {Block} from 'galio-framework';
 //// contexts
-import {PostsContext, AuthContext, UIContext} from '~/contexts';
+import {
+  PostsContext,
+  AuthContext,
+  UIContext,
+  SettingsContext,
+} from '~/contexts';
 import {PostData, PostRef, PostsTypes} from '~/contexts/types';
 //// etc
 import {SearchScreen} from '../screen/Search';
@@ -43,14 +48,17 @@ const SearchFeed = (props: Props): JSX.Element => {
   //// props
 
   //// contexts
+  const {setPostRef} = useContext(PostsContext);
   const {uiState, setToastMessage} = useContext(UIContext);
   const {authState} = useContext(AuthContext);
+  const {settingsState} = useContext(SettingsContext);
   //// states
   const [searchItems, setSearchItems] = useState([]);
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState(uiState.searchText);
   const [startIndex, setStartIndex] = useState(1);
   const [loadedAll, setLoadedAll] = useState(false);
   const [active, setActive] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   //// effects
   useEffect(() => {
@@ -94,6 +102,7 @@ const SearchFeed = (props: Props): JSX.Element => {
   };
 
   const _handleSearchChange = (_text: string) => {
+    console.log('_handleSearchChange. text', _text);
     setSearchText(_text);
   };
 
@@ -138,6 +147,10 @@ const SearchFeed = (props: Props): JSX.Element => {
     const {items} = response.data;
     console.log('search items', items);
 
+    if (!items) {
+      return;
+    }
+
     // filtering first
     // map
     let _items = [];
@@ -172,16 +185,26 @@ const SearchFeed = (props: Props): JSX.Element => {
     _handleSearch();
   };
 
+  const _navigateToPost = (index: number) => {
+    console.log('navigateToPost. postRef', searchItems[index]);
+    // navigate to the post details
+    setPostRef(searchItems[index].postRef);
+    navigate({name: 'PostDetails'});
+  };
+
   return (
     <SearchScreen
-      searchText={uiState.searchText}
+      searchText={searchText}
       active={active}
       items={searchItems}
+      loading={loading}
+      imageServer={settingsState.blockchains.image}
       handleSearch={_handleSearch}
       handleSearchChange={_handleSearchChange}
       handleActive={_handleActive}
       handleRefresh={_handleRefresh}
       handleLoadMore={_handleLoadMore}
+      handlePressPost={_navigateToPost}
     />
   );
 };
