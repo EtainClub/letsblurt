@@ -6,6 +6,8 @@ import {Platform} from 'react-native';
 import Config from 'react-native-config';
 //
 import axios from 'axios';
+//// firebase
+import {firebase} from '@react-native-firebase/functions';
 import AsyncStorage from '@react-native-community/async-storage';
 import {
   AuthContext,
@@ -14,6 +16,9 @@ import {
   UIContext,
   SettingsContext,
 } from '~/contexts';
+//// constant
+import {TRANSLATION_LANGUAGES} from '~/constants';
+
 import {navigate} from '~/navigation/service';
 
 export const LOGIN_TOKEN = 'loginToken';
@@ -61,8 +66,10 @@ export const ResolveAuth = (props) => {
 
     // get user login token from storage
     let username = await AsyncStorage.getItem(LOGIN_TOKEN);
-    //
-    const languages = await _getSupportedLanguages();
+    // get supported translation languages
+    const languages = TRANSLATION_LANGUAGES;
+    // const languages = await _getSupportedLanguages();
+
     // set languages
     setTranslateLanguages(languages);
     // initialize tts
@@ -103,30 +110,20 @@ export const ResolveAuth = (props) => {
     }
   };
 
-  /////
-  // TODO: put this in the backend
+  //// use proxy function to get supported translation languages
   const _getSupportedLanguages = async () => {
-    const key =
-      Platform.OS === 'android'
-        ? Config.LETSBLURT_ANDROID_TRANSLATION
-        : Config.LETSBLURT_IOS_TRANSLATION;
-
-    let url = `https://translation.googleapis.com/language/translate/v2/languages?key=${key}`;
     try {
-      const result = await axios.get(url);
-      return result.data.data.languages.map((language) =>
-        language.language.toUpperCase(),
-      );
+      const result = await firebase
+        .functions()
+        .httpsCallable('getTranslationLanguagesRequest')();
+
+      console.log('resolveAuth supported language. result', result);
+      return result.data.map((language) => language.language.toUpperCase());
     } catch (error) {
       console.log('failed to get translate languages', error);
       return null;
     }
   };
-
-  // const _handleOTPResult = (result: boolean) => {
-  //   console.log('opt result', result);
-  // };
-  // return <OTP usePhoneNumber={true} handleOTPResult={_handleOTPResult} />;
 
   return null;
 };

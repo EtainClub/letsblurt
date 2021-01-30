@@ -83,6 +83,9 @@ const WalletStatsView = (props: Props): JSX.Element => {
     const description =
       op === 'transfer' ? ' from ' + get(item, 'details', '') : '';
 
+    // handle small value
+    if (parseFloat(value) < 0.001) return;
+
     return (
       <Block
         row

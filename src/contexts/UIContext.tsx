@@ -105,7 +105,7 @@ const UIProvider = ({children}: Props) => {
   };
 
   //// set supported translate languages
-  const setTranslateLanguages = (languages: []) => {
+  const setTranslateLanguages = (languages: string[]) => {
     dispatch({
       type: UIActionTypes.SET_TRANSLATE_LANGUAGES,
       payload: languages,

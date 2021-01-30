@@ -57,7 +57,7 @@ interface SetAuthorsParamAction {
 //
 interface SetTranslateLanguagesAction {
   type: UIActionTypes.SET_TRANSLATE_LANGUAGES;
-  payload: [];
+  payload: string[];
 }
 //
 interface SetLanguageParamAction {
@@ -80,7 +80,7 @@ export interface UIContextType {
   // set search param
   setSearchParam: (text: string) => void;
   //
-  setTranslateLanguages: (languages: []) => void;
+  setTranslateLanguages: (languages: string[]) => void;
   //
   setLanguageParam: (language: string) => void;
   //

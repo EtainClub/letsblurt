@@ -253,7 +253,8 @@ const Header = (props: Props): JSX.Element => {
     console.log('header. _handleLeftPress');
     const {back, navigation} = props;
     try {
-      navigation.goBack();
+      if (back) navigation.goBack();
+      else navigation.openDrawer();
     } catch {
       // show modal
       Alert.alert(
@@ -269,8 +270,6 @@ const Header = (props: Props): JSX.Element => {
         {cancelable: true},
       );
     }
-    //    if (back) navigation.goBack();
-    //    else navigation.openDrawer();
   };
 
   ////
@@ -344,7 +343,7 @@ const Header = (props: Props): JSX.Element => {
   return (
     <Block style={headerStyles}>
       <NavBar
-        back={true}
+        back={back}
         title={intl.formatMessage({id: `${title.toLowerCase()}`})}
         style={styles.navbar}
         transparent={transparent}
@@ -356,9 +355,9 @@ const Header = (props: Props): JSX.Element => {
           left: -70,
         }}
         leftStyle={{paddingTop: 3, flex: 0.3}}
-        //        leftIconName={back ? null : 'navicon'}
-        leftIconName="chevron-left"
-        leftIconFamily="entypo"
+        leftIconName={back ? 'chevron-left' : 'navicon'}
+        //leftIconName="chevron-left"
+        leftIconFamily="font-awesome"
         leftIconColor={white ? theme.COLORS.WHITE : theme.COLORS.ICON}
         titleStyle={[
           styles.title,

@@ -82,7 +82,7 @@ const TabFeedStack = () => {
         component={Feed}
         options={{
           header: ({navigation}) => {
-            return <Header title="Feed" navigation={navigation} />;
+            return <Header title="Feed" navigation={navigation} back={false} />;
           },
         }}
       />
@@ -91,7 +91,9 @@ const TabFeedStack = () => {
         component={SearchFeed}
         options={{
           header: ({navigation}) => {
-            return <Header title="Search" navigation={navigation} />;
+            return (
+              <Header title="Search" navigation={navigation} back={true} />
+            );
           },
         }}
       />
@@ -107,7 +109,13 @@ const TabNotificationStack = () => {
         component={Notification}
         options={{
           header: ({navigation}) => {
-            return <Header title="Notification" navigation={navigation} />;
+            return (
+              <Header
+                title="Notification"
+                navigation={navigation}
+                back={false}
+              />
+            );
           },
         }}
       />
@@ -125,7 +133,9 @@ const TabProfileStack = (props): JSX.Element => {
         component={Profile}
         options={{
           header: ({navigation}) => {
-            return <Header title="Profile" navigation={navigation} />;
+            return (
+              <Header title="Profile" navigation={navigation} back={false} />
+            );
           },
         }}
       />
@@ -141,7 +151,9 @@ const TabPostingStack = (): JSX.Element => {
         component={Posting}
         options={{
           header: ({navigation}) => {
-            return <Header title="Posting" navigation={navigation} />;
+            return (
+              <Header title="Posting" navigation={navigation} back={false} />
+            );
           },
         }}
       />
@@ -157,7 +169,9 @@ const TabWalletStack = (): JSX.Element => {
         component={Wallet}
         options={{
           header: ({navigation}) => {
-            return <Header title="Wallet" navigation={navigation} />;
+            return (
+              <Header title="Wallet" navigation={navigation} back={false} />
+            );
           },
         }}
       />
@@ -281,7 +295,7 @@ const PostDetailsStack = () => (
       component={PostDetails}
       options={{
         header: ({navigation}) => {
-          return <Header title="Post" navigation={navigation} />;
+          return <Header title="Post" navigation={navigation} back={true} />;
         },
       }}
     />
@@ -296,7 +310,9 @@ const AuthorStack = () => {
         component={AuthorProfile}
         options={{
           header: ({navigation}) => {
-            return <Header title="Author" navigation={navigation} />;
+            return (
+              <Header title="Author" navigation={navigation} back={true} />
+            );
           },
         }}
       />
@@ -328,7 +344,9 @@ const SettingsStack = () => {
         component={Settings}
         options={{
           header: ({navigation}) => {
-            return <Header title="Settings" navigation={navigation} />;
+            return (
+              <Header title="Settings" navigation={navigation} back={true} />
+            );
           },
         }}
       />
