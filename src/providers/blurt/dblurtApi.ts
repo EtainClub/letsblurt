@@ -46,6 +46,7 @@ import {
   BLURT_CHAIN_PREFIX,
   CHAIN_TIMEOUT,
   BLURT_NOTIFICATIONS_ENDPOINT,
+  NUM_FETCH_COMMENTS,
 } from '~/constants/blockchain';
 
 import {jsonStringify} from '~/utils/jsonUtils';
@@ -865,6 +866,8 @@ export const fetchPostDetails = async (
 ): Promise<PostData> => {
   try {
     const post = await client.database.call('get_content', [author, permlink]);
+    console.log('fetchPostDetails. post', post);
+
     const postData = await parsePost(
       post,
       username,
@@ -872,6 +875,54 @@ export const fetchPostDetails = async (
       //      blockchainSettings.image,
       isPromoted,
     );
+    if (postData) return postData;
+    return null;
+  } catch (error) {
+    console.log('failed to fetch post details', error);
+    return null;
+  }
+};
+
+//// fetch post details
+export const fetchPostDetails2 = async (
+  tag: string,
+  author: string,
+  permlink: string,
+  username: string = null,
+  isPromoted = false,
+): Promise<PostData> => {
+  try {
+    const post = await client.database.call('get_content', [author, permlink]);
+    console.log('fetchPostDetails. post', post);
+
+    const postState = await client.call('condenser_api', 'get_state', [
+      post.url,
+    ]);
+    console.log('fetchPostDetails. post state', postState);
+
+    const postData = await parsePost(
+      post,
+      username,
+      BLURT_IMAGE_SERVERS[0],
+      //      blockchainSettings.image,
+      isPromoted,
+    );
+
+    // build array
+    let _comments = [];
+    Object.keys(postState.content).forEach((key) => {
+      _comments.push(postState.content[key]);
+    });
+    console.log('raw comments', _comments);
+
+    const comments = await parsePosts(
+      _comments,
+      username,
+      BLURT_IMAGE_SERVERS[0],
+    );
+
+    console.log('comment parsed', comments);
+
     if (postData) return postData;
     return null;
   } catch (error) {
@@ -916,6 +967,45 @@ export const fetchRawPost = async (
     console.log('failed to get raw post');
     return error;
   }
+};
+
+// fetch last comments
+// get_replies_by_last_update
+export const fetchRecentComments = async (
+  startAuthor: string,
+  startPermlink: string,
+  limit: number = NUM_FETCH_COMMENTS + 1,
+  username: string = null,
+) => {
+  let results;
+  //const query = [startAuthor, startPermlink, limit];
+  //blurtcurator/re-ya-soy-un-delfin-i-am-already-a-dolphin-20210131t000152z
+  const query = [
+    'blurtcurator',
+    're-ya-soy-un-delfin-i-am-already-a-dolphin-20210131t000152z',
+    50,
+  ];
+  try {
+    // get all comments of depth 1
+    results = await client.database.call('get_replies_by_last_update', query);
+  } catch (error) {
+    console.log('failed to fetch comments', error);
+  }
+
+  console.log('[fetchRecentComments] results', results);
+  // return if no comments
+  if (!results) return null;
+
+  // setup comments of parent
+  const comments = [];
+  // loop over children
+  for (let i = 0; i < results.length; i++) {
+    // parse comment
+    const extComment = await parseComment(results[i], username);
+    comments.push(extComment);
+  }
+
+  return comments;
 };
 
 // fetch comments

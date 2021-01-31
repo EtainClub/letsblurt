@@ -2,6 +2,7 @@
 // @test
 export const COMMUNITY_TAG = 'hive-196917';
 export const NUM_FETCH_POSTS = 10;
+export const NUM_FETCH_COMMENTS = 50;
 export const TRUNCATE_BODY_LENGTH = 1000;
 
 // categories for steem posts

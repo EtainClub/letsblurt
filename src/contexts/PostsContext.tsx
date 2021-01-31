@@ -9,6 +9,7 @@ import {
   broadcastPost,
   broadcastPostUpdate,
   fetchPostDetails,
+  fetchPostDetails2,
   fetchAccountState,
 } from '~/providers/blurt/dblurtApi';
 import {renderPostBody} from '~/utils/render-helpers';
@@ -451,6 +452,13 @@ const PostsProvider = ({children}: Props) => {
       postRef.permlink,
       username,
     );
+    // const post = await fetchPostDetails2(
+    //   '',
+    //   postRef.author,
+    //   postRef.permlink,
+    //   username,
+    // );
+
     console.log('[getPostDetails] post', post);
     if (post) {
       // dispatch action

@@ -14,7 +14,7 @@ import axios from 'axios';
 
 import {PostDetailsScreen} from '../screen/PostDetails';
 // blurt api
-import {fetchComments} from '~/providers/blurt/dblurtApi';
+import {fetchComments, fetchRecentComments} from '~/providers/blurt/dblurtApi';
 import {argonTheme} from '~/constants/argonTheme';
 import {navigate} from '~/navigation/service';
 import {
@@ -81,13 +81,13 @@ const PostDetails = (props: Props): JSX.Element => {
       updateVoteAmount(authState.currentCredentials.username);
     }
   }, []);
-  //// event: new post ref set
-  useEffect(() => {
-    if (postsState.postRef) {
-      // fetch post
-      _fetchPostDetailsEntry();
-    }
-  }, [postsState.postRef]);
+  // //// event: new post ref set
+  // useEffect(() => {
+  //   if (postsState.postRef) {
+  //     // fetch post
+  //     _fetchPostDetailsEntry();
+  //   }
+  // }, [postsState.postRef]);
   //// event: comment submitted
   useEffect(() => {
     if (submitted) {
@@ -129,7 +129,7 @@ const PostDetails = (props: Props): JSX.Element => {
   // }, [uiState.selectedLanguage]);
 
   const _fetchPostDetailsEntry = async () => {
-    console.log('_fetchPostDetailsEntry postRef', postsState.postRef);
+    console.log('_fetchPostDetailsEntry post state', postsState.postRef);
     // clear the previous post
     setPostDetails(null);
     // remove the parent post
@@ -155,7 +155,8 @@ const PostDetails = (props: Props): JSX.Element => {
     // set original details
     setOriginalPostDetails(details);
     // fetch comments
-    _fetchComments();
+    //_fetchComments();
+    _fetchRecentComments();
   };
 
   const _fetchParentPost = async (postRef: PostRef) => {
@@ -177,6 +178,8 @@ const PostDetails = (props: Props): JSX.Element => {
   };
 
   const _fetchComments = async () => {
+    return;
+
     // fetch comments on this post
     const _comments = await fetchComments(
       postsState.postRef.author,
@@ -184,8 +187,25 @@ const PostDetails = (props: Props): JSX.Element => {
       authState.currentCredentials.username,
     );
     console.log('_fetchComments', _comments);
+
     setComments(_comments);
     // TODO need to update context state
+  };
+
+  const _fetchRecentComments = async () => {
+    // get the first comment of the post
+    try {
+      const _lastComments = await fetchRecentComments(
+        postsState.postRef.author,
+        postsState.postRef.permlink,
+        50,
+        authState.currentCredentials.username,
+      );
+
+      console.log('_fetchComments. last comments', _lastComments);
+    } catch (error) {
+      console.log('failed to fetch recent comments');
+    }
   };
 
   const _onRefresh = async () => {
