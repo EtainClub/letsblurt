@@ -67,10 +67,12 @@ const EditorView = (props: Props): JSX.Element => {
     />
   );
 
+  console.log('editor depth', depth);
+
   return close ? null : (
     <Block>
       <KeyboardAvoidingView behavior="height" enabled>
-        <Block center style={[{paddingHorizontal: theme.SIZES.BASE}]}>
+        <Block center style={{paddingHorizontal: theme.SIZES.BASE}}>
           <Block row center space="between">
             <Icon
               style={{marginRight: 5}}
@@ -83,7 +85,13 @@ const EditorView = (props: Props): JSX.Element => {
             <Input
               style={
                 isComment
-                  ? [styles.commentContainer, {height: containerHeight}]
+                  ? [
+                      styles.commentContainer,
+                      {
+                        width: width * 0.85 - depth * 20,
+                        height: containerHeight,
+                      },
+                    ]
                   : styles.postContainer
               }
               editable={editable}

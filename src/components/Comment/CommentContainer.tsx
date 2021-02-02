@@ -198,6 +198,7 @@ const CommentContainer = (props: Props): JSX.Element => {
 
   ////
   const _closeEditor = () => {
+    setShowReply(false);
     setEditMode(false);
   };
 
@@ -231,6 +232,7 @@ const CommentContainer = (props: Props): JSX.Element => {
           isComment={true}
           depth={comment.depth}
           close={false}
+          handleCloseEditor={_closeEditor}
           handleBodyChange={(text) => {}}
           handleSubmitComment={_handleSubmitComment}
         />
