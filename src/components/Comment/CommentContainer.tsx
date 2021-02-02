@@ -6,6 +6,8 @@ import {View, Dimensions} from 'react-native';
 import {useIntl} from 'react-intl';
 //// firebase
 import {firebase} from '@react-native-firebase/functions';
+// blurt api
+import {fetchComments} from '~/providers/blurt/dblurtApi';
 //// UIs
 //// contexts
 import {
@@ -66,11 +68,25 @@ const CommentContainer = (props: Props): JSX.Element => {
   const [originalBody, setOriginalBody] = useState(comment.body);
   const [translatedBody, setTranslatedBody] = useState(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState('');
+  const [childComments, setChildComments] = useState([]);
   // tts
   const [speaking, setSpeaking] = useState(false);
   const reputation = comment.state.reputation.toFixed(0);
 
   const formatedTime = comment && getTimeFromNow(comment.state.createdAt);
+
+  // fetch child comments
+  const _fetchChildComments = async () => {
+    // fetch comments on this post
+    const _comments = await fetchComments(
+      postsState.postRef.author,
+      postsState.postRef.permlink,
+      authState.currentCredentials.username,
+    );
+    console.log('_fetchChildComments', _comments);
+
+    setChildComments(_comments);
+  };
 
   const _handleSubmitComment = async (_text: string) => {
     // check sanity
@@ -222,7 +238,7 @@ const CommentContainer = (props: Props): JSX.Element => {
           handlePressSpeak={_handlePressSpeak}
           handleSubmitComment={_handleSubmitComment}
           handlePressChildren={_handlePressChildren}
-          fetchComments={props.fetchComments}
+          fetchComments={_fetchChildComments}
         />
       ) : (
         <Editor

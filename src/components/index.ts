@@ -1,18 +1,15 @@
-import Button from './Button';
-//import Select from "./Select";
-import {Tabs} from './Tabs';
-//import Post from "./Post";
-import {Header} from './Header';
 import {Avatar} from './Avatar';
 import {ActionBar} from './ActionBar';
 import {AuthorList} from './AuthorList';
 import {Beneficiary} from './Beneficiary';
 import {Comment} from './Comment';
+import {Comments} from './Comments';
 import {DNDTimes} from './DNDTimes';
 import {DraggableList} from './DraggableList';
 import Drawer from './Drawer';
-import {Editor} from './PostingEditor';
 import {DropdownModal} from './DropdownModal';
+import {Editor} from './PostingEditor';
+import {Header} from './Header';
 import {ImageUpload} from './ImageUpload';
 import {OTP} from './OTP';
 import {ParentPost} from './ParentPost';
@@ -28,14 +25,17 @@ export {
   Avatar,
   ActionBar,
   AuthorList,
-  Button,
+  Beneficiary,
+  Comment,
+  Comments,
+  DNDTimes,
+  DraggableList,
   Drawer,
+  DropdownModal,
   Editor,
   Header,
-  Tabs,
-  DropdownModal,
-  Comment,
   ImageUpload,
+  OTP,
   PostsFeed,
   PostsListView,
   PostBody,
@@ -44,9 +44,5 @@ export {
   TokenTransfer,
   WalletStatsView,
   WalletKeyView,
-  DraggableList,
   ParentPost,
-  OTP,
-  Beneficiary,
-  DNDTimes,
 };

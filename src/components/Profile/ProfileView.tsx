@@ -44,7 +44,6 @@ const ProfileView: React.FC<Props> = ({
   ...props
 }): JSX.Element => {
   //// props
-  console.log('[ProfileView] props', props);
   const {profile} = props.profileData;
   //// language
   const intl = useIntl();

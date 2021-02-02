@@ -48,7 +48,6 @@ interface Props {
 //// component with default props
 const ProfileEditForm = (props: Props): JSX.Element => {
   //// props
-  console.log('[ProfileView] props', props);
   const {profile} = props.profileData;
   //// language
   const intl = useIntl();

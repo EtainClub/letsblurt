@@ -25,6 +25,7 @@ import {
   ImageUpload,
   ParentPost,
   PostBody,
+  Comments,
 } from '~/components';
 import {argonTheme} from '~/constants/argonTheme';
 import {UIContext} from '~/contexts';
@@ -69,37 +70,37 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
     props.handlePressTag(tag);
   };
 
-  const _renderComments = () => {
-    const {comments} = props;
-    return (
-      <Block style={{top: -20}}>
-        {comments ? (
-          comments.map((comment, index) => {
-            return (
-              <Comment
-                key={comment.id}
-                postIndex={props.index}
-                comment={comment}
-                index={0}
-                fetchComments={props.fetchComments}
-              />
-            );
-          })
-        ) : (
-          <View style={{top: 20}}>
-            <ActivityIndicator color={argonTheme.COLORS.ERROR} size="small" />
-          </View>
-        )}
-      </Block>
-    );
-  };
+  // const _renderComments = () => {
+  //   const {comments} = props;
+  //   return (
+  //     <Block style={{top: -20}}>
+  //       {comments ? (
+  //         comments.map((comment, index) => {
+  //           return (
+  //             <Comment
+  //               key={comment.id}
+  //               postIndex={props.index}
+  //               comment={comment}
+  //               index={0}
+  //               fetchComments={props.fetchComments}
+  //             />
+  //           );
+  //         })
+  //       ) : (
+  //         <View style={{top: 20}}>
+  //           <ActivityIndicator color={argonTheme.COLORS.ERROR} size="small" />
+  //         </View>
+  //       )}
+  //     </Block>
+  //   );
+  // };
 
   const _onRefresh = async () => {
     await props.handleRefresh();
   };
 
   return !props.loading ? (
-    <Block style={{marginHorizontal: 5, marginBottom: 170}}>
+    <Block style={{marginHorizontal: 5, marginBottom: 150}}>
       {props.parentPost && <ParentPost post={props.parentPost} />}
       <Text size={24}>{post.state.title}</Text>
       <Block row space="between">
@@ -173,7 +174,8 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
             />
           </Block>
         </Block>
-        {_renderComments()}
+        <Comments postRef={post.state.post_ref} />
+        {/* {_renderComments()} */}
       </ScrollView>
     </Block>
   ) : (

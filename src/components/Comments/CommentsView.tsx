@@ -1,0 +1,62 @@
+//// react
+import React, {useState, useEffect, Fragment} from 'react';
+//// react native
+import {View, StyleSheet, FlatList, Dimensions} from 'react-native';
+//// config
+import Config from 'react-native-config';
+//// language
+import {useIntl} from 'react-intl';
+//// ui
+import {Block, Button, Input, Text, theme, Icon} from 'galio-framework';
+import Modal from 'react-native-modal';
+import {argonTheme} from '~/constants';
+import {materialTheme} from '~/constants/';
+//// contexts types
+import {CommentData, PostRef} from '~/contexts/types';
+//// utils
+import {get} from 'lodash';
+//// views
+import {Comment} from '~/components';
+//// constants
+const {width, height} = Dimensions.get('window');
+
+//// props
+interface Props {
+  comments: CommentData[];
+  showChildComments: boolean;
+  handlePressChildren: (postRef: PostRef) => void;
+}
+const CommentsView = (props: Props): JSX.Element => {
+  //// props
+  const {comments, showChildComments} = props;
+
+  const _renderItem = ({item}) => {
+    return (
+      <Comment
+        comment={item}
+        showChildComments={showChildComments}
+        handlePressReply={() => {}}
+        handlePressEditComment={() => {}}
+        handlePressTranslation={() => {}}
+        handlePressSpeak={() => {}}
+        handleSubmitComment={() => {}}
+        fetchComments={() => {}}
+      />
+    );
+  };
+
+  // TODO: check the comment is the last one, then set margin bottom to 100, otherwiese, set 20
+  return (
+    <Block style={{marginBottom: 100}}>
+      <Fragment>
+        <FlatList
+          data={comments}
+          renderItem={_renderItem}
+          keyExtractor={(item) => get(item, 'permlink')}
+        />
+      </Fragment>
+    </Block>
+  );
+};
+
+export {CommentsView};

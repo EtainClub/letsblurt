@@ -1,17 +1,18 @@
 // post details container
-// react
+//// react
 import React, {useState, useEffect, useContext} from 'react';
-// react native
+//// react native
 import {View, ActivityIndicator, Platform} from 'react-native';
 //// language
 import {useIntl} from 'react-intl';
-// config
+//// config
 import Config from 'react-native-config';
 //// firebase
 import {firebase} from '@react-native-firebase/functions';
-// axios
+//// axios
 import axios from 'axios';
-
+//// components
+// screens
 import {PostDetailsScreen} from '../screen/PostDetails';
 // blurt api
 import {fetchComments, fetchRecentComments} from '~/providers/blurt/dblurtApi';
@@ -81,22 +82,22 @@ const PostDetails = (props: Props): JSX.Element => {
       updateVoteAmount(authState.currentCredentials.username);
     }
   }, []);
-  // //// event: new post ref set
-  // useEffect(() => {
-  //   if (postsState.postRef) {
-  //     // fetch post
-  //     _fetchPostDetailsEntry();
-  //   }
-  // }, [postsState.postRef]);
-  //// event: comment submitted
+  //// event: new post ref set
   useEffect(() => {
-    if (submitted) {
-      // clear submitted
-      setSubmitted(false);
-      // fetch comments
-      _fetchComments();
+    if (postsState.postRef) {
+      // fetch post
+      _fetchPostDetailsEntry();
     }
-  }, [submitted]);
+  }, [postsState.postRef]);
+  // //// event: comment submitted
+  // useEffect(() => {
+  //   if (submitted) {
+  //     // clear submitted
+  //     setSubmitted(false);
+  //     // fetch comments
+  //     _fetchComments();
+  //   }
+  // }, [submitted]);
 
   //// event: parent post exists
   useEffect(() => {
@@ -155,8 +156,7 @@ const PostDetails = (props: Props): JSX.Element => {
     // set original details
     setOriginalPostDetails(details);
     // fetch comments
-    //_fetchComments();
-    _fetchRecentComments();
+    //    _fetchComments();
   };
 
   const _fetchParentPost = async (postRef: PostRef) => {
@@ -178,8 +178,6 @@ const PostDetails = (props: Props): JSX.Element => {
   };
 
   const _fetchComments = async () => {
-    return;
-
     // fetch comments on this post
     const _comments = await fetchComments(
       postsState.postRef.author,
@@ -189,24 +187,23 @@ const PostDetails = (props: Props): JSX.Element => {
     console.log('_fetchComments', _comments);
 
     setComments(_comments);
-    // TODO need to update context state
   };
 
-  const _fetchRecentComments = async () => {
-    // get the first comment of the post
-    try {
-      const _lastComments = await fetchRecentComments(
-        postsState.postRef.author,
-        postsState.postRef.permlink,
-        50,
-        authState.currentCredentials.username,
-      );
+  // const _fetchRecentComments = async () => {
+  //   // get the first comment of the post
+  //   try {
+  //     const _lastComments = await fetchRecentComments(
+  //       postsState.postRef.author,
+  //       postsState.postRef.permlink,
+  //       50,
+  //       authState.currentCredentials.username,
+  //     );
 
-      console.log('_fetchComments. last comments', _lastComments);
-    } catch (error) {
-      console.log('failed to fetch recent comments');
-    }
-  };
+  //     console.log('_fetchComments. last comments', _lastComments);
+  //   } catch (error) {
+  //     console.log('failed to fetch recent comments');
+  //   }
+  // };
 
   const _onRefresh = async () => {
     await _fetchPostDetailsEntry();
