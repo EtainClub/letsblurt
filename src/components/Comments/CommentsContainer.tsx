@@ -32,7 +32,6 @@ const CommentsContainer = (props: Props): JSX.Element => {
   //// states
   const [postRef, setPostRef] = useState<PostRef>(props.postRef);
   const [comments, setComments] = useState<CommentData[]>([]);
-  const [showChildComments, setShowChildComments] = useState(false);
   //// effects
   // effect: mount
   useEffect(() => {
@@ -58,14 +57,11 @@ const CommentsContainer = (props: Props): JSX.Element => {
     setPostRef(_postRef);
     // fetch child comments
     _fetchComments();
-    // toggle the state
-    setShowChildComments(!showChildComments);
   };
 
   return (
     <CommentsView
       comments={comments}
-      showChildComments={showChildComments}
       handlePressChildren={_handlePressChildren}
     />
   );

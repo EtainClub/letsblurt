@@ -31,22 +31,15 @@ const {height, width} = Dimensions.get('window');
 //// view
 import {CommentView} from './CommentView';
 
-import {fetchRecursiveComments} from '~/providers/blurt';
-
 // component
 interface Props {
   comment: CommentData;
-  username?: string;
-  index: number;
-  postsType: PostsTypes;
-  postIndex: number;
-  fetchComments: () => void;
   //  handleSubmitComment: (message: string) => void;
   //  updateComment: () => void;
 }
 const CommentContainer = (props: Props): JSX.Element => {
   //// props
-  const {comment, postIndex, postsType, username} = props;
+  const {comment} = props;
   //// language
   const intl = useIntl();
   //// contexts
@@ -67,26 +60,16 @@ const CommentContainer = (props: Props): JSX.Element => {
   const [showOriginal, setShowOriginal] = useState(true);
   const [originalBody, setOriginalBody] = useState(comment.body);
   const [translatedBody, setTranslatedBody] = useState(null);
-  const [uploadedImageUrl, setUploadedImageUrl] = useState('');
   const [childComments, setChildComments] = useState([]);
+  // const [showChildComments, setShowChildComments] = useState(
+  //   props.showChildComments || false,
+  // );
+  const [showChildComments, setShowChildComments] = useState(false);
   // tts
   const [speaking, setSpeaking] = useState(false);
   const reputation = comment.state.reputation.toFixed(0);
 
   const formatedTime = comment && getTimeFromNow(comment.state.createdAt);
-
-  // fetch child comments
-  const _fetchChildComments = async () => {
-    // fetch comments on this post
-    const _comments = await fetchComments(
-      postsState.postRef.author,
-      postsState.postRef.permlink,
-      authState.currentCredentials.username,
-    );
-    console.log('_fetchChildComments', _comments);
-
-    setChildComments(_comments);
-  };
 
   const _handleSubmitComment = async (_text: string) => {
     // check sanity
@@ -209,16 +192,8 @@ const CommentContainer = (props: Props): JSX.Element => {
 
   //// fetch children comments
   const _handlePressChildren = async () => {
-    ///
-    console.log('_handlePressChildren');
-
-    const _comments = await fetchRecursiveComments(
-      comment.state.post_ref.author,
-      comment.state.post_ref.permlink,
-      username,
-    );
-
-    console.log('_handlePressChildren. comment', _comments);
+    // toggle
+    setShowChildComments(!showChildComments);
   };
 
   return (
@@ -226,19 +201,14 @@ const CommentContainer = (props: Props): JSX.Element => {
       {!editMode ? (
         <CommentView
           key={comment.id}
-          postsType={postsType}
-          postIndex={postIndex}
           comment={comment}
-          body={body}
-          username={props.username}
-          index={0}
+          showChildComments={showChildComments}
           handlePressReply={_handlePressReply}
           handlePressEditComment={_handlePressEditComment}
           handlePressTranslation={_handlePressTranslation}
           handlePressSpeak={_handlePressSpeak}
           handleSubmitComment={_handleSubmitComment}
           handlePressChildren={_handlePressChildren}
-          fetchComments={_fetchChildComments}
         />
       ) : (
         <Editor

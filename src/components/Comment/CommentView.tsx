@@ -37,30 +37,30 @@ interface Props {
   handlePressEditComment: () => void;
   handlePressTranslation: () => void;
   handlePressSpeak: () => void;
+  handlePressChildren: () => void;
   handleSubmitComment: (text: string) => Promise<boolean>;
-  fetchComments: () => void;
   //  handleSubmitComment: (message: string) => void;
   //  updateComment: () => void;
 }
 const CommentView = (props: Props): JSX.Element => {
   //// props
-  const {comment} = props;
+  const {comment, showChildComments} = props;
   //// language
   const intl = useIntl();
   //// state
-  const [showChildComments, setShowChildComments] = useState(
-    props.showChildComments || false,
-  );
+  // const [showChildComments, setShowChildComments] = useState(
+  //   props.showChildComments || false,
+  // );
 
   const formatedTime = comment && getTimeFromNow(comment.state.createdAt);
 
-  const _handlePressChildren = () => {
-    // toggle
-    setShowChildComments(!showChildComments);
-  };
+  // const _handlePressChildren = () => {
+  //   // toggle
+  //   setShowChildComments(!showChildComments);
+  // };
 
   return (
-    <View style={{marginTop: 30, marginLeft: 20}}>
+    <View style={{marginTop: 30, marginLeft: 10}}>
       <Block
         style={{padding: 5}}
         card
@@ -91,7 +91,7 @@ const CommentView = (props: Props): JSX.Element => {
             handlePressSpeak={props.handlePressSpeak}
           />
           {comment.children > 0 && (
-            <TouchableWithoutFeedback onPress={_handlePressChildren}>
+            <TouchableWithoutFeedback onPress={props.handlePressChildren}>
               <Block row style={{paddingRight: 10}}>
                 <Icon
                   size={ActionBarStyleComment.iconSize}

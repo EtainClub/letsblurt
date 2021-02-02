@@ -174,7 +174,9 @@ const PostDetailsScreen = (props: Props): JSX.Element => {
             />
           </Block>
         </Block>
-        <Comments postRef={post.state.post_ref} />
+        <Block style={{marginBottom: 100}}>
+          <Comments postRef={post.state.post_ref} />
+        </Block>
         {/* {_renderComments()} */}
       </ScrollView>
     </Block>
