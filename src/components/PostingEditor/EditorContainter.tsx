@@ -22,6 +22,7 @@ interface Props {
   close?: boolean;
   clearBody?: boolean;
   handleBodyChange?: (body: string) => void;
+  handleCloseEditor?: () => void;
   handleSubmitComment?: (text: string) => Promise<boolean>;
 }
 const EditorContainer = (props: Props): JSX.Element => {
@@ -181,6 +182,12 @@ const EditorContainer = (props: Props): JSX.Element => {
     setBody('');
   };
 
+  //// cancel the editing
+  const _cancelEditing = () => {
+    setBody('');
+    props.handleCloseEditor();
+  };
+
   return (
     <Block>
       <EditorView
@@ -199,6 +206,7 @@ const EditorContainer = (props: Props): JSX.Element => {
         handleUploadedImageURL={_handleUploadedImageURL}
         handlePressMention={_handlePressMention}
         handlePressClear={_handlePressClear}
+        handlePressCancel={_cancelEditing}
       />
       {showAuthorsModal && (
         <AuthorList

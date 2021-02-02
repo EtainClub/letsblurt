@@ -36,6 +36,7 @@ interface Props {
   comment: CommentData;
   //  handleSubmitComment: (message: string) => void;
   //  updateComment: () => void;
+  fetchComments: () => void;
 }
 const CommentContainer = (props: Props): JSX.Element => {
   //// props
@@ -60,7 +61,6 @@ const CommentContainer = (props: Props): JSX.Element => {
   const [showOriginal, setShowOriginal] = useState(true);
   const [originalBody, setOriginalBody] = useState(comment.body);
   const [translatedBody, setTranslatedBody] = useState(null);
-  const [childComments, setChildComments] = useState([]);
   // const [showChildComments, setShowChildComments] = useState(
   //   props.showChildComments || false,
   // );
@@ -196,6 +196,11 @@ const CommentContainer = (props: Props): JSX.Element => {
     setShowChildComments(!showChildComments);
   };
 
+  ////
+  const _closeEditor = () => {
+    setEditMode(false);
+  };
+
   return (
     <View>
       {!editMode ? (
@@ -217,6 +222,7 @@ const CommentContainer = (props: Props): JSX.Element => {
           depth={comment.depth}
           close={false}
           handleBodyChange={(text) => {}}
+          handleCloseEditor={_closeEditor}
           handleSubmitComment={_handleSubmitComment}
         />
       )}

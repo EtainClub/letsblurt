@@ -23,6 +23,7 @@ const {width, height} = Dimensions.get('window');
 //// props
 interface Props {
   comments: CommentData[];
+  fetchComments: () => void;
   handlePressChildren: (postRef: PostRef) => void;
 }
 const CommentsView = (props: Props): JSX.Element => {
@@ -30,8 +31,13 @@ const CommentsView = (props: Props): JSX.Element => {
   const {comments} = props;
 
   const _renderItem = ({item}) => {
-    console.log('[CommentsView] renderItem. item', item);
-    return <Comment key={item.id} comment={item} />;
+    return (
+      <Comment
+        key={item.id}
+        comment={item}
+        fetchComments={props.fetchComments}
+      />
+    );
   };
 
   // TODO: check the comment is the last one, then set margin bottom to 100, otherwiese, set 20

@@ -31,6 +31,7 @@ interface Props {
   handleUploadedImageURL: (url: string) => void;
   handlePressMention: () => void;
   handlePressClear: () => void;
+  handlePressCancel: () => void;
 }
 const EditorView = (props: Props): JSX.Element => {
   //// props
@@ -69,35 +70,40 @@ const EditorView = (props: Props): JSX.Element => {
   return close ? null : (
     <Block>
       <KeyboardAvoidingView behavior="height" enabled>
-        <Block
-          center
-          style={[
-            depth ? {right: depth * 10} : null,
-            {paddingHorizontal: theme.SIZES.BASE},
-          ]}>
-          <Input
-            style={
-              isComment
-                ? [styles.commentContainer, {height: containerHeight}]
-                : styles.postContainer
-            }
-            editable={editable}
-            value={body}
-            onChangeText={props.handleBodyChange}
-            onSelectionChange={props.handleOnSelectionChange}
-            onKeyPress={props.handlePressKey}
-            right={isComment ? true : false}
-            iconContent={isComment ? iconSend : null}
-            placeholder={intl.formatMessage({id: 'Posting.body_placeholder'})}
-            placeholderTextColor={argonTheme.COLORS.FACEBOOK}
-            color="black"
-            multiline
-            rounded
-            blurOnSubmit={false}
-            textAlignVertical="top"
-            autoCorrect={false}
-            onContentSizeChange={props.handleContainerHeight}
-          />
+        <Block center style={[{paddingHorizontal: theme.SIZES.BASE}]}>
+          <Block row center space="between">
+            <Icon
+              style={{marginRight: 5}}
+              size={30}
+              color={argonTheme.COLORS.ERROR}
+              name="cancel"
+              family="material-icon"
+              onPress={props.handlePressCancel}
+            />
+            <Input
+              style={
+                isComment
+                  ? [styles.commentContainer, {height: containerHeight}]
+                  : styles.postContainer
+              }
+              editable={editable}
+              value={body}
+              onChangeText={props.handleBodyChange}
+              onSelectionChange={props.handleOnSelectionChange}
+              onKeyPress={props.handlePressKey}
+              right={isComment ? true : false}
+              iconContent={isComment ? iconSend : null}
+              placeholder={intl.formatMessage({id: 'Posting.body_placeholder'})}
+              placeholderTextColor={argonTheme.COLORS.FACEBOOK}
+              color="black"
+              multiline
+              rounded
+              blurOnSubmit={false}
+              textAlignVertical="top"
+              autoCorrect={false}
+              onContentSizeChange={props.handleContainerHeight}
+            />
+          </Block>
           <Block row left style={{top: -10}}>
             <ImageUpload
               isComment={isComment}
@@ -141,7 +147,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   commentContainer: {
-    width: width * 0.8,
+    width: width * 0.85,
     height: theme.SIZES.BASE * 3,
     backgroundColor: theme.COLORS.WHITE,
     borderColor: 'red',

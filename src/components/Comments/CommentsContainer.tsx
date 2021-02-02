@@ -62,6 +62,7 @@ const CommentsContainer = (props: Props): JSX.Element => {
   return (
     <CommentsView
       comments={comments}
+      fetchComments={_fetchComments}
       handlePressChildren={_handlePressChildren}
     />
   );
